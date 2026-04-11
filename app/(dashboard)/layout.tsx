@@ -9,7 +9,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const tenant = await getTenant();
-  const session = await getServerSession();
+  const session = await getServerSession({
+    secret: process.env.NEXTAUTH_SECRET,
+  });
   if (!session) redirect("/login");
   if (!tenant) notFound();
 

@@ -1,14 +1,15 @@
-import LogoutButton from '@/components/dashboard/LogoutButton';
-import pool from '@/lib/db';
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
+import LogoutButton from "@/components/dashboard/LogoutButton";
+import { authOptions } from "@/lib/auth-options";
+import pool from "@/lib/db";
+import { getServerSession } from "next-auth/next";
+import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session) redirect('/login');
 
   // verify this user is actually an admin

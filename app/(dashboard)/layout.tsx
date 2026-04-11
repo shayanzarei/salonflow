@@ -1,13 +1,16 @@
+import LogoutButton from "@/components/dashboard/LogoutButton";
 import { getTenant } from "@/lib/tenant";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-
+import { notFound, redirect } from "next/navigation";
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const tenant = await getTenant();
+  const session = await getServerSession();
+  if (!session) redirect("/login");
   if (!tenant) notFound();
 
   return (
@@ -53,10 +56,13 @@ export default async function DashboardLayout({
         </nav>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100">
-          <Link href="/" className="text-xs text-gray-400 hover:text-gray-600">
+        <div className="px-6 py-4 border-t border-gray-100 space-y-2">
+          <Link
+            href="/"
+            className="block text-xs text-gray-400 hover:text-gray-600">
             View customer site →
           </Link>
+          <LogoutButton />
         </div>
       </aside>
 

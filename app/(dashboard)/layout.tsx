@@ -1,17 +1,69 @@
-export default function SalonDashboardLayout({
+import { getTenant } from '@/lib/tenant';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+export default async function DashboardLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
+  const tenant = await getTenant();
+  if (!tenant) notFound();
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b border-zinc-200 bg-white px-6 py-3 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-          Salon dashboard
-        </p>
-        <p className="text-xs text-zinc-500">
-          Auth guard + tenant context go here.
-        </p>
-      </header>
-      <div className="flex-1">{children}</div>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-gray-100 flex flex-col">
+        {/* Logo */}
+        <div className="px-6 py-5 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div
+              className="h-8 w-8 rounded-lg flex items-center justify-center text-white font-semibold text-sm"
+              style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
+            >
+              {tenant.name.charAt(0)}
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 text-sm">{tenant.name}</p>
+              <p className="text-xs text-gray-400 capitalize">{tenant.plan_tier} plan</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          {[
+            { href: '/dashboard', label: 'Overview' },
+            { href: '/dashboard/bookings', label: 'Bookings' },
+            { href: '/dashboard/staff', label: 'Staff' },
+            { href: '/dashboard/services', label: 'Services' },
+            { href: '/dashboard/customers', label: 'Customers' },
+            { href: '/dashboard/settings', label: 'Settings' },
+          ].map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="flex items-center px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-100">
+          <Link href="/" className="text-xs text-gray-400 hover:text-gray-600">
+            View customer site →
+          </Link>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-5xl mx-auto px-8 py-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

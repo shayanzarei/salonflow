@@ -1,20 +1,25 @@
+import { headers } from 'next/headers';
+import { getServerSession, Session } from 'next-auth';
 import pool from '@/lib/db';
 import { Tenant } from '@/types/tenant';
-import { headers } from 'next/headers';
 
 export async function getTenant(): Promise<Tenant | null> {
   const headersList = await headers();
   let slug = headersList.get('x-tenant-slug');
 
-  console.log('🔍 x-tenant-slug from header:', slug);
-  console.log('🔍 NODE_ENV:', process.env.NODE_ENV);
-  console.log('🔍 DEV_TENANT_SLUG:', process.env.DEV_TENANT_SLUG);
-
+  // in development fall back to DEV_TENANT_SLUG
   if (!slug && process.env.NODE_ENV === 'development') {
     slug = process.env.DEV_TENANT_SLUG ?? null;
   }
 
-  console.log('🔍 final slug:', slug);
+  // if still no slug, try to get it from the session
+  // this covers dashboard pages where the salon owner is logged in
+  if (!slug) {
+    const session = await getServerSession();
+    if (session && !(session as Session).isAdmin) {
+      slug = (session as Session).slug ?? null;
+    }
+  }
 
   if (!slug) return null;
 
@@ -22,8 +27,6 @@ export async function getTenant(): Promise<Tenant | null> {
     'SELECT * FROM tenants WHERE slug = $1',
     [slug]
   );
-
-  console.log('🔍 tenant found:', result.rows[0]?.name ?? 'NONE');
 
   return result.rows[0] ?? null;
 }

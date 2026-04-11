@@ -1,17 +1,18 @@
 import LogoutButton from "@/components/dashboard/LogoutButton";
 import { getTenant } from "@/lib/tenant";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const tenant = await getTenant();
-  // const session = await getServerSession({
-  //   secret: process.env.NEXTAUTH_SECRET,
-  // });
-  // if (!session) redirect("/login");
+  const session = await getServerSession({
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+  if (!session) redirect("/login");
   if (!tenant) notFound();
 
   return (

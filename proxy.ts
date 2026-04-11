@@ -5,13 +5,17 @@ export default function proxy(req: NextRequest) {
   const slug = host.split('.')[0];
   const pathname = req.nextUrl.pathname;
 
-  // skip tenant resolution for admin and dashboard routes
   const reserved = ['admin', 'app', 'www', 'localhost', 'localhost:3000', 'localhost:3001'];
-  const adminPaths = ['/admin', '/dashboard', '/login', '/staff', '/services', '/bookings', '/customers', '/settings'];
+  const adminPaths = [
+    '/admin', '/dashboard', '/overview', '/login',
+    '/staff', '/services', '/bookings', '/customers',
+    '/settings', '/api'
+  ];
 
   const isAdminPath = adminPaths.some(p => pathname.startsWith(p));
+  if (isAdminPath) return NextResponse.next();
 
-  if (reserved.includes(slug) || isAdminPath) return NextResponse.next();
+  if (reserved.includes(slug)) return NextResponse.next();
 
   const res = NextResponse.next();
   res.headers.set('x-tenant-slug', slug);

@@ -1,21 +1,24 @@
-import type { DefaultSession } from "next-auth";
+import "next-auth";
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
-    tenantId?: string;
-    slug?: string;
-    user: DefaultSession["user"] & { tenantId?: string; slug?: string };
+    tenantId: string;
+    slug: string;
+    isAdmin: boolean;
   }
 
   interface User {
-    tenantId?: string;
-    slug?: string;
+    tenantId: string;
+    slug: string;
+    isAdmin: boolean;
   }
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   interface JWT {
-    tenantId?: string;
-    slug?: string;
+    tenantId: string;
+    slug: string;
+    isAdmin: boolean;
   }
 }
+

@@ -1,8 +1,8 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,7 +26,15 @@ export default function LoginPage() {
       setError('Invalid slug or password');
       setLoading(false);
     } else {
-      router.push('/dashboard');
+      // fetch session to check isAdmin
+      const res = await fetch('/api/auth/session');
+      const session = await res.json();
+
+      if (session?.isAdmin) {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     }
   }
 

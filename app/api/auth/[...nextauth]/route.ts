@@ -1,7 +1,7 @@
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
 import pool from '@/lib/db';
+import bcrypt from 'bcryptjs';
+import NextAuth, { Session } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
 const handler = NextAuth({
   providers: [
@@ -14,7 +14,6 @@ const handler = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // find tenant by email (we'll use slug as email for now)
         const result = await pool.query(
           `SELECT * FROM tenants WHERE slug = $1`,
           [credentials.email]
@@ -36,6 +35,7 @@ const handler = NextAuth({
           email: tenant.slug,
           tenantId: tenant.id,
           slug: tenant.slug,
+          isAdmin: tenant.is_admin,
         };
       },
     }),
@@ -45,15 +45,15 @@ const handler = NextAuth({
       if (user) {
         if (user.tenantId) token.tenantId = user.tenantId;
         if (user.slug) token.slug = user.slug;
+        if (user.isAdmin) token.isAdmin = user.isAdmin;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token.tenantId) session.tenantId = token.tenantId;
-      if (token.slug) session.slug = token.slug;
-      if (session.user) {
-        if (token.tenantId) session.user.tenantId = token.tenantId;
-        if (token.slug) session.user.slug = token.slug;
+      if (token) {
+        (session as Session).tenantId = token.tenantId;
+        (session as Session).slug = token.slug;
+        (session as Session).isAdmin = token.isAdmin;
       }
       return session;
     },

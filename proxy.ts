@@ -1,30 +1,23 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-/** Edge proxy (formerly middleware). Must be default export or named `proxy`. */
-export default function proxy(request: NextRequest) {
-  const host = request.headers.get("host") ?? "";
-  const slug = host.split(".")[0] ?? "";
+export default function proxy(req: NextRequest) {
+  const host = req.headers.get('host') ?? '';
+  const slug = host.split('.')[0];
+  const pathname = req.nextUrl.pathname;
 
-  const reserved = [
-    "admin",
-    "app",
-    "www",
-    "localhost",
-    "localhost:3000",
-    "localhost:3001",
-    "127",
-    "192",
-  ];
-  if (reserved.includes(slug)) {
-    return NextResponse.next();
-  }
+  // skip tenant resolution for admin and dashboard routes
+  const reserved = ['admin', 'app', 'www', 'localhost', 'localhost:3000', 'localhost:3001'];
+  const adminPaths = ['/admin', '/dashboard', '/login', '/staff', '/services', '/bookings', '/customers', '/settings'];
+
+  const isAdminPath = adminPaths.some(p => pathname.startsWith(p));
+
+  if (reserved.includes(slug) || isAdminPath) return NextResponse.next();
 
   const res = NextResponse.next();
-  res.headers.set("x-tenant-slug", slug);
+  res.headers.set('x-tenant-slug', slug);
   return res;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

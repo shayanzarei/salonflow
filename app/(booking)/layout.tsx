@@ -7,7 +7,12 @@ export default async function BookingLayout({
   children: React.ReactNode;
 }) {
   const tenant = await getTenant();
-  if (!tenant) notFound();
+
+  // if no tenant found just render children without branding
+  // this handles cases where layout bleeds into admin/dashboard routes
+  if (!tenant) {
+    return notFound();
+  }
 
   return (
     <div

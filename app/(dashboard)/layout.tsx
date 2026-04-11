@@ -1,6 +1,6 @@
-import { getTenant } from '@/lib/tenant';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { getTenant } from "@/lib/tenant";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function DashboardLayout({
   children,
@@ -19,13 +19,16 @@ export default async function DashboardLayout({
           <div className="flex items-center gap-3">
             <div
               className="h-8 w-8 rounded-lg flex items-center justify-center text-white font-semibold text-sm"
-              style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
-            >
+              style={{ backgroundColor: tenant.primary_color ?? "#7C3AED" }}>
               {tenant.name.charAt(0)}
             </div>
             <div>
-              <p className="font-semibold text-gray-900 text-sm">{tenant.name}</p>
-              <p className="text-xs text-gray-400 capitalize">{tenant.plan_tier} plan</p>
+              <p className="font-semibold text-gray-900 text-sm">
+                {tenant.name}
+              </p>
+              <p className="text-xs text-gray-400 capitalize">
+                {tenant.plan_tier} plan
+              </p>
             </div>
           </div>
         </div>
@@ -33,18 +36,17 @@ export default async function DashboardLayout({
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           {[
-            { href: '/dashboard', label: 'Overview' },
-            { href: '/dashboard/bookings', label: 'Bookings' },
-            { href: '/dashboard/staff', label: 'Staff' },
-            { href: '/dashboard/services', label: 'Services' },
-            { href: '/dashboard/customers', label: 'Customers' },
-            { href: '/dashboard/settings', label: 'Settings' },
+            { href: "/dashboard", label: "Overview" },
+            { href: "/bookings", label: "Bookings" },
+            { href: "/staff", label: "Staff" },
+            { href: "/services", label: "Services" },
+            { href: "/customers", label: "Customers" },
+            { href: "/settings", label: "Settings" },
           ].map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="flex items-center px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-            >
+              className="flex items-center px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
               {item.label}
             </a>
           ))}
@@ -60,9 +62,7 @@ export default async function DashboardLayout({
 
       {/* Main content */}
       <main className="flex-1 overflow-auto">
-        <div className="max-w-5xl mx-auto px-8 py-8">
-          {children}
-        </div>
+        <div className="max-w-5xl mx-auto px-8 py-8">{children}</div>
       </main>
     </div>
   );

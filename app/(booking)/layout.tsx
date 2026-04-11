@@ -1,5 +1,4 @@
 import { getTenant } from '@/lib/tenant';
-import { notFound } from 'next/navigation';
 
 export default async function BookingLayout({
   children,
@@ -8,10 +7,15 @@ export default async function BookingLayout({
 }) {
   const tenant = await getTenant();
 
-  // if no tenant found just render children without branding
-  // this handles cases where layout bleeds into admin/dashboard routes
   if (!tenant) {
-    return notFound();
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">SalonFlow</h1>
+          <p className="text-gray-500 mt-2">Salon not found.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -30,8 +34,8 @@ export default async function BookingLayout({
             </div>
             <span className="font-semibold text-gray-900">{tenant.name}</span>
           </div>
-          
-            <a href="/book"
+          <a
+            href="/book"
             className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
             style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
           >

@@ -1,10 +1,13 @@
-import pool from "@/lib/db";
-import { getTenant } from "@/lib/tenant";
-import { notFound } from "next/navigation";
+import pool from '@/lib/db';
+import { getTenant } from '@/lib/tenant';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export default async function BookingHomePage() {
   const tenant = await getTenant();
-  if (!tenant) notFound();
+
+  // no tenant means visiting the root domain — redirect to admin
+  if (!tenant) redirect('/admin');
 
   const result = await pool.query(
     `SELECT * FROM services WHERE tenant_id = $1 ORDER BY name`,
@@ -21,13 +24,13 @@ export default async function BookingHomePage() {
         <p className="text-gray-500 text-lg">
           Book your appointment online in seconds.
         </p>
-
-        <a
-          href="/book"
+        
+          <Link href="/book"
           className="inline-block mt-6 px-8 py-3 rounded-xl text-white font-medium text-lg transition-opacity hover:opacity-90"
-          style={{ backgroundColor: tenant.primary_color ?? "#7C3AED" }}>
+          style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
+        >
           Book an appointment
-        </a>
+        </Link>
       </div>
 
       {services.length > 0 ? (
@@ -39,12 +42,11 @@ export default async function BookingHomePage() {
             {services.map((service) => (
               <div
                 key={service.id}
-                className="border border-gray-100 rounded-xl p-5 bg-white hover:shadow-sm transition-shadow">
+                className="border border-gray-100 rounded-xl p-5 bg-white hover:shadow-sm transition-shadow"
+              >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-medium text-gray-900">
-                      {service.name}
-                    </h3>
+                    <h3 className="font-medium text-gray-900">{service.name}</h3>
                     {service.description && (
                       <p className="text-sm text-gray-500 mt-1">
                         {service.description}
@@ -56,18 +58,18 @@ export default async function BookingHomePage() {
                   </div>
                   <span
                     className="text-sm font-semibold"
-                    style={{ color: tenant.primary_color ?? "#7C3AED" }}>
+                    style={{ color: tenant.primary_color ?? '#7C3AED' }}
+                  >
                     ${service.price}
                   </span>
                 </div>
-                <a
-                  href={`/book/staff?service=${service.id}`}
+                
+                  <Link href={`/book/staff?service=${service.id}`}
                   className="mt-4 block text-center py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-                  style={{
-                    backgroundColor: tenant.primary_color ?? "#7C3AED",
-                  }}>
+                  style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
+                >
                   Book
-                </a>
+                </Link>
               </div>
             ))}
           </div>

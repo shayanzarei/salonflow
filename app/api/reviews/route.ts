@@ -12,6 +12,10 @@ export async function POST(req: NextRequest) {
         const rating = parseInt(formData.get('rating') as string);
         const comment = formData.get('comment') as string;
 
+        if (!rating || rating < 1 || rating > 5) {
+            return NextResponse.json({ error: 'Invalid rating' }, { status: 400 });
+        }
+
         // verify token
         const bookingResult = await pool.query(
             `SELECT * FROM bookings WHERE id = $1 AND review_token = $2`,

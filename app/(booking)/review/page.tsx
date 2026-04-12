@@ -1,3 +1,4 @@
+import StarRating from '@/components/booking/StarRating';
 import pool from '@/lib/db';
 import { getTenant } from '@/lib/tenant';
 import Link from 'next/link';
@@ -81,26 +82,7 @@ export default async function ReviewPage({
                             <label className="block text-sm font-medium text-gray-700 mb-3">
                                 Your rating
                             </label>
-                            <div className="flex gap-3">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <label key={star} className="cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="rating"
-                                            value={star}
-                                            defaultChecked={preselectedRating === star}
-                                            className="sr-only"
-                                            required
-                                        />
-                                        <span
-                                            className="text-4xl hover:scale-110 transition-transform inline-block"
-                                            style={{ color: preselectedRating && star <= preselectedRating ? '#F59E0B' : '#D1D5DB' }}
-                                        >
-                                            ★
-                                        </span>
-                                    </label>
-                                ))}
-                            </div>
+                            <StarRating defaultRating={preselectedRating ?? 0} />
                         </div>
 
                         {/* Comment */}

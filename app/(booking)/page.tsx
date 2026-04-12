@@ -74,15 +74,15 @@ export default async function BookingHomePage() {
                 Experience the finest hair care in a space designed for relaxation, luxury, and transformation.
               </p>
               <div className="flex gap-4 flex-wrap">
-                
-                  <Link href="/book"
+
+                <Link href="/book"
                   className="px-8 py-4 rounded-full text-white font-medium text-sm transition-opacity hover:opacity-90"
                   style={{ backgroundColor: brand }}
                 >
                   Book an appointment
                 </Link>
-                
-                  <Link href="#services"
+
+                <Link href="#services"
                   className="px-8 py-4 rounded-full border border-gray-300 text-gray-700 font-medium text-sm hover:bg-white transition-colors"
                 >
                   View services
@@ -167,7 +167,7 @@ export default async function BookingHomePage() {
 
       {/* Team */}
       {sections.section_team && staffList.length > 0 && (
-        <section className="py-24" style={{ backgroundColor: '#FAF7F4' }}>
+        <section id="team" className="py-24" style={{ backgroundColor: '#FAF7F4' }}>
           <div className="max-w-6xl mx-auto px-8">
             <p className="text-xs tracking-widest uppercase mb-3" style={{ color: '#9C7B5A' }}>
               Meet the team
@@ -193,7 +193,7 @@ export default async function BookingHomePage() {
 
       {/* Reviews */}
       {sections.section_reviews && (
-        <section className="py-24 bg-white">
+        <section id="reviews" className="py-24 bg-white">
           <div className="max-w-6xl mx-auto px-8">
             <p className="text-xs tracking-widest uppercase mb-3" style={{ color: '#9C7B5A' }}>
               What clients say
@@ -247,7 +247,7 @@ export default async function BookingHomePage() {
 
       {/* Contact */}
       {sections.section_contact && (
-        <section className="py-20 bg-gray-900">
+        <section id="contact" className="py-20 bg-gray-900">
           <div className="max-w-6xl mx-auto px-8 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div>
               <h2 className="text-3xl font-medium text-white mb-3">Ready to book?</h2>
@@ -258,8 +258,8 @@ export default async function BookingHomePage() {
                 <p className="text-gray-400 text-sm mt-1">{tenant.hours}</p>
               )}
             </div>
-            
-              <Link href="/book"
+
+            <Link href="/book"
               className="px-8 py-4 rounded-full text-white font-medium text-sm transition-opacity hover:opacity-90 flex-shrink-0"
               style={{ backgroundColor: brand }}
             >

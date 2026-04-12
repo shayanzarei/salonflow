@@ -1,8 +1,6 @@
-import { formatEUR } from "@/lib/format-currency";
 import pool from "@/lib/db";
-import { getTenant } from '@/lib/tenant';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { getTenant } from "@/lib/tenant";
+import { redirect } from "next/navigation";
 
 async function getSectionFlags(tenantId: string) {
   const result = await pool.query(
@@ -27,18 +25,16 @@ async function getSectionFlags(tenantId: string) {
 
 export default async function BookingHomePage() {
   const tenant = await getTenant();
-  if (!tenant) redirect('/login');
+  if (!tenant) redirect("/login");
 
   const [servicesResult, staffResult, reviewsResult, sections] =
     await Promise.all([
-      pool.query(
-        `SELECT * FROM services WHERE tenant_id = $1 ORDER BY name`,
-        [tenant.id]
-      ),
-      pool.query(
-        `SELECT * FROM staff WHERE tenant_id = $1 ORDER BY name`,
-        [tenant.id]
-      ),
+      pool.query(`SELECT * FROM services WHERE tenant_id = $1 ORDER BY name`, [
+        tenant.id,
+      ]),
+      pool.query(`SELECT * FROM staff WHERE tenant_id = $1 ORDER BY name`, [
+        tenant.id,
+      ]),
       pool.query(
         `SELECT * FROM reviews WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT 4`,
         [tenant.id]
@@ -49,79 +45,311 @@ export default async function BookingHomePage() {
   const services = servicesResult.rows;
   const staffList = staffResult.rows;
   const reviews = reviewsResult.rows;
-  const brand = tenant.primary_color ?? '#7C3AED';
+  const brand = tenant.primary_color ?? "#7C3AED";
 
   return (
-    <div style={{ fontFamily: 'var(--font-sans)' }}>
-
+    <div style={{ fontFamily: "var(--font-sans)", background: "white" }}>
       {/* Hero */}
       {sections.section_hero && (
-        <section
-          className="min-h-[90vh] flex items-center"
-          style={{ backgroundColor: '#FAF7F4' }}
-        >
-          <div className="max-w-6xl mx-auto px-8 py-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
+        <section style={{ background: "white", padding: "80px 0 100px" }}>
+          <div
+            style={{
+              maxWidth: 1200,
+              margin: "0 auto",
+              padding: "0 40px",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 60,
+              alignItems: "center",
+            }}
+          >
             <div>
-              <p
-                className="text-xs tracking-widest uppercase mb-5"
-                style={{ color: '#9C7B5A' }}
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "#F5F3FF",
+                  borderRadius: 100,
+                  padding: "6px 14px",
+                  marginBottom: 24,
+                }}
               >
-                Premium hair salon
-              </p>
-              <h1 className="text-5xl lg:text-6xl font-medium text-gray-900 leading-tight mb-6">
-                {tenant.tagline ?? `Welcome to ${tenant.name}`}
+                <span style={{ fontSize: 12, color: brand }}>✦</span>
+                <span style={{ fontSize: 12, color: brand, fontWeight: 500 }}>
+                  Premium Beauty Experience
+                </span>
+              </div>
+              <h1
+                style={{
+                  fontSize: 56,
+                  fontWeight: 700,
+                  color: "#0f0f0f",
+                  lineHeight: 1.1,
+                  margin: "0 0 20px",
+                }}
+              >
+                {tenant.tagline ? (
+                  tenant.tagline
+                ) : (
+                  <>
+                    Elevate your
+                    <br />
+                    <span style={{ color: brand }}>natural beauty</span>
+                  </>
+                )}
               </h1>
-              <p className="text-gray-500 text-lg leading-relaxed mb-10 max-w-md">
-                Experience the finest hair care in a space designed for relaxation, luxury, and transformation.
+              <p
+                style={{
+                  fontSize: 16,
+                  color: "#666",
+                  lineHeight: 1.7,
+                  margin: "0 0 36px",
+                  maxWidth: 420,
+                }}
+              >
+                Experience luxury treatments tailored to your unique style. Book
+                your appointment seamlessly and discover the ultimate salon
+                experience.
               </p>
-              <div className="flex gap-4 flex-wrap">
-
-                <Link href="/book"
-                  className="px-8 py-4 rounded-full text-white font-medium text-sm transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: brand }}
+              <div style={{ display: "flex", gap: 12, marginBottom: 36 }}>
+                <a
+                  href="/book"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "14px 28px",
+                    background: brand,
+                    color: "white",
+                    borderRadius: 100,
+                    fontSize: 15,
+                    fontWeight: 500,
+                    textDecoration: "none",
+                  }}
                 >
-                  Book an appointment
-                </Link>
+                  Book an Appointment →
+                </a>
 
-                <Link href="#services"
-                  className="px-8 py-4 rounded-full border border-gray-300 text-gray-700 font-medium text-sm hover:bg-white transition-colors"
+                <a
+                  href="#services"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    padding: "14px 28px",
+                    border: "1px solid #e5e7eb",
+                    color: "#333",
+                    borderRadius: 100,
+                    fontSize: 15,
+                    fontWeight: 500,
+                    textDecoration: "none",
+                  }}
                 >
-                  View services
-                </Link>
+                  View Services
+                </a>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ display: "flex" }}>
+                  {["A", "B", "C", "D"].map((l, i) => (
+                    <div
+                      key={l}
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        background: brand,
+                        border: "2px solid white",
+                        marginLeft: i > 0 ? -8 : 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: 11,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {l}
+                    </div>
+                  ))}
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      background: "#f3f4f6",
+                      border: "2px solid white",
+                      marginLeft: -8,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 10,
+                      color: "#666",
+                      fontWeight: 600,
+                    }}
+                  >
+                    +2k
+                  </div>
+                </div>
+                <div>
+                  <div style={{ display: "flex", gap: 2, marginBottom: 2 }}>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <span key={s} style={{ color: "#F59E0B", fontSize: 14 }}>
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: 12, color: "#666", margin: 0 }}>
+                    4.9/5 from 2,000+ reviews
+                  </p>
+                </div>
               </div>
             </div>
-            <div
-              className="h-96 lg:h-[500px] rounded-3xl overflow-hidden flex items-center justify-center"
-              style={{ backgroundColor: '#E8DDD4' }}
-            >
-              {tenant.hero_image_url ? (
-                <img
-                  src={tenant.hero_image_url}
-                  alt={tenant.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <p className="text-sm" style={{ color: '#B8A898' }}>
-                  Add a hero image in settings
-                </p>
-              )}
+
+            <div style={{ position: "relative" }}>
+              <div
+                style={{
+                  borderRadius: 24,
+                  overflow: "hidden",
+                  background: "#f3f0ed",
+                  height: 420,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {tenant.hero_image_url ? (
+                  <img
+                    src={tenant.hero_image_url}
+                    alt={tenant.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <p style={{ color: "#B8A898", fontSize: 14 }}>
+                    Add a hero image in settings
+                  </p>
+                )}
+              </div>
+              {/* Next available card */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 24,
+                  left: 24,
+                  right: 24,
+                  background: "white",
+                  borderRadius: 16,
+                  padding: "16px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+                }}
+              >
+                <div>
+                  <p
+                    style={{
+                      fontSize: 11,
+                      color: "#999",
+                      margin: "0 0 4px",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Next Available
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: "#111",
+                      margin: 0,
+                    }}
+                  >
+                    Today, 2:30 PM
+                  </p>
+                </div>
+
+                <a
+                  href="/book"
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: brand,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "white",
+                    textDecoration: "none",
+                    fontSize: 18,
+                  }}
+                >
+                  →
+                </a>
+              </div>
             </div>
           </div>
         </section>
       )}
 
       {/* Stats bar */}
-      <div className="bg-gray-900 py-8">
-        <div className="max-w-6xl mx-auto px-8 grid grid-cols-2 lg:grid-cols-4 gap-8">
+      <div
+        style={{
+          background: "white",
+          borderTop: "1px solid #f3f4f6",
+          borderBottom: "1px solid #f3f4f6",
+          padding: "40px 0",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "0 40px",
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: 0,
+          }}
+        >
           {[
-            { value: '8+', label: 'Years of experience' },
-            { value: '2,400+', label: 'Happy clients' },
-            { value: '4.9', label: 'Average rating' },
-            { value: `${staffList.length}`, label: 'Expert stylists' },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="text-white text-2xl font-medium">{stat.value}</p>
-              <p className="text-gray-500 text-xs mt-1">{stat.label}</p>
+            { value: "8+", label: "Years Experience" },
+            { value: "2,400+", label: "Happy Clients" },
+            { value: "4.9", label: "Average Rating" },
+            { value: `${staffList.length}`, label: "Expert Stylists" },
+          ].map((stat, i) => (
+            <div
+              key={stat.label}
+              style={{
+                textAlign: "center",
+                borderRight: i < 3 ? "1px solid #f3f4f6" : "none",
+                padding: "0 24px",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 36,
+                  fontWeight: 700,
+                  color: "#111",
+                  margin: "0 0 6px",
+                }}
+              >
+                {stat.value}
+              </p>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#999",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  margin: 0,
+                }}
+              >
+                {stat.label}
+              </p>
             </div>
           ))}
         </div>
@@ -129,36 +357,182 @@ export default async function BookingHomePage() {
 
       {/* Services */}
       {sections.section_services && services.length > 0 && (
-        <section id="services" className="py-24 bg-white">
-          <div className="max-w-6xl mx-auto px-8">
-            <p className="text-xs tracking-widest uppercase mb-3" style={{ color: '#9C7B5A' }}>
-              What we offer
-            </p>
-            <h2 className="text-4xl font-medium text-gray-900 mb-14">Our services</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <section
+          id="services"
+          style={{ padding: "100px 0", background: "white" }}
+        >
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 40px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-end",
+                marginBottom: 48,
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "#999",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    margin: "0 0 12px",
+                  }}
+                >
+                  Our Services
+                </p>
+                <h2
+                  style={{
+                    fontSize: 40,
+                    fontWeight: 700,
+                    color: "#111",
+                    margin: "0 0 12px",
+                  }}
+                >
+                  Signature Services
+                </h2>
+                <p
+                  style={{
+                    fontSize: 15,
+                    color: "#888",
+                    margin: 0,
+                    maxWidth: 400,
+                  }}
+                >
+                  Tailored treatments designed to enhance your natural beauty
+                  and provide ultimate relaxation.
+                </p>
+              </div>
+              <a
+                href="/book"
+                style={{
+                  fontSize: 14,
+                  color: brand,
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                View All Services →
+              </a>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 24,
+              }}
+            >
               {services.map((service) => (
                 <div
                   key={service.id}
-                  className="p-7 rounded-2xl border transition-shadow hover:shadow-sm"
-                  style={{ backgroundColor: '#FAF7F4', borderColor: '#F0EBE4' }}
+                  style={{
+                    border: "1px solid #f0f0f0",
+                    borderRadius: 20,
+                    overflow: "hidden",
+                    background: "white",
+                    transition: "box-shadow 0.2s",
+                  }}
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="font-medium text-gray-900 text-lg">{service.name}</h3>
-                    <span className="font-medium text-lg" style={{ color: brand }}>
-                      {formatEUR(Number(service.price))}
-                    </span>
-                  </div>
-                  {service.description && (
-                    <p className="text-gray-500 text-sm mb-2">{service.description}</p>
-                  )}
-                  <p className="text-gray-400 text-xs mb-6">{service.duration_mins} mins</p>
-                  <Link
-                    href={`/book/staff?service=${service.id}`}
-                    className="block text-center py-2.5 rounded-full text-sm font-medium text-white transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: brand }}
+                  {/* Service image placeholder */}
+                  <div
+                    style={{
+                      height: 200,
+                      background: "#f8f7f5",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    Book
-                  </Link>
+                    <p style={{ color: "#ccc", fontSize: 13 }}>Service photo</p>
+                  </div>
+                  <div style={{ padding: 24 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        marginBottom: 8,
+                      }}
+                    >
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: brand,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.08em",
+                            margin: "0 0 6px",
+                            fontWeight: 500,
+                          }}
+                        >
+                          Hair Care
+                        </p>
+                        <h3
+                          style={{
+                            fontSize: 18,
+                            fontWeight: 700,
+                            color: "#111",
+                            margin: 0,
+                          }}
+                        >
+                          {service.name}
+                        </h3>
+                      </div>
+                      <span
+                        style={{ fontSize: 16, fontWeight: 700, color: "#111" }}
+                      >
+                        €{service.price}
+                      </span>
+                    </div>
+                    {service.description && (
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: "#888",
+                          lineHeight: 1.6,
+                          margin: "8px 0 16px",
+                        }}
+                      >
+                        {service.description}
+                      </p>
+                    )}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <p style={{ fontSize: 13, color: "#999", margin: 0 }}>
+                        ⏱ {service.duration_mins} min
+                      </p>
+
+                      <a
+                        href={`/book/staff?service=${service.id}`}
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: "50%",
+                          border: `1px solid ${brand}`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: brand,
+                          textDecoration: "none",
+                          fontSize: 18,
+                          fontWeight: 300,
+                        }}
+                      >
+                        +
+                      </a>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -168,23 +542,86 @@ export default async function BookingHomePage() {
 
       {/* Team */}
       {sections.section_team && staffList.length > 0 && (
-        <section id="team" className="py-24" style={{ backgroundColor: '#FAF7F4' }}>
-          <div className="max-w-6xl mx-auto px-8">
-            <p className="text-xs tracking-widest uppercase mb-3" style={{ color: '#9C7B5A' }}>
-              Meet the team
-            </p>
-            <h2 className="text-4xl font-medium text-gray-900 mb-14">Our stylists</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
+        <section
+          id="team"
+          style={{ padding: "100px 0", background: "#fafafa" }}
+        >
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 40px" }}>
+            <div style={{ textAlign: "center", marginBottom: 60 }}>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#999",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  margin: "0 0 12px",
+                }}
+              >
+                Our Experts
+              </p>
+              <h2
+                style={{
+                  fontSize: 40,
+                  fontWeight: 700,
+                  color: "#111",
+                  margin: 0,
+                }}
+              >
+                Meet Our Team
+              </h2>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${Math.min(staffList.length, 4)}, 1fr)`,
+                gap: 32,
+              }}
+            >
               {staffList.map((member) => (
-                <div key={member.id} className="text-center">
+                <div key={member.id} style={{ textAlign: "center" }}>
                   <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-medium mx-auto mb-4"
-                    style={{ backgroundColor: brand }}
+                    style={{
+                      width: 120,
+                      height: 120,
+                      borderRadius: "50%",
+                      background: brand,
+                      margin: "0 auto 20px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: 40,
+                      fontWeight: 600,
+                    }}
                   >
-                    {member.name.charAt(0)}
+                    {member.avatar_url ? (
+                      <img
+                        src={member.avatar_url}
+                        alt={member.name}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "50%",
+                        }}
+                      />
+                    ) : (
+                      member.name.charAt(0)
+                    )}
                   </div>
-                  <p className="font-medium text-gray-900">{member.name}</p>
-                  <p className="text-gray-500 text-sm mt-1">{member.role}</p>
+                  <h3
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 600,
+                      color: "#111",
+                      margin: "0 0 6px",
+                    }}
+                  >
+                    {member.name}
+                  </h3>
+                  <p style={{ fontSize: 14, color: "#888", margin: 0 }}>
+                    {member.role}
+                  </p>
                 </div>
               ))}
             </div>
@@ -194,29 +631,114 @@ export default async function BookingHomePage() {
 
       {/* Reviews */}
       {sections.section_reviews && (
-        <section id="reviews" className="py-24 bg-white">
-          <div className="max-w-6xl mx-auto px-8">
-            <p className="text-xs tracking-widest uppercase mb-3" style={{ color: '#9C7B5A' }}>
-              What clients say
-            </p>
-            <h2 className="text-4xl font-medium text-gray-900 mb-14">Reviews</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {reviews.length > 0 ? reviews.map((review) => (
+        <section
+          id="reviews"
+          style={{ padding: "100px 0", background: "white" }}
+        >
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 40px" }}>
+            <div style={{ textAlign: "center", marginBottom: 60 }}>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#999",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  margin: "0 0 12px",
+                }}
+              >
+                Testimonials
+              </p>
+              <h2
+                style={{
+                  fontSize: 40,
+                  fontWeight: 700,
+                  color: "#111",
+                  margin: 0,
+                }}
+              >
+                What Our Clients Say
+              </h2>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: 24,
+              }}
+            >
+              {reviews.length > 0 ? (
+                reviews.map((review) => (
+                  <div
+                    key={review.id}
+                    style={{
+                      padding: 32,
+                      border: "1px solid #f0f0f0",
+                      borderRadius: 20,
+                      background: "white",
+                    }}
+                  >
+                    <div style={{ display: "flex", gap: 2, marginBottom: 16 }}>
+                      {Array.from({ length: review.rating }).map((_, i) => (
+                        <span
+                          key={i}
+                          style={{ color: "#F59E0B", fontSize: 16 }}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 15,
+                        color: "#444",
+                        lineHeight: 1.7,
+                        margin: "0 0 20px",
+                      }}
+                    >
+                      "{review.comment}"
+                    </p>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 12 }}
+                    >
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          background: brand,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: 14,
+                        }}
+                      >
+                        {review.client_name.charAt(0)}
+                      </div>
+                      <p
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 600,
+                          color: "#111",
+                          margin: 0,
+                        }}
+                      >
+                        {review.client_name}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
                 <div
-                  key={review.id}
-                  className="p-7 rounded-2xl border"
-                  style={{ borderColor: '#F0EBE4' }}
+                  style={{
+                    gridColumn: "1/-1",
+                    textAlign: "center",
+                    padding: "60px 0",
+                    color: "#ccc",
+                    fontSize: 14,
+                  }}
                 >
-                  <p className="text-sm mb-4" style={{ color: '#9C7B5A' }}>
-                    {'★'.repeat(review.rating)}
-                  </p>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-5">
-                    &quot;{review.comment}&quot;
-                  </p>
-                  <p className="font-medium text-gray-900 text-sm">{review.client_name}</p>
-                </div>
-              )) : (
-                <div className="col-span-2 text-center py-12 text-gray-400 text-sm">
                   No reviews yet.
                 </div>
               )}
@@ -227,54 +749,302 @@ export default async function BookingHomePage() {
 
       {/* About */}
       {sections.section_about && tenant.about && (
-        <section className="py-24" style={{ backgroundColor: '#FAF7F4' }}>
-          <div className="max-w-6xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <section
+          id="about"
+          style={{ padding: "100px 0", background: "#fafafa" }}
+        >
+          <div
+            style={{
+              maxWidth: 1200,
+              margin: "0 auto",
+              padding: "0 40px",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 80,
+              alignItems: "center",
+            }}
+          >
             <div
-              className="h-80 rounded-3xl flex items-center justify-center"
-              style={{ backgroundColor: '#E8DDD4' }}
+              style={{
+                borderRadius: 24,
+                overflow: "hidden",
+                background: "#f0ebe4",
+                height: 400,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <p className="text-sm" style={{ color: '#B8A898' }}>Salon photo</p>
+              <p style={{ color: "#B8A898", fontSize: 14 }}>Salon photo</p>
             </div>
             <div>
-              <p className="text-xs tracking-widest uppercase mb-3" style={{ color: '#9C7B5A' }}>
-                Our story
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#999",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  margin: "0 0 12px",
+                }}
+              >
+                Our Story
               </p>
-              <h2 className="text-4xl font-medium text-gray-900 mb-6">About us</h2>
-              <p className="text-gray-500 leading-relaxed">{tenant.about}</p>
+              <h2
+                style={{
+                  fontSize: 40,
+                  fontWeight: 700,
+                  color: "#111",
+                  margin: "0 0 20px",
+                }}
+              >
+                About {tenant.name}
+              </h2>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: "#666",
+                  lineHeight: 1.8,
+                  margin: 0,
+                }}
+              >
+                {tenant.about}
+              </p>
             </div>
           </div>
         </section>
       )}
 
-      {/* Contact */}
+      {/* Contact CTA */}
       {sections.section_contact && (
-        <section id="contact" className="py-20 bg-gray-900">
-          <div className="max-w-6xl mx-auto px-8 flex flex-col lg:flex-row items-center justify-between gap-8">
-            <div>
-              <h2 className="text-3xl font-medium text-white mb-3">Ready to book?</h2>
-              {tenant.address && (
-                <p className="text-gray-400 text-sm">{tenant.address}</p>
-              )}
-              {tenant.hours && (
-                <p className="text-gray-400 text-sm mt-1">{tenant.hours}</p>
-              )}
-            </div>
-
-            <Link href="/book"
-              className="px-8 py-4 rounded-full text-white font-medium text-sm transition-opacity hover:opacity-90 flex-shrink-0"
-              style={{ backgroundColor: brand }}
+        <section
+          id="contact"
+          style={{ padding: "80px 40px", background: "#111" }}
+        >
+          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+            <div
+              style={{
+                background: brand,
+                borderRadius: 24,
+                padding: "60px 80px",
+                textAlign: "center",
+              }}
             >
-              Book now
-            </Link>
+              <h2
+                style={{
+                  fontSize: 40,
+                  fontWeight: 700,
+                  color: "white",
+                  margin: "0 0 16px",
+                }}
+              >
+                Ready for your transformation?
+              </h2>
+              <p
+                style={{
+                  fontSize: 16,
+                  color: "rgba(255,255,255,0.8)",
+                  margin: "0 0 36px",
+                }}
+              >
+                Book your appointment today and let our expert team enhance your
+                natural beauty in our luxurious, relaxing environment.
+              </p>
+
+              <a
+                href="/book"
+                style={{
+                  display: "inline-block",
+                  padding: "14px 36px",
+                  background: "white",
+                  color: brand,
+                  borderRadius: 100,
+                  fontSize: 15,
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                Book Now
+              </a>
+            </div>
+            {(tenant.address || tenant.hours) && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 40,
+                  marginTop: 40,
+                }}
+              >
+                {tenant.address && (
+                  <p style={{ color: "#888", fontSize: 14, margin: 0 }}>
+                    📍 {tenant.address}
+                  </p>
+                )}
+                {tenant.hours && (
+                  <p style={{ color: "#888", fontSize: 14, margin: 0 }}>
+                    🕐 {tenant.hours}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </section>
       )}
 
       {/* Footer */}
-      <footer className="bg-black py-6">
-        <div className="max-w-6xl mx-auto px-8 flex justify-between items-center">
-          <p className="text-gray-600 text-xs">© 2026 {tenant.name}</p>
-          <p className="text-gray-700 text-xs">Powered by SalonFlow</p>
+      <footer style={{ background: "#0a0a0a", padding: "60px 0 30px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 40px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "2fr 1fr 1fr 1fr",
+              gap: 60,
+              marginBottom: 60,
+            }}
+          >
+            {/* Brand */}
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  marginBottom: 16,
+                }}
+              >
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 8,
+                    background: brand,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "white",
+                    fontWeight: 700,
+                    fontSize: 14,
+                  }}
+                >
+                  {tenant.name.charAt(0)}
+                </div>
+                <span style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
+                  {tenant.name}
+                </span>
+              </div>
+              <p
+                style={{
+                  color: "#666",
+                  fontSize: 14,
+                  lineHeight: 1.7,
+                  margin: 0,
+                  maxWidth: 240,
+                }}
+              >
+                Your premium destination for luxury beauty treatments.
+                Experience the perfect blend of expertise and relaxation.
+              </p>
+            </div>
+
+            {/* Services */}
+            <div>
+              <h4
+                style={{
+                  color: "white",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  margin: "0 0 20px",
+                }}
+              >
+                Services
+              </h4>
+              {services.slice(0, 5).map((s) => (
+                <a
+                  key={s.id}
+                  href={`/book/staff?service=${s.id}`}
+                  style={{
+                    display: "block",
+                    color: "#666",
+                    fontSize: 14,
+                    textDecoration: "none",
+                    marginBottom: 10,
+                  }}
+                >
+                  {s.name}
+                </a>
+              ))}
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4
+                style={{
+                  color: "white",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  margin: "0 0 20px",
+                }}
+              >
+                Company
+              </h4>
+              {["About Us", "Our Team", "Reviews", "Contact"].map((item) => (
+                <a
+                  key={item}
+                  href="#"
+                  style={{
+                    display: "block",
+                    color: "#666",
+                    fontSize: 14,
+                    textDecoration: "none",
+                    marginBottom: 10,
+                  }}
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4
+                style={{
+                  color: "white",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  margin: "0 0 20px",
+                }}
+              >
+                Contact
+              </h4>
+              {tenant.address && (
+                <p style={{ color: "#666", fontSize: 14, margin: "0 0 10px" }}>
+                  📍 {tenant.address}
+                </p>
+              )}
+              {tenant.hours && (
+                <p style={{ color: "#666", fontSize: 14, margin: "0 0 10px" }}>
+                  🕐 {tenant.hours}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div
+            style={{
+              borderTop: "1px solid #1a1a1a",
+              paddingTop: 24,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <p style={{ color: "#444", fontSize: 13, margin: 0 }}>
+              © 2026 {tenant.name}. All rights reserved.
+            </p>
+            <p style={{ color: "#333", fontSize: 13, margin: 0 }}>
+              Powered by SalonFlow
+            </p>
+          </div>
         </div>
       </footer>
     </div>

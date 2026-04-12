@@ -114,6 +114,18 @@ export const sendBookingReminders = inngest.createFunction(
         `UPDATE bookings SET reminder_2h_sent = true WHERE id = $1`,
         [booking.id]
       );
+
+      console.log('Now:', now.toISOString());
+      console.log('24hr window:', oneDayWindowStart.toISOString(), 'to', oneDayWindowEnd.toISOString());
+      console.log('2hr window:', twoHourWindowStart.toISOString(), 'to', twoHourWindowEnd.toISOString());
+      console.log('24hr bookings found:', oneDayBookings.rows.length);
+      console.log('2hr bookings found:', twoHourBookings.rows.length);
+
+      // debug - check what bookings exist
+      const allBookings = await pool.query(
+        `SELECT id, client_name, booked_at, reminder_24h_sent FROM bookings WHERE client_name = 'Test Reminder'`
+      );
+      console.log('Test booking:', JSON.stringify(allBookings.rows));
     }
 
     return {

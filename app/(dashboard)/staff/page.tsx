@@ -1,6 +1,7 @@
-import pool from '@/lib/db';
-import { getTenant } from '@/lib/tenant';
-import { notFound } from 'next/navigation';
+import pool from "@/lib/db";
+import { getTenant } from "@/lib/tenant";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function StaffPage() {
   const tenant = await getTenant();
@@ -19,10 +20,11 @@ export default async function StaffPage() {
           <h1 className="text-2xl font-bold text-gray-900">Staff</h1>
           <p className="text-gray-500 mt-1">Manage your team</p>
         </div>
-        
-        <a href="/staff/new"
+
+        <a
+          href="/staff/new"
           className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
+          style={{ backgroundColor: tenant.primary_color ?? "#7C3AED" }}
         >
           Add staff
         </a>
@@ -36,14 +38,17 @@ export default async function StaffPage() {
         ) : (
           <div className="divide-y divide-gray-50">
             {staffList.map((member) => (
-              <div
+              <Link
                 key={member.id}
-                className="px-6 py-4 flex items-center justify-between"
+                href={`/staff/${member.id}`}
+                className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-4">
                   <div
                     className="h-9 w-9 rounded-full flex items-center justify-center text-white font-medium text-sm"
-                    style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
+                    style={{
+                      backgroundColor: tenant.primary_color ?? "#7C3AED",
+                    }}
                   >
                     {member.name.charAt(0)}
                   </div>
@@ -65,7 +70,7 @@ export default async function StaffPage() {
                     Delete
                   </button>
                 </form>
-              </div>
+              </Link>
             ))}
           </div>
         )}

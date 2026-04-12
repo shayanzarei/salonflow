@@ -1,39 +1,41 @@
-'use client';
+"use client";
 
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     const formData = new FormData(e.currentTarget);
 
-    const result = await signIn('credentials', {
-      email: formData.get('email'),
-      password: formData.get('password'),
+    const result = await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
       redirect: false,
     });
 
     if (result?.error) {
-      setError('Invalid slug or password');
+      setError("Invalid slug or password");
       setLoading(false);
     } else {
       // fetch session to check isAdmin
-      const res = await fetch('/api/auth/session');
+      const res = await fetch("/api/auth/session");
       const session = await res.json();
 
       if (session?.isAdmin) {
-        router.push('/admin');
+        router.push("/admin");
+      } else if ((session as any)?.isStaff) {
+        router.push("/staff-portal");
       } else {
-        router.push('/dashboard');
+        router.push("/dashboard");
       }
     }
   }
@@ -46,7 +48,9 @@ export default function LoginPage() {
             S
           </div>
           <h1 className="text-xl font-bold text-gray-900">SalonFlow</h1>
-          <p className="text-gray-500 text-sm mt-1">Sign in to your dashboard</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Sign in to your dashboard
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,16 +80,14 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-500">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-500">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full py-3 rounded-xl bg-purple-600 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
       </div>

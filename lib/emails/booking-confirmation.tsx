@@ -6,6 +6,9 @@ export function bookingConfirmationEmail({
     bookedAt,
     price,
     salonAddress,
+    cancellationToken,
+    bookingId,
+    salonSlug,
 }: {
     clientName: string;
     salonName: string;
@@ -14,6 +17,9 @@ export function bookingConfirmationEmail({
     bookedAt: Date;
     price: number;
     salonAddress: string | null;
+    cancellationToken: string;
+    bookingId: string;
+    salonSlug: string;
 }) {
     const date = bookedAt.toLocaleDateString('en-US', {
         weekday: 'long',
@@ -27,6 +33,8 @@ export function bookingConfirmationEmail({
         minute: '2-digit',
     });
 
+    const cancelUrl = `https://${salonSlug}.salonflow.xyz/book/cancel?booking=${bookingId}&token=${cancellationToken}`;
+
     return {
         subject: `Booking confirmed — ${serviceName} at ${salonName}`,
         html: `
@@ -38,18 +46,15 @@ export function bookingConfirmationEmail({
   </head>
   <body style="margin:0;padding:0;background:#FAF7F4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
     <div style="max-width:560px;margin:40px auto;padding:0 20px;">
-      
-      <!-- Header -->
+  
       <div style="text-align:center;margin-bottom:32px;">
         <p style="font-size:13px;color:#9C7B5A;letter-spacing:0.08em;text-transform:uppercase;margin:0;">
           Booking confirmed
         </p>
       </div>
   
-      <!-- Card -->
       <div style="background:white;border-radius:20px;overflow:hidden;border:1px solid #F0EBE4;">
-        
-        <!-- Top banner -->
+  
         <div style="background:#1a1a1a;padding:32px;text-align:center;">
           <p style="color:#9C7B5A;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 8px;">
             ${salonName}
@@ -59,13 +64,11 @@ export function bookingConfirmationEmail({
           </h1>
         </div>
   
-        <!-- Details -->
         <div style="padding:32px;">
           <p style="color:#666;font-size:15px;margin:0 0 24px;">
             Hi ${clientName}, your appointment is confirmed. Here are your details:
           </p>
   
-          <!-- Booking summary -->
           <div style="background:#FAF7F4;border-radius:12px;padding:20px;margin-bottom:24px;">
             <table style="width:100%;border-collapse:collapse;">
               <tr>
@@ -92,23 +95,23 @@ export function bookingConfirmationEmail({
           </div>
   
           ${salonAddress ? `
-          <!-- Location -->
           <div style="border-top:1px solid #F0EBE4;padding-top:20px;margin-bottom:24px;">
             <p style="color:#999;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px;">Location</p>
             <p style="color:#1a1a1a;font-size:14px;margin:0;">${salonAddress}</p>
           </div>
           ` : ''}
   
-          <!-- CTA -->
-          <div style="text-align:center;margin-top:24px;">
-            <p style="color:#999;font-size:13px;margin:0;">
-              Need to cancel or reschedule? Contact the salon directly.
-            </p>
+          <!-- Cancel button -->
+          <div style="border-top:1px solid #F0EBE4;padding-top:24px;text-align:center;">
+            <p style="color:#999;font-size:13px;margin:0 0 12px;">Need to cancel?</p>
+            <a href="${cancelUrl}"
+              style="display:inline-block;padding:10px 24px;border:1px solid #E5E7EB;border-radius:100px;color:#666;font-size:13px;text-decoration:none;">
+              Cancel appointment
+            </a>
           </div>
         </div>
       </div>
   
-      <!-- Footer -->
       <div style="text-align:center;margin-top:24px;">
         <p style="color:#bbb;font-size:12px;margin:0;">Powered by SalonFlow</p>
       </div>

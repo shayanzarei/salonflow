@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
 
     const booking = result.rows[0];
 
+
     // fetch details for the email
     const [tenantResult, serviceResult, staffResult] = await Promise.all([
       pool.query(`SELECT * FROM tenants WHERE id = $1`, [tenant_id]),
@@ -41,7 +42,6 @@ export async function POST(req: NextRequest) {
     const service = serviceResult.rows[0];
     const staff = staffResult.rows[0];
 
-    // send confirmation email
     const { subject, html } = bookingConfirmationEmail({
       clientName: client_name,
       salonName: tenant.name,
@@ -50,6 +50,9 @@ export async function POST(req: NextRequest) {
       bookedAt: new Date(booked_at),
       price: parseFloat(service.price),
       salonAddress: tenant.address,
+      cancellationToken: booking.cancellation_token,
+      bookingId: booking.id,
+      salonSlug: tenant.slug,
     });
 
     await sendEmail({

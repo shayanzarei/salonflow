@@ -3,9 +3,12 @@ export function bookingReminderEmail({
     salonName,
     serviceName,
     staffName,
-    price,
     bookedAt,
     salonAddress,
+    price,
+    cancellationToken,
+    bookingId,
+    salonSlug,
     reminderType,
 }: {
     clientName: string;
@@ -13,9 +16,12 @@ export function bookingReminderEmail({
     serviceName: string;
     staffName: string;
     bookedAt: Date;
-    price: number;
     salonAddress: string | null;
-    reminderType: '24h' | '2h';
+    price: number;
+    cancellationToken: string;
+    bookingId: string;
+    salonSlug: string;
+    reminderType: '48h' | '24h' | '2h';
 }) {
     const date = bookedAt.toLocaleDateString('en-US', {
         weekday: 'long',
@@ -28,12 +34,18 @@ export function bookingReminderEmail({
         minute: '2-digit',
     });
 
-    const reminderText = reminderType === '24h'
-        ? 'Your appointment is tomorrow'
-        : 'Your appointment is in 2 hours';
+    const reminderText = {
+        '48h': 'Your appointment is in 2 days',
+        '24h': 'Your appointment is tomorrow',
+        '2h': 'Your appointment is in 2 hours',
+    }[reminderType];
+
+    const cancelUrl = `https://${salonSlug}.salonflow.xyz/book/cancel?booking=${bookingId}&token=${cancellationToken}`;
 
     return {
-        subject: `Reminder: ${serviceName} at ${salonName} — ${reminderType === '24h' ? 'tomorrow' : 'in 2 hours'}`,
+        subject: `Reminder: ${serviceName} at ${salonName} — ${reminderType === '48h' ? 'in 2 days' :
+            reminderType === '24h' ? 'tomorrow' : 'in 2 hours'
+            }`,
         html: `
   <!DOCTYPE html>
   <html>
@@ -92,9 +104,20 @@ export function bookingReminderEmail({
           </div>
   
           ${salonAddress ? `
-          <div style="border-top:1px solid #F0EBE4;padding-top:20px;">
+          <div style="border-top:1px solid #F0EBE4;padding-top:20px;margin-bottom:24px;">
             <p style="color:#999;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px;">Location</p>
             <p style="color:#1a1a1a;font-size:14px;margin:0;">${salonAddress}</p>
+          </div>
+          ` : ''}
+  
+          <!-- Cancel button -->
+          ${reminderType !== '2h' ? `
+          <div style="border-top:1px solid #F0EBE4;padding-top:24px;text-align:center;">
+            <p style="color:#999;font-size:13px;margin:0 0 12px;">Need to cancel?</p>
+            <a href="${cancelUrl}"
+              style="display:inline-block;padding:10px 24px;border:1px solid #E5E7EB;border-radius:100px;color:#666;font-size:13px;text-decoration:none;">
+              Cancel appointment
+            </a>
           </div>
           ` : ''}
         </div>

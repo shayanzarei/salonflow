@@ -1,4 +1,4 @@
-import pool from '@/lib/db';
+
 import { getTenant } from '@/lib/tenant';
 import { notFound } from 'next/navigation';
 
@@ -100,8 +100,8 @@ export default async function SettingsPage() {
                 {tenant.plan_tier === 'starter'
                   ? 'Online booking + email reminders'
                   : tenant.plan_tier === 'pro'
-                  ? 'Everything in Starter + SMS + analytics'
-                  : 'All features included'}
+                    ? 'Everything in Starter + SMS + analytics'
+                    : 'All features included'}
               </p>
             </div>
             <span

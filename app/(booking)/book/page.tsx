@@ -1,8 +1,7 @@
-import { formatEUR } from "@/lib/format-currency";
+import BookingProgress from "@/components/booking/BookingProgress";
 import pool from "@/lib/db";
-import { getTenant } from '@/lib/tenant';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { getTenant } from "@/lib/tenant";
+import { notFound } from "next/navigation";
 
 export default async function ChooseServicePage() {
   const tenant = await getTenant();
@@ -13,46 +12,105 @@ export default async function ChooseServicePage() {
     [tenant.id]
   );
   const services = result.rows;
+  const brand = tenant.primary_color ?? "#7C3AED";
 
   return (
-    <div>
-      <div className="mb-8">
-        <Link href="/" className="text-sm text-gray-400 hover:text-gray-600">
+    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "40px 24px" }}>
+        {/* Back */}
+        <a
+          href="/"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            color: "#666",
+            fontSize: 14,
+            textDecoration: "none",
+            marginBottom: 32,
+          }}
+        >
           ← Back
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900 mt-4">
-          Choose a service
-        </h1>
-      </div>
+        </a>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {services.map((service) => (
-          <a
-            key={service.id}
-            href={`/book/staff?service=${service.id}`}
-            className="border border-gray-100 rounded-xl p-5 bg-white hover:shadow-sm transition-shadow"
+        {/* Progress */}
+        <BookingProgress step={1} brand={brand} />
+
+        {/* Title */}
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <h1
+            style={{
+              fontSize: 40,
+              fontWeight: 700,
+              color: "#111",
+              margin: "0 0 12px",
+            }}
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-medium text-gray-900">{service.name}</h3>
-                {service.description && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    {service.description}
-                  </p>
-                )}
-                <p className="text-sm text-gray-400 mt-2">
-                  {service.duration_mins} mins
-                </p>
-              </div>
-              <span
-                className="text-sm font-semibold"
-                style={{ color: tenant.primary_color ?? '#7C3AED' }}
+            Choose a service
+          </h1>
+          <p style={{ fontSize: 16, color: "#888", margin: 0 }}>
+            Select the treatment that's perfect for you
+          </p>
+        </div>
+
+        {/* Services grid */}
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
+        >
+          {services.map((service) => (
+            <a
+              key={service.id}
+              href={`/book/staff?service=${service.id}`}
+              style={{
+                display: "block",
+                background: "white",
+                border: "1px solid #f0f0f0",
+                borderRadius: 16,
+                padding: "28px 32px",
+                textDecoration: "none",
+                transition: "border-color 0.2s, box-shadow 0.2s",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 17,
+                  fontWeight: 600,
+                  color: "#111",
+                  margin: "0 0 10px",
+                }}
               >
-                {formatEUR(Number(service.price))}
-              </span>
-            </div>
-          </a>
-        ))}
+                {service.name}
+              </h3>
+              {service.description && (
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: "#888",
+                    lineHeight: 1.6,
+                    margin: "0 0 24px",
+                  }}
+                >
+                  {service.description}
+                </p>
+              )}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginTop: "auto",
+                }}
+              >
+                <span style={{ fontSize: 13, color: "#aaa" }}>
+                  {service.duration_mins} min
+                </span>
+                <span style={{ fontSize: 22, fontWeight: 700, color: brand }}>
+                  €{service.price}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   );

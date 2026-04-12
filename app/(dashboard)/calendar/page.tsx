@@ -1,7 +1,7 @@
-import pool from '@/lib/db';
-import { getTenant } from '@/lib/tenant';
-import { notFound } from 'next/navigation';
-import CalendarView from '@/components/dashboard/CalendarView';
+import CalendarView from "@/components/dashboard/CalendarView";
+import pool from "@/lib/db";
+import { getTenant } from "@/lib/tenant";
+import { notFound } from "next/navigation";
 
 export default async function CalendarPage() {
   const tenant = await getTenant();
@@ -45,7 +45,7 @@ export default async function CalendarPage() {
       <CalendarView
         bookings={result.rows}
         staff={staffResult.rows}
-        brandColor={tenant.primary_color ?? '#7C3AED'}
+        brandColor={tenant.primary_color ?? "#7C3AED"}
       />
     </div>
   );

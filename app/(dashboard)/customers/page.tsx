@@ -1,4 +1,5 @@
-import pool from '@/lib/db';
+import { formatEUR } from "@/lib/format-currency";
+import pool from "@/lib/db";
 import { getTenant } from '@/lib/tenant';
 import { notFound } from 'next/navigation';
 
@@ -68,7 +69,7 @@ export default async function CustomersPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-900">
-                    ${parseFloat(customer.total_spent).toFixed(2)} spent
+                    {formatEUR(parseFloat(customer.total_spent))} spent
                   </p>
                   <p className="text-xs text-gray-400">
                     {customer.total_bookings} booking{customer.total_bookings !== '1' ? 's' : ''}

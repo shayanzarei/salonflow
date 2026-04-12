@@ -1,4 +1,5 @@
-import pool from '@/lib/db';
+import { formatEUR } from "@/lib/format-currency";
+import pool from "@/lib/db";
 import { getTenant } from '@/lib/tenant';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -144,7 +145,7 @@ export default async function BookingHomePage() {
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="font-medium text-gray-900 text-lg">{service.name}</h3>
                     <span className="font-medium text-lg" style={{ color: brand }}>
-                      ${service.price}
+                      {formatEUR(Number(service.price))}
                     </span>
                   </div>
                   {service.description && (

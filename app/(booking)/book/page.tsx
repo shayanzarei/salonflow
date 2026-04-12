@@ -1,4 +1,5 @@
-import pool from '@/lib/db';
+import { formatEUR } from "@/lib/format-currency";
+import pool from "@/lib/db";
 import { getTenant } from '@/lib/tenant';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -47,7 +48,7 @@ export default async function ChooseServicePage() {
                 className="text-sm font-semibold"
                 style={{ color: tenant.primary_color ?? '#7C3AED' }}
               >
-                ${service.price}
+                {formatEUR(Number(service.price))}
               </span>
             </div>
           </a>

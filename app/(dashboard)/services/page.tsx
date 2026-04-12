@@ -1,4 +1,5 @@
-import pool from '@/lib/db';
+import { formatEUR } from "@/lib/format-currency";
+import pool from "@/lib/db";
 import { getTenant } from '@/lib/tenant';
 import { notFound } from 'next/navigation';
 
@@ -58,7 +59,7 @@ export default async function ServicesPage() {
                     className="text-sm font-semibold"
                     style={{ color: tenant.primary_color ?? '#7C3AED' }}
                   >
-                    ${service.price}
+                    {formatEUR(Number(service.price))}
                   </span>
                   <form action="/api/services/delete" method="POST">
                     <input type="hidden" name="id" value={service.id} />

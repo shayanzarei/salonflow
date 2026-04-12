@@ -1,4 +1,5 @@
-import pool from '@/lib/db';
+import { formatEUR } from "@/lib/format-currency";
+import pool from "@/lib/db";
 
 export default async function AdminOverviewPage() {
   const [tenantsResult, bookingsResult, revenueResult] = await Promise.all([
@@ -15,7 +16,10 @@ export default async function AdminOverviewPage() {
   const stats = [
     { label: 'Total salons', value: tenantsResult.rows[0].count },
     { label: 'Total bookings', value: bookingsResult.rows[0].count },
-    { label: 'Platform revenue', value: `$${parseFloat(revenueResult.rows[0].total).toFixed(2)}` },
+    {
+      label: "Platform revenue",
+      value: formatEUR(parseFloat(revenueResult.rows[0].total)),
+    },
   ];
 
   return (

@@ -1,3 +1,5 @@
+import { formatEUR } from "@/lib/format-currency";
+
 export function bookingReminderEmail({
     clientName,
     salonName,
@@ -98,7 +100,7 @@ export function bookingReminderEmail({
               </tr>
               <tr style="border-top:1px solid #F0EBE4;">
                 <td style="padding:12px 0 4px;color:#1a1a1a;font-size:14px;font-weight:500;">Total</td>
-                <td style="padding:12px 0 4px;color:#7C3AED;font-size:16px;font-weight:600;text-align:right;">$${price}</td>
+                <td style="padding:12px 0 4px;color:#7C3AED;font-size:16px;font-weight:600;text-align:right;">${formatEUR(price)}</td>
               </tr>
             </table>
           </div>

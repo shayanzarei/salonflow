@@ -1,5 +1,6 @@
 "use client";
 
+import { formatEUR } from "@/lib/format-currency";
 import { useState } from "react";
 
 interface Booking {
@@ -281,7 +282,7 @@ export default function CalendarView({
                 <div className="flex justify-between text-sm border-t border-gray-100 pt-2">
                   <span className="text-gray-500">Price</span>
                   <span className="font-semibold" style={{ color: brandColor }}>
-                    ${selectedBooking.price}
+                    {formatEUR(Number(selectedBooking.price))}
                   </span>
                 </div>
               </div>

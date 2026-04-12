@@ -1,4 +1,5 @@
-import pool from '@/lib/db';
+import { formatEUR } from "@/lib/format-currency";
+import pool from "@/lib/db";
 import { getTenant } from '@/lib/tenant';
 import { notFound } from 'next/navigation';
 
@@ -89,7 +90,7 @@ export default async function DashboardPage() {
           { label: "Today's bookings", value: stats.todayCount },
           { label: 'Upcoming', value: stats.upcomingCount },
           { label: 'Total customers', value: stats.customerCount },
-          { label: 'Total revenue', value: `$${stats.revenue.toFixed(2)}` },
+          { label: 'Total revenue', value: formatEUR(stats.revenue) },
         ].map((stat) => (
           <div
             key={stat.label}

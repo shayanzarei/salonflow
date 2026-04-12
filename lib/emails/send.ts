@@ -1,7 +1,5 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function sendEmail({
     to,
     subject,
@@ -14,8 +12,10 @@ export async function sendEmail({
     from?: string;
 }) {
     try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
         const { error } = await resend.emails.send({
-            from: from ?? 'SalonFlow Bookings <bookings@salonflow.xyz>',
+            from: from ?? 'SalonFlow <bookings@salonflow.xyz>',
             to,
             subject,
             html,

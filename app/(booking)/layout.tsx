@@ -1,4 +1,5 @@
-import { getTenant } from '@/lib/tenant';
+import { getTenant } from "@/lib/tenant";
+import Link from "next/link";
 
 export default async function BookingLayout({
   children,
@@ -8,51 +9,85 @@ export default async function BookingLayout({
   const tenant = await getTenant();
 
   if (!tenant) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">SalonFlow</h1>
-          <p className="text-gray-500 mt-2">Salon not found.</p>
-        </div>
-      </div>
-    );
+    return <>{children}</>;
   }
 
   return (
-    <div
-      className="min-h-screen bg-gray-50"
-      style={{ '--brand-color': tenant.primary_color ?? '#7C3AED' } as React.CSSProperties}
-    >
-      <header className="border-b border-gray-100 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+    <>
+      <nav
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
+          background: "white",
+          borderBottom: "1px solid #f0ebe4",
+        }}>
+        <div
+          style={{
+            maxWidth: 1152,
+            margin: "0 auto",
+            padding: "0 32px",
+            height: 64,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div
-              className="h-9 w-9 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-              style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
-            >
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: tenant.primary_color ?? "#7C3AED",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                fontWeight: 500,
+                fontSize: 14,
+              }}>
               {tenant.name.charAt(0)}
             </div>
-            <span className="font-semibold text-gray-900">{tenant.name}</span>
+            <span style={{ fontWeight: 500, fontSize: 15, color: "#1a1a1a" }}>
+              {tenant.name}
+            </span>
           </div>
-          <a
+          <div
+            style={{ display: "flex", gap: 32, fontSize: 14, color: "#666" }}>
+            <a
+              href="#services"
+              style={{ color: "#666", textDecoration: "none" }}>
+              Services
+            </a>
+            <a href="#team" style={{ color: "#666", textDecoration: "none" }}>
+              Team
+            </a>
+            <a
+              href="#reviews"
+              style={{ color: "#666", textDecoration: "none" }}>
+              Reviews
+            </a>
+            <a href="#about" style={{ color: "#666", textDecoration: "none" }}>
+              About
+            </a>
+          </div>
+
+          <Link
             href="/book"
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-            style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
-          >
+            style={{
+              padding: "10px 24px",
+              background: tenant.primary_color ?? "#7C3AED",
+              color: "white",
+              borderRadius: 100,
+              fontSize: 14,
+              fontWeight: 500,
+              textDecoration: "none",
+            }}>
             Book now
-          </a>
+          </Link>
         </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-6 py-10">
-        {children}
-      </main>
-
-      <footer className="border-t border-gray-100 mt-20">
-        <div className="max-w-4xl mx-auto px-6 py-6 text-center text-sm text-gray-400">
-          Powered by SalonFlow
-        </div>
-      </footer>
-    </div>
+      </nav>
+      {children}
+    </>
   );
 }

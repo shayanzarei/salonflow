@@ -5,5 +5,10 @@ export interface Tenant {
   plan_tier: 'starter' | 'pro' | 'enterprise';
   logo_url: string | null;
   primary_color: string | null;
+  tagline: string | null;
+  about: string | null;
+  address: string | null;
+  hours: string | null;
+  hero_image_url: string | null;
   created_at: string;
 }

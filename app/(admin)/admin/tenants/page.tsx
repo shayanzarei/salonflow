@@ -38,10 +38,11 @@ export default async function AdminTenantsPage() {
         ) : (
           <div className="divide-y divide-gray-50">
             {tenants.map((tenant) => (
-              <div
+              <Link
                 key={tenant.id}
-                className="px-6 py-4 flex items-center justify-between"
-              >
+                href={`/admin/tenants/${tenant.id}`}
+                className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
                 <div className="flex items-center gap-4">
                   <div
                     className="h-9 w-9 rounded-lg flex items-center justify-center text-white font-medium text-sm"
@@ -74,7 +75,7 @@ export default async function AdminTenantsPage() {
                     {tenant.plan_tier}
                   </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

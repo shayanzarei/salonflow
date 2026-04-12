@@ -12,10 +12,10 @@ export const sendBookingReminders = inngest.createFunction(
   async () => {
     const now = new Date();
 
-    // find bookings happening in ~24 hours (between 23.5 and 24.5 hours from now)
+    // find bookings happening in ~24 hours (between 22 and 26 hours from now)
     const oneDayFrom = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-    const oneDayWindowStart = new Date(oneDayFrom.getTime() - 30 * 60 * 1000);
-    const oneDayWindowEnd = new Date(oneDayFrom.getTime() + 30 * 60 * 1000);
+    const oneDayWindowStart = new Date(oneDayFrom.getTime() - 2 * 60 * 60 * 1000);
+    const oneDayWindowEnd = new Date(oneDayFrom.getTime() + 2 * 60 * 60 * 1000);
 
     // find bookings happening in ~2 hours (between 1.5 and 2.5 hours from now)
     const twoHoursFrom = new Date(now.getTime() + 2 * 60 * 60 * 1000);

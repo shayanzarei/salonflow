@@ -1,3 +1,4 @@
+import ClientSearch from "@/components/dashboard/ClientSearch";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -38,43 +39,8 @@ export default async function NewBookingPage() {
       <form action="/api/bookings/manual" method="POST" className="space-y-4">
         <input type="hidden" name="tenant_id" value={tenant.id} />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Client name
-          </label>
-          <input
-            type="text"
-            name="client_name"
-            required
-            placeholder="Sarah Johnson"
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            name="client_email"
-            required
-            placeholder="sarah@example.com"
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Phone <span className="text-gray-400">(optional)</span>
-          </label>
-          <input
-            type="tel"
-            name="client_phone"
-            placeholder="+31 6 12345678"
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-          />
-        </div>
+        {/* Client search with autofill */}
+        <ClientSearch />
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

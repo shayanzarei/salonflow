@@ -53,7 +53,7 @@ export default async function StaffDetailPage({
     [id]
   );
 
-  const [statsResult, upcomingResult, pastResult] = await Promise.all([
+  const [statsResult, upcomingResult, pastResult, hoursResult] = await Promise.all([
     pool.query(
       `SELECT
          COUNT(*) AS total_bookings,
@@ -86,11 +86,19 @@ export default async function StaffDetailPage({
        LIMIT 20`,
       [id]
     ),
+    pool.query(
+      `SELECT day_of_week, start_time, end_time, is_working
+       FROM staff_working_hours
+       WHERE staff_id = $1
+       ORDER BY day_of_week`,
+      [id]
+    ),
   ]);
 
   const stats = statsResult.rows[0];
   const upcomingBookings = upcomingResult.rows;
   const pastBookings = pastResult.rows;
+  const workingHours = hoursResult.rows;
 
   return (
     <div className="min-w-0">
@@ -309,6 +317,7 @@ export default async function StaffDetailPage({
         pastBookings={pastBookings}
         brand={brand}
         activity={activityResult.rows}
+        workingHours={workingHours}
       />
     </div>
   );

@@ -1,36 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface TimeSlot {
   value: string;
   label: string;
   period: "morning" | "afternoon" | "evening";
-}
-
-function generateSlotsForDate(date: Date): TimeSlot[] {
-  const slots: TimeSlot[] = [];
-  const now = new Date();
-
-  for (let h = 9; h < 20; h++) {
-    for (const m of [0, 30]) {
-      const slotDate = new Date(date);
-      slotDate.setHours(h, m, 0, 0);
-      if (slotDate <= now) continue;
-
-      const label = slotDate.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-      });
-
-      const period: TimeSlot["period"] =
-        h < 12 ? "morning" : h < 17 ? "afternoon" : "evening";
-
-      slots.push({ value: slotDate.toISOString(), label, period });
-    }
-  }
-  return slots;
+  available: boolean;
+  reason?: "booked" | "past";
 }
 
 export default function TimeSlotPicker({
@@ -50,41 +28,74 @@ export default function TimeSlotPicker({
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-  // generate calendar days
+  const [slots, setSlots] = useState<TimeSlot[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [slotsError, setSlotsError] = useState(false);
+
+  // Fetch available slots whenever the date, service, or staff changes
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function fetchSlots() {
+      setLoadingSlots(true);
+      setSlotsError(false);
+      setSelectedTime(null);
+      setSlots([]);
+
+      // Build YYYY-MM-DD from local date (matches what the user sees)
+      const y = selectedDate.getFullYear();
+      const m = String(selectedDate.getMonth() + 1).padStart(2, "0");
+      const d = String(selectedDate.getDate()).padStart(2, "0");
+      const dateStr = `${y}-${m}-${d}`;
+
+      try {
+        const res = await fetch(
+          `/api/availability?serviceId=${service}&staffId=${staff}&date=${dateStr}`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) throw new Error("Request failed");
+        const data = await res.json() as {
+          slots: {
+            isoTime: string;
+            label: string;
+            period: string;
+            available: boolean;
+            reason?: "booked" | "past";
+          }[];
+        };
+        setSlots(
+          data.slots.map((s) => ({
+            value: s.isoTime,
+            label: s.label,
+            period: s.period as TimeSlot["period"],
+            available: s.available,
+            reason: s.reason,
+          }))
+        );
+      } catch (e) {
+        if ((e as Error).name !== "AbortError") setSlotsError(true);
+      } finally {
+        setLoadingSlots(false);
+      }
+    }
+
+    fetchSlots();
+    return () => controller.abort();
+  }, [selectedDate, service, staff]);
+
+  // Calendar helpers
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const calendarDays: (Date | null)[] = [];
-
   for (let i = 0; i < firstDay; i++) calendarDays.push(null);
   for (let d = 1; d <= daysInMonth; d++)
     calendarDays.push(new Date(year, month, d));
 
-  const slots = generateSlotsForDate(selectedDate);
   const morning = slots.filter((s) => s.period === "morning");
   const afternoon = slots.filter((s) => s.period === "afternoon");
   const evening = slots.filter((s) => s.period === "evening");
-
-  function prevMonth() {
-    setCurrentMonth(new Date(year, month - 1, 1));
-  }
-
-  function nextMonth() {
-    setCurrentMonth(new Date(year, month + 1, 1));
-  }
-
-  function selectDate(date: Date) {
-    setSelectedDate(date);
-    setSelectedTime(null);
-  }
-
-  function handleContinue() {
-    if (!selectedTime) return;
-    router.push(
-      `/book/confirm?service=${service}&staff=${staff}&time=${selectedTime}`
-    );
-  }
 
   const isToday = (date: Date) =>
     date.toDateString() === new Date().toDateString();
@@ -98,25 +109,23 @@ export default function TimeSlotPicker({
     day: "numeric",
   });
 
+  function selectDate(date: Date) {
+    setSelectedDate(date);
+    setSelectedTime(null);
+  }
+
+  function handleContinue() {
+    if (!selectedTime) return;
+    router.push(
+      `/book/confirm?service=${service}&staff=${staff}&time=${selectedTime}`
+    );
+  }
+
   return (
-    <div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 24,
-          alignItems: "start",
-        }}
-      >
+    <div className="min-w-0">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start lg:gap-6">
         {/* Calendar */}
-        <div
-          style={{
-            background: "white",
-            border: "1px solid #f0f0f0",
-            borderRadius: 20,
-            padding: 28,
-          }}
-        >
+        <div className="rounded-[20px] border border-gray-100 bg-white p-4 sm:p-6 md:p-7">
           <h3
             style={{
               fontSize: 16,
@@ -138,7 +147,8 @@ export default function TimeSlotPicker({
             }}
           >
             <button
-              onClick={prevMonth}
+              type="button"
+              onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
               style={{
                 width: 32,
                 height: 32,
@@ -161,7 +171,8 @@ export default function TimeSlotPicker({
               })}
             </span>
             <button
-              onClick={nextMonth}
+              type="button"
+              onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}
               style={{
                 width: 32,
                 height: 32,
@@ -215,6 +226,7 @@ export default function TimeSlotPicker({
               <div key={i} style={{ textAlign: "center" }}>
                 {date ? (
                   <button
+                    type="button"
                     onClick={() => !isPast(date) && selectDate(date)}
                     style={{
                       width: "100%",
@@ -249,23 +261,10 @@ export default function TimeSlotPicker({
           </div>
 
           {/* Legend */}
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              marginTop: 20,
-              paddingTop: 16,
-              borderTop: "1px solid #f5f5f5",
-            }}
-          >
+          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t border-gray-100 pt-4">
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div
-                style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: "50%",
-                  background: brand,
-                }}
+                style={{ width: 12, height: 12, borderRadius: "50%", background: brand }}
               />
               <span style={{ fontSize: 12, color: "#888" }}>Selected</span>
             </div>
@@ -287,31 +286,30 @@ export default function TimeSlotPicker({
                   width: 12,
                   height: 12,
                   borderRadius: "50%",
-                  background: "#f0f0f0",
+                  background: "#FAFAFA",
+                  border: "1px solid #F3F4F6",
                 }}
               />
               <span style={{ fontSize: 12, color: "#888" }}>Unavailable</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  background: "#FEF3C7",
+                  border: "1px solid #FDE68A",
+                }}
+              />
+              <span style={{ fontSize: 12, color: "#888" }}>Already booked</span>
             </div>
           </div>
         </div>
 
         {/* Time slots */}
-        <div
-          style={{
-            background: "white",
-            border: "1px solid #f0f0f0",
-            borderRadius: 20,
-            padding: 28,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 20,
-            }}
-          >
+        <div className="rounded-[20px] border border-gray-100 bg-white p-4 sm:p-6 md:p-7">
+          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h3
               style={{
                 fontSize: 16,
@@ -322,12 +320,70 @@ export default function TimeSlotPicker({
             >
               Available times
             </h3>
-            <span style={{ fontSize: 13, color: brand, fontWeight: 500 }}>
+            <span
+              className="text-sm font-medium sm:text-[13px]"
+              style={{ color: brand }}
+            >
               {selectedDateLabel}
             </span>
           </div>
 
-          {slots.length === 0 ? (
+          {/* Loading state */}
+          {loadingSlots && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "40px 0",
+                gap: 12,
+              }}
+            >
+              {/* Spinner */}
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                style={{ animation: "spin 0.8s linear infinite" }}
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="#e5e7eb"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M12 2a10 10 0 0 1 10 10"
+                  stroke={brand}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <p style={{ fontSize: 13, color: "#aaa", margin: 0 }}>
+                Checking availability…
+              </p>
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          )}
+
+          {/* Error state */}
+          {!loadingSlots && slotsError && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "40px 0",
+                color: "#EF4444",
+                fontSize: 14,
+              }}
+            >
+              Could not load availability. Please try again.
+            </div>
+          )}
+
+          {/* Empty state — no slots at all for this day */}
+          {!loadingSlots && !slotsError && slots.length === 0 && (
             <div
               style={{
                 textAlign: "center",
@@ -338,7 +394,10 @@ export default function TimeSlotPicker({
             >
               No available slots for this date
             </div>
-          ) : (
+          )}
+
+          {/* Slot groups */}
+          {!loadingSlots && !slotsError && slots.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               {[
                 { label: "Morning", slots: morning },
@@ -360,37 +419,75 @@ export default function TimeSlotPicker({
                     >
                       {group.label}
                     </p>
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(3, 1fr)",
-                        gap: 8,
-                      }}
-                    >
-                      {group.slots.map((slot) => (
-                        <button
-                          key={slot.value}
-                          onClick={() => setSelectedTime(slot.value)}
-                          style={{
-                            padding: "10px 8px",
-                            borderRadius: 10,
-                            border:
-                              selectedTime === slot.value
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {group.slots.map((slot) => {
+                        const isSelected = selectedTime === slot.value;
+                        const isBooked = !slot.available && slot.reason === "booked";
+                        const isPastSlot = !slot.available && slot.reason === "past";
+                        const isDisabled = !slot.available;
+
+                        return (
+                          <button
+                            type="button"
+                            key={slot.value}
+                            disabled={isDisabled}
+                            onClick={() =>
+                              slot.available && setSelectedTime(slot.value)
+                            }
+                            title={
+                              isBooked
+                                ? "Already booked"
+                                : isPastSlot
+                                  ? "Time has passed"
+                                  : undefined
+                            }
+                            className="relative min-h-11 rounded-[10px] px-1 py-2.5 text-xs sm:text-[13px]"
+                            style={{
+                              border: isSelected
                                 ? `2px solid ${brand}`
-                                : "1px solid #e5e7eb",
-                            background:
-                              selectedTime === slot.value
+                                : isDisabled
+                                  ? "1px solid #F3F4F6"
+                                  : "1px solid #e5e7eb",
+                              background: isSelected
                                 ? `${brand}10`
-                                : "white",
-                            color: selectedTime === slot.value ? brand : "#333",
-                            fontSize: 13,
-                            fontWeight: selectedTime === slot.value ? 600 : 400,
-                            cursor: "pointer",
-                          }}
-                        >
-                          {slot.label}
-                        </button>
-                      ))}
+                                : isDisabled
+                                  ? "#FAFAFA"
+                                  : "white",
+                              color: isSelected
+                                ? brand
+                                : isDisabled
+                                  ? "#C4C4C4"
+                                  : "#333",
+                              cursor: isDisabled ? "not-allowed" : "pointer",
+                              fontWeight: isSelected ? 600 : 400,
+                              transition: "all 0.1s",
+                              textDecoration: isDisabled
+                                ? "line-through"
+                                : "none",
+                            }}
+                          >
+                            {slot.label}
+                            {/* "Booked" badge */}
+                            {isBooked && (
+                              <span
+                                style={{
+                                  display: "block",
+                                  fontSize: 9,
+                                  fontWeight: 600,
+                                  color: "#E5A300",
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.04em",
+                                  textDecoration: "none",
+                                  lineHeight: 1,
+                                  marginTop: 2,
+                                }}
+                              >
+                                Booked
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
@@ -400,23 +497,20 @@ export default function TimeSlotPicker({
       </div>
 
       {/* Continue button */}
-      <div style={{ marginTop: 32, textAlign: "center" }}>
+      <div className="mt-8 px-1 text-center sm:mt-10">
         <button
+          type="button"
           onClick={handleContinue}
           disabled={!selectedTime}
+          className="w-full max-w-md rounded-full px-6 py-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed sm:inline-block sm:w-auto sm:min-w-[280px] sm:px-10 sm:text-[15px]"
           style={{
-            padding: "16px 60px",
             background: selectedTime ? brand : "#e5e7eb",
             color: selectedTime ? "white" : "#aaa",
             border: "none",
-            borderRadius: 100,
-            fontSize: 15,
-            fontWeight: 600,
             cursor: selectedTime ? "pointer" : "not-allowed",
-            transition: "all 0.2s",
           }}
         >
-          Continue to Confirmation →
+          Continue to confirmation →
         </button>
       </div>
     </div>

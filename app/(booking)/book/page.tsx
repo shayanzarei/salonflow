@@ -16,20 +16,12 @@ export default async function ChooseServicePage() {
   const brand = tenant.primary_color ?? "#7C3AED";
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "40px 24px" }}>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-[860px] px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         {/* Back */}
         <a
           href="/"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            color: "#666",
-            fontSize: 14,
-            textDecoration: "none",
-            marginBottom: 32,
-          }}
+          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
         >
           ← Back
         </a>
@@ -38,39 +30,22 @@ export default async function ChooseServicePage() {
         <BookingProgress step={1} brand={brand} />
 
         {/* Title */}
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h1
-            style={{
-              fontSize: 40,
-              fontWeight: 700,
-              color: "#111",
-              margin: "0 0 12px",
-            }}
-          >
+        <div className="mb-8 text-center sm:mb-10 md:mb-12">
+          <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
             Choose a service
           </h1>
-          <p style={{ fontSize: 16, color: "#888", margin: 0 }}>
-            Select the treatment that's perfect for you
+          <p className="mt-2 text-sm text-gray-500 sm:text-base">
+            Select the treatment that&apos;s perfect for you
           </p>
         </div>
 
         {/* Services grid */}
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
-        >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 md:gap-5">
           {services.map((service) => (
             <a
               key={service.id}
               href={`/book/staff?service=${service.id}`}
-              style={{
-                display: "block",
-                background: "white",
-                border: "1px solid #f0f0f0",
-                borderRadius: 16,
-                padding: "28px 32px",
-                textDecoration: "none",
-                transition: "border-color 0.2s, box-shadow 0.2s",
-              }}
+              className="block min-h-[44px] rounded-2xl border border-gray-100 bg-white p-5 no-underline transition-shadow hover:border-gray-200 hover:shadow-md sm:p-6 md:p-7"
             >
               <h3
                 style={{
@@ -94,18 +69,14 @@ export default async function ChooseServicePage() {
                   {service.description}
                 </p>
               )}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginTop: "auto",
-                }}
-              >
-                <span style={{ fontSize: 13, color: "#aaa" }}>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs text-gray-400 sm:text-[13px]">
                   {service.duration_mins} min
                 </span>
-                <span style={{ fontSize: 22, fontWeight: 700, color: brand }}>
+                <span
+                  className="text-lg font-bold sm:text-xl md:text-[22px]"
+                  style={{ color: brand }}
+                >
                   €{service.price}
                 </span>
               </div>

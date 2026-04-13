@@ -33,53 +33,27 @@ export default async function ConfirmPage({
   const bookedAt = new Date(time);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px" }}>
-        {/* Back */}
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-[900px] px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <a
           href={`/book/time?service=${service}&staff=${staff}`}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            color: "#666",
-            fontSize: 14,
-            textDecoration: "none",
-            marginBottom: 32,
-          }}
+          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
         >
           ← Back
         </a>
 
-        {/* Progress */}
         <BookingProgress step={4} brand={brand} />
 
-        {/* Title */}
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h1
-            style={{
-              fontSize: 40,
-              fontWeight: 700,
-              color: "#111",
-              margin: "0 0 12px",
-            }}
-          >
+        <div className="mb-8 text-center sm:mb-10 md:mb-12">
+          <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
             Confirm your booking
           </h1>
-          <p style={{ fontSize: 16, color: "#888", margin: 0 }}>
+          <p className="mt-2 text-sm text-gray-500 sm:text-base">
             Review your appointment details before confirming
           </p>
         </div>
 
-        {/* Two column layout */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 24,
-            alignItems: "start",
-          }}
-        >
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6 lg:items-start">
           {/* Left — Booking summary */}
           <div
             style={{
@@ -90,7 +64,7 @@ export default async function ConfirmPage({
             }}
           >
             {/* Header */}
-            <div style={{ background: brand, padding: "28px 32px" }}>
+            <div className="px-5 py-6 sm:px-8 sm:py-7" style={{ background: brand }}>
               <p
                 style={{
                   fontSize: 12,
@@ -115,7 +89,7 @@ export default async function ConfirmPage({
             </div>
 
             {/* Details */}
-            <div style={{ padding: 32 }}>
+            <div className="p-5 sm:p-6 md:p-8">
               {/* Staff */}
               <div
                 style={{
@@ -189,18 +163,12 @@ export default async function ConfirmPage({
                 ].map((item) => (
                   <div
                     key={item.label}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
+                    className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
                   >
-                    <span style={{ fontSize: 14, color: "#888" }}>
+                    <span className="shrink-0 text-sm text-gray-500">
                       {item.label}
                     </span>
-                    <span
-                      style={{ fontSize: 14, fontWeight: 500, color: "#111" }}
-                    >
+                    <span className="min-w-0 text-sm font-medium text-gray-900 sm:text-right">
                       {item.value}
                     </span>
                   </div>
@@ -256,14 +224,7 @@ export default async function ConfirmPage({
           </div>
 
           {/* Right — Customer form */}
-          <div
-            style={{
-              background: "white",
-              border: "1px solid #f0f0f0",
-              borderRadius: 20,
-              padding: 32,
-            }}
-          >
+          <div className="rounded-[20px] border border-gray-100 bg-white p-5 sm:p-6 md:p-8">
             <h2
               style={{
                 fontSize: 20,
@@ -305,17 +266,7 @@ export default async function ConfirmPage({
                   name="client_name"
                   required
                   placeholder="Sarah Johnson"
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12,
-                    padding: "12px 16px",
-                    fontSize: 14,
-                    color: "#111",
-                    background: "white",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
+                  className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
                 />
               </div>
 
@@ -336,17 +287,7 @@ export default async function ConfirmPage({
                   name="client_email"
                   required
                   placeholder="sarah@example.com"
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12,
-                    padding: "12px 16px",
-                    fontSize: 14,
-                    color: "#111",
-                    background: "white",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
+                  className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
                 />
               </div>
 
@@ -369,17 +310,7 @@ export default async function ConfirmPage({
                   type="tel"
                   name="client_phone"
                   placeholder="+31 6 12345678"
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12,
-                    padding: "12px 16px",
-                    fontSize: 14,
-                    color: "#111",
-                    background: "white",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
+                  className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
                 />
               </div>
 
@@ -406,18 +337,8 @@ export default async function ConfirmPage({
 
               <button
                 type="submit"
-                style={{
-                  width: "100%",
-                  padding: "16px",
-                  background: brand,
-                  color: "white",
-                  border: "none",
-                  borderRadius: 100,
-                  fontSize: 15,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  marginTop: 4,
-                }}
+                className="mt-1 w-full min-h-12 rounded-full border-none py-4 text-base font-semibold text-white"
+                style={{ background: brand, cursor: "pointer" }}
               >
                 Confirm booking →
               </button>

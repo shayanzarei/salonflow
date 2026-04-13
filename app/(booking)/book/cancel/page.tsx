@@ -36,17 +36,7 @@ export default async function CancelPage({
 
   if (alreadyCancelled) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "#f9fafb",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px 24px",
-        }}
-      >
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-10 sm:px-6 sm:py-12">
         <div
           style={{
             width: 80,
@@ -61,30 +51,16 @@ export default async function CancelPage({
         >
           <span style={{ fontSize: 36 }}>✓</span>
         </div>
-        <h1
-          style={{
-            fontSize: 32,
-            fontWeight: 700,
-            color: "#111",
-            margin: "0 0 12px",
-          }}
-        >
+        <h1 className="mb-3 text-center text-2xl font-bold text-gray-900 sm:text-3xl">
           Already cancelled
         </h1>
-        <p style={{ fontSize: 16, color: "#888", margin: "0 0 32px" }}>
+        <p className="mb-8 text-center text-sm text-gray-500 sm:text-base">
           This appointment has already been cancelled.
         </p>
         <a
           href="/"
-          style={{
-            padding: "14px 36px",
-            background: brand,
-            color: "white",
-            borderRadius: 100,
-            fontSize: 15,
-            fontWeight: 600,
-            textDecoration: "none",
-          }}
+          className="inline-flex min-h-12 items-center justify-center rounded-full px-8 py-3 text-sm font-semibold text-white no-underline sm:px-10 sm:text-[15px]"
+          style={{ background: brand }}
         >
           Back to home
         </a>
@@ -93,17 +69,7 @@ export default async function CancelPage({
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f9fafb",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "40px 24px",
-      }}
-    >
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-10 sm:px-6 sm:py-12">
       {/* Warning icon */}
       <div
         style={{
@@ -121,43 +87,15 @@ export default async function CancelPage({
       </div>
 
       {/* Title */}
-      <h1
-        style={{
-          fontSize: 36,
-          fontWeight: 700,
-          color: "#111",
-          margin: "0 0 12px",
-          textAlign: "center",
-        }}
-      >
+      <h1 className="mb-3 max-w-md text-balance text-center text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
         Cancel appointment?
       </h1>
-      <p
-        style={{
-          fontSize: 16,
-          color: "#888",
-          margin: "0 0 36px",
-          textAlign: "center",
-          lineHeight: 1.7,
-        }}
-      >
-        Are you sure you want to cancel this booking?
-        <br />
-        This action cannot be undone.
+      <p className="mb-8 max-w-md text-center text-sm leading-relaxed text-gray-500 sm:mb-9 sm:text-base">
+        Are you sure you want to cancel this booking? This action cannot be
+        undone.
       </p>
 
-      {/* Booking details card */}
-      <div
-        style={{
-          background: "white",
-          border: "1px solid #f0f0f0",
-          borderRadius: 20,
-          padding: 28,
-          width: "100%",
-          maxWidth: 480,
-          marginBottom: 16,
-        }}
-      >
+      <div className="mb-4 w-full max-w-md rounded-[20px] border border-gray-100 bg-white p-5 sm:p-7">
         <p
           style={{
             fontSize: 12,
@@ -173,18 +111,8 @@ export default async function CancelPage({
           ℹ Appointment Details
         </p>
 
-        {/* Service row */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 24,
-            paddingBottom: 20,
-            borderBottom: "1px solid #f5f5f5",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div className="mb-6 flex flex-col gap-4 border-b border-gray-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3.5">
             <div
               style={{
                 width: 44,
@@ -215,15 +143,12 @@ export default async function CancelPage({
               </p>
             </div>
           </div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: brand }}>
+          <span className="text-lg font-bold sm:text-xl" style={{ color: brand }}>
             €{bookingData.price}
           </span>
         </div>
 
-        {/* Details grid */}
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}
-        >
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <p
               style={{
@@ -333,17 +258,7 @@ export default async function CancelPage({
       </div>
 
       {/* Cancellation policy */}
-      <div
-        style={{
-          background: "#FEF2F2",
-          border: "1px solid #FECACA",
-          borderRadius: 16,
-          padding: "16px 20px",
-          width: "100%",
-          maxWidth: 480,
-          marginBottom: 28,
-        }}
-      >
+      <div className="mb-7 w-full max-w-md rounded-2xl border border-red-200 bg-red-50 p-4 sm:p-5">
         <p
           style={{
             fontSize: 14,
@@ -371,57 +286,19 @@ export default async function CancelPage({
         </p>
       </div>
 
-      {/* Action buttons */}
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          width: "100%",
-          maxWidth: 480,
-          marginBottom: 20,
-        }}
-      >
+      <div className="mb-5 flex w-full max-w-md flex-col gap-3 sm:mb-6 sm:flex-row sm:gap-3">
         <a
           href="/"
-          style={{
-            flex: 1,
-            padding: "16px",
-            background: "white",
-            color: "#333",
-            border: "1px solid #e5e7eb",
-            borderRadius: 100,
-            fontSize: 15,
-            fontWeight: 600,
-            textDecoration: "none",
-            textAlign: "center",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-          }}
+          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-center text-sm font-semibold text-gray-800 no-underline sm:text-[15px]"
         >
           ← Keep appointment
         </a>
-        <form action="/api/bookings/cancel" method="POST" style={{ flex: 1 }}>
+        <form action="/api/bookings/cancel" method="POST" className="flex-1">
           <input type="hidden" name="booking_id" value={booking} />
           <input type="hidden" name="token" value={token} />
           <button
             type="submit"
-            style={{
-              width: "100%",
-              padding: "16px",
-              background: "#EF4444",
-              color: "white",
-              border: "none",
-              borderRadius: 100,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-            }}
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-none bg-red-500 px-4 py-3 text-sm font-semibold text-white"
           >
             ✕ Yes, cancel
           </button>

@@ -32,39 +32,25 @@ export default async function ChooseTimePage({
   if (!selectedService || !selectedStaff) notFound();
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px" }}>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-[900px] px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <a
           href={`/book/staff?service=${service}`}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            color: "#666",
-            fontSize: 14,
-            textDecoration: "none",
-            marginBottom: 32,
-          }}
+          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
         >
           ← Back
         </a>
 
         <BookingProgress step={3} brand={brand} />
 
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h1
-            style={{
-              fontSize: 40,
-              fontWeight: 700,
-              color: "#111",
-              margin: "0 0 12px",
-            }}
-          >
+        <div className="mb-8 text-center sm:mb-10 md:mb-12">
+          <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
             Choose a time
           </h1>
-          <p style={{ fontSize: 16, color: "#888", margin: 0 }}>
-            {selectedService.name} <span style={{ color: "#bbb" }}>with</span>{" "}
-            {selectedStaff.name}
+          <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-gray-500 sm:text-base">
+            <span className="text-gray-800">{selectedService.name}</span>{" "}
+            <span className="text-gray-400">with</span>{" "}
+            <span className="text-gray-800">{selectedStaff.name}</span>
           </p>
         </div>
 

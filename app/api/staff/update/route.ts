@@ -1,7 +1,11 @@
+import { requireOwner } from "@/lib/require-owner";
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+  const guard = await requireOwner();
+  if (guard.error) return guard.error;
+
   try {
     const formData = await req.formData();
     const staff_id = formData.get("staff_id") as string;
@@ -24,17 +28,7 @@ export async function POST(req: NextRequest) {
          avatar_color = NULLIF($6, ''),
          bio = NULLIF($7, '')
        WHERE id = $8 AND tenant_id = $9`,
-      [
-        name,
-        role,
-        email,
-        phone,
-        avatar_url,
-        avatar_color,
-        bio,
-        staff_id,
-        tenant_id,
-      ]
+      [name, role, email, phone, avatar_url, avatar_color, bio, staff_id, tenant_id]
     );
 
     return NextResponse.json({ success: true });

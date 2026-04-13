@@ -32,17 +32,7 @@ export default async function SuccessPage({
   const bookedAt = bookingData ? new Date(bookingData.booked_at) : null;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f9fafb",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "40px 24px",
-      }}
-    >
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-10 sm:px-6 sm:py-12">
       {/* Success icon */}
       <div style={{ position: "relative", marginBottom: 32 }}>
         <div
@@ -80,44 +70,17 @@ export default async function SuccessPage({
       </div>
 
       {/* Title */}
-      <h1
-        style={{
-          fontSize: 40,
-          fontWeight: 700,
-          color: "#111",
-          margin: "0 0 12px",
-          textAlign: "center",
-        }}
-      >
+      <h1 className="mb-3 max-w-md text-balance text-center text-3xl font-bold text-gray-900 sm:text-4xl md:text-[40px]">
         Booking confirmed!
       </h1>
-      <p
-        style={{
-          fontSize: 16,
-          color: "#888",
-          margin: "0 0 40px",
-          textAlign: "center",
-          lineHeight: 1.7,
-        }}
-      >
-        We've sent a confirmation email with all the details.
-        <br />
-        We can't wait to see you!
+      <p className="mb-8 max-w-md text-center text-sm leading-relaxed text-gray-500 sm:mb-10 sm:text-base">
+        We&apos;ve sent a confirmation email with all the details. We
+        can&apos;t wait to see you!
       </p>
 
       {/* Booking details card */}
       {bookingData && bookedAt && (
-        <div
-          style={{
-            background: "white",
-            border: "1px solid #f0f0f0",
-            borderRadius: 20,
-            padding: 32,
-            width: "100%",
-            maxWidth: 480,
-            marginBottom: 32,
-          }}
-        >
+        <div className="mb-8 w-full max-w-md rounded-[20px] border border-gray-100 bg-white p-5 sm:mb-10 sm:p-8">
           {/* Service + staff */}
           <div
             style={{
@@ -161,14 +124,7 @@ export default async function SuccessPage({
           </div>
 
           {/* Details grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 20,
-              marginBottom: 24,
-            }}
-          >
+          <div className="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-5">
             {[
               {
                 icon: "📅",
@@ -261,23 +217,13 @@ export default async function SuccessPage({
 
       <a
         href="/"
-        style={{
-          display: "inline-block",
-          padding: "16px 48px",
-          background: brand,
-          color: "white",
-          borderRadius: 100,
-          fontSize: 15,
-          fontWeight: 600,
-          textDecoration: "none",
-          marginBottom: 20,
-        }}
+        className="mb-5 inline-flex w-full max-w-md items-center justify-center rounded-full px-8 py-4 text-center text-sm font-semibold text-white no-underline sm:mb-6 sm:w-auto sm:px-12 sm:text-[15px]"
+        style={{ background: brand }}
       >
         Back to home
       </a>
 
-      {/* Secondary actions */}
-      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+      <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-6">
         <a
           href={
             bookedAt
@@ -297,7 +243,9 @@ export default async function SuccessPage({
         >
           📅 Add to calendar
         </a>
-        <span style={{ color: "#ddd" }}>|</span>
+        <span className="hidden text-gray-300 sm:inline" aria-hidden>
+          |
+        </span>
         <a
           href={`https://wa.me/?text=${encodeURIComponent(`I just booked at ${bookingData?.salon_name ?? "the salon"}!`)}`}
           target="_blank"

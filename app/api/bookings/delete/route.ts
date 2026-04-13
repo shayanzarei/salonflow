@@ -1,7 +1,11 @@
+import { requireOwner } from "@/lib/require-owner";
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+  const guard = await requireOwner();
+  if (guard.error) return guard.error;
+
   try {
     const formData = await req.formData();
     const booking_id = formData.get("booking_id") as string;

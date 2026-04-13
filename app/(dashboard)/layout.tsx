@@ -9,9 +9,16 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const tenant = await getTenant();
   const session = await getServerSession(authOptions);
+
+  // Not logged in at all
   if (!session) redirect("/login");
+
+  // Staff members have their own portal — never let them into the owner dashboard
+  if ((session as { isStaff: boolean }).isStaff === true)
+    redirect("/staff-portal");
+
+  const tenant = await getTenant();
   if (!tenant) notFound();
 
   const brand = tenant.primary_color ?? "#7C3AED";

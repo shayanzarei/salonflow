@@ -49,44 +49,25 @@ export default async function ChooseStaffPage({
   const selectedService = serviceResult.rows[0] ?? null;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f9fafb" }}>
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "40px 24px" }}>
-        {/* Back */}
-
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-[860px] px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <a
           href="/book"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            color: "#666",
-            fontSize: 14,
-            textDecoration: "none",
-            marginBottom: 32,
-          }}
+          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
         >
           ← Back
         </a>
 
-        {/* Progress */}
         <BookingProgress step={2} brand={brand} />
 
-        {/* Title */}
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h1
-            style={{
-              fontSize: 40,
-              fontWeight: 700,
-              color: "#111",
-              margin: "0 0 12px",
-            }}
-          >
+        <div className="mb-8 text-center sm:mb-10 md:mb-12">
+          <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
             Choose a staff member
           </h1>
           {selectedService && (
-            <p style={{ fontSize: 15, color: "#888", margin: 0 }}>
+            <p className="mt-2 text-sm text-gray-500 sm:text-[15px]">
               Selected:{" "}
-              <strong style={{ color: "#555" }}>{selectedService.name}</strong>
+              <strong className="text-gray-700">{selectedService.name}</strong>
             </p>
           )}
         </div>
@@ -99,18 +80,7 @@ export default async function ChooseStaffPage({
             <a
               key={member.id}
               href={`/book/time?service=${service}&staff=${member.id}`}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                background: "white",
-                border: "1px solid #f0f0f0",
-                borderRadius: 16,
-                padding: "32px 24px",
-                textDecoration: "none",
-                transition: "border-color 0.2s",
-                cursor: "pointer",
-              }}
+              className="flex cursor-pointer flex-col items-center rounded-2xl border border-gray-100 bg-white p-6 no-underline transition-shadow hover:border-gray-200 hover:shadow-md sm:p-8"
             >
               {/* Avatar */}
               <div

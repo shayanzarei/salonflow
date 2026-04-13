@@ -59,6 +59,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check for double-booking: new slot must not overlap any existing booking
+    // for the same staff member (confirmed or pending).
+    // Overlap condition: new_start < existing_end AND new_end > existing_start
+    const conflictResult = await pool.query(
+      `SELECT b.id
+       FROM bookings b
+       JOIN services s ON b.service_id = s.id
+       WHERE b.staff_id = $1
+         AND b.status IN ('confirmed', 'pending')
+         AND b.booked_at < ($2::timestamptz + ($3::int || ' minutes')::interval)
+         AND (b.booked_at + (s.duration_mins || ' minutes')::interval) > $2::timestamptz
+       LIMIT 1`,
+      [staff_id, booked_at, service.duration_mins]
+    );
+
+    if (conflictResult.rows.length > 0) {
+      return NextResponse.json(
+        { error: 'This time slot is already booked. Please choose another time.' },
+        { status: 409 }
+      );
+    }
+
     const result = await pool.query(
       `INSERT INTO bookings 
         (tenant_id, service_id, staff_id, booked_at, client_name, client_email, client_phone, status)

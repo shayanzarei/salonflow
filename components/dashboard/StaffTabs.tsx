@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import PortalAccessTab from "@/components/dashboard/PortalAccessTab";
+import WorkingHoursTab, { type DayHours } from "@/components/dashboard/WorkingHoursTab";
 
 interface Booking {
   id: string;
@@ -33,6 +34,7 @@ export default function StaffTabs({
   pastBookings,
   brand,
   activity,
+  workingHours,
 }: {
   staffId: string;
   tenantId: string;
@@ -43,14 +45,16 @@ export default function StaffTabs({
   pastBookings: Booking[];
   brand: string;
   activity: Activity[];
+  workingHours: DayHours[];
 }) {
-  const [activeTab, setActiveTab] = useState<"upcoming" | "past" | "portal">(
-    "upcoming"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "upcoming" | "past" | "portal" | "hours"
+  >("upcoming");
 
   const tabs = [
-    { id: "upcoming", label: "Upcoming Appointments" },
-    { id: "past", label: "Past Appointments" },
+    { id: "upcoming", label: "Upcoming" },
+    { id: "past", label: "Past" },
+    { id: "hours", label: "Working Hours" },
     { id: "portal", label: "Portal Access" },
   ];
 
@@ -228,7 +232,7 @@ export default function StaffTabs({
           <button
             key={tab.id}
             type="button"
-            onClick={() => setActiveTab(tab.id as "upcoming" | "past" | "portal")}
+            onClick={() => setActiveTab(tab.id as "upcoming" | "past" | "portal" | "hours")}
             className="shrink-0 cursor-pointer border-none bg-transparent px-3 py-3 text-left text-sm sm:px-5 sm:py-3 sm:text-[14px]"
             style={{
               fontWeight: activeTab === tab.id ? 600 : 400,
@@ -285,6 +289,14 @@ export default function StaffTabs({
         >
           <BookingTable bookings={pastBookings} />
         </div>
+      )}
+
+      {activeTab === "hours" && (
+        <WorkingHoursTab
+          staffId={staffId}
+          brand={brand}
+          initialHours={workingHours}
+        />
       )}
 
       {activeTab === "portal" && (

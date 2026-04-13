@@ -1,8 +1,12 @@
+import { requireOwner } from "@/lib/require-owner";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+  const guard = await requireOwner();
+  if (guard.error) return guard.error;
+
   try {
     const tenant = await getTenant();
     if (!tenant) {

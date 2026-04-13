@@ -6,9 +6,23 @@ export default function LogoutButton() {
   return (
     <button
       onClick={() => signOut({ callbackUrl: '/login' })}
-      className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '10px 12px',
+        borderRadius: 10,
+        color: '#666',
+        fontSize: 14,
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        width: '100%',
+        textAlign: 'left',
+      }}
     >
-      Sign out
+      <span style={{ fontSize: 16 }}>🚪</span>
+      <span>Logout</span>
     </button>
   );
 }

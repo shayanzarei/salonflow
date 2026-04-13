@@ -1,4 +1,3 @@
-import { formatEUR } from "@/lib/format-currency";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -13,26 +12,21 @@ export default async function BookingDetailPage({
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const result = await pool.query(
-    `SELECT
-       b.*,
-       s.name AS service_name,
-       s.price,
-       s.duration_mins,
-       st.name AS staff_name,
-       st.id AS staff_id
-     FROM bookings b
-     JOIN services s ON b.service_id = s.id
-     JOIN staff st ON b.staff_id = st.id
-     WHERE b.id = $1 AND b.tenant_id = $2`,
-    [id, tenant.id]
-  );
+  const brand = tenant.primary_color ?? "#7C3AED";
 
-  const booking = result.rows[0];
-  if (!booking) notFound();
-
-  // fetch all services and staff for edit form
-  const [servicesResult, staffResult] = await Promise.all([
+  const [bookingResult, servicesResult, staffResult] = await Promise.all([
+    pool.query(
+      `SELECT
+         b.*,
+         s.name AS service_name, s.price, s.duration_mins,
+         st.name AS staff_name, st.role AS staff_role,
+         st.id AS staff_id
+       FROM bookings b
+       JOIN services s ON b.service_id = s.id
+       JOIN staff st ON b.staff_id = st.id
+       WHERE b.id = $1 AND b.tenant_id = $2`,
+      [id, tenant.id]
+    ),
     pool.query(`SELECT * FROM services WHERE tenant_id = $1 ORDER BY name`, [
       tenant.id,
     ]),
@@ -41,229 +35,724 @@ export default async function BookingDetailPage({
     ]),
   ]);
 
+  const booking = bookingResult.rows[0];
+  if (!booking) notFound();
+
   const services = servicesResult.rows;
   const staffList = staffResult.rows;
-  const brand = tenant.primary_color ?? "#7C3AED";
+
+  // get client stats
+  const clientStats = await pool.query(
+    `SELECT
+       COUNT(*) AS total_bookings,
+       COALESCE(SUM(s.price), 0) AS total_spent,
+       MIN(b.created_at) AS member_since
+     FROM bookings b
+     JOIN services s ON b.service_id = s.id
+     WHERE b.tenant_id = $1 AND b.client_email = $2`,
+    [tenant.id, booking.client_email]
+  );
+
+  const stats = clientStats.rows[0];
+  const initials = booking.client_name
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const statusConfig: Record<
+    string,
+    { color: string; bg: string; dot: string }
+  > = {
+    confirmed: { color: "#059669", bg: "#ECFDF5", dot: "#10B981" },
+    pending: { color: "#D97706", bg: "#FFFBEB", dot: "#F59E0B" },
+    cancelled: { color: "#DC2626", bg: "#FEF2F2", dot: "#EF4444" },
+  };
+
+  const sc = statusConfig[booking.status] ?? statusConfig.pending;
+  const bookingRef = `#BK-${booking.id.split("-")[0].toUpperCase()}`;
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <Link
-            href="/bookings"
-            className="text-sm text-gray-400 hover:text-gray-600"
-          >
-            ← Back to bookings
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-4">
-            Booking details
-          </h1>
-        </div>
-        <span
-          className={`text-xs px-3 py-1.5 rounded-full font-medium ${
-            booking.status === "confirmed"
-              ? "bg-green-50 text-green-600"
-              : booking.status === "cancelled"
-                ? "bg-red-50 text-red-500"
-                : "bg-yellow-50 text-yellow-600"
-          }`}
+    <div>
+      {/* Header */}
+      <div style={{ marginBottom: 24 }}>
+        <Link
+          href="/bookings"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 13,
+            color: "#888",
+            textDecoration: "none",
+            marginBottom: 12,
+          }}
         >
-          {booking.status}
-        </span>
+          ← Back to Bookings
+        </Link>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <h1
+            style={{ fontSize: 24, fontWeight: 700, color: "#111", margin: 0 }}
+          >
+            Booking {bookingRef}
+          </h1>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: 13,
+              fontWeight: 500,
+              color: sc.color,
+              background: sc.bg,
+              padding: "6px 14px",
+              borderRadius: 100,
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: sc.dot,
+              }}
+            />
+            {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+          </span>
+        </div>
       </div>
 
-      {/* Client info */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
-        <h2 className="font-semibold text-gray-900 mb-4">Client</h2>
-        <div className="flex items-center gap-4">
+      {/* Two column layout */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 380px",
+          gap: 20,
+          alignItems: "start",
+        }}
+      >
+        {/* Left column */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Client info card */}
           <div
-            className="h-12 w-12 rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0"
-            style={{ backgroundColor: brand }}
+            style={{
+              background: "white",
+              borderRadius: 16,
+              border: "1px solid #f0f0f0",
+              padding: 24,
+            }}
           >
-            {booking.client_name.charAt(0)}
-          </div>
-          <div>
-            <p className="font-medium text-gray-900">{booking.client_name}</p>
-            <p className="text-sm text-gray-400">{booking.client_email}</p>
-            {booking.client_phone && (
-              <p className="text-sm text-gray-400">{booking.client_phone}</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Booking info */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
-        <h2 className="font-semibold text-gray-900 mb-4">Appointment</h2>
-        <div className="space-y-3">
-          {[
-            { label: "Service", value: booking.service_name },
-            { label: "Staff", value: booking.staff_name },
-            {
-              label: "Date",
-              value: new Date(booking.booked_at).toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              }),
-            },
-            {
-              label: "Time",
-              value: new Date(booking.booked_at).toLocaleTimeString("en-US", {
-                hour: "numeric",
-                minute: "2-digit",
-              }),
-            },
-            { label: "Duration", value: `${booking.duration_mins} mins` },
-            { label: "Price", value: formatEUR(booking.price) },
-          ].map((item) => (
-            <div key={item.label} className="flex justify-between text-sm">
-              <span className="text-gray-500">{item.label}</span>
-              <span className="font-medium text-gray-900">{item.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Edit form */}
-      {booking.status !== "cancelled" && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-4">
-          <h2 className="font-semibold text-gray-900 mb-4">Edit booking</h2>
-          <form
-            action="/api/bookings/update"
-            method="POST"
-            className="space-y-4"
-          >
-            <input type="hidden" name="booking_id" value={booking.id} />
-            <input type="hidden" name="tenant_id" value={tenant.id} />
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Service
-                </label>
-                <select
-                  name="service_id"
-                  defaultValue={booking.service_id}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-                >
-                  {services.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Staff
-                </label>
-                <select
-                  name="staff_id"
-                  defaultValue={booking.staff_id}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-                >
-                  {staffList.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  defaultValue={
-                    new Date(booking.booked_at).toISOString().split("T")[0]
-                  }
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Time
-                </label>
-                <input
-                  type="time"
-                  name="time"
-                  defaultValue={new Date(booking.booked_at)
-                    .toTimeString()
-                    .slice(0, 5)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <select
-                name="status"
-                defaultValue={booking.status}
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-              >
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: brand }}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 20,
+              }}
             >
-              Save changes
-            </button>
-          </form>
-        </div>
-      )}
+              <span style={{ fontSize: 16 }}>👤</span>
+              <h2
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "#111",
+                  margin: 0,
+                }}
+              >
+                Client Information
+              </h2>
+            </div>
 
-      {/* Danger zone */}
-      <div className="bg-white rounded-xl border border-red-100 p-6">
-        <h2 className="font-semibold text-gray-900 mb-1">Danger zone</h2>
-        <p className="text-xs text-gray-400 mb-4">
-          These actions cannot be undone
-        </p>
-        <div className="flex gap-3">
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 20,
+              }}
+            >
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: "50%",
+                  background: brand,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  fontWeight: 700,
+                  fontSize: 18,
+                  flexShrink: 0,
+                }}
+              >
+                {initials}
+              </div>
+              <div>
+                <p
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: "#111",
+                    margin: "0 0 4px",
+                  }}
+                >
+                  {booking.client_name}
+                </p>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#888",
+                    margin: "0 0 2px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
+                  }}
+                >
+                  <span>✉</span> {booking.client_email}
+                </p>
+                {booking.client_phone && (
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "#888",
+                      margin: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5,
+                    }}
+                  >
+                    <span>📞</span> {booking.client_phone}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Stats pills */}
+            <div style={{ display: "flex", gap: 10 }}>
+              {[
+                { label: "TOTAL BOOKINGS", value: stats.total_bookings },
+                {
+                  label: "TOTAL SPENT",
+                  value: `€${parseFloat(stats.total_spent).toFixed(0)}`,
+                },
+                {
+                  label: "MEMBER SINCE",
+                  value: new Date(stats.member_since).toLocaleDateString(
+                    "en-US",
+                    { month: "short", year: "numeric" }
+                  ),
+                },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  style={{
+                    flex: 1,
+                    background: "#f9fafb",
+                    borderRadius: 10,
+                    padding: "10px 14px",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: 10,
+                      color: "#aaa",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      margin: "0 0 4px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {s.label}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: "#111",
+                      margin: 0,
+                    }}
+                  >
+                    {s.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Appointment details card */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              border: "1px solid #f0f0f0",
+              padding: 24,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 20,
+              }}
+            >
+              <span style={{ fontSize: 16 }}>📅</span>
+              <h2
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "#111",
+                  margin: 0,
+                }}
+              >
+                Appointment Details
+              </h2>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {[
+                {
+                  icon: "✂",
+                  label: "Service",
+                  value: booking.service_name,
+                  colored: false,
+                },
+                {
+                  icon: "👤",
+                  label: "Staff",
+                  value: booking.staff_name,
+                  colored: false,
+                },
+                {
+                  icon: "📅",
+                  label: "Date",
+                  colored: false,
+                  value: new Date(booking.booked_at).toLocaleDateString(
+                    "en-US",
+                    { month: "short", day: "numeric", year: "numeric" }
+                  ),
+                },
+                {
+                  icon: "🕐",
+                  label: "Time",
+                  colored: false,
+                  value: new Date(booking.booked_at).toLocaleTimeString(
+                    "en-US",
+                    { hour: "numeric", minute: "2-digit" }
+                  ),
+                },
+                {
+                  icon: "⏱",
+                  label: "Duration",
+                  value: `${booking.duration_mins} minutes`,
+                  colored: false,
+                },
+                {
+                  icon: "💶",
+                  label: "Price",
+                  value: `€${booking.price}`,
+                  colored: true,
+                },
+                ...(tenant.address
+                  ? [
+                      {
+                        icon: "📍",
+                        label: "Location",
+                        value: tenant.address,
+                        colored: false,
+                      },
+                    ]
+                  : []),
+              ].map((item, i) => (
+                <div
+                  key={item.label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "14px 0",
+                    borderBottom: i < 6 ? "1px solid #f5f5f5" : "none",
+                  }}
+                >
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 10 }}
+                  >
+                    <span style={{ fontSize: 15 }}>{item.icon}</span>
+                    <span style={{ fontSize: 14, color: "#666" }}>
+                      {item.label}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: item.colored ? brand : "#111",
+                    }}
+                  >
+                    {item.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Edit booking card */}
           {booking.status !== "cancelled" && (
-            <form action="/api/bookings/update-status" method="POST">
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <input type="hidden" name="tenant_id" value={tenant.id} />
-              <input type="hidden" name="status" value="cancelled" />
-              <input
-                type="hidden"
-                name="redirect"
-                value={`/bookings/${booking.id}`}
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-              >
-                Cancel booking
-              </button>
-            </form>
-          )}
-          <form action="/api/bookings/delete" method="POST">
-            <input type="hidden" name="booking_id" value={booking.id} />
-            <input type="hidden" name="tenant_id" value={tenant.id} />
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+            <div
+              style={{
+                background: "white",
+                borderRadius: 16,
+                border: "1px solid #f0f0f0",
+                padding: 24,
+              }}
             >
-              Delete booking
-            </button>
-          </form>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 20,
+                }}
+              >
+                <span style={{ fontSize: 16 }}>✏️</span>
+                <h2
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: "#111",
+                    margin: 0,
+                  }}
+                >
+                  Edit Booking
+                </h2>
+              </div>
+
+              <form
+                action="/api/bookings/update"
+                method="POST"
+                style={{ display: "flex", flexDirection: "column", gap: 16 }}
+              >
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <input type="hidden" name="tenant_id" value={tenant.id} />
+
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#aaa",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Service
+                  </label>
+                  <select
+                    name="service_id"
+                    defaultValue={booking.service_id}
+                    style={{
+                      width: "100%",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                      fontSize: 14,
+                      color: "#111",
+                      background: "white",
+                      outline: "none",
+                    }}
+                  >
+                    {services.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#aaa",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Staff
+                  </label>
+                  <select
+                    name="staff_id"
+                    defaultValue={booking.staff_id}
+                    style={{
+                      width: "100%",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                      fontSize: 14,
+                      color: "#111",
+                      background: "white",
+                      outline: "none",
+                    }}
+                  >
+                    {staffList.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 12,
+                  }}
+                >
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: "#aaa",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                        marginBottom: 8,
+                      }}
+                    >
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      name="date"
+                      defaultValue={
+                        new Date(booking.booked_at).toISOString().split("T")[0]
+                      }
+                      style={{
+                        width: "100%",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 10,
+                        padding: "10px 14px",
+                        fontSize: 14,
+                        color: "#111",
+                        background: "white",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: "#aaa",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                        marginBottom: 8,
+                      }}
+                    >
+                      Time
+                    </label>
+                    <input
+                      type="time"
+                      name="time"
+                      defaultValue={new Date(booking.booked_at)
+                        .toTimeString()
+                        .slice(0, 5)}
+                      style={{
+                        width: "100%",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 10,
+                        padding: "10px 14px",
+                        fontSize: 14,
+                        color: "#111",
+                        background: "white",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#aaa",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Status
+                  </label>
+                  <select
+                    name="status"
+                    defaultValue={booking.status}
+                    style={{
+                      width: "100%",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                      fontSize: 14,
+                      color: "#111",
+                      background: "white",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="confirmed">● Confirmed</option>
+                    <option value="pending">● Pending</option>
+                    <option value="cancelled">● Cancelled</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    background: brand,
+                    color: "white",
+                    border: "none",
+                    borderRadius: 10,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    marginTop: 4,
+                  }}
+                >
+                  Save Changes
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Quick actions card */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: 16,
+              border: "1px solid #f0f0f0",
+              padding: 24,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 20,
+              }}
+            >
+              <span style={{ fontSize: 16 }}>⚡</span>
+              <h2
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "#111",
+                  margin: 0,
+                }}
+              >
+                Quick Actions
+              </h2>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {booking.status !== "cancelled" && (
+                <form action="/api/bookings/update-status" method="POST">
+                  <input type="hidden" name="booking_id" value={booking.id} />
+                  <input type="hidden" name="tenant_id" value={tenant.id} />
+                  <input type="hidden" name="status" value="cancelled" />
+                  <input
+                    type="hidden"
+                    name="redirect"
+                    value={`/bookings/${booking.id}`}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      width: "100%",
+                      padding: "11px",
+                      background: "white",
+                      color: "#DC2626",
+                      border: "1px solid #FECACA",
+                      borderRadius: 10,
+                      fontSize: 14,
+                      fontWeight: 500,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                    }}
+                  >
+                    ✕ Cancel Booking
+                  </button>
+                </form>
+              )}
+
+              <form action="/api/bookings/delete" method="POST">
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <input type="hidden" name="tenant_id" value={tenant.id} />
+                <button
+                  type="submit"
+                  style={{
+                    width: "100%",
+                    padding: "11px",
+                    background: "#EF4444",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 10,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                  }}
+                >
+                  🗑 Delete Booking
+                </button>
+              </form>
+
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#aaa",
+                  textAlign: "center",
+                  margin: "4px 0 0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 4,
+                }}
+              >
+                ⚠ This action cannot be undone
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

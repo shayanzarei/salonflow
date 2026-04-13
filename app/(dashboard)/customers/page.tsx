@@ -1,7 +1,7 @@
-import { formatEUR } from "@/lib/format-currency";
 import pool from "@/lib/db";
-import { getTenant } from '@/lib/tenant';
-import { notFound } from 'next/navigation';
+import { formatEUR } from "@/lib/format-currency";
+import { getTenant } from "@/lib/tenant";
+import { notFound } from "next/navigation";
 
 export default async function CustomersPage() {
   const tenant = await getTenant();
@@ -30,7 +30,7 @@ export default async function CustomersPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
         <p className="text-gray-500 mt-1">
-          {customers.length} total customer{customers.length !== 1 ? 's' : ''}
+          {customers.length} total customer{customers.length !== 1 ? "s" : ""}
         </p>
       </div>
 
@@ -41,15 +41,17 @@ export default async function CustomersPage() {
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
-            {customers.map((customer) => (
+            {customers.map((customer, index) => (
               <div
-                key={customer.client_email}
+                key={customer.client_email + index}
                 className="px-6 py-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-4">
                   <div
                     className="h-9 w-9 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0"
-                    style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
+                    style={{
+                      backgroundColor: tenant.primary_color ?? "#7C3AED",
+                    }}
                   >
                     {customer.client_name.charAt(0)}
                   </div>
@@ -72,13 +74,14 @@ export default async function CustomersPage() {
                     {formatEUR(parseFloat(customer.total_spent))} spent
                   </p>
                   <p className="text-xs text-gray-400">
-                    {customer.total_bookings} booking{customer.total_bookings !== '1' ? 's' : ''}
+                    {customer.total_bookings} booking
+                    {customer.total_bookings !== "1" ? "s" : ""}
                   </p>
                   <p className="text-xs text-gray-400">
-                    Last visit{' '}
-                    {new Date(customer.last_visit).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
+                    Last visit{" "}
+                    {new Date(customer.last_visit).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
                     })}
                   </p>
                 </div>

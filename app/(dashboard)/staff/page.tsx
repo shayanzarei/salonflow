@@ -3,75 +3,359 @@ import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+const STAFF_COLORS = [
+  "#7C3AED",
+  "#F59E0B",
+  "#10B981",
+  "#EC4899",
+  "#3B82F6",
+  "#EF4444",
+  "#8B5CF6",
+  "#06B6D4",
+];
+
 export default async function StaffPage() {
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const result = await pool.query(
-    `SELECT * FROM staff WHERE tenant_id = $1 ORDER BY name`,
+  const brand = tenant.primary_color ?? "#7C3AED";
+
+  const staffResult = await pool.query(
+    `SELECT
+       s.*,
+       COUNT(b.id) FILTER (WHERE b.booked_at >= NOW() AND b.status = 'confirmed') AS upcoming_count,
+       COALESCE(SUM(sv.price) FILTER (WHERE b.status = 'confirmed'), 0) AS total_revenue,
+       COUNT(b.id) FILTER (WHERE b.booked_at >= NOW() - INTERVAL '7 days' AND b.status = 'confirmed') AS week_appointments
+     FROM staff s
+     LEFT JOIN bookings b ON b.staff_id = s.id
+     LEFT JOIN services sv ON b.service_id = sv.id
+     WHERE s.tenant_id = $1
+     GROUP BY s.id
+     ORDER BY s.name`,
     [tenant.id]
   );
-  const staffList = result.rows;
+
+  const staffList = staffResult.rows;
+  const totalWeekAppointments = staffList.reduce(
+    (sum, s) => sum + parseInt(s.week_appointments),
+    0
+  );
+  const activeStaff = staffList.filter((s) => s.password_hash).length;
+  const totalRevenue = staffList.reduce(
+    (sum, s) => sum + parseFloat(s.total_revenue),
+    0
+  );
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Staff</h1>
-          <p className="text-gray-500 mt-1">Manage your team</p>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 24,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <h1
+            style={{ fontSize: 24, fontWeight: 700, color: "#111", margin: 0 }}
+          >
+            Staff
+          </h1>
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 500,
+              color: brand,
+              background: `${brand}15`,
+              padding: "3px 10px",
+              borderRadius: 100,
+            }}
+          >
+            {staffList.length} Team Members
+          </span>
         </div>
-
-        <a
+        <Link
           href="/staff/new"
-          className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: tenant.primary_color ?? "#7C3AED" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "10px 18px",
+            background: brand,
+            color: "white",
+            borderRadius: 10,
+            fontSize: 14,
+            fontWeight: 500,
+            textDecoration: "none",
+          }}
         >
-          Add staff
-        </a>
+          + Add Staff Member
+        </Link>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100">
+      {/* Stats cards */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 16,
+          marginBottom: 24,
+        }}
+      >
+        {[
+          {
+            label: "Total Appointments (This Week)",
+            value: totalWeekAppointments,
+            icon: "✅",
+            iconBg: "#ECFDF5",
+          },
+          {
+            label: "Active Staff Today",
+            value: `${activeStaff} / ${staffList.length}`,
+            icon: "👥",
+            iconBg: "#EEF2FF",
+          },
+          {
+            label: "Total Revenue Generated",
+            value: `€${totalRevenue.toLocaleString("en", { minimumFractionDigits: 0 })}`,
+            icon: "📈",
+            iconBg: "#F5F3FF",
+          },
+        ].map((stat) => (
+          <div
+            key={stat.label}
+            style={{
+              background: "white",
+              borderRadius: 16,
+              border: "1px solid #f0f0f0",
+              padding: "20px 24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              <p style={{ fontSize: 13, color: "#888", margin: "0 0 8px" }}>
+                {stat.label}
+              </p>
+              <p
+                style={{
+                  fontSize: 24,
+                  fontWeight: 700,
+                  color: "#111",
+                  margin: 0,
+                }}
+              >
+                {stat.value}
+              </p>
+            </div>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                background: stat.iconBg,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 20,
+                flexShrink: 0,
+              }}
+            >
+              {stat.icon}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Team directory */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: 16,
+          border: "1px solid #f0f0f0",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            padding: "18px 24px",
+            borderBottom: "1px solid #f5f5f5",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <h2
+            style={{ fontSize: 15, fontWeight: 600, color: "#111", margin: 0 }}
+          >
+            Team Directory
+          </h2>
+        </div>
+
         {staffList.length === 0 ? (
-          <div className="px-6 py-12 text-center text-gray-400 text-sm">
-            No staff yet. Add your first team member.
+          <div style={{ padding: "60px 24px", textAlign: "center" }}>
+            <p style={{ fontSize: 32, margin: "0 0 12px" }}>👥</p>
+            <h3
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: "#111",
+                margin: "0 0 8px",
+              }}
+            >
+              No team members yet
+            </h3>
+            <p style={{ fontSize: 14, color: "#888", margin: "0 0 20px" }}>
+              Add your first staff member to get started
+            </p>
+            <Link
+              href="/staff/new"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "10px 20px",
+                background: brand,
+                color: "white",
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 500,
+                textDecoration: "none",
+              }}
+            >
+              + Add Staff Member
+            </Link>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {staffList.map((member) => (
-              <Link
-                key={member.id}
-                href={`/staff/${member.id}`}
-                className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
+          <div>
+            {staffList.map((member, i) => {
+              const color = STAFF_COLORS[i % STAFF_COLORS.length];
+              const initials = member.name
+                .split(" ")
+                .map((n: string) => n[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase();
+              const hasPortal = !!member.password_hash;
+              const upcomingCount = parseInt(member.upcoming_count);
+
+              return (
+                <div
+                  key={member.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "16px 24px",
+                    borderBottom: "1px solid #f9f9f9",
+                    transition: "background 0.15s",
+                  }}
+                >
+                  {/* Left: avatar + info */}
                   <div
-                    className="h-9 w-9 rounded-full flex items-center justify-center text-white font-medium text-sm"
-                    style={{
-                      backgroundColor: tenant.primary_color ?? "#7C3AED",
-                    }}
+                    style={{ display: "flex", alignItems: "center", gap: 14 }}
                   >
-                    {member.name.charAt(0)}
+                    <div
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        background: `${color}20`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: color,
+                        fontWeight: 700,
+                        fontSize: 15,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {initials}
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          fontSize: 15,
+                          fontWeight: 600,
+                          color: "#111",
+                          margin: "0 0 2px",
+                        }}
+                      >
+                        {member.name}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: "#666",
+                          margin: "0 0 1px",
+                        }}
+                      >
+                        {member.role}
+                      </p>
+                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                        {member.email}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {member.name}
-                    </p>
-                    <p className="text-xs text-gray-400">{member.role}</p>
-                    <p className="text-xs text-gray-400">{member.email}</p>
+
+                  {/* Right: portal status + upcoming + menu */}
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 20 }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 500,
+                        padding: "4px 12px",
+                        borderRadius: 100,
+                        background: hasPortal ? "#ECFDF5" : "#F5F5F5",
+                        color: hasPortal ? "#059669" : "#999",
+                      }}
+                    >
+                      {hasPortal ? "Active" : "Not set"}
+                    </span>
+
+                    <div style={{ textAlign: "right", minWidth: 80 }}>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: "#111",
+                          margin: 0,
+                        }}
+                      >
+                        {upcomingCount} upcoming
+                      </p>
+                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                        appointments
+                      </p>
+                    </div>
+
+                    {/* Quick actions */}
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <Link
+                        href={`/staff/${member.id}`}
+                        style={{
+                          fontSize: 13,
+                          color: brand,
+                          textDecoration: "none",
+                          fontWeight: 500,
+                          padding: "6px 14px",
+                          border: `1px solid ${brand}30`,
+                          borderRadius: 8,
+                          background: `${brand}08`,
+                        }}
+                      >
+                        View 👀
+                      </Link>
+                    </div>
                   </div>
                 </div>
-                <form action="/api/staff/delete" method="POST">
-                  <input type="hidden" name="id" value={member.id} />
-                  <input type="hidden" name="tenant_id" value={tenant.id} />
-                  <button
-                    type="submit"
-                    className="text-xs text-red-400 hover:text-red-600 transition-colors"
-                  >
-                    Delete
-                  </button>
-                </form>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

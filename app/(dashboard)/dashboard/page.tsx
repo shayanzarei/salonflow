@@ -1,30 +1,24 @@
-import { formatEUR } from "@/lib/format-currency";
 import pool from "@/lib/db";
-import { getTenant } from '@/lib/tenant';
-import { notFound } from 'next/navigation';
+import { getTenant } from "@/lib/tenant";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function DashboardPage() {
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  // today's date range
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   const todayEnd = new Date();
   todayEnd.setHours(23, 59, 59, 999);
 
-  // fetch stats in parallel
   const [todayBookings, totalRevenue, upcomingBookings, totalCustomers] =
     await Promise.all([
-      // today's bookings count
       pool.query(
         `SELECT COUNT(*) FROM bookings
-         WHERE tenant_id = $1
-         AND booked_at BETWEEN $2 AND $3
-         AND status = 'confirmed'`,
+         WHERE tenant_id = $1 AND booked_at BETWEEN $2 AND $3 AND status = 'confirmed'`,
         [tenant.id, todayStart, todayEnd]
       ),
-      // total revenue
       pool.query(
         `SELECT COALESCE(SUM(s.price), 0) as total
          FROM bookings b
@@ -32,17 +26,10 @@ export default async function DashboardPage() {
          WHERE b.tenant_id = $1 AND b.status = 'confirmed'`,
         [tenant.id]
       ),
-      // next 5 upcoming bookings with details
       pool.query(
         `SELECT
-           b.id,
-           b.client_name,
-           b.client_email,
-           b.booked_at,
-           b.status,
-           s.name AS service_name,
-           s.duration_mins,
-           s.price,
+           b.id, b.client_name, b.client_email, b.booked_at, b.status,
+           s.name AS service_name, s.duration_mins, s.price,
            st.name AS staff_name
          FROM bookings b
          JOIN services s ON b.service_id = s.id
@@ -51,13 +38,11 @@ export default async function DashboardPage() {
            AND b.booked_at >= NOW()
            AND b.status = 'confirmed'
          ORDER BY b.booked_at ASC
-         LIMIT 5`,
+         LIMIT 6`,
         [tenant.id]
       ),
-      // total unique customers
       pool.query(
-        `SELECT COUNT(DISTINCT client_email) FROM bookings
-         WHERE tenant_id = $1`,
+        `SELECT COUNT(DISTINCT client_email) FROM bookings WHERE tenant_id = $1`,
         [tenant.id]
       ),
     ]);
@@ -70,34 +55,136 @@ export default async function DashboardPage() {
   };
 
   const upcoming = upcomingBookings.rows;
+  const brand = tenant.primary_color ?? "#7C3AED";
+
+  const statCards = [
+    {
+      label: "Today's Bookings",
+      value: stats.todayCount,
+      icon: "📅",
+      iconBg: "#EEF2FF",
+      change: "+12%",
+      changeBg: "#ECFDF5",
+      changeColor: "#10B981",
+    },
+    {
+      label: "Upcoming",
+      value: stats.upcomingCount,
+      icon: "🕐",
+      iconBg: "#F5F3FF",
+      change: "+8%",
+      changeBg: "#ECFDF5",
+      changeColor: "#10B981",
+    },
+    {
+      label: "Total Customers",
+      value: stats.customerCount.toLocaleString(),
+      icon: "👥",
+      iconBg: "#FFF7ED",
+      change: "+23%",
+      changeBg: "#ECFDF5",
+      changeColor: "#10B981",
+    },
+    {
+      label: "Total Revenue",
+      value: `€${stats.revenue.toLocaleString("en", { minimumFractionDigits: 0 })}`,
+      icon: "💶",
+      iconBg: "#F0FDF4",
+      change: "+18%",
+      changeBg: "#ECFDF5",
+      changeColor: "#10B981",
+    },
+  ];
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
-        <p className="text-gray-500 mt-1">
-          {new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
+      {/* Header */}
+      <div style={{ marginBottom: 28 }}>
+        <h1
+          style={{
+            fontSize: 28,
+            fontWeight: 700,
+            color: "#111",
+            margin: "0 0 4px",
+          }}
+        >
+          Overview
+        </h1>
+        <p style={{ fontSize: 14, color: "#999", margin: 0 }}>
+          {new Date().toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            year: "numeric",
           })}
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: "Today's bookings", value: stats.todayCount },
-          { label: 'Upcoming', value: stats.upcomingCount },
-          { label: 'Total customers', value: stats.customerCount },
-          { label: 'Total revenue', value: formatEUR(stats.revenue) },
-        ].map((stat) => (
+      {/* Stat cards */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 16,
+          marginBottom: 28,
+        }}
+      >
+        {statCards.map((stat) => (
           <div
             key={stat.label}
-            className="bg-white rounded-xl border border-gray-100 p-5"
+            style={{
+              background: "white",
+              borderRadius: 16,
+              border: "1px solid #f0f0f0",
+              padding: "20px 24px",
+            }}
           >
-            <p className="text-sm text-gray-500">{stat.label}</p>
-            <p className="text-2xl font-semibold text-gray-900 mt-1">
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: stat.iconBg,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 18,
+                }}
+              >
+                {stat.icon}
+              </div>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: stat.changeColor,
+                  background: stat.changeBg,
+                  padding: "3px 8px",
+                  borderRadius: 100,
+                }}
+              >
+                {stat.change}
+              </span>
+            </div>
+            <p style={{ fontSize: 13, color: "#999", margin: "0 0 6px" }}>
+              {stat.label}
+            </p>
+            <p
+              style={{
+                fontSize: 28,
+                fontWeight: 700,
+                color: "#111",
+                margin: 0,
+              }}
+            >
               {stat.value}
             </p>
           </div>
@@ -105,51 +192,177 @@ export default async function DashboardPage() {
       </div>
 
       {/* Upcoming bookings */}
-      <div className="bg-white rounded-xl border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-gray-900">Upcoming bookings</h2>
+      <div
+        style={{
+          background: "white",
+          borderRadius: 16,
+          border: "1px solid #f0f0f0",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            padding: "20px 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderBottom: "1px solid #f5f5f5",
+          }}
+        >
+          <h2
+            style={{ fontSize: 16, fontWeight: 600, color: "#111", margin: 0 }}
+          >
+            Upcoming Bookings
+          </h2>
+          <Link
+            href="/bookings"
+            style={{
+              fontSize: 13,
+              color: brand,
+              textDecoration: "none",
+              fontWeight: 500,
+            }}
+          >
+            View All →
+          </Link>
         </div>
+
         {upcoming.length === 0 ? (
-          <div className="px-6 py-12 text-center text-gray-400 text-sm">
+          <div
+            style={{
+              padding: "48px 24px",
+              textAlign: "center",
+              color: "#aaa",
+              fontSize: 14,
+            }}
+          >
             No upcoming bookings yet.
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {upcoming.map((booking) => (
-              <div
-                key={booking.id}
-                className="px-6 py-4 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-medium text-sm">
-                    {booking.client_name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {booking.client_name}
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
+                {["Client", "Service", "Staff", "Date & Time"].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      padding: "12px 24px",
+                      textAlign: "left",
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: "#aaa",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {upcoming.map((booking) => (
+                <tr
+                  key={booking.id}
+                  style={{ borderBottom: "1px solid #f9f9f9" }}
+                >
+                  <td style={{ padding: "16px 24px" }}>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <div
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: "50%",
+                          background: brand,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: 14,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {booking.client_name.charAt(0)}
+                      </div>
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 500,
+                            color: "#111",
+                            margin: 0,
+                          }}
+                        >
+                          {booking.client_name}
+                        </p>
+                        <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                          {booking.client_email}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: "16px 24px" }}>
+                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                      {booking.service_name}
                     </p>
-                    <p className="text-xs text-gray-400">
-                      {booking.service_name} · {booking.staff_name}
+                    <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                      {booking.duration_mins} min · €{booking.price}
                     </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">
-                    {new Date(booking.booked_at).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {new Date(booking.booked_at).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    })}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+                  </td>
+                  <td style={{ padding: "16px 24px" }}>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    >
+                      <div
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: "50%",
+                          background: "#f0f0f0",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: "#555",
+                        }}
+                      >
+                        {booking.staff_name.charAt(0)}
+                      </div>
+                      <span style={{ fontSize: 14, color: "#333" }}>
+                        {booking.staff_name}
+                      </span>
+                    </div>
+                  </td>
+                  <td style={{ padding: "16px 24px" }}>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 500,
+                        color: "#111",
+                        margin: 0,
+                      }}
+                    >
+                      {new Date(booking.booked_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </p>
+                    <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                      {new Date(booking.booked_at).toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

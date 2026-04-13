@@ -37,16 +37,10 @@ export default async function CalendarPage() {
   );
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
-        <p className="text-gray-500 mt-1">Your weekly schedule</p>
-      </div>
-      <CalendarView
-        bookings={result.rows}
-        staff={staffResult.rows}
-        brandColor={tenant.primary_color ?? "#7C3AED"}
-      />
-    </div>
+    <CalendarView
+      bookings={result.rows}
+      staff={staffResult.rows}
+      brandColor={tenant.primary_color ?? "#7C3AED"}
+    />
   );
 }

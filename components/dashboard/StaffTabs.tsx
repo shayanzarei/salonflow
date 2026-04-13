@@ -80,7 +80,8 @@ export default function StaffTabs({
     }
 
     return (
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+      <table className="w-full min-w-[720px] border-collapse">
         <thead>
           <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
             {["Date & Time", "Client", "Service", "Status", "Action"].map(
@@ -215,30 +216,21 @@ export default function StaffTabs({
           })}
         </tbody>
       </table>
+      </div>
     );
   }
 
   return (
-    <div>
-      {/* Tab nav */}
-      <div
-        style={{
-          display: "flex",
-          gap: 0,
-          marginBottom: 20,
-          borderBottom: "1px solid #f0f0f0",
-        }}
-      >
+    <div className="min-w-0">
+      {/* Tab nav — scroll horizontally on small screens */}
+      <div className="-mx-1 mb-5 flex gap-0 overflow-x-auto overflow-y-hidden border-b border-gray-100 px-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            type="button"
+            onClick={() => setActiveTab(tab.id as "upcoming" | "past" | "portal")}
+            className="shrink-0 cursor-pointer border-none bg-transparent px-3 py-3 text-left text-sm sm:px-5 sm:py-3 sm:text-[14px]"
             style={{
-              padding: "12px 20px",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: 14,
               fontWeight: activeTab === tab.id ? 600 : 400,
               color: activeTab === tab.id ? brand : "#888",
               borderBottom:
@@ -264,39 +256,16 @@ export default function StaffTabs({
           }}
         >
           {/* Filter */}
-          <div
-            style={{
-              padding: "14px 20px",
-              borderBottom: "1px solid #f5f5f5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <select
-              style={{
-                border: "1px solid #e5e7eb",
-                borderRadius: 8,
-                padding: "6px 12px",
-                fontSize: 13,
-                color: "#555",
-                background: "white",
-                outline: "none",
-              }}
-            >
+          <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+            <select className="min-h-10 w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600 outline-none sm:max-w-[200px]">
               <option>Next 7 Days</option>
               <option>Next 30 Days</option>
               <option>All upcoming</option>
             </select>
             <button
-              style={{
-                fontSize: 13,
-                color: brand,
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                fontWeight: 500,
-              }}
+              type="button"
+              className="shrink-0 text-left text-sm font-medium sm:text-right"
+              style={{ color: brand, background: "none", border: "none", cursor: "pointer" }}
             >
               Export List
             </button>

@@ -9,6 +9,7 @@ export interface Tenant {
   about: string | null;
   address: string | null;
   hours: string | null;
+  phone?: string | null;
   hero_image_url: string | null;
   created_at: string;
 }

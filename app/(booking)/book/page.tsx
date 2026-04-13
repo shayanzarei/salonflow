@@ -1,5 +1,6 @@
 import BookingProgress from "@/components/booking/BookingProgress";
 import pool from "@/lib/db";
+import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
 
@@ -8,7 +9,7 @@ export default async function ChooseServicePage() {
   if (!tenant) notFound();
 
   const result = await pool.query(
-    `SELECT * FROM services WHERE tenant_id = $1 ORDER BY name`,
+    `SELECT * FROM services WHERE tenant_id = $1 AND ${bookableServiceSql()} ORDER BY name`,
     [tenant.id]
   );
   const services = result.rows;

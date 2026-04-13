@@ -114,135 +114,67 @@ export default function CalendarView({
   }
 
   return (
-    <div>
+    <div className="min-w-0">
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 24,
-        }}
-      >
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
-          <p className="text-gray-500 mt-1">Your weekly schedule</p>
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Calendar</h1>
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
+            Your weekly schedule
+          </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto lg:justify-end">
           {/* Search */}
-          <div style={{ position: "relative" }}>
-            <span
-              style={{
-                position: "absolute",
-                left: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: 14,
-                color: "#aaa",
-              }}
-            >
+          <div className="relative min-w-0 flex-1 sm:max-w-[220px] lg:flex-initial">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
               🔍
             </span>
             <input
               type="text"
               placeholder="Search clients..."
-              style={{
-                paddingLeft: 36,
-                paddingRight: 16,
-                paddingTop: 9,
-                paddingBottom: 9,
-                border: "1px solid #e5e7eb",
-                borderRadius: 100,
-                fontSize: 14,
-                color: "#111",
-                background: "white",
-                outline: "none",
-                width: 200,
-              }}
+              className="w-full rounded-full border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 outline-none"
             />
           </div>
 
           {/* Week nav */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="flex shrink-0 items-center justify-center gap-2 sm:justify-start">
             <button
+              type="button"
               onClick={prevWeek}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                border: "1px solid #e5e7eb",
-                color: "#111",
-                background: "white",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 14,
-              }}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-sm text-gray-900"
             >
               ‹
             </button>
-            <span
-              style={{
-                fontSize: 15,
-                fontWeight: 600,
-                color: "#111",
-                minWidth: 100,
-                textAlign: "center",
-              }}
-            >
+            <span className="min-w-[7.5rem] text-center text-sm font-semibold text-gray-900 sm:text-[15px]">
               {currentWeekStart.toLocaleDateString("en-US", {
                 month: "long",
                 year: "numeric",
               })}
             </span>
             <button
+              type="button"
               onClick={nextWeek}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                border: "1px solid #e5e7eb",
-                color: "#111",
-                background: "white",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 14,
-              }}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-sm text-gray-900"
             >
               ›
             </button>
           </div>
 
           <button
+            type="button"
             onClick={goToToday}
-            style={{
-              padding: "8px 20px",
-              border: `1.5px solid ${brandColor}`,
-              borderRadius: 100,
-              background: "white",
-              color: brandColor,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            className="shrink-0 rounded-full border-[1.5px] bg-white px-5 py-2 text-sm font-semibold"
+            style={{ borderColor: brandColor, color: brandColor }}
           >
             Today
           </button>
         </div>
       </div>
 
-      {/* Calendar grid */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: 16,
-          border: "1px solid #f0f0f0",
-          overflow: "hidden",
-        }}
-      >
+      {/* Calendar grid — min width so week scrolls horizontally on phones */}
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+        <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+          <div className="min-w-[760px]">
         {/* Day headers */}
         <div
           style={{
@@ -461,44 +393,20 @@ export default function CalendarView({
         </div>
 
         {/* Staff legend + filter */}
-        <div
-          style={{
-            padding: "16px 20px",
-            borderTop: "1px solid #f5f5f5",
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            flexWrap: "wrap",
-          }}
-        >
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: "#aaa",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-            }}
-          >
+        <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden border-t border-gray-100 px-4 py-4 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] sm:flex-wrap sm:gap-4 sm:px-5">
+          <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
             Staff:
           </span>
 
           {/* All filter */}
           <button
+            type="button"
             onClick={() => setSelectedStaffId("all")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "4px 12px",
-              borderRadius: 100,
-              border: "none",
-              cursor: "pointer",
-              background: selectedStaffId === "all" ? "#111" : "transparent",
-              color: selectedStaffId === "all" ? "white" : "#666",
-              fontSize: 13,
-              fontWeight: selectedStaffId === "all" ? 600 : 400,
-            }}
+            className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[13px] ${
+              selectedStaffId === "all"
+                ? "bg-gray-900 font-semibold text-white"
+                : "font-normal text-gray-600"
+            }`}
           >
             All
           </button>
@@ -508,20 +416,14 @@ export default function CalendarView({
             const isActive = selectedStaffId === member.id;
             return (
               <button
+                type="button"
                 key={member.id}
                 onClick={() => setSelectedStaffId(isActive ? "all" : member.id)}
+                className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[13px]"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "4px 12px",
-                  borderRadius: 100,
-                  border: "none",
-                  cursor: "pointer",
+                  fontWeight: isActive ? 600 : 400,
                   background: isActive ? `${color}20` : "transparent",
                   color: isActive ? color : "#555",
-                  fontSize: 13,
-                  fontWeight: isActive ? 600 : 400,
                 }}
               >
                 <span
@@ -537,6 +439,8 @@ export default function CalendarView({
               </button>
             );
           })}
+        </div>
+          </div>
         </div>
       </div>
 

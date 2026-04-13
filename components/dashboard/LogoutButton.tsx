@@ -10,6 +10,7 @@ export default function LogoutButton() {
         display: 'flex',
         alignItems: 'center',
         gap: 10,
+        minHeight: 44,
         padding: '10px 12px',
         borderRadius: 10,
         color: '#666',

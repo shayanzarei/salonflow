@@ -49,28 +49,14 @@ export default async function StaffPage() {
   return (
     <div>
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 24,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <h1
-            style={{ fontSize: 24, fontWeight: 700, color: "#111", margin: 0 }}
-          >
-            Staff
-          </h1>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Staff</h1>
           <span
+            className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium sm:text-[13px]"
             style={{
-              fontSize: 13,
-              fontWeight: 500,
               color: brand,
               background: `${brand}15`,
-              padding: "3px 10px",
-              borderRadius: 100,
             }}
           >
             {staffList.length} Team Members
@@ -78,32 +64,15 @@ export default async function StaffPage() {
         </div>
         <Link
           href="/staff/new"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "10px 18px",
-            background: brand,
-            color: "white",
-            borderRadius: 10,
-            fontSize: 14,
-            fontWeight: 500,
-            textDecoration: "none",
-          }}
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] px-4 py-2.5 text-sm font-medium text-white no-underline"
+          style={{ background: brand }}
         >
           + Add Staff Member
         </Link>
       </div>
 
       {/* Stats cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 16,
-          marginBottom: 24,
-        }}
-      >
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[
           {
             label: "Total Appointments (This Week)",
@@ -245,19 +214,10 @@ export default async function StaffPage() {
               return (
                 <div
                   key={member.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "16px 24px",
-                    borderBottom: "1px solid #f9f9f9",
-                    transition: "background 0.15s",
-                  }}
+                  className="flex flex-col gap-4 border-b border-gray-50 px-4 py-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-6"
                 >
                   {/* Left: avatar + info */}
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 14 }}
-                  >
+                  <div className="flex min-w-0 items-center gap-3.5 sm:gap-3.5">
                     <div
                       style={{
                         width: 48,
@@ -302,9 +262,7 @@ export default async function StaffPage() {
                   </div>
 
                   {/* Right: portal status + upcoming + menu */}
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 20 }}
-                  >
+                  <div className="flex flex-wrap items-center gap-3 sm:justify-end sm:gap-5">
                     <span
                       style={{
                         fontSize: 12,

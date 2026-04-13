@@ -14,16 +14,20 @@ export default async function NewBookingPage() {
   ]);
 
   return (
-    <div>
-      <div style={{ marginBottom: 28 }}>
+    <div className="min-w-0">
+      <div className="mb-6 sm:mb-7">
         <Link
           href="/bookings"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#888', textDecoration: 'none', marginBottom: 12 }}
+          className="mb-3 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-500 no-underline"
         >
           ← Back to Bookings
         </Link>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111', margin: '0 0 4px' }}>Add Booking</h1>
-        <p style={{ fontSize: 14, color: '#888', margin: 0 }}>Manually create a booking for a client</p>
+        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
+          Add Booking
+        </h1>
+        <p className="mt-1 text-sm text-gray-500 sm:text-base">
+          Manually create a booking for a client
+        </p>
       </div>
 
       <AddBookingForm

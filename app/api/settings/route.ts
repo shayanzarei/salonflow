@@ -1,10 +1,21 @@
 import pool from "@/lib/db";
+import { getTenant } from "@/lib/tenant";
 import { NextRequest, NextResponse } from "next/server";
+
+const SECTION_KEYS = [
+  "section_services",
+  "section_team",
+  "section_reviews",
+] as const;
 
 export async function POST(req: NextRequest) {
   try {
+    const tenant = await getTenant();
+    if (!tenant) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await req.formData();
-    const tenant_id = formData.get("tenant_id") as string;
     const action = formData.get("action") as string;
 
     if (action === "info") {
@@ -14,6 +25,8 @@ export async function POST(req: NextRequest) {
       const about = formData.get("about") as string;
       const address = formData.get("address") as string;
       const hours = formData.get("hours") as string;
+      const phone = formData.get("phone") as string;
+      const logo_url = formData.get("logo_url") as string;
 
       await pool.query(
         `UPDATE tenants SET
@@ -22,29 +35,56 @@ export async function POST(req: NextRequest) {
            tagline = NULLIF($3, ''),
            about = NULLIF($4, ''),
            address = NULLIF($5, ''),
-           hours = NULLIF($6, '')
-         WHERE id = $7`,
-        [name, slug, tagline, about, address, hours, tenant_id]
+           hours = NULLIF($6, ''),
+           phone = NULLIF($7, ''),
+           logo_url = NULLIF($8, '')
+         WHERE id = $9`,
+        [
+          name,
+          slug,
+          tagline,
+          about,
+          address,
+          hours,
+          phone,
+          logo_url,
+          tenant.id,
+        ]
       );
     }
 
     if (action === "branding") {
-      const primary_color = formData.get("primary_color") as string;
-      const logo_url = formData.get("logo_url") as string;
+      const primary_color = (formData.get("primary_color") as string)?.trim();
       const hero_image_url = formData.get("hero_image_url") as string;
+
+      const color =
+        primary_color && /^#[0-9A-Fa-f]{6}$/.test(primary_color)
+          ? primary_color
+          : tenant.primary_color ?? "#7C3AED";
 
       await pool.query(
         `UPDATE tenants SET
            primary_color = $1,
-           logo_url = NULLIF($2, ''),
-           hero_image_url = NULLIF($3, '')
-         WHERE id = $4`,
-        [primary_color, logo_url, hero_image_url, tenant_id]
+           hero_image_url = NULLIF($2, '')
+         WHERE id = $3`,
+        [color, hero_image_url, tenant.id]
       );
+
+      for (const key of SECTION_KEYS) {
+        const enabled = formData.get(key) === "true";
+        await pool.query(
+          `INSERT INTO feature_flags (tenant_id, feature, enabled)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (tenant_id, feature)
+           DO UPDATE SET enabled = EXCLUDED.enabled`,
+          [tenant.id, key, enabled]
+        );
+      }
     }
 
     return NextResponse.redirect(new URL("/settings", req.url));
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error("Unknown error");
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

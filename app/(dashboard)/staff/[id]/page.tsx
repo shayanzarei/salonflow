@@ -93,183 +93,87 @@ export default async function StaffDetailPage({
   const pastBookings = pastResult.rows;
 
   return (
-    <div>
+    <div className="min-w-0">
       {/* Header */}
-      <div style={{ marginBottom: 20 }}>
+      <div className="mb-4 sm:mb-5">
         <Link
           href="/staff"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 13,
-            color: "#888",
-            textDecoration: "none",
-            marginBottom: 16,
-          }}
+          className="inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-500 no-underline"
         >
           ← Back to Staff
         </Link>
       </div>
 
       {/* Profile card */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: 16,
-          border: "1px solid #f0f0f0",
-          padding: 24,
-          marginBottom: 20,
-          flex: 3,
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr auto",
-            gap: 24,
-            alignItems: "start",
-          }}
-        >
-          {/* Left: profile info */}
-          <div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                marginBottom: 16,
-              }}
-            >
-              {/* Avatar */}
-              <div style={{ position: "relative", flexShrink: 0 }}>
-                <div
-                  style={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: "50%",
-                    background: `${color}20`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: color,
-                    fontWeight: 700,
-                    fontSize: 22,
-                  }}
-                >
-                  {initials}
-                </div>
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 2,
-                    right: 2,
-                    width: 12,
-                    height: 12,
-                    borderRadius: "50%",
-                    background: "#10B981",
-                    border: "2px solid white",
-                  }}
-                />
+      <div className="mb-5 rounded-2xl border border-gray-100 bg-white p-4 sm:mb-6 sm:p-6">
+        <div className="flex flex-col gap-4">
+          {/* Avatar + name block */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            <div className="relative h-[72px] w-[72px] shrink-0">
+              <div
+                className="flex h-[72px] w-[72px] items-center justify-center rounded-full text-[22px] font-bold"
+                style={{ background: `${color}20`, color }}
+              >
+                {initials}
               </div>
+              <div
+                className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"
+                aria-hidden
+              />
+            </div>
 
-              {/* Name + actions */}
-              <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <div>
-                    <h1
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 700,
-                        color: "#111",
-                        margin: "0 0 4px",
-                      }}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                <div className="min-w-0">
+                  <h1 className="text-balance text-xl font-bold text-gray-900 sm:text-[22px]">
+                    {member.name}
+                  </h1>
+                  <p className="mt-1 text-sm text-gray-500">{member.role}</p>
+                </div>
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:justify-end">
+                  <Link
+                    href={`/staff/${id}/edit`}
+                    className="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-200 px-4 text-center text-sm font-medium text-gray-700 no-underline"
+                  >
+                    Edit Profile
+                  </Link>
+                  <form
+                    action="/api/staff/delete"
+                    method="POST"
+                    className="w-full sm:w-auto"
+                  >
+                    <input type="hidden" name="id" value={id} />
+                    <input type="hidden" name="tenant_id" value={tenant.id} />
+                    <button
+                      type="submit"
+                      className="min-h-10 w-full rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-500 sm:w-auto"
                     >
-                      {member.name}
-                    </h1>
-                    <p style={{ fontSize: 14, color: "#888", margin: 0 }}>
-                      {member.role}
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <Link
-                      href={`/staff/${id}/edit`}
-                      style={{
-                        padding: "8px 16px",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 8,
-                        fontSize: 13,
-                        color: "#555",
-                        textDecoration: "none",
-                        fontWeight: 500,
-                      }}
-                    >
-                      Edit Profile
-                    </Link>
-                    <form
-                      action="/api/staff/delete"
-                      method="POST"
-                      style={{ display: "inline" }}
-                    >
-                      <input type="hidden" name="id" value={id} />
-                      <input type="hidden" name="tenant_id" value={tenant.id} />
-                      <button
-                        type="submit"
-                        style={{
-                          padding: "8px 16px",
-                          border: "1px solid #FECACA",
-                          borderRadius: 8,
-                          fontSize: 13,
-                          color: "#EF4444",
-                          background: "white",
-                          cursor: "pointer",
-                          fontWeight: 500,
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </form>
-                  </div>
+                      Delete
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
+          </div>
 
             {/* Contact info */}
-            <div style={{ display: "flex", gap: 24, marginBottom: 14 }}>
-              <span
-                style={{
-                  fontSize: 13,
-                  color: "#888",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                }}
-              >
-                ✉ {member.email}
+            <div className="flex flex-col gap-2 text-sm text-gray-500 sm:flex-row sm:flex-wrap sm:gap-x-6 sm:gap-y-1">
+              <span className="flex min-w-0 items-start gap-1.5 break-all">
+                <span className="shrink-0" aria-hidden>
+                  ✉
+                </span>
+                {member.email}
               </span>
               {member.phone && (
-                <span
-                  style={{
-                    fontSize: 13,
-                    color: "#888",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                  }}
-                >
-                  📞 {member.phone}
+                <span className="flex items-center gap-1.5 break-all">
+                  <span aria-hidden>📞</span>
+                  {member.phone}
                 </span>
               )}
             </div>
 
             {/* Status badges */}
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className="flex flex-wrap gap-2">
               <span
                 style={{
                   display: "inline-flex",
@@ -309,20 +213,11 @@ export default async function StaffDetailPage({
                 🔑 Portal {member.password_hash ? "Active" : "Not set"}
               </span>
             </div>
-          </div>
         </div>
       </div>
 
       {/* stat cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 12,
-          width: "100%",
-          marginBottom: 20,
-        }}
-      >
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:mb-6 sm:grid-cols-3 sm:gap-3">
         {[
           {
             label: "TOTAL BOOKINGS",

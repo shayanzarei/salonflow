@@ -1,5 +1,6 @@
 import BookingProgress from "@/components/booking/BookingProgress";
 import pool from "@/lib/db";
+import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
 
@@ -15,14 +16,32 @@ export default async function ChooseStaffPage({
   const brand = tenant.primary_color ?? "#7C3AED";
 
   const [staffResult, serviceResult] = await Promise.all([
-    pool.query(`SELECT * FROM staff WHERE tenant_id = $1 ORDER BY name`, [
-      tenant.id,
-    ]),
     service
-      ? pool.query(`SELECT * FROM services WHERE id = $1 AND tenant_id = $2`, [
-          service,
+      ? pool.query(
+          `SELECT st.*
+           FROM staff st
+           WHERE st.tenant_id = $1
+           AND (
+             NOT EXISTS (
+               SELECT 1 FROM service_staff ss
+               WHERE ss.service_id = $2::uuid AND ss.tenant_id = $1
+             )
+             OR EXISTS (
+               SELECT 1 FROM service_staff ss
+               WHERE ss.service_id = $2::uuid AND ss.staff_id = st.id AND ss.tenant_id = $1
+             )
+           )
+           ORDER BY st.name`,
+          [tenant.id, service]
+        )
+      : pool.query(`SELECT * FROM staff WHERE tenant_id = $1 ORDER BY name`, [
           tenant.id,
-        ])
+        ]),
+    service
+      ? pool.query(
+          `SELECT * FROM services WHERE id = $1 AND tenant_id = $2 AND ${bookableServiceSql()}`,
+          [service, tenant.id]
+        )
       : Promise.resolve({ rows: [] }),
   ]);
 
@@ -74,7 +93,7 @@ export default async function ChooseStaffPage({
 
         {/* Staff grid */}
         <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4"
         >
           {staffList.map((member) => (
             <a

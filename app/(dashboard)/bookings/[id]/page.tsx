@@ -130,16 +130,9 @@ export default async function BookingDetailPage({
       </div>
 
       {/* Two column layout */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 380px",
-          gap: 20,
-          alignItems: "start",
-        }}
-      >
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start">
         {/* Left column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div className="flex min-w-0 flex-col gap-5">
           {/* Client info card */}
           <div
             style={{
@@ -406,7 +399,7 @@ export default async function BookingDetailPage({
         </div>
 
         {/* Right column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div className="flex min-w-0 flex-col gap-5 xl:sticky xl:top-20 xl:self-start">
           {/* Edit booking card */}
           {booking.status !== "cancelled" && (
             <div
@@ -518,13 +511,7 @@ export default async function BookingDetailPage({
                   </select>
                 </div>
 
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 12,
-                  }}
-                >
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
                     <label
                       style={{

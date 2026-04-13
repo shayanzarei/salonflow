@@ -122,12 +122,7 @@ export default async function DashboardPage() {
 
       {/* Stat cards */}
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 16,
-          marginBottom: 28,
-        }}
+        className="mb-7 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4"
       >
         {statCards.map((stat) => (
           <div
@@ -239,7 +234,8 @@ export default async function DashboardPage() {
             No upcoming bookings yet.
           </div>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+            <table className="w-full min-w-[640px] border-collapse">
             <thead>
               <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
                 {["Client", "Service", "Staff", "Date & Time"].map((h) => (
@@ -363,6 +359,7 @@ export default async function DashboardPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

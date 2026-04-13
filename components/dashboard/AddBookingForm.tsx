@@ -98,15 +98,16 @@ export default function AddBookingForm({
 
   const inputStyle = {
     width: "100%",
+    minHeight: 44,
     border: "1px solid #e5e7eb",
     borderRadius: 10,
     padding: "10px 14px",
-    fontSize: 14,
+    fontSize: 16,
     color: "#111",
     background: "white",
     outline: "none",
     boxSizing: "border-box" as const,
-  };
+  } as const;
 
   const labelStyle = {
     display: "block",
@@ -122,26 +123,12 @@ export default function AddBookingForm({
   ];
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 340px",
-          gap: 20,
-          alignItems: "start",
-        }}
-      >
-        {/* Left column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <form onSubmit={handleSubmit} className="min-w-0">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:items-start lg:gap-5">
+        {/* Left column — form fields */}
+        <div className="flex min-w-0 flex-col gap-5">
           {/* Client details */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
             <div
               style={{
                 display: "flex",
@@ -260,14 +247,7 @@ export default function AddBookingForm({
               </div>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 14,
-                marginBottom: 14,
-              }}
-            >
+            <div className="mb-3.5 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
               <div>
                 <label style={labelStyle}>Full Name</label>
                 <input
@@ -310,14 +290,7 @@ export default function AddBookingForm({
           </div>
 
           {/* Appointment details */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
             <div
               style={{
                 display: "flex",
@@ -374,13 +347,7 @@ export default function AddBookingForm({
                 </select>
               </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 14,
-                }}
-              >
+              <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                 <div>
                   <label style={labelStyle}>Date</label>
                   <input
@@ -418,7 +385,7 @@ export default function AddBookingForm({
                   ))}
                 </select>
                 {/* Status pills */}
-                <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <div className="mt-2.5 flex flex-wrap gap-2">
                   {statusConfig.map((s) => (
                     <span
                       key={s.value}
@@ -456,25 +423,10 @@ export default function AddBookingForm({
           </div>
         </div>
 
-        {/* Right column */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 16,
-            position: "sticky",
-            top: 80,
-          }}
-        >
+        {/* Right column — summary + actions (sticky from lg) */}
+        <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
           {/* Summary card */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
             <div
               style={{
                 display: "flex",
@@ -607,30 +559,12 @@ export default function AddBookingForm({
           </div>
 
           {/* Actions card */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
             <button
               type="submit"
               disabled={loading}
-              style={{
-                width: "100%",
-                padding: "13px",
-                background: brand,
-                color: "white",
-                border: "none",
-                borderRadius: 10,
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                marginBottom: 14,
-              }}
+              className="mb-3.5 w-full min-h-12 rounded-[10px] border-none text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
+              style={{ background: brand, padding: "13px" }}
             >
               {loading ? "Creating..." : "Create Booking"}
             </button>
@@ -661,16 +595,7 @@ export default function AddBookingForm({
             <button
               type="button"
               onClick={() => window.history.back()}
-              style={{
-                width: "100%",
-                padding: "11px",
-                background: "white",
-                color: "#666",
-                border: "1px solid #e5e7eb",
-                borderRadius: 10,
-                fontSize: 14,
-                cursor: "pointer",
-              }}
+              className="w-full min-h-11 cursor-pointer rounded-[10px] border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-600"
             >
               Cancel
             </button>

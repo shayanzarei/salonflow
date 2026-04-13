@@ -1,6 +1,7 @@
 import BookingProgress from "@/components/booking/BookingProgress";
 import TimeSlotPicker from "@/components/booking/TimeSlotPicker";
 import pool from "@/lib/db";
+import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
 
@@ -16,10 +17,10 @@ export default async function ChooseTimePage({
   const brand = tenant.primary_color ?? "#7C3AED";
 
   const [serviceResult, staffResult] = await Promise.all([
-    pool.query(`SELECT * FROM services WHERE id = $1 AND tenant_id = $2`, [
-      service,
-      tenant.id,
-    ]),
+    pool.query(
+      `SELECT * FROM services WHERE id = $1 AND tenant_id = $2 AND ${bookableServiceSql()}`,
+      [service, tenant.id]
+    ),
     pool.query(`SELECT * FROM staff WHERE id = $1 AND tenant_id = $2`, [
       staff,
       tenant.id,

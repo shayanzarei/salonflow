@@ -26,11 +26,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid token" }, { status: 400 });
     }
 
-    // save review
+    const booking = bookingResult.rows[0] as { service_id?: string };
+
+    // save review (service_id enables per-service ratings on the dashboard)
     await pool.query(
-      `INSERT INTO reviews (tenant_id, client_name, rating, comment)
-       VALUES ($1, $2, $3, $4)`,
-      [tenant_id, client_name, rating, comment]
+      `INSERT INTO reviews (tenant_id, service_id, client_name, rating, comment)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [tenant_id, booking.service_id ?? null, client_name, rating, comment]
     );
 
     return NextResponse.redirect(

@@ -1,12 +1,58 @@
 import pool from "@/lib/db";
 import { formatEUR } from "@/lib/format-currency";
 import { getTenant } from "@/lib/tenant";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export default async function CustomersPage() {
+const PAGE_SIZE = 12;
+
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+}
+
+function getStatus(totalBookings: number, totalSpent: number, lastVisit: string) {
+  const daysSinceVisit = Math.floor(
+    (Date.now() - new Date(lastVisit).getTime()) / (1000 * 60 * 60 * 24)
+  );
+  if (totalSpent >= 500 || totalBookings >= 10) return "VIP";
+  if (daysSinceVisit >= 60) return "At Risk";
+  if (totalBookings <= 1) return "New";
+  return "Regular";
+}
+
+function getDaysAgo(date: string) {
+  const days = Math.floor(
+    (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24)
+  );
+  if (days === 0) return "Today";
+  if (days === 1) return "1 day ago";
+  return `${days} days ago`;
+}
+
+const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  VIP: { label: "VIP", color: "#92400E", bg: "#FEF3C7" },
+  Regular: { label: "Regular", color: "#374151", bg: "#F3F4F6" },
+  New: { label: "New", color: "#065F46", bg: "#D1FAE5" },
+  "At Risk": { label: "At Risk", color: "#991B1B", bg: "#FEE2E2" },
+};
+
+export default async function CustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string; page?: string }>;
+}) {
   const tenant = await getTenant();
   if (!tenant) notFound();
 
+  const { tab, page } = await searchParams;
+  const activeTab = tab ?? "all";
+  const currentPage = parseInt(page ?? "1");
+  const offset = (currentPage - 1) * PAGE_SIZE;
+  const brand = tenant.primary_color ?? "#7C3AED";
+
+  // Fetch all customers with aggregated stats
   const result = await pool.query(
     `SELECT
        client_name,
@@ -14,7 +60,8 @@ export default async function CustomersPage() {
        client_phone,
        COUNT(*) AS total_bookings,
        SUM(s.price) AS total_spent,
-       MAX(b.booked_at) AS last_visit
+       MAX(b.booked_at) AS last_visit,
+       MIN(b.booked_at) AS member_since
      FROM bookings b
      JOIN services s ON b.service_id = s.id
      WHERE b.tenant_id = $1
@@ -23,71 +70,614 @@ export default async function CustomersPage() {
     [tenant.id]
   );
 
-  const customers = result.rows;
+  const allCustomers = result.rows.map((c) => ({
+    ...c,
+    total_bookings: parseInt(c.total_bookings),
+    total_spent: parseFloat(c.total_spent),
+    status: getStatus(
+      parseInt(c.total_bookings),
+      parseFloat(c.total_spent),
+      c.last_visit
+    ),
+  }));
+
+  // Stat card calculations
+  const totalCustomers = allCustomers.length;
+  const now = new Date();
+  const newThisMonth = allCustomers.filter((c) => {
+    const d = new Date(c.member_since);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  const prevMonthNew = allCustomers.filter((c) => {
+    const d = new Date(c.member_since);
+    const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    return d.getMonth() === prev.getMonth() && d.getFullYear() === prev.getFullYear();
+  }).length;
+  const newGrowthPct =
+    prevMonthNew > 0
+      ? Math.round(((newThisMonth - prevMonthNew) / prevMonthNew) * 100)
+      : null;
+  const avgSpend =
+    totalCustomers > 0
+      ? allCustomers.reduce((s, c) => s + c.total_spent, 0) / totalCustomers
+      : 0;
+
+  // Tab filtering
+  let filtered = allCustomers;
+  if (activeTab === "vip") filtered = allCustomers.filter((c) => c.status === "VIP");
+  else if (activeTab === "new") filtered = allCustomers.filter((c) => c.status === "New");
+  else if (activeTab === "at-risk") filtered = allCustomers.filter((c) => c.status === "At Risk");
+
+  const totalFiltered = filtered.length;
+  const totalPages = Math.ceil(totalFiltered / PAGE_SIZE);
+  const customers = filtered.slice(offset, offset + PAGE_SIZE);
+
+  const tabs = [
+    { label: "All Customers", value: "all" },
+    { label: "VIP", value: "vip" },
+    { label: "New", value: "new", suffix: "(this month)" },
+    { label: "At Risk", value: "at-risk", suffix: "(60+ days)" },
+  ];
+
+  function tabHref(t: string) {
+    return t === "all" ? "/customers" : `/customers?tab=${t}`;
+  }
+
+  const showingFrom = totalFiltered === 0 ? 0 : offset + 1;
+  const showingTo = Math.min(offset + PAGE_SIZE, totalFiltered);
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
-        <p className="text-gray-500 mt-1">
-          {customers.length} total customer{customers.length !== 1 ? "s" : ""}
-        </p>
+      {/* Header */}
+      <div className="mb-5 sm:mb-6">
+        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Customers</h1>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100">
+      {/* Stat Cards */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:mb-7 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Total Customers */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: 16,
+            border: "1px solid #f0f0f0",
+            padding: "20px 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
+              Total Customers
+            </p>
+            <p style={{ fontSize: 30, fontWeight: 700, color: "#111", margin: "0 0 2px" }}>
+              {totalCustomers.toLocaleString()}
+            </p>
+            <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>All time</p>
+          </div>
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: `${brand}18`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                stroke={brand}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="9" cy="7" r="4" stroke={brand} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                stroke={brand}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+
+        {/* New This Month */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: 16,
+            border: "1px solid #f0f0f0",
+            padding: "20px 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
+              New This Month
+            </p>
+            <p style={{ fontSize: 30, fontWeight: 700, color: "#111", margin: "0 0 6px" }}>
+              {newThisMonth}
+            </p>
+            {newGrowthPct !== null && (
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: newGrowthPct >= 0 ? "#059669" : "#DC2626",
+                  background: newGrowthPct >= 0 ? "#D1FAE5" : "#FEE2E2",
+                  padding: "2px 8px",
+                  borderRadius: 100,
+                }}
+              >
+                {newGrowthPct >= 0 ? "↑" : "↓"} {Math.abs(newGrowthPct)}% vs last month
+              </span>
+            )}
+          </div>
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: "#D1FAE518",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                stroke="#059669"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="9" cy="7" r="4" stroke="#059669" strokeWidth="2" />
+              <line x1="19" y1="8" x2="19" y2="14" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
+              <line x1="22" y1="11" x2="16" y2="11" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Average Spend */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: 16,
+            border: "1px solid #f0f0f0",
+            padding: "20px 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
+              Average Spend
+            </p>
+            <p style={{ fontSize: 30, fontWeight: 700, color: "#111", margin: "0 0 2px" }}>
+              {formatEUR(avgSpend)}
+            </p>
+            <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>Per customer</p>
+          </div>
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: `${brand}18`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              fontSize: 22,
+              color: brand,
+              fontWeight: 600,
+            }}
+          >
+            €
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs — scroll horizontally on small screens */}
+      <div className="-mx-1 mb-5 flex gap-0 overflow-x-auto overflow-y-hidden border-b border-gray-200 px-1 pb-px [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
+        {tabs.map((t) => {
+          const isActive = activeTab === t.value;
+          return (
+            <Link
+              key={t.value}
+              href={tabHref(t.value)}
+              className="shrink-0 whitespace-nowrap border-b-2 border-transparent px-3 py-2.5 text-sm no-underline sm:px-[18px]"
+              style={{
+                fontWeight: isActive ? 600 : 400,
+                color: isActive ? brand : "#6B7280",
+                borderBottomColor: isActive ? brand : "transparent",
+              }}
+            >
+              {t.label}
+              {t.suffix && (
+                <span style={{ color: "#9CA3AF", fontWeight: 400, marginLeft: 4 }}>
+                  {t.suffix}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Table */}
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
         {customers.length === 0 ? (
-          <div className="px-6 py-12 text-center text-gray-400 text-sm">
-            No customers yet.
+          <div
+            style={{
+              padding: "48px 24px",
+              textAlign: "center",
+              color: "#9CA3AF",
+              fontSize: 14,
+            }}
+          >
+            No customers found.
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {customers.map((customer, index) => (
-              <div
-                key={customer.client_email + index}
-                className="px-6 py-4 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className="h-9 w-9 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0"
+          <>
+            <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+            <table className="w-full min-w-[960px] border-collapse">
+              <thead>
+                <tr style={{ borderBottom: "1px solid #F3F4F6" }}>
+                  {["Client", "Contact", "Visits", "Last Visit", "Total Spent", "Status", "Action"].map(
+                    (h) => (
+                      <th
+                        key={h}
+                        style={{
+                          padding: "14px 20px",
+                          textAlign: "left",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: "#9CA3AF",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        {h}
+                      </th>
+                    )
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {customers.map((customer, i) => {
+                  const cfg = STATUS_CONFIG[customer.status] ?? STATUS_CONFIG.Regular;
+                  return (
+                    <tr
+                      key={customer.client_email + i}
+                      style={{
+                        borderBottom:
+                          i < customers.length - 1 ? "1px solid #F9FAFB" : "none",
+                      }}
+                    >
+                      {/* Client */}
+                      <td style={{ padding: "16px 20px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                          <div
+                            style={{
+                              width: 38,
+                              height: 38,
+                              borderRadius: "50%",
+                              background: brand,
+                              color: "white",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 13,
+                              fontWeight: 600,
+                              flexShrink: 0,
+                            }}
+                          >
+                            {getInitials(customer.client_name)}
+                          </div>
+                          <div>
+                            <p
+                              style={{
+                                margin: 0,
+                                fontSize: 14,
+                                fontWeight: 600,
+                                color: "#111827",
+                              }}
+                            >
+                              {customer.client_name}
+                            </p>
+                            <p style={{ margin: 0, fontSize: 12, color: "#9CA3AF" }}>
+                              Member since{" "}
+                              {new Date(customer.member_since).toLocaleDateString("en-US", {
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Contact */}
+                      <td style={{ padding: "16px 20px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                              fontSize: 13,
+                              color: "#374151",
+                            }}
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                              <path
+                                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                                stroke="#9CA3AF"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <polyline
+                                points="22,6 12,13 2,6"
+                                stroke="#9CA3AF"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                            {customer.client_email}
+                          </div>
+                          {customer.client_phone && (
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                                fontSize: 13,
+                                color: "#374151",
+                              }}
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.4 2 2 0 0 1 3.64 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.86a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                                  stroke="#9CA3AF"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              {customer.client_phone}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Visits */}
+                      <td style={{ padding: "16px 20px" }}>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: 15,
+                            fontWeight: 600,
+                            color: "#111827",
+                          }}
+                        >
+                          {customer.total_bookings}
+                        </p>
+                        <p style={{ margin: 0, fontSize: 12, color: "#9CA3AF" }}>
+                          total visits
+                        </p>
+                      </td>
+
+                      {/* Last Visit */}
+                      <td style={{ padding: "16px 20px" }}>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: 14,
+                            fontWeight: 500,
+                            color: "#111827",
+                          }}
+                        >
+                          {new Date(customer.last_visit).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </p>
+                        <p style={{ margin: 0, fontSize: 12, color: "#9CA3AF" }}>
+                          {getDaysAgo(customer.last_visit)}
+                        </p>
+                      </td>
+
+                      {/* Total Spent */}
+                      <td style={{ padding: "16px 20px" }}>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: 15,
+                            fontWeight: 700,
+                            color: brand,
+                          }}
+                        >
+                          {formatEUR(customer.total_spent)}
+                        </p>
+                      </td>
+
+                      {/* Status */}
+                      <td style={{ padding: "16px 20px" }}>
+                        <span
+                          style={{
+                            display: "inline-block",
+                            padding: "4px 12px",
+                            borderRadius: 100,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: cfg.color,
+                            background: cfg.bg,
+                          }}
+                        >
+                          {cfg.label}
+                        </span>
+                      </td>
+
+                      {/* Action */}
+                      <td style={{ padding: "16px 20px" }}>
+                        <Link
+                          href={`/bookings?search=${encodeURIComponent(customer.client_name)}`}
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 600,
+                            color: brand,
+                            textDecoration: "none",
+                          }}
+                        >
+                          View History
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <p style={{ margin: 0, fontSize: 13, color: "#6B7280" }}>
+                Showing{" "}
+                <strong style={{ color: "#111" }}>
+                  {showingFrom}–{showingTo}
+                </strong>{" "}
+                of{" "}
+                <strong style={{ color: "#111" }}>
+                  {totalFiltered.toLocaleString()}
+                </strong>{" "}
+                customers
+              </p>
+
+              <div className="flex flex-wrap items-center gap-1 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
+                {/* Prev */}
+                {currentPage > 1 ? (
+                  <Link
+                    href={`/customers?${activeTab !== "all" ? `tab=${activeTab}&` : ""}page=${currentPage - 1}`}
                     style={{
-                      backgroundColor: tenant.primary_color ?? "#7C3AED",
+                      width: 32,
+                      height: 32,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 8,
+                      border: "1px solid #E5E7EB",
+                      fontSize: 14,
+                      color: "#374151",
+                      textDecoration: "none",
                     }}
                   >
-                    {customer.client_name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {customer.client_name}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {customer.client_email}
-                    </p>
-                    {customer.client_phone && (
-                      <p className="text-xs text-gray-400">
-                        {customer.client_phone}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">
-                    {formatEUR(parseFloat(customer.total_spent))} spent
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {customer.total_bookings} booking
-                    {customer.total_bookings !== "1" ? "s" : ""}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Last visit{" "}
-                    {new Date(customer.last_visit).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </p>
-                </div>
+                    ‹
+                  </Link>
+                ) : (
+                  <span
+                    style={{
+                      width: 32,
+                      height: 32,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 8,
+                      border: "1px solid #E5E7EB",
+                      fontSize: 14,
+                      color: "#D1D5DB",
+                    }}
+                  >
+                    ‹
+                  </span>
+                )}
+
+                {/* Page numbers */}
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  const p = i + 1;
+                  const isActive = p === currentPage;
+                  return (
+                    <Link
+                      key={p}
+                      href={`/customers?${activeTab !== "all" ? `tab=${activeTab}&` : ""}page=${p}`}
+                      style={{
+                        width: 32,
+                        height: 32,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 8,
+                        border: isActive ? "none" : "1px solid #E5E7EB",
+                        fontSize: 14,
+                        fontWeight: isActive ? 700 : 400,
+                        color: isActive ? "white" : "#374151",
+                        background: isActive ? brand : "white",
+                        textDecoration: "none",
+                      }}
+                    >
+                      {p}
+                    </Link>
+                  );
+                })}
+
+                {totalPages > 5 && (
+                  <span style={{ fontSize: 14, color: "#9CA3AF", padding: "0 4px" }}>
+                    …
+                  </span>
+                )}
+
+                {/* Next */}
+                {currentPage < totalPages ? (
+                  <Link
+                    href={`/customers?${activeTab !== "all" ? `tab=${activeTab}&` : ""}page=${currentPage + 1}`}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 8,
+                      border: "1px solid #E5E7EB",
+                      fontSize: 14,
+                      color: "#374151",
+                      textDecoration: "none",
+                    }}
+                  >
+                    ›
+                  </Link>
+                ) : (
+                  <span
+                    style={{
+                      width: 32,
+                      height: 32,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 8,
+                      border: "1px solid #E5E7EB",
+                      fontSize: 14,
+                      color: "#D1D5DB",
+                    }}
+                  >
+                    ›
+                  </span>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>

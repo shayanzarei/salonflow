@@ -1,91 +1,53 @@
-import { getTenant } from '@/lib/tenant';
-import { notFound } from 'next/navigation';
+import { AddServiceForm } from "@/components/dashboard/AddServiceForm";
+import pool from "@/lib/db";
+import { getTenant } from "@/lib/tenant";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function NewServicePage() {
   const tenant = await getTenant();
   if (!tenant) notFound();
 
+  const brand = tenant.primary_color ?? "#7C3AED";
+
+  const staffResult = await pool.query(
+    `SELECT id, name, role, avatar_url FROM staff WHERE tenant_id = $1 ORDER BY name`,
+    [tenant.id]
+  );
+
   return (
-    <div className="max-w-lg">
-      <div className="mb-8">
-        <a
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <Link
           href="/services"
-          className="text-sm text-gray-400 hover:text-gray-600"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 13,
+            color: "#888",
+            textDecoration: "none",
+            marginBottom: 12,
+          }}
         >
-          ← Back
-        </a>
-        <h1 className="text-2xl font-bold text-gray-900 mt-4">
-          Add a service
+          ← Back to Services
+        </Link>
+        <h1
+          style={{
+            fontSize: 26,
+            fontWeight: 700,
+            color: "#111",
+            margin: "0 0 6px",
+          }}
+        >
+          Add New Service
         </h1>
+        <p style={{ fontSize: 14, color: "#888", margin: 0 }}>
+          Create a new service for your salon
+        </p>
       </div>
 
-      <form action="/api/services" method="POST" className="space-y-4">
-        <input type="hidden" name="tenant_id" value={tenant.id} />
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Service name
-          </label>
-          <input
-            type="text"
-            name="name"
-            required
-            placeholder="e.g. Haircut"
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <input
-            type="text"
-            name="description"
-            placeholder="e.g. Classic cut and style"
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Price (€)
-            </label>
-            <input
-              type="number"
-              name="price"
-              required
-              min="0"
-              step="0.01"
-              placeholder="35.00"
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Duration (mins)
-            </label>
-            <input
-              type="number"
-              name="duration_mins"
-              required
-              min="5"
-              step="5"
-              placeholder="45"
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400"
-            />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="w-full py-3 rounded-xl text-white font-medium transition-opacity hover:opacity-90"
-          style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
-        >
-          Add service
-        </button>
-      </form>
+      <AddServiceForm brand={brand} staff={staffResult.rows} />
     </div>
   );
 }

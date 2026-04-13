@@ -13,7 +13,14 @@ const navItems = [
   { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
 
-export default function SidebarNav({ brandColor }: { brandColor: string }) {
+export default function SidebarNav({
+  brandColor,
+  onNavigateAction,
+}: {
+  brandColor: string;
+  /** Close mobile drawer when a nav link is activated */
+  onNavigateAction?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
@@ -27,10 +34,12 @@ export default function SidebarNav({ brandColor }: { brandColor: string }) {
           <Link
             key={item.href}
             href={item.href}
+            onClick={() => onNavigateAction?.()}
             style={{
               display: "flex",
               alignItems: "center",
               gap: 10,
+              minHeight: 44,
               padding: "10px 12px",
               borderRadius: 10,
               fontSize: 14,

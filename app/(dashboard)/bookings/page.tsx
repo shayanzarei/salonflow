@@ -83,86 +83,45 @@ export default async function BookingsPage({
   return (
     <div>
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 28,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <h1
-            style={{ fontSize: 24, fontWeight: 700, color: "#111", margin: 0 }}
-          >
+      <div className="mb-6 flex flex-col gap-4 sm:mb-7 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
             Bookings
           </h1>
           <span
+            className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium sm:text-[13px]"
             style={{
-              fontSize: 13,
-              fontWeight: 500,
               color: brand,
               background: `${brand}15`,
-              padding: "3px 10px",
-              borderRadius: 100,
             }}
           >
             {totalCount} Total
           </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link
-            href="/bookings/new"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "10px 18px",
-              background: brand,
-              color: "white",
-              borderRadius: 10,
-              fontSize: 14,
-              fontWeight: 500,
-              textDecoration: "none",
-            }}
-          >
-            + Add Booking
-          </Link>
-        </div>
+        <Link
+          href="/bookings/new"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] px-4 py-2.5 text-sm font-medium text-white no-underline sm:w-auto"
+          style={{ background: brand }}
+        >
+          + Add Booking
+        </Link>
       </div>
 
       {/* Filters + search */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: 16,
-          border: "1px solid #f0f0f0",
-          padding: "16px 20px",
-          marginBottom: 16,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-        }}
-      >
-        {/* Status filters */}
-        <div style={{ display: "flex", gap: 6 }}>
+      <div className="mb-4 flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        {/* Status filters — horizontal scroll on narrow screens */}
+        <div className="-mx-1 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
           {filters.map((f) => {
             const isActive = (status ?? "") === f.value;
             return (
               <Link
                 key={f.value}
                 href={f.value ? `/bookings?status=${f.value}` : "/bookings"}
-                style={{
-                  padding: "7px 16px",
-                  borderRadius: 100,
-                  fontSize: 14,
-                  fontWeight: isActive ? 600 : 400,
-                  textDecoration: "none",
-                  background: isActive ? "#111" : "transparent",
-                  color: isActive ? "white" : "#666",
-                  border: isActive ? "none" : "1px solid #e5e7eb",
-                }}
+                className={`shrink-0 rounded-full px-4 py-2 text-sm no-underline ${
+                  isActive
+                    ? "bg-gray-900 font-semibold text-white"
+                    : "border border-gray-200 font-normal text-gray-600"
+                }`}
               >
                 {f.label}
               </Link>
@@ -170,24 +129,15 @@ export default async function BookingsPage({
           })}
         </div>
 
-        {/* Search + filters */}
-        <div style={{ display: "flex", gap: 10 }}>
+        {/* Search */}
+        <div className="min-w-0 shrink-0 sm:max-w-full">
           <form
             method="GET"
             action="/bookings"
-            style={{ position: "relative" }}
+            className="relative w-full sm:w-auto"
           >
             {status && <input type="hidden" name="status" value={status} />}
-            <span
-              style={{
-                position: "absolute",
-                left: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: 14,
-                color: "#aaa",
-              }}
-            >
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
               🔍
             </span>
             <input
@@ -195,19 +145,7 @@ export default async function BookingsPage({
               name="search"
               defaultValue={search ?? ""}
               placeholder="Search client, service..."
-              style={{
-                paddingLeft: 36,
-                paddingRight: 16,
-                paddingTop: 9,
-                paddingBottom: 9,
-                border: "1px solid #e5e7eb",
-                borderRadius: 10,
-                fontSize: 14,
-                color: "#111",
-                background: "white",
-                outline: "none",
-                width: 220,
-              }}
+              className="w-full min-w-0 rounded-[10px] border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 outline-none sm:w-[220px] md:w-[260px]"
             />
           </form>
           {/* <button
@@ -230,15 +168,9 @@ export default async function BookingsPage({
       </div>
 
       {/* Table */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: 16,
-          border: "1px solid #f0f0f0",
-          overflow: "hidden",
-        }}
-      >
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+        <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+          <table className="w-full min-w-[920px] border-collapse">
           <thead>
             <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
               {[
@@ -449,19 +381,12 @@ export default async function BookingsPage({
             )}
           </tbody>
         </table>
+        </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div
-            style={{
-              padding: "16px 20px",
-              borderTop: "1px solid #f5f5f5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
               <span style={{ fontSize: 13, color: "#666" }}>Show</span>
               <select
                 style={{
@@ -481,7 +406,7 @@ export default async function BookingsPage({
               </span>
             </div>
 
-            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 sm:gap-2 [-webkit-overflow-scrolling:touch]">
               {currentPage > 1 && (
                 <Link
                   href={`/bookings?${status ? `status=${status}&` : ""}${search ? `search=${search}&` : ""}page=${currentPage - 1}`}

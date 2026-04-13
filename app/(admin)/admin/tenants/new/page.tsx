@@ -2,15 +2,14 @@ import Link from "next/link";
 
 export default function NewTenantPage() {
     return (
-      <div className="max-w-lg">
-        <div className="mb-8">
-          
+      <div className="w-full max-w-lg min-w-0">
+        <div className="mb-6 sm:mb-8">
             <Link href="/admin/tenants"
-            className="text-sm text-gray-400 hover:text-gray-600"
+            className="inline-flex min-h-10 items-center text-sm text-gray-400 hover:text-gray-600"
           >
             ← Back
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-4">
+          <h1 className="mt-4 text-xl font-bold text-gray-900 sm:text-2xl">
             Onboard a new salon
           </h1>
         </div>
@@ -25,7 +24,7 @@ export default function NewTenantPage() {
               name="name"
               required
               placeholder="e.g. Glam Studio"
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-gray-400"
+              className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
             />
           </div>
   
@@ -33,14 +32,14 @@ export default function NewTenantPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Slug
             </label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-400">myplatform.com/</span>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <span className="shrink-0 text-sm text-gray-400">myplatform.com/</span>
               <input
                 type="text"
                 name="slug"
                 required
                 placeholder="glam-studio"
-                className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-gray-400"
+                className="min-h-11 w-full flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
               />
             </div>
           </div>
@@ -51,7 +50,7 @@ export default function NewTenantPage() {
             </label>
             <select
               name="plan_tier"
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-gray-400"
+              className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
             >
               <option value="starter">Starter — $29/mo</option>
               <option value="pro">Pro — $79/mo</option>
@@ -80,13 +79,13 @@ export default function NewTenantPage() {
               name="password"
               required
               placeholder="Set a password for the salon owner"
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-gray-400"
+              className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
             />
           </div>
   
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-gray-900 text-white font-medium hover:opacity-90 transition-opacity"
+            className="min-h-12 w-full rounded-xl bg-gray-900 py-3 font-medium text-white transition-opacity hover:opacity-90"
           >
             Create salon
           </button>

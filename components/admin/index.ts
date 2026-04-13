@@ -1,2 +1,3 @@
 /** Super-admin-only UI — colocate components here. */
-export {};
+export { AdminChrome } from "./AdminChrome";
+

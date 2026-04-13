@@ -32,31 +32,31 @@ export default async function TenantDetailPage({
     });
 
     return (
-        <div className="max-w-2xl">
-            <div className="mb-8">
+        <div className="w-full max-w-2xl min-w-0">
+            <div className="mb-6 sm:mb-8">
 
                 <Link href="/admin/tenants"
-                    className="text-sm text-gray-400 hover:text-gray-600"
+                    className="inline-flex min-h-10 items-center text-sm text-gray-400 hover:text-gray-600"
                 >
                     ← Back to tenants
                 </Link>
-                <div className="flex items-center gap-4 mt-4">
+                <div className="mt-4 flex items-center gap-3 sm:gap-4">
                     <div
                         className="h-10 w-10 rounded-lg flex items-center justify-center text-white font-semibold"
                         style={{ backgroundColor: tenant.primary_color ?? '#7C3AED' }}
                     >
                         {tenant.name.charAt(0)}
                     </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{tenant.name}</h1>
-                        <p className="text-gray-400 text-sm">{tenant.slug}.salonflow.xyz</p>
+                    <div className="min-w-0">
+                        <h1 className="text-balance text-xl font-bold text-gray-900 sm:text-2xl">{tenant.name}</h1>
+                        <p className="truncate text-sm text-gray-400">{tenant.slug}.salonflow.xyz</p>
                     </div>
                 </div>
             </div>
 
             {/* Site sections control */}
-            <div className="bg-white rounded-xl border border-gray-100 mb-6">
-                <div className="px-6 py-4 border-b border-gray-100">
+            <div className="mb-6 overflow-hidden rounded-xl border border-gray-100 bg-white">
+                <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
                     <h2 className="font-semibold text-gray-900">Website sections</h2>
                     <p className="text-xs text-gray-400 mt-0.5">
                         Enable or disable sections on this salon&apos;s public website
@@ -71,9 +71,9 @@ export default async function TenantDetailPage({
                         return (
                             <div
                                 key={section.key}
-                                className="px-6 py-4 flex items-center justify-between"
+                                className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                             >
-                                <div>
+                                <div className="min-w-0 pr-0 sm:pr-4">
                                     <p className="text-sm font-medium text-gray-900">
                                         {section.label}
                                         {section.required && (
@@ -87,19 +87,24 @@ export default async function TenantDetailPage({
                                     </p>
                                 </div>
                                 {section.required ? (
-                                    <div style={{ width: 44, height: 24, borderRadius: 100, background: '#7C3AED', opacity: 0.4, flexShrink: 0, position: 'relative' }}>
-                                        <span style={{ position: 'absolute', top: 3, left: 23, width: 18, height: 18, borderRadius: '50%', background: 'white' }} />
+                                    <div className="relative h-6 w-11 shrink-0 self-start rounded-full bg-violet-600 opacity-40 sm:self-center" aria-hidden>
+                                        <span className="absolute left-[23px] top-[3px] h-[18px] w-[18px] rounded-full bg-white" />
                                     </div>
                                 ) : (
-                                    <form action="/api/admin/sections" method="POST">
+                                    <form action="/api/admin/sections" method="POST" className="shrink-0 self-start sm:self-center">
                                         <input type="hidden" name="tenant_id" value={id} />
                                         <input type="hidden" name="feature" value={section.key} />
                                         <input type="hidden" name="enabled" value={isEnabled ? 'false' : 'true'} />
                                         <button
                                             type="submit"
-                                            style={{ width: 44, height: 24, borderRadius: 100, background: isEnabled ? '#7C3AED' : '#D1D5DB', border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}
+                                            className="relative h-6 w-11 cursor-pointer rounded-full border-none transition-colors"
+                                            style={{ background: isEnabled ? "#7C3AED" : "#D1D5DB" }}
+                                            aria-label={isEnabled ? `Disable ${section.label}` : `Enable ${section.label}`}
                                         >
-                                            <span style={{ position: 'absolute', top: 3, left: isEnabled ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'left 0.2s' }} />
+                                            <span
+                                                className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white transition-[left]"
+                                                style={{ left: isEnabled ? 23 : 3 }}
+                                            />
                                         </button>
                                     </form>
                                 )}
@@ -110,14 +115,14 @@ export default async function TenantDetailPage({
             </div>
 
             {/* Tenant content editor */}
-            <div className="bg-white rounded-xl border border-gray-100">
-                <div className="px-6 py-4 border-b border-gray-100">
+            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
+                <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
                     <h2 className="font-semibold text-gray-900">Site content</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="mt-0.5 text-xs text-gray-400">
                         Edit this salon&apos;s website content
                     </p>
                 </div>
-                <form action="/api/admin/tenants/content" method="POST" className="p-6 space-y-4">
+                <form action="/api/admin/tenants/content" method="POST" className="space-y-4 p-4 sm:p-6">
                     <input type="hidden" name="tenant_id" value={id} />
 
                     <div>
@@ -129,7 +134,7 @@ export default async function TenantDetailPage({
                             name="tagline"
                             defaultValue={tenant.tagline ?? ''}
                             placeholder="Where beauty meets craft"
-                            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
+                            className="min-h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
                         />
                     </div>
 
@@ -142,7 +147,7 @@ export default async function TenantDetailPage({
                             defaultValue={tenant.about ?? ''}
                             placeholder="Tell the salon's story..."
                             rows={3}
-                            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400 resize-none"
+                            className="w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
                         />
                     </div>
 
@@ -155,7 +160,7 @@ export default async function TenantDetailPage({
                             name="address"
                             defaultValue={tenant.address ?? ''}
                             placeholder="123 Beauty Lane, Amsterdam"
-                            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
+                            className="min-h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
                         />
                     </div>
 
@@ -168,7 +173,7 @@ export default async function TenantDetailPage({
                             name="hours"
                             defaultValue={tenant.hours ?? ''}
                             placeholder="Mon–Sat 9am–7pm"
-                            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
+                            className="min-h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
                         />
                     </div>
 
@@ -181,21 +186,21 @@ export default async function TenantDetailPage({
                             name="hero_image_url"
                             defaultValue={tenant.hero_image_url ?? ''}
                             placeholder="https://example.com/hero.jpg"
-                            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
+                            className="min-h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
                         />
                     </div>
 
-                    <div className="flex items-center justify-between pt-2">
+                    <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                         <Link
                             href={`https://${tenant.slug}.salonflow.xyz`}
                             target="_blank"
-                            className="text-sm text-purple-600 hover:text-purple-700"
+                            className="order-2 text-sm text-purple-600 hover:text-purple-700 sm:order-1"
                         >
                             Preview site →
                         </Link>
                         <button
                             type="submit"
-                            className="px-6 py-2.5 rounded-lg text-sm font-medium text-white bg-gray-900 hover:opacity-90 transition-opacity"
+                            className="order-1 min-h-11 w-full rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 sm:order-2 sm:w-auto"
                         >
                             Save content
                         </button>

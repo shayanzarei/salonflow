@@ -35,7 +35,7 @@ export function bookingConfirmationEmail({
         minute: '2-digit',
     });
 
-    const cancelUrl = `https://${salonSlug}.salonflow.xyz/book/cancel?booking=${bookingId}&token=${cancellationToken}`;
+    const cancelUrl = `https://${salonSlug}.solohub.nl/book/cancel?booking=${bookingId}&token=${cancellationToken}`;
 
     return {
         subject: `Booking confirmed — ${serviceName} at ${salonName}`,
@@ -115,7 +115,7 @@ export function bookingConfirmationEmail({
       </div>
   
       <div style="text-align:center;margin-top:24px;">
-        <p style="color:#bbb;font-size:12px;margin:0;">Powered by SalonFlow</p>
+        <p style="color:#bbb;font-size:12px;margin:0;">Powered by SoloHub</p>
       </div>
   
     </div>

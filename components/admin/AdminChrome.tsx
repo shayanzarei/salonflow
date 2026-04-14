@@ -48,7 +48,7 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-gray-900">
-                SalonFlow
+                SoloHub
               </p>
               <p className="truncate text-xs text-gray-400">Super Admin</p>
             </div>

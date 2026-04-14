@@ -47,7 +47,7 @@ export default function LoginPage() {
           <div className="h-10 w-10 rounded-xl bg-purple-600 flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
             S
           </div>
-          <h1 className="text-xl font-bold text-gray-900">SalonFlow</h1>
+          <h1 className="text-xl font-bold text-gray-900">SoloHub</h1>
           <p className="text-gray-500 text-sm mt-1">
             Sign in to your dashboard
           </p>

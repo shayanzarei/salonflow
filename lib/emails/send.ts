@@ -15,7 +15,7 @@ export async function sendEmail({
         const resend = new Resend(process.env.RESEND_API_KEY);
 
         const { error } = await resend.emails.send({
-            from: from ?? 'SalonFlow <bookings@salonflow.xyz>',
+            from: from ?? 'SoloHub <bookings@solohub.nl>',
             to,
             subject,
             html,

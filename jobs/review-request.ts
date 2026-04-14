@@ -15,7 +15,7 @@ export function reviewRequestEmail({
     reviewToken: string;
     salonSlug: string;
 }) {
-    const reviewUrl = `https://${salonSlug}.salonflow.xyz/review?booking=${bookingId}&token=${reviewToken}`;
+    const reviewUrl = `https://${salonSlug}.solohub.nl/review?booking=${bookingId}&token=${reviewToken}`;
 
     return {
         subject: `How was your visit to ${salonName}?`,
@@ -90,7 +90,7 @@ export function reviewRequestEmail({
       </div>
   
       <div style="text-align:center;margin-top:24px;">
-        <p style="color:#bbb;font-size:12px;margin:0;">Powered by SalonFlow</p>
+        <p style="color:#bbb;font-size:12px;margin:0;">Powered by SoloHub</p>
       </div>
   
     </div>

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'SalonFlow',
+  title: 'SoloHub',
   description: 'Multi-tenant salon booking platform',
 };
 

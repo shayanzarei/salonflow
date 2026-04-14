@@ -51,14 +51,14 @@ export async function POST(req: NextRequest) {
         <p style="color:#666;font-size:15px;margin:0 0 24px;">
           Hi ${booking.client_name}, your appointment for ${booking.service_name} has been cancelled.
         </p>
-        <a href="https://${booking.salon_slug}.salonflow.xyz"
+        <a href="https://${booking.salon_slug}.solohub.nl"
           style="display:inline-block;padding:12px 28px;background:#7C3AED;color:white;border-radius:100px;font-size:14px;font-weight:500;text-decoration:none;">
           Book again
         </a>
       </div>
     </div>
     <div style="text-align:center;margin-top:24px;">
-      <p style="color:#bbb;font-size:12px;margin:0;">Powered by SalonFlow</p>
+      <p style="color:#bbb;font-size:12px;margin:0;">Powered by SoloHub</p>
     </div>
   </div>
 </body>

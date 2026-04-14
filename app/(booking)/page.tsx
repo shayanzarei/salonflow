@@ -840,7 +840,7 @@ export default async function BookingHomePage({
               © 2026 {tenant.name}. All rights reserved.
             </p>
             <p className="text-center text-[13px] text-gray-700 sm:text-right">
-              Powered by SalonFlow
+              Powered by SoloHub
             </p>
           </div>
         </div>

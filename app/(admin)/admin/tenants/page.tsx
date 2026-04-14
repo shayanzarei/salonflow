@@ -148,7 +148,7 @@ export default async function AdminTenantsPage({
                             {tenant.name}
                           </p>
                           <p className="truncate text-xs text-gray-500">
-                            {tenant.slug}.salonflow.xyz
+                            {tenant.slug}.SoloHub.nl
                           </p>
                         </div>
                       </div>

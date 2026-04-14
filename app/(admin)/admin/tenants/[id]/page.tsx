@@ -134,7 +134,7 @@ export default async function TenantDetailPage({
                     </span>
                   </div>
                   <p className="truncate text-xs text-gray-500">
-                    {tenant.slug}.salonflow.xyz
+                    {tenant.slug}.SoloHub.nl
                   </p>
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default async function TenantDetailPage({
                 Copy URL
               </button>
               <Link
-                href={`https://${tenant.slug}.salonflow.xyz`}
+                href={`https://${tenant.slug}.solohub.nl`}
                 target="_blank"
                 className="inline-flex min-h-10 items-center rounded-[10px] bg-violet-600 px-3 text-xs font-medium text-white hover:opacity-90"
               >
@@ -590,7 +590,7 @@ export default async function TenantDetailPage({
 
                 <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                   <Link
-                    href={`https://${tenant.slug}.salonflow.xyz`}
+                    href={`https://${tenant.slug}.solohub.nl`}
                     target="_blank"
                     className="order-2 text-sm text-purple-600 hover:text-purple-700 sm:order-1"
                   >

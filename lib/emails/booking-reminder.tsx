@@ -42,7 +42,7 @@ export function bookingReminderEmail({
         '2h': 'Your appointment is in 2 hours',
     }[reminderType];
 
-    const cancelUrl = `https://${salonSlug}.salonflow.xyz/book/cancel?booking=${bookingId}&token=${cancellationToken}`;
+    const cancelUrl = `https://${salonSlug}.solohub.nl/book/cancel?booking=${bookingId}&token=${cancellationToken}`;
 
     return {
         subject: `Reminder: ${serviceName} at ${salonName} — ${reminderType === '48h' ? 'in 2 days' :
@@ -126,7 +126,7 @@ export function bookingReminderEmail({
       </div>
   
       <div style="text-align:center;margin-top:24px;">
-        <p style="color:#bbb;font-size:12px;margin:0;">Powered by SalonFlow</p>
+        <p style="color:#bbb;font-size:12px;margin:0;">Powered by SoloHub</p>
       </div>
   
     </div>

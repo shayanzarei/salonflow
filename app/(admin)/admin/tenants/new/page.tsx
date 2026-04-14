@@ -58,7 +58,7 @@ export default function NewTenantPage() {
                   className="min-w-0 px-3 text-gray-900 outline-none"
                 />
                 <span className="flex items-center justify-center border-l border-gray-200 px-3 text-gray-500">
-                  .salonflow.xyz
+                  .SoloHub.nl
                 </span>
               </div>
               <p className="mt-1 text-xs text-gray-500">

@@ -139,7 +139,7 @@ export default async function DashboardPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <h1 className="text-3xl font-bold text-gray-900">
-                Welcome to SalonFlow,{" "}
+                Welcome to SoloHub,{" "}
                 <span style={{ color: brand }}>{tenant.name}</span>! 👋
               </h1>
               <p className="mt-2 text-sm text-gray-600">
@@ -246,7 +246,7 @@ export default async function DashboardPage() {
                 Publish Booking Site
               </button>
               <Link
-                href={`https://${tenant.slug}.salonflow.xyz`}
+                href={`https://${tenant.slug}.solohub.nl`}
                 target="_blank"
                 className="mt-2 inline-flex w-full items-center justify-center rounded-[10px] border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-700"
               >

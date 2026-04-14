@@ -58,7 +58,7 @@ export default async function SettingsPage({
               </label>
               <div className="flex overflow-hidden rounded-lg border border-gray-200">
                 <span className="border-r border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-400">
-                  salonflow.xyz/
+                  SoloHub.nl/
                 </span>
                 <input
                   type="text"

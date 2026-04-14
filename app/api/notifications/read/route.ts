@@ -1,6 +1,7 @@
 import { authOptions } from "@/lib/auth-options";
 import pool from "@/lib/db";
 import { getServerSession } from "next-auth";
+import type { Session } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 type Viewer = {
@@ -9,7 +10,13 @@ type Viewer = {
   recipientId: string;
 };
 
-function getViewer(session: Awaited<ReturnType<typeof getServerSession>>): Viewer | null {
+type AppSession = Session & {
+  tenantId?: string;
+  isStaff?: boolean;
+  staffId?: string | null;
+};
+
+function getViewer(session: AppSession | null): Viewer | null {
   if (!session?.tenantId) return null;
   if (session.isStaff) {
     if (!session.staffId) return null;

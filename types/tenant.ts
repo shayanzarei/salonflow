@@ -15,5 +15,13 @@ export interface Tenant {
   social_facebook: string | null;
   social_tiktok: string | null;
   social_youtube: string | null;
+  business_started_at: string | null;
+  website_template:
+    | "signuture"
+    | "luxe"
+    | "minimalist"
+    | "urban"
+    | "professional"
+    | "playful";
   created_at: string;
 }

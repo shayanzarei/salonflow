@@ -1,5 +1,6 @@
 import { PLANS, SITE_SECTIONS } from '@/config/plans';
 import pool from '@/lib/db';
+import { WEBSITE_TEMPLATES, normalizeWebsiteTemplate } from "@/lib/website-templates";
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -28,6 +29,10 @@ export default async function TenantDetailPage({
 
     const tenant = tenantResult.rows[0];
     if (!tenant) notFound();
+    const selectedTemplate = normalizeWebsiteTemplate(tenant.website_template);
+    const businessStartedValue = tenant.business_started_at
+      ? new Date(tenant.business_started_at).toISOString().slice(0, 10)
+      : "";
 
     // fetch ALL flags for this tenant
     const flagsResult = await pool.query(
@@ -70,6 +75,73 @@ export default async function TenantDetailPage({
             </div>
 
             {/* Plan features — per-tenant overrides */}
+            <div className="mb-6 overflow-hidden rounded-xl border border-gray-100 bg-white">
+                <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
+                    <h2 className="font-semibold text-gray-900">Website template</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                        Select which public website template this salon uses.
+                    </p>
+                </div>
+                <form action="/api/admin/tenants/template" method="POST" className="space-y-4 p-4 sm:p-6">
+                    <input type="hidden" name="tenant_id" value={id} />
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Template
+                        </label>
+                        <select
+                            name="website_template"
+                            defaultValue={selectedTemplate}
+                            className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
+                        >
+                            {WEBSITE_TEMPLATES.map((template) => (
+                                <option key={template.id} value={template.id}>
+                                    {template.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            className="min-h-11 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                        >
+                            Save template
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div className="mb-6 overflow-hidden rounded-xl border border-gray-100 bg-white">
+                <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
+                    <h2 className="font-semibold text-gray-900">Business experience</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                        Set when this salon business started. Public site shows this as years of experience.
+                    </p>
+                </div>
+                <form action="/api/admin/tenants/business" method="POST" className="space-y-4 p-4 sm:p-6">
+                    <input type="hidden" name="tenant_id" value={id} />
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Business started date
+                        </label>
+                        <input
+                            type="date"
+                            name="business_started_at"
+                            defaultValue={businessStartedValue}
+                            className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
+                        />
+                    </div>
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            className="min-h-11 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                        >
+                            Save date
+                        </button>
+                    </div>
+                </form>
+            </div>
+
             <div className="mb-6 overflow-hidden rounded-xl border border-gray-100 bg-white">
                 <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
                     <h2 className="font-semibold text-gray-900">Feature flags</h2>

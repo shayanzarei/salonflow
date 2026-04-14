@@ -1,7 +1,15 @@
+import { BookingPublicNav } from "@/components/booking/BookingPublicNav";
+import { LuxeTemplate } from "@/components/booking/templates/LuxeTemplate";
+import { MinimalistTemplate } from "@/components/booking/templates/MinimalistTemplate";
+import { PlayfulTemplate } from "@/components/booking/templates/PlayfulTemplate";
+import { ProfessionalTemplate } from "@/components/booking/templates/ProfessionalTemplate";
+import { UrbanTemplate } from "@/components/booking/templates/UrbanTemplate";
 import { ClockIcon, FacebookIcon, InstagramIcon, MapPinIcon, TikTokIcon, YoutubeIcon } from "@/components/ui/Icons";
+import { computeSlots } from "@/lib/availability";
 import pool from "@/lib/db";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
+import { normalizeWebsiteTemplate } from "@/lib/website-templates";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
@@ -26,11 +34,84 @@ async function getSectionFlags(tenantId: string) {
   return map;
 }
 
+function formatDateOnly(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+async function getNextAvailableSlot(input: {
+  tenantId: string;
+  serviceIds: string[];
+  staffIds: string[];
+}) {
+  const { tenantId, serviceIds, staffIds } = input;
+  if (serviceIds.length === 0 || staffIds.length === 0) return null;
+
+  const assignmentsRes = await pool.query(
+    `SELECT service_id, staff_id
+     FROM service_staff
+     WHERE service_id = ANY($1::uuid[])`,
+    [serviceIds]
+  );
+
+  const assignedStaffByService = new Map<string, Set<string>>();
+  for (const row of assignmentsRes.rows) {
+    if (!assignedStaffByService.has(row.service_id)) {
+      assignedStaffByService.set(row.service_id, new Set<string>());
+    }
+    assignedStaffByService.get(row.service_id)?.add(row.staff_id);
+  }
+
+  const today = new Date();
+  for (let offset = 0; offset < 14; offset++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + offset);
+    const dateStr = formatDateOnly(date);
+    let bestForDay: { isoTime: string; label: string } | null = null;
+
+    for (const serviceId of serviceIds) {
+      const explicitlyAssigned = assignedStaffByService.get(serviceId);
+      const eligibleStaffIds =
+        explicitlyAssigned && explicitlyAssigned.size > 0
+          ? staffIds.filter((staffId) => explicitlyAssigned.has(staffId))
+          : staffIds;
+
+      for (const staffId of eligibleStaffIds) {
+        const slots = await computeSlots({
+          tenantId,
+          serviceId,
+          staffId,
+          date: dateStr,
+        });
+        const firstAvailable = slots.find((slot) => slot.available);
+        if (!firstAvailable) continue;
+
+        if (
+          !bestForDay ||
+          new Date(firstAvailable.isoTime).getTime() <
+            new Date(bestForDay.isoTime).getTime()
+        ) {
+          bestForDay = {
+            isoTime: firstAvailable.isoTime,
+            label: firstAvailable.label,
+          };
+        }
+      }
+    }
+
+    if (bestForDay) return bestForDay;
+  }
+
+  return null;
+}
+
 export default async function BookingHomePage() {
   const tenant = await getTenant();
   if (!tenant) redirect("/login");
 
-  const [servicesResult, staffResult, reviewsResult, galleryResult, reviewStatsResult, sections] =
+  const [servicesResult, staffResult, reviewsResult, galleryResult, reviewStatsResult, clientStatsResult, sections] =
     await Promise.all([
       pool.query(
         `SELECT s.*, sc.name AS category_name
@@ -57,6 +138,15 @@ export default async function BookingHomePage() {
          FROM reviews WHERE tenant_id = $1`,
         [tenant.id]
       ),
+      pool.query(
+        `SELECT
+           COUNT(DISTINCT LOWER(TRIM(client_email)))::int AS total_clients
+         FROM bookings
+         WHERE tenant_id = $1
+           AND client_email IS NOT NULL
+           AND TRIM(client_email) <> ''`,
+        [tenant.id]
+      ),
       getSectionFlags(tenant.id),
     ]);
 
@@ -65,14 +155,52 @@ export default async function BookingHomePage() {
   const reviews = reviewsResult.rows;
   const galleryItems = galleryResult.rows;
   const reviewStats = reviewStatsResult.rows[0];
+  const clientStats = clientStatsResult.rows[0];
   const totalReviews = parseInt(reviewStats.total);
   const avgRating = parseFloat(reviewStats.avg_rating);
+  const totalClients = clientStats?.total_clients ?? 0;
   const brand = tenant.primary_color ?? "#7C3AED";
+  const websiteTemplate = normalizeWebsiteTemplate(tenant.website_template);
+  const yearsExperience = Math.max(
+    1,
+    new Date().getFullYear() -
+      new Date(tenant.business_started_at ?? tenant.created_at).getFullYear()
+  );
+  const priorityServiceIds = services
+    .slice()
+    .sort((a, b) => a.duration_mins - b.duration_mins)
+    .slice(0, 3)
+    .map((service) => service.id as string);
+  const nextAvailable = await getNextAvailableSlot({
+    tenantId: tenant.id,
+    serviceIds: priorityServiceIds,
+    staffIds: staffList.map((staff) => staff.id as string),
+  });
+  const nextAvailableDate = nextAvailable ? new Date(nextAvailable.isoTime) : null;
+  const todayKey = formatDateOnly(new Date());
+  const nextAvailableLabel = nextAvailable
+    ? formatDateOnly(nextAvailableDate as Date) === todayKey
+      ? `Today, ${nextAvailable.label}`
+      : `${(nextAvailableDate as Date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        })}, ${nextAvailable.label}`
+    : "No slots available";
+
+  if (websiteTemplate === "luxe") return <LuxeTemplate tenant={tenant} />;
+  if (websiteTemplate === "minimalist")
+    return <MinimalistTemplate tenant={tenant} />;
+  if (websiteTemplate === "urban") return <UrbanTemplate tenant={tenant} />;
+  if (websiteTemplate === "professional")
+    return <ProfessionalTemplate tenant={tenant} />;
+  if (websiteTemplate === "playful") return <PlayfulTemplate tenant={tenant} />;
 
   return (
-    <div className="bg-white font-[family-name:var(--font-sans)]">
-      {/* Hero */}
-      {sections.section_hero && (
+    <>
+      <BookingPublicNav brand={brand} salonName={tenant.name} bookHref="/book" />
+      <div className="bg-white font-[family-name:var(--font-sans)]">
+        {/* Hero */}
+        {sections.section_hero && (
         <section className="bg-white py-12 sm:py-16 md:py-20 lg:py-24 lg:pb-[100px]">
           <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 sm:gap-12 sm:px-6 lg:grid-cols-2 lg:gap-14 lg:px-10 xl:gap-[60px]">
             <div className="min-w-0">
@@ -185,7 +313,7 @@ export default async function BookingHomePage() {
                     Next Available
                   </p>
                   <p className="truncate text-sm font-semibold text-gray-900 sm:text-base">
-                    Today, 2:30 PM
+                    {nextAvailableLabel}
                   </p>
                 </div>
 
@@ -207,9 +335,9 @@ export default async function BookingHomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
           <div className="flex flex-col divide-y divide-gray-100 sm:grid sm:grid-cols-2 sm:divide-y-0 sm:gap-x-8 sm:gap-y-10 sm:text-center md:grid-cols-4 md:gap-x-0 md:gap-y-0">
             {[
-              { value: "8+", label: "Years Experience" },
-              { value: "2,400+", label: "Happy Clients" },
-              { value: "4.9", label: "Average Rating" },
+              { value: `${yearsExperience}+`, label: "Years Experience" },
+              { value: `${totalClients.toLocaleString()}+`, label: "Happy Clients" },
+              { value: totalReviews > 0 ? avgRating.toFixed(1) : "0.0", label: "Average Rating" },
               { value: `${staffList.length}`, label: "Expert Stylists" },
             ].map((stat, i) => (
               <div
@@ -549,7 +677,7 @@ export default async function BookingHomePage() {
       )}
 
       {/* Footer */}
-      <footer className="bg-[#0a0a0a] pb-8 pt-12 sm:pb-10 sm:pt-14 md:pt-16">
+        <footer className="bg-[#0a0a0a] pb-8 pt-12 sm:pb-10 sm:pt-14 md:pt-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
           <div className="mb-10 grid grid-cols-1 gap-10 sm:mb-12 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-12 md:mb-14 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-x-12 xl:gap-16">
             {/* Brand */}
@@ -652,7 +780,8 @@ export default async function BookingHomePage() {
             </p>
           </div>
         </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WEBSITE_TEMPLATES } from "@/lib/website-templates";
 
 export default function NewTenantPage() {
     return (
@@ -57,6 +58,23 @@ export default function NewTenantPage() {
               <option value="enterprise">Enterprise — $199/mo</option>
             </select>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Website template
+            </label>
+            <select
+              name="website_template"
+              defaultValue="signuture"
+              className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
+            >
+              {WEBSITE_TEMPLATES.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.label}
+                </option>
+              ))}
+            </select>
+          </div>
   
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -67,6 +85,17 @@ export default function NewTenantPage() {
               name="primary_color"
               defaultValue="#7C3AED"
               className="h-10 w-16 rounded-lg border border-gray-200 cursor-pointer"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Business started date
+            </label>
+            <input
+              type="date"
+              name="business_started_at"
+              className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
             />
           </div>
   

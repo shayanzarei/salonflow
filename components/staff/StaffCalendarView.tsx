@@ -1,5 +1,6 @@
 "use client";
 
+import { XIcon } from "@/components/ui/Icons";
 import { useState } from "react";
 
 interface Booking {
@@ -119,9 +120,9 @@ export default function StaffCalendarView({
               </h3>
               <button
                 onClick={() => setSelectedBooking(null)}
-                className="text-gray-400 text-lg"
+                className="text-gray-400"
               >
-                ×
+                <XIcon size={18} />
               </button>
             </div>
             <div className="space-y-3">

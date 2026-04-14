@@ -1,7 +1,6 @@
 import { requireOwner } from "@/lib/require-owner";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
-import { SERVICE_CATEGORIES } from "@/lib/service-categories";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -20,14 +19,8 @@ export async function POST(req: NextRequest) {
     const description = formData.get("description") as string;
     const price = formData.get("price") as string;
     const duration_mins = formData.get("duration_mins") as string;
-    const category = (formData.get("category") as string)?.trim() ?? "Other";
+    const categoryId = (formData.get("category_id") as string)?.trim() || null;
     const is_active = formData.get("is_active") === "true";
-
-    const safeCategory = (SERVICE_CATEGORIES as readonly string[]).includes(
-      category
-    )
-      ? category
-      : "Other";
 
     await pool.query(
       `UPDATE services SET
@@ -35,7 +28,8 @@ export async function POST(req: NextRequest) {
          description = NULLIF($2, ''),
          price = $3,
          duration_mins = $4,
-         category = $5,
+         category_id = $5,
+         category = CASE WHEN $5::uuid IS NOT NULL THEN NULL ELSE category END,
          is_active = $6,
          is_draft = false
        WHERE id = $7 AND tenant_id = $8`,
@@ -44,7 +38,7 @@ export async function POST(req: NextRequest) {
         description,
         parseFloat(price),
         parseInt(duration_mins, 10),
-        safeCategory,
+        categoryId,
         is_active,
         id,
         tenant.id,

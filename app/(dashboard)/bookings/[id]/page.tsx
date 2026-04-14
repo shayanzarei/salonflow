@@ -1,3 +1,4 @@
+import { CalendarIcon, ClockIcon, MapPinIcon, ScissorsIcon, TrashIcon, UserIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -150,7 +151,7 @@ export default async function BookingDetailPage({
                 marginBottom: 20,
               }}
             >
-              <span style={{ fontSize: 16 }}>👤</span>
+              <UserIcon size={16} color="#6B7280" />
               <h2
                 style={{
                   fontSize: 15,
@@ -297,7 +298,7 @@ export default async function BookingDetailPage({
                 marginBottom: 20,
               }}
             >
-              <span style={{ fontSize: 16 }}>📅</span>
+              <CalendarIcon size={16} color="#6B7280" />
               <h2
                 style={{
                   fontSize: 15,
@@ -313,19 +314,19 @@ export default async function BookingDetailPage({
             <div style={{ display: "flex", flexDirection: "column" }}>
               {[
                 {
-                  icon: "✂",
+                  icon: <ScissorsIcon size={15} color="#6B7280" />,
                   label: "Service",
                   value: booking.service_name,
                   colored: false,
                 },
                 {
-                  icon: "👤",
+                  icon: <UserIcon size={15} color="#6B7280" />,
                   label: "Staff",
                   value: booking.staff_name,
                   colored: false,
                 },
                 {
-                  icon: "📅",
+                  icon: <CalendarIcon size={15} color="#6B7280" />,
                   label: "Date",
                   colored: false,
                   value: new Date(booking.booked_at).toLocaleDateString(
@@ -334,7 +335,7 @@ export default async function BookingDetailPage({
                   ),
                 },
                 {
-                  icon: "🕐",
+                  icon: <ClockIcon size={15} color="#6B7280" />,
                   label: "Time",
                   colored: false,
                   value: new Date(booking.booked_at).toLocaleTimeString(
@@ -343,13 +344,13 @@ export default async function BookingDetailPage({
                   ),
                 },
                 {
-                  icon: "⏱",
+                  icon: <ClockIcon size={15} color="#6B7280" />,
                   label: "Duration",
                   value: `${booking.duration_mins} minutes`,
                   colored: false,
                 },
                 {
-                  icon: "💶",
+                  icon: <span style={{ fontSize: 13, fontWeight: 700, color: "#6B7280" }}>€</span>,
                   label: "Price",
                   value: `€${booking.price}`,
                   colored: true,
@@ -357,7 +358,7 @@ export default async function BookingDetailPage({
                 ...(tenant.address
                   ? [
                       {
-                        icon: "📍",
+                        icon: <MapPinIcon size={15} color="#6B7280" />,
                         label: "Location",
                         value: tenant.address,
                         colored: false,
@@ -378,7 +379,7 @@ export default async function BookingDetailPage({
                   <div
                     style={{ display: "flex", alignItems: "center", gap: 10 }}
                   >
-                    <span style={{ fontSize: 15 }}>{item.icon}</span>
+                    <span style={{ display: "flex", flexShrink: 0 }}>{item.icon}</span>
                     <span style={{ fontSize: 14, color: "#666" }}>
                       {item.label}
                     </span>
@@ -720,7 +721,7 @@ export default async function BookingDetailPage({
                     gap: 6,
                   }}
                 >
-                  🗑 Delete Booking
+                  <TrashIcon size={15} /> Delete Booking
                 </button>
               </form>
 

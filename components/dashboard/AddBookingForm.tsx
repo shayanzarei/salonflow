@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarIcon, SearchIcon, UserIcon } from "@/components/ui/Icons";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -137,7 +138,7 @@ export default function AddBookingForm({
                 marginBottom: 20,
               }}
             >
-              <span style={{ fontSize: 16 }}>👤</span>
+              <UserIcon size={16} color="#6B7280" />
               <h2
                 style={{
                   fontSize: 15,
@@ -160,11 +161,11 @@ export default function AddBookingForm({
                     left: 12,
                     top: "50%",
                     transform: "translateY(-50%)",
-                    fontSize: 14,
                     color: "#aaa",
+                    display: "flex",
                   }}
                 >
-                  🔍
+                  <SearchIcon size={15} />
                 </span>
                 <input
                   type="text"
@@ -299,7 +300,7 @@ export default function AddBookingForm({
                 marginBottom: 20,
               }}
             >
-              <span style={{ fontSize: 16 }}>📅</span>
+              <CalendarIcon size={16} color="#6B7280" />
               <h2
                 style={{
                   fontSize: 15,

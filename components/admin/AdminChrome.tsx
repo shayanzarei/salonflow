@@ -1,6 +1,7 @@
 "use client";
 
 import LogoutButton from "@/components/dashboard/LogoutButton";
+import { XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -56,7 +57,7 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
             onClick={() => setMenuOpen(false)}
             aria-label="Close navigation menu"
           >
-            <span className="text-xl leading-none">×</span>
+            <XIcon size={18} />
           </button>
         </div>
 

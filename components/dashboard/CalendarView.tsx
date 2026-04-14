@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarIcon, ClockIcon, ScissorsIcon, SearchIcon, UserIcon, XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -126,8 +127,8 @@ export default function CalendarView({
         <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto lg:justify-end">
           {/* Search */}
           <div className="relative min-w-0 flex-1 sm:max-w-[220px] lg:flex-initial">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
-              🔍
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <SearchIcon size={15} />
             </span>
             <input
               type="text"
@@ -375,7 +376,7 @@ export default function CalendarView({
                                 margin: "2px 0 0",
                               }}
                             >
-                              🕐{" "}
+                              <ClockIcon size={10} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />
                               {new Date(booking.booked_at).toLocaleTimeString(
                                 "en-US",
                                 { hour: "numeric", minute: "2-digit" }
@@ -493,12 +494,10 @@ export default function CalendarView({
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  fontSize: 20,
                   color: "#aaa",
-                  lineHeight: 1,
                 }}
               >
-                ×
+                <XIcon size={18} />
               </button>
             </div>
 
@@ -558,17 +557,17 @@ export default function CalendarView({
             >
               {[
                 {
-                  icon: "✂",
+                  icon: <ScissorsIcon size={15} />,
                   label: "Service",
                   value: selectedBooking.service_name,
                 },
                 {
-                  icon: "👤",
+                  icon: <UserIcon size={15} />,
                   label: "Staff",
                   value: selectedBooking.staff_name,
                 },
                 {
-                  icon: "📅",
+                  icon: <CalendarIcon size={15} />,
                   label: "Date",
                   value: new Date(selectedBooking.booked_at).toLocaleDateString(
                     "en-US",
@@ -576,7 +575,7 @@ export default function CalendarView({
                   ),
                 },
                 {
-                  icon: "🕐",
+                  icon: <ClockIcon size={15} />,
                   label: "Time",
                   value: new Date(selectedBooking.booked_at).toLocaleTimeString(
                     "en-US",
@@ -584,12 +583,12 @@ export default function CalendarView({
                   ),
                 },
                 {
-                  icon: "⏱",
+                  icon: <ClockIcon size={15} />,
                   label: "Duration",
                   value: `${selectedBooking.duration_mins} mins`,
                 },
                 {
-                  icon: "💶",
+                  icon: <span style={{ fontSize: 13, fontWeight: 600 }}>€</span>,
                   label: "Price",
                   value: `€${selectedBooking.price}`,
                   colored: true,

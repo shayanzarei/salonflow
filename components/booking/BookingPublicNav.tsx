@@ -1,5 +1,6 @@
 "use client";
 
+import { XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -18,6 +19,7 @@ type Props = {
 
 export function BookingPublicNav({ brand, salonName, bookHref }: Props) {
   const [open, setOpen] = useState(false);
+  const homeHref = "/";
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -49,7 +51,11 @@ export function BookingPublicNav({ brand, salonName, bookHref }: Props) {
 
       <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-5 md:px-8">
-          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <Link
+            href={homeHref}
+            className="flex min-w-0 items-center gap-2.5 sm:gap-3"
+            onClick={() => setOpen(false)}
+          >
             <div
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white sm:h-10 sm:w-10"
               style={{ background: brand }}
@@ -59,17 +65,17 @@ export function BookingPublicNav({ brand, salonName, bookHref }: Props) {
             <span className="truncate text-sm font-semibold text-gray-900 sm:text-base">
               {salonName}
             </span>
-          </div>
+          </Link>
 
           <div className="hidden items-center gap-6 md:flex lg:gap-8">
             {LINKS.map((item) => (
-              <a
+              <Link
                 key={item.hash}
-                href={`#${item.hash}`}
+                href={`/#${item.hash}`}
                 className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -90,7 +96,7 @@ export function BookingPublicNav({ brand, salonName, bookHref }: Props) {
               aria-label={open ? "Close menu" : "Open menu"}
             >
               {open ? (
-                <span className="text-2xl leading-none text-gray-700">×</span>
+                <XIcon size={18} color="#374151" />
               ) : (
                 <span className="flex flex-col gap-1" aria-hidden>
                   <span className="block h-0.5 w-5 rounded-full bg-gray-700" />
@@ -107,13 +113,13 @@ export function BookingPublicNav({ brand, salonName, bookHref }: Props) {
             <ul className="flex flex-col gap-1">
               {LINKS.map((item) => (
                 <li key={item.hash}>
-                  <a
-                    href={`#${item.hash}`}
+                  <Link
+                    href={`/#${item.hash}`}
                     className="flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-gray-800 hover:bg-gray-50"
                     onClick={() => setOpen(false)}
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
               <li className="pt-2">

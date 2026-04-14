@@ -3,12 +3,6 @@ import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import { NextRequest, NextResponse } from "next/server";
 
-const SECTION_KEYS = [
-  "section_services",
-  "section_team",
-  "section_reviews",
-] as const;
-
 export async function POST(req: NextRequest) {
   const guard = await requireOwner();
   if (guard.error) return guard.error;
@@ -73,17 +67,23 @@ export async function POST(req: NextRequest) {
          WHERE id = $3`,
         [color, hero_image_url, tenant.id]
       );
+    }
 
-      for (const key of SECTION_KEYS) {
-        const enabled = formData.get(key) === "true";
-        await pool.query(
-          `INSERT INTO feature_flags (tenant_id, feature, enabled)
-           VALUES ($1, $2, $3)
-           ON CONFLICT (tenant_id, feature)
-           DO UPDATE SET enabled = EXCLUDED.enabled`,
-          [tenant.id, key, enabled]
-        );
-      }
+    if (action === "social") {
+      const instagram = (formData.get("social_instagram") as string) ?? "";
+      const facebook  = (formData.get("social_facebook")  as string) ?? "";
+      const tiktok    = (formData.get("social_tiktok")    as string) ?? "";
+      const youtube   = (formData.get("social_youtube")   as string) ?? "";
+
+      await pool.query(
+        `UPDATE tenants SET
+           social_instagram = NULLIF($1, ''),
+           social_facebook  = NULLIF($2, ''),
+           social_tiktok    = NULLIF($3, ''),
+           social_youtube   = NULLIF($4, '')
+         WHERE id = $5`,
+        [instagram, facebook, tiktok, youtube, tenant.id]
+      );
     }
 
     return NextResponse.redirect(new URL("/settings", req.url));

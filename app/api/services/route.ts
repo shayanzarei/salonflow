@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     const priceRaw = formData.get("price") as string;
     const durationRaw = formData.get("duration_mins") as string;
     const categoryRaw = (formData.get("category") as string)?.trim() ?? "";
+    const categoryId = (formData.get("category_id") as string)?.trim() || null;
     const is_active = formData.get("is_active") === "true";
 
     let price: number;
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
       if (Number.isNaN(duration_mins) || duration_mins < 5) duration_mins = 60;
       category = (SERVICE_CATEGORIES as readonly string[]).includes(categoryRaw)
         ? categoryRaw
-        : "Other";
+        : null as unknown as string;
     } else {
       if (!priceRaw || !durationRaw) {
         return NextResponse.json(
@@ -57,10 +58,14 @@ export async function POST(req: NextRequest) {
       if (Number.isNaN(duration_mins) || duration_mins < 5) {
         return NextResponse.json({ error: "Invalid duration" }, { status: 400 });
       }
-      if (!(SERVICE_CATEGORIES as readonly string[]).includes(categoryRaw)) {
-        return NextResponse.json({ error: "Category is required" }, { status: 400 });
+      // category_id (custom category) takes priority; legacy text category is optional
+      if (!categoryId && !(SERVICE_CATEGORIES as readonly string[]).includes(categoryRaw)) {
+        category = null as unknown as string;
+      } else {
+        category = (SERVICE_CATEGORIES as readonly string[]).includes(categoryRaw)
+          ? categoryRaw
+          : null as unknown as string;
       }
-      category = categoryRaw;
     }
 
     const staffIds = formData
@@ -74,9 +79,9 @@ export async function POST(req: NextRequest) {
 
       const insert = await client.query(
         `INSERT INTO services (
-           tenant_id, name, description, price, duration_mins, category, is_active, is_draft
+           tenant_id, name, description, price, duration_mins, category, category_id, is_active, is_draft
          )
-         VALUES ($1, $2, NULLIF($3, ''), $4, $5, $6, $7, $8)
+         VALUES ($1, $2, NULLIF($3, ''), $4, $5, $6, $7, $8, $9)
          RETURNING id`,
         [
           tenant.id,
@@ -85,6 +90,7 @@ export async function POST(req: NextRequest) {
           price,
           duration_mins,
           category,
+          categoryId,
           is_active,
           isDraft,
         ]

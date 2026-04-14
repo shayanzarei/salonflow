@@ -7,6 +7,8 @@ export type ServiceDetailApi = {
   id: string;
   name: string;
   category: string;
+  category_id: string | null;
+  category_name: string | null;
   description: string | null;
   durationMinutes: number;
   price: number;
@@ -48,6 +50,8 @@ export async function loadServiceDetail(
     pool.query(
       `SELECT
          s.*,
+         sc.id   AS cat_id,
+         sc.name AS cat_name,
          COUNT(b.id)::int AS total_bookings,
          COUNT(b.id) FILTER (WHERE b.booked_at >= date_trunc('month', NOW()))::int AS month_bookings,
          COUNT(b.id) FILTER (
@@ -72,8 +76,9 @@ export async function loadServiceDetail(
        FROM services s
        LEFT JOIN bookings b ON b.service_id = s.id AND b.tenant_id = s.tenant_id
        LEFT JOIN services s2 ON s2.id = b.service_id
+       LEFT JOIN service_categories sc ON sc.id = s.category_id
        WHERE s.id = $1 AND s.tenant_id = $2
-       GROUP BY s.id`,
+       GROUP BY s.id, sc.id, sc.name`,
       [serviceId, tenantId]
     ),
     pool.query(
@@ -141,13 +146,16 @@ export async function loadServiceDetail(
   const averageRating = parseFloat(String(rev?.avg_rating ?? 0));
   const reviewCount = rev?.review_count ?? 0;
 
-  const category =
-    (row.category as string)?.trim() || "Other";
+  const category_id   = (row.cat_id   as string | null) ?? null;
+  const category_name = (row.cat_name as string | null) ?? null;
+  const category = category_name ?? (row.category as string)?.trim() ?? "Other";
 
   return {
     id: row.id,
     name: row.name,
     category,
+    category_id,
+    category_name,
     description: row.description ?? null,
     durationMinutes: row.duration_mins,
     price: parseFloat(String(row.price)),

@@ -10,10 +10,16 @@ export default async function NewServicePage() {
 
   const brand = tenant.primary_color ?? "#7C3AED";
 
-  const staffResult = await pool.query(
-    `SELECT id, name, role, avatar_url FROM staff WHERE tenant_id = $1 ORDER BY name`,
-    [tenant.id]
-  );
+  const [staffResult, categoriesResult] = await Promise.all([
+    pool.query(
+      `SELECT id, name, role, avatar_url FROM staff WHERE tenant_id = $1 ORDER BY name`,
+      [tenant.id]
+    ),
+    pool.query(
+      `SELECT id, name FROM service_categories WHERE tenant_id = $1 ORDER BY sort_order, name`,
+      [tenant.id]
+    ),
+  ]);
 
   return (
     <div>
@@ -47,7 +53,7 @@ export default async function NewServicePage() {
         </p>
       </div>
 
-      <AddServiceForm brand={brand} staff={staffResult.rows} />
+      <AddServiceForm brand={brand} staff={staffResult.rows} categories={categoriesResult.rows} />
     </div>
   );
 }

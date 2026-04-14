@@ -12,7 +12,11 @@ function getInitials(name: string) {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
-function getStatus(totalBookings: number, totalSpent: number, lastVisit: string) {
+function getStatus(
+  totalBookings: number,
+  totalSpent: number,
+  lastVisit: string
+) {
   const daysSinceVisit = Math.floor(
     (Date.now() - new Date(lastVisit).getTime()) / (1000 * 60 * 60 * 24)
   );
@@ -31,7 +35,10 @@ function getDaysAgo(date: string) {
   return `${days} days ago`;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; color: string; bg: string }
+> = {
   VIP: { label: "VIP", color: "#92400E", bg: "#FEF3C7" },
   Regular: { label: "Regular", color: "#374151", bg: "#F3F4F6" },
   New: { label: "New", color: "#065F46", bg: "#D1FAE5" },
@@ -86,12 +93,16 @@ export default async function CustomersPage({
   const now = new Date();
   const newThisMonth = allCustomers.filter((c) => {
     const d = new Date(c.member_since);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    return (
+      d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    );
   }).length;
   const prevMonthNew = allCustomers.filter((c) => {
     const d = new Date(c.member_since);
     const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    return d.getMonth() === prev.getMonth() && d.getFullYear() === prev.getFullYear();
+    return (
+      d.getMonth() === prev.getMonth() && d.getFullYear() === prev.getFullYear()
+    );
   }).length;
   const newGrowthPct =
     prevMonthNew > 0
@@ -104,9 +115,12 @@ export default async function CustomersPage({
 
   // Tab filtering
   let filtered = allCustomers;
-  if (activeTab === "vip") filtered = allCustomers.filter((c) => c.status === "VIP");
-  else if (activeTab === "new") filtered = allCustomers.filter((c) => c.status === "New");
-  else if (activeTab === "at-risk") filtered = allCustomers.filter((c) => c.status === "At Risk");
+  if (activeTab === "vip")
+    filtered = allCustomers.filter((c) => c.status === "VIP");
+  else if (activeTab === "new")
+    filtered = allCustomers.filter((c) => c.status === "New");
+  else if (activeTab === "at-risk")
+    filtered = allCustomers.filter((c) => c.status === "At Risk");
 
   const totalFiltered = filtered.length;
   const totalPages = Math.ceil(totalFiltered / PAGE_SIZE);
@@ -130,7 +144,9 @@ export default async function CustomersPage({
     <div>
       {/* Header */}
       <div className="mb-5 sm:mb-6">
-        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Customers</h1>
+        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
+          Customers
+        </h1>
       </div>
 
       {/* Stat Cards */}
@@ -151,10 +167,19 @@ export default async function CustomersPage({
             <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
               Total Customers
             </p>
-            <p style={{ fontSize: 30, fontWeight: 700, color: "#111", margin: "0 0 2px" }}>
+            <p
+              style={{
+                fontSize: 30,
+                fontWeight: 700,
+                color: "#111",
+                margin: "0 0 2px",
+              }}
+            >
               {totalCustomers.toLocaleString()}
             </p>
-            <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>All time</p>
+            <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
+              All time
+            </p>
           </div>
           <div
             style={{
@@ -176,7 +201,15 @@ export default async function CustomersPage({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <circle cx="9" cy="7" r="4" stroke={brand} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <circle
+                cx="9"
+                cy="7"
+                r="4"
+                stroke={brand}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
               <path
                 d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
                 stroke={brand}
@@ -204,7 +237,14 @@ export default async function CustomersPage({
             <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
               New This Month
             </p>
-            <p style={{ fontSize: 30, fontWeight: 700, color: "#111", margin: "0 0 6px" }}>
+            <p
+              style={{
+                fontSize: 30,
+                fontWeight: 700,
+                color: "#111",
+                margin: "0 0 6px",
+              }}
+            >
               {newThisMonth}
             </p>
             {newGrowthPct !== null && (
@@ -218,7 +258,8 @@ export default async function CustomersPage({
                   borderRadius: 100,
                 }}
               >
-                {newGrowthPct >= 0 ? "↑" : "↓"} {Math.abs(newGrowthPct)}% vs last month
+                {newGrowthPct >= 0 ? "↑" : "↓"} {Math.abs(newGrowthPct)}% vs
+                last month
               </span>
             )}
           </div>
@@ -227,7 +268,7 @@ export default async function CustomersPage({
               width: 48,
               height: 48,
               borderRadius: "50%",
-              background: "#D1FAE518",
+              background: `${brand}18`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -237,14 +278,30 @@ export default async function CustomersPage({
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path
                 d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                stroke="#059669"
+                stroke={brand}
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <circle cx="9" cy="7" r="4" stroke="#059669" strokeWidth="2" />
-              <line x1="19" y1="8" x2="19" y2="14" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
-              <line x1="22" y1="11" x2="16" y2="11" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
+              <circle cx="9" cy="7" r="4" stroke={brand} strokeWidth="2" />
+              <line
+                x1="19"
+                y1="8"
+                x2="19"
+                y2="14"
+                stroke={brand}
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <line
+                x1="22"
+                y1="11"
+                x2="16"
+                y2="11"
+                stroke={brand}
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           </div>
         </div>
@@ -265,10 +322,19 @@ export default async function CustomersPage({
             <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
               Average Spend
             </p>
-            <p style={{ fontSize: 30, fontWeight: 700, color: "#111", margin: "0 0 2px" }}>
+            <p
+              style={{
+                fontSize: 30,
+                fontWeight: 700,
+                color: "#111",
+                margin: "0 0 2px",
+              }}
+            >
               {formatEUR(avgSpend)}
             </p>
-            <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>Per customer</p>
+            <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
+              Per customer
+            </p>
           </div>
           <div
             style={{
@@ -282,7 +348,7 @@ export default async function CustomersPage({
               flexShrink: 0,
               fontSize: 22,
               color: brand,
-              fontWeight: 600,
+              fontWeight: 500,
             }}
           >
             €
@@ -307,7 +373,9 @@ export default async function CustomersPage({
             >
               {t.label}
               {t.suffix && (
-                <span style={{ color: "#9CA3AF", fontWeight: 400, marginLeft: 4 }}>
+                <span
+                  style={{ color: "#9CA3AF", fontWeight: 400, marginLeft: 4 }}
+                >
                   {t.suffix}
                 </span>
               )}
@@ -332,11 +400,18 @@ export default async function CustomersPage({
         ) : (
           <>
             <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-            <table className="w-full min-w-[960px] border-collapse">
-              <thead>
-                <tr style={{ borderBottom: "1px solid #F3F4F6" }}>
-                  {["Client", "Contact", "Visits", "Last Visit", "Total Spent", "Status", "Action"].map(
-                    (h) => (
+              <table className="w-full min-w-[960px] border-collapse">
+                <thead>
+                  <tr style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    {[
+                      "Client",
+                      "Contact",
+                      "Visits",
+                      "Last Visit",
+                      "Total Spent",
+                      "Status",
+                      "Action",
+                    ].map((h) => (
                       <th
                         key={h}
                         style={{
@@ -351,94 +426,88 @@ export default async function CustomersPage({
                       >
                         {h}
                       </th>
-                    )
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {customers.map((customer, i) => {
-                  const cfg = STATUS_CONFIG[customer.status] ?? STATUS_CONFIG.Regular;
-                  return (
-                    <tr
-                      key={customer.client_email + i}
-                      style={{
-                        borderBottom:
-                          i < customers.length - 1 ? "1px solid #F9FAFB" : "none",
-                      }}
-                    >
-                      {/* Client */}
-                      <td style={{ padding: "16px 20px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {customers.map((customer, i) => {
+                    const cfg =
+                      STATUS_CONFIG[customer.status] ?? STATUS_CONFIG.Regular;
+                    return (
+                      <tr
+                        key={customer.client_email + i}
+                        style={{
+                          borderBottom:
+                            i < customers.length - 1
+                              ? "1px solid #F9FAFB"
+                              : "none",
+                        }}
+                      >
+                        {/* Client */}
+                        <td style={{ padding: "16px 20px" }}>
                           <div
                             style={{
-                              width: 38,
-                              height: 38,
-                              borderRadius: "50%",
-                              background: brand,
-                              color: "white",
                               display: "flex",
                               alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: 13,
-                              fontWeight: 600,
-                              flexShrink: 0,
+                              gap: 12,
                             }}
                           >
-                            {getInitials(customer.client_name)}
-                          </div>
-                          <div>
-                            <p
+                            <div
                               style={{
-                                margin: 0,
-                                fontSize: 14,
+                                width: 38,
+                                height: 38,
+                                borderRadius: "50%",
+                                background: brand,
+                                color: "white",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: 13,
                                 fontWeight: 600,
-                                color: "#111827",
+                                flexShrink: 0,
                               }}
                             >
-                              {customer.client_name}
-                            </p>
-                            <p style={{ margin: 0, fontSize: 12, color: "#9CA3AF" }}>
-                              Member since{" "}
-                              {new Date(customer.member_since).toLocaleDateString("en-US", {
-                                month: "short",
-                                year: "numeric",
-                              })}
-                            </p>
+                              {getInitials(customer.client_name)}
+                            </div>
+                            <div>
+                              <p
+                                style={{
+                                  margin: 0,
+                                  fontSize: 14,
+                                  fontWeight: 600,
+                                  color: "#111827",
+                                }}
+                              >
+                                {customer.client_name}
+                              </p>
+                              <p
+                                style={{
+                                  margin: 0,
+                                  fontSize: 12,
+                                  color: "#9CA3AF",
+                                }}
+                              >
+                                Member since{" "}
+                                {new Date(
+                                  customer.member_since
+                                ).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Contact */}
-                      <td style={{ padding: "16px 20px" }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        {/* Contact */}
+                        <td style={{ padding: "16px 20px" }}>
                           <div
                             style={{
                               display: "flex",
-                              alignItems: "center",
-                              gap: 6,
-                              fontSize: 13,
-                              color: "#374151",
+                              flexDirection: "column",
+                              gap: 4,
                             }}
                           >
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                              <path
-                                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                                stroke="#9CA3AF"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <polyline
-                                points="22,6 12,13 2,6"
-                                stroke="#9CA3AF"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                            {customer.client_email}
-                          </div>
-                          {customer.client_phone && (
                             <div
                               style={{
                                 display: "flex",
@@ -448,109 +517,162 @@ export default async function CustomersPage({
                                 color: "#374151",
                               }}
                             >
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                              <svg
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
                                 <path
-                                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.4 2 2 0 0 1 3.64 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.86a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                                  stroke="#9CA3AF"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <polyline
+                                  points="22,6 12,13 2,6"
                                   stroke="#9CA3AF"
                                   strokeWidth="2"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                 />
                               </svg>
-                              {customer.client_phone}
+                              {customer.client_email}
                             </div>
-                          )}
-                        </div>
-                      </td>
+                            {customer.client_phone && (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 6,
+                                  fontSize: 13,
+                                  color: "#374151",
+                                }}
+                              >
+                                <svg
+                                  width="13"
+                                  height="13"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.4 2 2 0 0 1 3.64 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.86a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                                    stroke="#9CA3AF"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                {customer.client_phone}
+                              </div>
+                            )}
+                          </div>
+                        </td>
 
-                      {/* Visits */}
-                      <td style={{ padding: "16px 20px" }}>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: 15,
-                            fontWeight: 600,
-                            color: "#111827",
-                          }}
-                        >
-                          {customer.total_bookings}
-                        </p>
-                        <p style={{ margin: 0, fontSize: 12, color: "#9CA3AF" }}>
-                          total visits
-                        </p>
-                      </td>
+                        {/* Visits */}
+                        <td style={{ padding: "16px 20px" }}>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: 15,
+                              fontWeight: 600,
+                              color: "#111827",
+                            }}
+                          >
+                            {customer.total_bookings}
+                          </p>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: 12,
+                              color: "#9CA3AF",
+                            }}
+                          >
+                            total visits
+                          </p>
+                        </td>
 
-                      {/* Last Visit */}
-                      <td style={{ padding: "16px 20px" }}>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: 14,
-                            fontWeight: 500,
-                            color: "#111827",
-                          }}
-                        >
-                          {new Date(customer.last_visit).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </p>
-                        <p style={{ margin: 0, fontSize: 12, color: "#9CA3AF" }}>
-                          {getDaysAgo(customer.last_visit)}
-                        </p>
-                      </td>
+                        {/* Last Visit */}
+                        <td style={{ padding: "16px 20px" }}>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: 14,
+                              fontWeight: 500,
+                              color: "#111827",
+                            }}
+                          >
+                            {new Date(customer.last_visit).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
+                          </p>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: 12,
+                              color: "#9CA3AF",
+                            }}
+                          >
+                            {getDaysAgo(customer.last_visit)}
+                          </p>
+                        </td>
 
-                      {/* Total Spent */}
-                      <td style={{ padding: "16px 20px" }}>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: 15,
-                            fontWeight: 700,
-                            color: brand,
-                          }}
-                        >
-                          {formatEUR(customer.total_spent)}
-                        </p>
-                      </td>
+                        {/* Total Spent */}
+                        <td style={{ padding: "16px 20px" }}>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: 15,
+                              fontWeight: 700,
+                              color: brand,
+                            }}
+                          >
+                            {formatEUR(customer.total_spent)}
+                          </p>
+                        </td>
 
-                      {/* Status */}
-                      <td style={{ padding: "16px 20px" }}>
-                        <span
-                          style={{
-                            display: "inline-block",
-                            padding: "4px 12px",
-                            borderRadius: 100,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: cfg.color,
-                            background: cfg.bg,
-                          }}
-                        >
-                          {cfg.label}
-                        </span>
-                      </td>
+                        {/* Status */}
+                        <td style={{ padding: "16px 20px" }}>
+                          <span
+                            style={{
+                              display: "inline-block",
+                              padding: "4px 12px",
+                              borderRadius: 100,
+                              fontSize: 12,
+                              fontWeight: 600,
+                              color: cfg.color,
+                              background: cfg.bg,
+                            }}
+                          >
+                            {cfg.label}
+                          </span>
+                        </td>
 
-                      {/* Action */}
-                      <td style={{ padding: "16px 20px" }}>
-                        <Link
-                          href={`/bookings?search=${encodeURIComponent(customer.client_name)}`}
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: brand,
-                            textDecoration: "none",
-                          }}
-                        >
-                          View History
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        {/* Action */}
+                        <td style={{ padding: "16px 20px" }}>
+                          <Link
+                            href={`/bookings?search=${encodeURIComponent(customer.client_name)}`}
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 600,
+                              color: brand,
+                              textDecoration: "none",
+                            }}
+                          >
+                            View History
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
             {/* Pagination */}
@@ -634,7 +756,9 @@ export default async function CustomersPage({
                 })}
 
                 {totalPages > 5 && (
-                  <span style={{ fontSize: 14, color: "#9CA3AF", padding: "0 4px" }}>
+                  <span
+                    style={{ fontSize: 14, color: "#9CA3AF", padding: "0 4px" }}
+                  >
                     …
                   </span>
                 )}

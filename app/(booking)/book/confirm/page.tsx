@@ -1,4 +1,5 @@
 import BookingProgress from "@/components/booking/BookingProgress";
+import { MapPinIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
@@ -215,8 +216,8 @@ export default async function ConfirmPage({
                   >
                     Location
                   </p>
-                  <p style={{ fontSize: 14, color: "#555", margin: 0 }}>
-                    📍 {tenant.address}
+                  <p style={{ fontSize: 14, color: "#555", margin: 0, display: "flex", alignItems: "center", gap: 4 }}>
+                    <MapPinIcon size={13} /> {tenant.address}
                   </p>
                 </div>
               )}

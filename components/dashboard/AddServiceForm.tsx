@@ -1,10 +1,11 @@
 "use client";
 
+import { ScissorsIcon } from "@/components/ui/Icons";
 import {
   ServiceActiveToggle,
   ServiceDurationField,
 } from "@/components/dashboard/ServiceEditFormExtras";
-import { getCategoryStyle, SERVICE_CATEGORIES } from "@/lib/service-categories";
+import { getCategoryStyle } from "@/lib/service-categories";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -15,24 +16,33 @@ type StaffRow = {
   avatar_url: string | null;
 };
 
+type CategoryRow = {
+  id: string;
+  name: string;
+};
+
 export function AddServiceForm({
   brand,
   staff,
+  categories = [],
 }: {
   brand: string;
   staff: StaffRow[];
+  categories?: CategoryRow[];
 }) {
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [categoryName, setCategoryName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [durationMins, setDurationMins] = useState(60);
   const [showOnSite, setShowOnSite] = useState(true);
   const [selectedStaff, setSelectedStaff] = useState<Set<string>>(new Set());
 
+  // For the preview chip: use custom category name if selected, otherwise infer from service name
   const previewStyle = useMemo(
-    () => getCategoryStyle(category || null, name || "Service"),
-    [category, name]
+    () => getCategoryStyle(null, name || "Service"),
+    [name]
   );
 
   const priceNum = parseFloat(price);
@@ -75,7 +85,7 @@ export function AddServiceForm({
                 marginBottom: 20,
               }}
             >
-              <span style={{ fontSize: 20 }}>✂</span>
+              <ScissorsIcon size={20} color="#6B7280" />
               <h2
                 style={{
                   fontSize: 15,
@@ -130,30 +140,53 @@ export function AddServiceForm({
                 >
                   Category
                 </label>
-                <select
-                  name="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    padding: "11px 14px",
-                    fontSize: 14,
-                    background: "white",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <option value="" disabled>
-                    Select a category
-                  </option>
-                  {SERVICE_CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                {categories.length > 0 ? (
+                  <select
+                    name="category_id"
+                    value={categoryId}
+                    onChange={(e) => {
+                      const selectedId = e.target.value;
+                      const selectedName = categories.find((c) => c.id === selectedId)?.name ?? "";
+                      setCategoryId(selectedId);
+                      setCategoryName(selectedName);
+                    }}
+                    style={{
+                      width: "100%",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      padding: "11px 14px",
+                      fontSize: 14,
+                      background: "white",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <option value="">No category</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div
+                    style={{
+                      padding: "11px 14px",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      fontSize: 13,
+                      color: "#9CA3AF",
+                      background: "#F9FAFB",
+                    }}
+                  >
+                    No categories yet —{" "}
+                    <a
+                      href="/services?tab=categories"
+                      style={{ color: brand, textDecoration: "none", fontWeight: 500 }}
+                    >
+                      create one first
+                    </a>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -496,7 +529,7 @@ export function AddServiceForm({
                 }}
               >
                 {previewStyle.icon}{" "}
-                {category || "Hair Care"}
+                {categoryName || "No category"}
               </span>
               <h3
                 style={{

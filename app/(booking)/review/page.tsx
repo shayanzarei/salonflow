@@ -1,4 +1,5 @@
 import StarRating from "@/components/booking/StarRating";
+import { StarIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
@@ -64,7 +65,7 @@ export default async function ReviewPage({
               justifyContent: "center",
             }}
           >
-            <span style={{ fontSize: 36 }}>⭐</span>
+            <StarIcon size={32} color="white" />
           </div>
           <div
             style={{

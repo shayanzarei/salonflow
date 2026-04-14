@@ -1,3 +1,10 @@
+import {
+  CheckCircleIcon,
+  EyeIcon,
+  PlusIcon,
+  TrendingUpIcon,
+  UsersIcon,
+} from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -67,7 +74,11 @@ export default async function StaffPage() {
           className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] px-4 py-2.5 text-sm font-medium text-white no-underline"
           style={{ background: brand }}
         >
-          + Add Staff Member
+          <PlusIcon
+            size={14}
+            style={{ display: "inline", verticalAlign: "middle" }}
+          />
+          Add Staff Member
         </Link>
       </div>
 
@@ -77,19 +88,19 @@ export default async function StaffPage() {
           {
             label: "Total Appointments (This Week)",
             value: totalWeekAppointments,
-            icon: "✅",
+            icon: <CheckCircleIcon size={20} color="#10B981" />,
             iconBg: "#ECFDF5",
           },
           {
             label: "Active Staff Today",
             value: `${activeStaff} / ${staffList.length}`,
-            icon: "👥",
+            icon: <UsersIcon size={20} color="#6366F1" />,
             iconBg: "#EEF2FF",
           },
           {
             label: "Total Revenue Generated",
             value: `€${totalRevenue.toLocaleString("en", { minimumFractionDigits: 0 })}`,
-            icon: "📈",
+            icon: <TrendingUpIcon size={20} color="#7C3AED" />,
             iconBg: "#F5F3FF",
           },
         ].map((stat) => (
@@ -129,7 +140,6 @@ export default async function StaffPage() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 20,
                 flexShrink: 0,
               }}
             >
@@ -166,7 +176,15 @@ export default async function StaffPage() {
 
         {staffList.length === 0 ? (
           <div style={{ padding: "60px 24px", textAlign: "center" }}>
-            <p style={{ fontSize: 32, margin: "0 0 12px" }}>👥</p>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: 12,
+              }}
+            >
+              <UsersIcon size={36} color="#D1D5DB" />
+            </div>
             <h3
               style={{
                 fontSize: 16,
@@ -195,7 +213,11 @@ export default async function StaffPage() {
                 textDecoration: "none",
               }}
             >
-              + Add Staff Member
+              <PlusIcon
+                size={14}
+                style={{ display: "inline", verticalAlign: "middle" }}
+              />
+              Add Staff Member
             </Link>
           </div>
         ) : (
@@ -307,7 +329,15 @@ export default async function StaffPage() {
                           background: `${brand}08`,
                         }}
                       >
-                        View 👀
+                        <EyeIcon
+                          size={13}
+                          style={{
+                            display: "inline",
+                            verticalAlign: "middle",
+                            marginRight: 4,
+                          }}
+                        />{" "}
+                        View
                       </Link>
                     </div>
                   </div>

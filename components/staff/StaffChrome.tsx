@@ -1,6 +1,7 @@
 "use client";
 
 import LogoutButton from "@/components/dashboard/LogoutButton";
+import { XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -86,7 +87,7 @@ export function StaffChrome({ brand, staffName, salonName, children }: Props) {
             onClick={() => setMenuOpen(false)}
             aria-label="Close menu"
           >
-            <span className="text-xl leading-none">×</span>
+            <XIcon size={18} />
           </button>
         </div>
 

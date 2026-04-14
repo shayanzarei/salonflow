@@ -1,5 +1,6 @@
 "use client";
 
+import { TrashIcon, UserIcon } from "@/components/ui/Icons";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -134,7 +135,7 @@ export default function StaffEditForm({
                 marginBottom: 24,
               }}
             >
-              <span style={{ fontSize: 16 }}>👤</span>
+              <UserIcon size={16} color="#6B7280" />
               <h2
                 style={{
                   fontSize: 15,
@@ -597,7 +598,7 @@ export default function StaffEditForm({
                 gap: 6,
               }}
             >
-              🗑 Delete Staff Member
+              <TrashIcon size={15} /> Delete Staff Member
             </button>
           </div>
         </div>

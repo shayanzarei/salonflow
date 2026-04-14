@@ -1,4 +1,5 @@
 import StaffTabs from "@/components/dashboard/StaffTabs";
+import { CalendarIcon, TrendingUpIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -230,23 +231,20 @@ export default async function StaffDetailPage({
           {
             label: "TOTAL BOOKINGS",
             value: parseInt(stats.total_bookings).toLocaleString(),
-            icon: "📅",
+            icon: <CalendarIcon size={16} color={brand} />,
             iconBg: "#EEF2FF",
-            iconColor: brand,
           },
           {
             label: "THIS WEEK",
             value: stats.this_week,
-            icon: "🔄",
+            icon: <TrendingUpIcon size={16} color="#F59E0B" />,
             iconBg: "#FFF7ED",
-            iconColor: "#F59E0B",
           },
           {
             label: "REVENUE (MTD)",
             value: `€${parseFloat(stats.revenue).toLocaleString("en", { minimumFractionDigits: 0 })}`,
-            icon: "€",
+            icon: <span style={{ fontSize: 14, fontWeight: 700, color: "#10B981" }}>€</span>,
             iconBg: "#ECFDF5",
-            iconColor: "#10B981",
           },
         ].map((stat) => (
           <div
@@ -295,9 +293,7 @@ export default async function StaffDetailPage({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 16,
                 flexShrink: 0,
-                color: stat.iconColor,
               }}
             >
               {stat.icon}

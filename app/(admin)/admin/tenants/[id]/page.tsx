@@ -1,7 +1,18 @@
-import { SITE_SECTIONS } from '@/config/plans';
+import { PLANS, SITE_SECTIONS } from '@/config/plans';
 import pool from '@/lib/db';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+
+const ALL_PLAN_FEATURES = [
+  { key: 'online_booking',  label: 'Online booking',   description: 'Clients can book appointments online' },
+  { key: 'email_reminders', label: 'Email reminders',  description: 'Automated booking confirmation & reminder emails' },
+  { key: 'sms_reminders',   label: 'SMS reminders',    description: 'SMS notifications for bookings' },
+  { key: 'analytics',       label: 'Analytics',        description: 'Revenue, popular services & busy-hours charts' },
+  { key: 'custom_branding', label: 'Custom branding',  description: 'Custom primary colour & hero image' },
+  { key: 'gift_cards',      label: 'Gift cards',       description: 'Sell & redeem gift cards' },
+  { key: 'multi_location',  label: 'Multi-location',   description: 'Manage multiple salon locations' },
+  { key: 'api_access',      label: 'API access',       description: 'Direct API access for integrations' },
+] as const;
 
 export default async function TenantDetailPage({
     params,
@@ -18,18 +29,22 @@ export default async function TenantDetailPage({
     const tenant = tenantResult.rows[0];
     if (!tenant) notFound();
 
-    // fetch current section flags for this tenant
+    // fetch ALL flags for this tenant
     const flagsResult = await pool.query(
-        `SELECT feature, enabled FROM feature_flags
-     WHERE tenant_id = $1 AND feature LIKE 'section_%'`,
+        `SELECT feature, enabled FROM feature_flags WHERE tenant_id = $1`,
         [id]
     );
 
-    // build a map of section -> enabled
+    // build a map of flag -> enabled
     const flagMap: Record<string, boolean> = {};
     flagsResult.rows.forEach((row) => {
         flagMap[row.feature] = row.enabled;
     });
+
+    // Which features the plan already includes
+    const planFeatures = new Set(
+        PLANS[tenant.plan_tier as keyof typeof PLANS]?.features ?? []
+    );
 
     return (
         <div className="w-full max-w-2xl min-w-0">
@@ -54,12 +69,71 @@ export default async function TenantDetailPage({
                 </div>
             </div>
 
-            {/* Site sections control */}
+            {/* Plan features — per-tenant overrides */}
+            <div className="mb-6 overflow-hidden rounded-xl border border-gray-100 bg-white">
+                <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
+                    <h2 className="font-semibold text-gray-900">Feature flags</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                        Override individual features for this salon regardless of plan.
+                        Features already included in their plan are shown but cannot be disabled here — downgrade the plan first.
+                    </p>
+                </div>
+                <div className="divide-y divide-gray-50">
+                    {ALL_PLAN_FEATURES.map((feat) => {
+                        const inPlan = planFeatures.has(feat.key as never);
+                        // Override enabled = DB flag if set; otherwise falls back to plan
+                        const isEnabled = inPlan || (flagMap[feat.key] ?? false);
+
+                        return (
+                            <div
+                                key={feat.key}
+                                className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+                            >
+                                <div className="min-w-0 pr-0 sm:pr-4">
+                                    <p className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                                        {feat.label}
+                                        {inPlan && (
+                                            <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-600">
+                                                In plan
+                                            </span>
+                                        )}
+                                    </p>
+                                    <p className="mt-0.5 text-xs text-gray-400">{feat.description}</p>
+                                </div>
+                                {inPlan ? (
+                                    <div className="relative h-6 w-11 shrink-0 self-start rounded-full bg-violet-600 opacity-40 sm:self-center" aria-hidden>
+                                        <span className="absolute left-[23px] top-[3px] h-[18px] w-[18px] rounded-full bg-white" />
+                                    </div>
+                                ) : (
+                                    <form action="/api/admin/sections" method="POST" className="shrink-0 self-start sm:self-center">
+                                        <input type="hidden" name="tenant_id" value={id} />
+                                        <input type="hidden" name="feature" value={feat.key} />
+                                        <input type="hidden" name="enabled" value={isEnabled ? 'false' : 'true'} />
+                                        <button
+                                            type="submit"
+                                            className="relative h-6 w-11 cursor-pointer rounded-full border-none transition-colors"
+                                            style={{ background: isEnabled ? "#7C3AED" : "#D1D5DB" }}
+                                            aria-label={isEnabled ? `Disable ${feat.label}` : `Enable ${feat.label}`}
+                                        >
+                                            <span
+                                                className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white transition-[left]"
+                                                style={{ left: isEnabled ? 23 : 3 }}
+                                            />
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Website sections */}
             <div className="mb-6 overflow-hidden rounded-xl border border-gray-100 bg-white">
                 <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
                     <h2 className="font-semibold text-gray-900">Website sections</h2>
                     <p className="text-xs text-gray-400 mt-0.5">
-                        Enable or disable sections on this salon&apos;s public website
+                        Control which sections appear on this salon&apos;s public booking site
                     </p>
                 </div>
                 <div className="divide-y divide-gray-50">
@@ -77,14 +151,10 @@ export default async function TenantDetailPage({
                                     <p className="text-sm font-medium text-gray-900">
                                         {section.label}
                                         {section.required && (
-                                            <span className="ml-2 text-xs text-gray-400">
-                                                (always on)
-                                            </span>
+                                            <span className="ml-2 text-xs text-gray-400">(always on)</span>
                                         )}
                                     </p>
-                                    <p className="text-xs text-gray-400 mt-0.5">
-                                        {section.description}
-                                    </p>
+                                    <p className="mt-0.5 text-xs text-gray-400">{section.description}</p>
                                 </div>
                                 {section.required ? (
                                     <div className="relative h-6 w-11 shrink-0 self-start rounded-full bg-violet-600 opacity-40 sm:self-center" aria-hidden>

@@ -1,3 +1,4 @@
+import { ClockIcon, FacebookIcon, InstagramIcon, MapPinIcon, TikTokIcon, YoutubeIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
@@ -29,10 +30,13 @@ export default async function BookingHomePage() {
   const tenant = await getTenant();
   if (!tenant) redirect("/login");
 
-  const [servicesResult, staffResult, reviewsResult, sections] =
+  const [servicesResult, staffResult, reviewsResult, galleryResult, reviewStatsResult, sections] =
     await Promise.all([
       pool.query(
-        `SELECT * FROM services WHERE tenant_id = $1 AND ${bookableServiceSql()} ORDER BY name`,
+        `SELECT s.*, sc.name AS category_name
+         FROM services s
+         LEFT JOIN service_categories sc ON s.category_id = sc.id
+         WHERE s.tenant_id = $1 AND ${bookableServiceSql()} ORDER BY s.name`,
         [tenant.id]
       ),
       pool.query(`SELECT * FROM staff WHERE tenant_id = $1 ORDER BY name`, [
@@ -42,12 +46,27 @@ export default async function BookingHomePage() {
         `SELECT * FROM reviews WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT 4`,
         [tenant.id]
       ),
+      pool.query(
+        `SELECT * FROM gallery_items WHERE tenant_id = $1 ORDER BY sort_order, created_at LIMIT 12`,
+        [tenant.id]
+      ),
+      pool.query(
+        `SELECT
+           COUNT(*) AS total,
+           COALESCE(ROUND(AVG(rating)::numeric, 1), 0) AS avg_rating
+         FROM reviews WHERE tenant_id = $1`,
+        [tenant.id]
+      ),
       getSectionFlags(tenant.id),
     ]);
 
   const services = servicesResult.rows;
   const staffList = staffResult.rows;
   const reviews = reviewsResult.rows;
+  const galleryItems = galleryResult.rows;
+  const reviewStats = reviewStatsResult.rows[0];
+  const totalReviews = parseInt(reviewStats.total);
+  const avgRating = parseFloat(reviewStats.avg_rating);
   const brand = tenant.primary_color ?? "#7C3AED";
 
   return (
@@ -103,36 +122,46 @@ export default async function BookingHomePage() {
                   View Services
                 </a>
               </div>
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                <div className="flex shrink-0">
-                  {["A", "B", "C", "D"].map((l) => (
-                    <div
-                      key={l}
-                      className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white first:ml-0"
-                      style={{ background: brand }}
-                    >
-                      {l}
-                    </div>
-                  ))}
-                  <div
-                    className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-[10px] font-semibold text-gray-600"
-                  >
-                    +2k
-                  </div>
-                </div>
-                <div className="min-w-0">
-                  <div className="mb-0.5 flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <span key={s} className="text-sm text-amber-500">
-                        ★
-                      </span>
+              {totalReviews > 0 && (
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                  {/* Avatar stack from real reviewers */}
+                  <div className="flex shrink-0">
+                    {reviews.slice(0, 4).map((r, i) => (
+                      <div
+                        key={r.id}
+                        className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white"
+                        style={{ background: brand, marginLeft: i === 0 ? 0 : -8 }}
+                      >
+                        {r.client_name.charAt(0).toUpperCase()}
+                      </div>
                     ))}
+                    {totalReviews > 4 && (
+                      <div
+                        className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-[10px] font-semibold text-gray-600"
+                        style={{ marginLeft: -8 }}
+                      >
+                        +{totalReviews - 4}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-gray-600 sm:text-[13px]">
-                    4.9/5 from 2,000+ reviews
-                  </p>
+                  <div className="min-w-0">
+                    <div className="mb-0.5 flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <span
+                          key={s}
+                          className="text-sm"
+                          style={{ color: s <= Math.round(avgRating) ? "#F59E0B" : "#D1D5DB" }}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-600 sm:text-[13px]">
+                      {avgRating.toFixed(1)}/5 from {totalReviews.toLocaleString()} review{totalReviews !== 1 ? "s" : ""}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="relative min-h-0 w-full">
@@ -249,18 +278,20 @@ export default async function BookingHomePage() {
                   <div className="p-4 sm:p-5 md:p-6">
                     <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                       <div className="min-w-0 flex-1">
-                        <p
-                          style={{
-                            fontSize: 11,
-                            color: brand,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.08em",
-                            margin: "0 0 6px",
-                            fontWeight: 500,
-                          }}
-                        >
-                          Hair Care
-                        </p>
+                        {(service.category_name ?? service.category) && (
+                          <p
+                            style={{
+                              fontSize: 11,
+                              color: brand,
+                              textTransform: "uppercase",
+                              letterSpacing: "0.08em",
+                              margin: "0 0 6px",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {service.category_name ?? service.category}
+                          </p>
+                        )}
                         <h3 className="text-base font-bold leading-snug text-gray-900 sm:text-lg">
                           {service.name}
                         </h3>
@@ -283,7 +314,7 @@ export default async function BookingHomePage() {
                     )}
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-[13px] text-gray-500">
-                        ⏱ {service.duration_mins} min
+                        <ClockIcon size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} /> {service.duration_mins} min
                       </p>
 
                       <a
@@ -348,6 +379,50 @@ export default async function BookingHomePage() {
                     {member.name}
                   </h3>
                   <p className="text-sm text-gray-500">{member.role}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Gallery — before/after */}
+      {sections.section_gallery && galleryItems.length > 0 && (
+        <section id="gallery" className="bg-[#fafafa] py-12 sm:py-16 md:py-24 lg:py-[100px]">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
+            <div className="mb-10 text-center sm:mb-12 md:mb-14 lg:mb-16">
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-gray-500">
+                Transformations
+              </p>
+              <h2 className="text-balance text-3xl font-bold text-gray-900 sm:text-4xl lg:text-[40px]">
+                Before &amp; After
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {galleryItems.map((item) => (
+                <div key={item.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                  <div className="grid grid-cols-2">
+                    <div className="relative overflow-hidden">
+                      <span className="absolute left-2 top-2 z-10 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-white">
+                        Before
+                      </span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.before_url} alt="Before" className="h-52 w-full object-cover" />
+                    </div>
+                    <div className="relative overflow-hidden">
+                      <span
+                        className="absolute left-2 top-2 z-10 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+                        style={{ backgroundColor: brand }}
+                      >
+                        After
+                      </span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.after_url} alt="After" className="h-52 w-full object-cover" />
+                    </div>
+                  </div>
+                  {item.caption && (
+                    <p className="px-4 py-3 text-sm text-gray-600">{item.caption}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -458,13 +533,13 @@ export default async function BookingHomePage() {
             {(tenant.address || tenant.hours) && (
               <div className="mt-8 flex flex-col items-center gap-4 text-center sm:mt-10 md:flex-row md:justify-center md:gap-10">
                 {tenant.address && (
-                  <p className="max-w-md text-sm text-gray-500 md:text-left">
-                    📍 {tenant.address}
+                  <p className="flex items-center gap-1.5 max-w-md text-sm text-gray-500 md:text-left">
+                    <MapPinIcon size={14} /> {tenant.address}
                   </p>
                 )}
                 {tenant.hours && (
-                  <p className="max-w-md text-sm text-gray-500 md:text-left">
-                    🕐 {tenant.hours}
+                  <p className="flex items-center gap-1.5 max-w-md text-sm text-gray-500 md:text-left">
+                    <ClockIcon size={14} /> {tenant.hours}
                   </p>
                 )}
               </div>
@@ -494,6 +569,31 @@ export default async function BookingHomePage() {
                 Your premium destination for luxury beauty treatments.
                 Experience the perfect blend of expertise and relaxation.
               </p>
+              {/* Social links */}
+              {(tenant.social_instagram || tenant.social_facebook || tenant.social_tiktok || tenant.social_youtube) && (
+                <div className="mt-4 flex items-center gap-3">
+                  {tenant.social_instagram && (
+                    <a href={tenant.social_instagram} target="_blank" rel="noopener noreferrer"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition-colors hover:border-gray-500 hover:text-white no-underline"
+                      aria-label="Instagram"><InstagramIcon size={16} /></a>
+                  )}
+                  {tenant.social_facebook && (
+                    <a href={tenant.social_facebook} target="_blank" rel="noopener noreferrer"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition-colors hover:border-gray-500 hover:text-white no-underline"
+                      aria-label="Facebook"><FacebookIcon size={16} /></a>
+                  )}
+                  {tenant.social_tiktok && (
+                    <a href={tenant.social_tiktok} target="_blank" rel="noopener noreferrer"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition-colors hover:border-gray-500 hover:text-white no-underline"
+                      aria-label="TikTok"><TikTokIcon size={16} /></a>
+                  )}
+                  {tenant.social_youtube && (
+                    <a href={tenant.social_youtube} target="_blank" rel="noopener noreferrer"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition-colors hover:border-gray-500 hover:text-white no-underline"
+                      aria-label="YouTube"><YoutubeIcon size={16} /></a>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Services */}
@@ -533,12 +633,12 @@ export default async function BookingHomePage() {
             <div className="sm:col-span-2 lg:col-span-1">
               <h4 className="mb-4 text-sm font-semibold text-white">Contact</h4>
               {tenant.address && (
-                <p className="mb-2.5 text-sm text-gray-500">
-                  📍 {tenant.address}
+                <p className="mb-2.5 flex items-center gap-1.5 text-sm text-gray-500">
+                  <MapPinIcon size={13} /> {tenant.address}
                 </p>
               )}
               {tenant.hours && (
-                <p className="text-sm text-gray-500">🕐 {tenant.hours}</p>
+                <p className="flex items-center gap-1.5 text-sm text-gray-500"><ClockIcon size={13} /> {tenant.hours}</p>
               )}
             </div>
           </div>

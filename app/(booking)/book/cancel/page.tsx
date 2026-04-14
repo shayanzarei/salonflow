@@ -1,3 +1,4 @@
+import { CalendarIcon, ClockIcon, MapPinIcon, ScissorsIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { notFound } from "next/navigation";
 
@@ -125,7 +126,7 @@ export default async function CancelPage({
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: 18, color: brand }}>✂</span>
+              <ScissorsIcon size={18} color={brand} />
             </div>
             <div>
               <h3
@@ -160,7 +161,7 @@ export default async function CancelPage({
                 gap: 4,
               }}
             >
-              📅 Date
+              <CalendarIcon size={12} /> Date
             </p>
             <p
               style={{
@@ -188,7 +189,7 @@ export default async function CancelPage({
                 gap: 4,
               }}
             >
-              🕐 Time
+              <ClockIcon size={12} /> Time
             </p>
             <p
               style={{
@@ -215,7 +216,7 @@ export default async function CancelPage({
                 gap: 4,
               }}
             >
-              ⏱ Duration
+              <ClockIcon size={12} /> Duration
             </p>
             <p
               style={{
@@ -240,7 +241,7 @@ export default async function CancelPage({
                   gap: 4,
                 }}
               >
-                📍 Location
+                <MapPinIcon size={12} /> Location
               </p>
               <p
                 style={{
@@ -322,7 +323,7 @@ export default async function CancelPage({
             gap: 6,
           }}
         >
-          📅 Choose a new time
+          <CalendarIcon size={14} /> Choose a new time
         </a>
       </div>
     </div>

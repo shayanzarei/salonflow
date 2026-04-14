@@ -1,3 +1,4 @@
+import { EyeIcon, PlusIcon, SearchIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -102,8 +103,10 @@ export default async function BookingsPage({
           href="/bookings/new"
           className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] px-4 py-2.5 text-sm font-medium text-white no-underline sm:w-auto"
           style={{ background: brand }}
+
         >
-          + Add Booking
+          <PlusIcon size={14} style={{ display: "inline", verticalAlign: "middle" }} />
+          Add Booking
         </Link>
       </div>
 
@@ -137,8 +140,8 @@ export default async function BookingsPage({
             className="relative w-full sm:w-auto"
           >
             {status && <input type="hidden" name="status" value={status} />}
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
-              🔍
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <SearchIcon size={15} />
             </span>
             <input
               type="text"
@@ -372,7 +375,7 @@ export default async function BookingsPage({
                           background: `${brand}08`,
                         }}
                       >
-                        View 👀
+                        <EyeIcon size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} /> View
                       </Link>
                     </td>
                   </tr>

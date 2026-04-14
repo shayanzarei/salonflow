@@ -2,8 +2,9 @@ import {
   ServiceActiveToggle,
   ServiceDurationField,
 } from "@/components/dashboard/ServiceEditFormExtras";
+import { CalendarIcon, ClockIcon, StarIcon, TrendingUpIcon, TrashIcon, UsersIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
-import { SERVICE_CATEGORIES, getCategoryStyle } from "@/lib/service-categories";
+import { getCategoryStyle } from "@/lib/service-categories";
 import { INDUSTRY_AVG_CANCELLATION_PCT, loadServiceDetail } from "@/lib/services/service-detail";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -29,9 +30,17 @@ export default async function ServiceDetailPage({
   if (!tenant) notFound();
 
   const brand = tenant.primary_color ?? "#7C3AED";
-  const detail = await loadServiceDetail(pool, tenant.id, id);
+
+  const [detail, categoriesResult] = await Promise.all([
+    loadServiceDetail(pool, tenant.id, id),
+    pool.query(
+      `SELECT id, name FROM service_categories WHERE tenant_id = $1 ORDER BY sort_order, name`,
+      [tenant.id]
+    ),
+  ]);
   if (!detail) notFound();
 
+  const customCategories: { id: string; name: string }[] = categoriesResult.rows;
   const catStyle = getCategoryStyle(detail.category, detail.name);
   const bookingsFmt = formatGrowth(detail.performance.bookingsGrowth);
   const revenueFmt = formatGrowth(detail.performance.revenueGrowth);
@@ -132,7 +141,7 @@ export default async function ServiceDetailPage({
                     borderRadius: 100,
                   }}
                 >
-                  {catStyle.icon} {detail.category}
+                  {catStyle.icon} {detail.category_name ?? detail.category}
                 </span>
               </div>
             </div>
@@ -166,23 +175,23 @@ export default async function ServiceDetailPage({
             >
               {[
                 {
-                  icon: "🕐",
+                  icon: <ClockIcon size={20} color="#6B7280" />,
                   label: "Duration",
                   value: `${detail.durationMinutes} min`,
                 },
                 {
-                  icon: "€",
+                  icon: <span style={{ fontSize: 18, fontWeight: 700, color: "#6B7280" }}>€</span>,
                   label: "Price",
                   value: `€${detail.price.toFixed(2)}`,
                   colored: true,
                 },
                 {
-                  icon: "📅",
+                  icon: <CalendarIcon size={20} color="#6B7280" />,
                   label: "Total Bookings",
                   value: detail.totalBookings.toString(),
                 },
                 {
-                  icon: "⭐",
+                  icon: <StarIcon size={20} color="#6B7280" />,
                   label: "Avg Rating",
                   value:
                     detail.reviewCount > 0
@@ -205,7 +214,7 @@ export default async function ServiceDetailPage({
                     padding: "12px 16px",
                   }}
                 >
-                  <span style={{ fontSize: 20 }}>{item.icon}</span>
+                  <span style={{ display: "flex", flexShrink: 0 }}>{item.icon}</span>
                   <div>
                     <p
                       style={{
@@ -262,7 +271,7 @@ export default async function ServiceDetailPage({
                 marginBottom: 20,
               }}
             >
-              <span style={{ fontSize: 16 }}>📈</span>
+              <TrendingUpIcon size={16} color="#6B7280" />
               <h2
                 style={{
                   fontSize: 15,
@@ -410,7 +419,7 @@ export default async function ServiceDetailPage({
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 16 }}>👥</span>
+                <UsersIcon size={16} color="#6B7280" />
                 <h2
                   style={{
                     fontSize: 15,
@@ -608,27 +617,49 @@ export default async function ServiceDetailPage({
                 >
                   Category
                 </label>
-                <select
-                  name="category"
-                  defaultValue={detail.category}
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    padding: "10px 14px",
-                    fontSize: 14,
-                    color: "#111",
-                    background: "white",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  {SERVICE_CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                {customCategories.length > 0 ? (
+                  <select
+                    name="category_id"
+                    defaultValue={detail.category_id ?? ""}
+                    style={{
+                      width: "100%",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                      fontSize: 14,
+                      color: "#111",
+                      background: "white",
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <option value="">No category</option>
+                    {customCategories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div
+                    style={{
+                      padding: "10px 14px",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      fontSize: 13,
+                      color: "#9CA3AF",
+                      background: "#F9FAFB",
+                    }}
+                  >
+                    No categories yet —{" "}
+                    <a
+                      href="/services?tab=categories"
+                      style={{ color: brand, textDecoration: "none", fontWeight: 500 }}
+                    >
+                      create one first
+                    </a>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -773,7 +804,7 @@ export default async function ServiceDetailPage({
                   gap: 8,
                 }}
               >
-                🗑 Delete Service
+                <TrashIcon size={15} /> Delete Service
               </button>
             </form>
           </div>

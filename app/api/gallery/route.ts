@@ -11,7 +11,7 @@ export async function GET() {
   if (!tenant) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const { rows } = await pool.query(
-    `SELECT * FROM service_categories WHERE tenant_id = $1 ORDER BY sort_order, name`,
+    `SELECT * FROM gallery_items WHERE tenant_id = $1 ORDER BY sort_order, created_at`,
     [tenant.id]
   );
   return NextResponse.json(rows);
@@ -25,19 +25,20 @@ export async function POST(req: NextRequest) {
   if (!tenant) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const name = (body.name as string)?.trim();
-  const description = (body.description as string)?.trim() || null;
+  const before_url = (body.before_url as string)?.trim();
+  const after_url  = (body.after_url  as string)?.trim();
+  const caption    = (body.caption    as string)?.trim() || null;
 
-  if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
+  if (!before_url || !after_url) {
+    return NextResponse.json({ error: "before_url and after_url are required" }, { status: 400 });
+  }
 
   const { rows } = await pool.query(
-    `INSERT INTO service_categories (tenant_id, name, description)
-     VALUES ($1, $2, $3)
-     ON CONFLICT (tenant_id, name) DO NOTHING
+    `INSERT INTO gallery_items (tenant_id, before_url, after_url, caption)
+     VALUES ($1, $2, $3, $4)
      RETURNING *`,
-    [tenant.id, name, description]
+    [tenant.id, before_url, after_url, caption]
   );
 
-  if (!rows[0]) return NextResponse.json({ error: "Category already exists" }, { status: 409 });
   return NextResponse.json(rows[0], { status: 201 });
 }

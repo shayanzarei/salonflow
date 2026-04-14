@@ -1,3 +1,4 @@
+import { CalendarIcon, ClockIcon, UsersIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -61,7 +62,7 @@ export default async function DashboardPage() {
     {
       label: "Today's Bookings",
       value: stats.todayCount,
-      icon: "📅",
+      icon: <CalendarIcon size={18} color="#6366F1" />,
       iconBg: "#EEF2FF",
       change: "+12%",
       changeBg: "#ECFDF5",
@@ -70,7 +71,7 @@ export default async function DashboardPage() {
     {
       label: "Upcoming",
       value: stats.upcomingCount,
-      icon: "🕐",
+      icon: <ClockIcon size={18} color="#7C3AED" />,
       iconBg: "#F5F3FF",
       change: "+8%",
       changeBg: "#ECFDF5",
@@ -79,7 +80,7 @@ export default async function DashboardPage() {
     {
       label: "Total Customers",
       value: stats.customerCount.toLocaleString(),
-      icon: "👥",
+      icon: <UsersIcon size={18} color="#F59E0B" />,
       iconBg: "#FFF7ED",
       change: "+23%",
       changeBg: "#ECFDF5",
@@ -88,7 +89,7 @@ export default async function DashboardPage() {
     {
       label: "Total Revenue",
       value: `€${stats.revenue.toLocaleString("en", { minimumFractionDigits: 0 })}`,
-      icon: "💶",
+      icon: <span style={{ fontSize: 16, fontWeight: 700, color: "#10B981" }}>€</span>,
       iconBg: "#F0FDF4",
       change: "+18%",
       changeBg: "#ECFDF5",
@@ -151,7 +152,6 @@ export default async function DashboardPage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 18,
                 }}
               >
                 {stat.icon}

@@ -1,3 +1,4 @@
+import { CalendarIcon, ClockIcon, MapPinIcon, ScissorsIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 
@@ -104,7 +105,7 @@ export default async function SuccessPage({
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: 20, color: brand }}>✂</span>
+              <ScissorsIcon size={20} color={brand} />
             </div>
             <div>
               <h3
@@ -127,7 +128,7 @@ export default async function SuccessPage({
           <div className="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-5">
             {[
               {
-                icon: "📅",
+                icon: <CalendarIcon size={12} />,
                 label: "Date",
                 value: bookedAt.toLocaleDateString("en-US", {
                   weekday: "long",
@@ -137,7 +138,7 @@ export default async function SuccessPage({
                 }),
               },
               {
-                icon: "🕐",
+                icon: <ClockIcon size={12} />,
                 label: "Time",
                 value: bookedAt.toLocaleTimeString("en-US", {
                   hour: "numeric",
@@ -145,12 +146,12 @@ export default async function SuccessPage({
                 }),
               },
               {
-                icon: "⏱",
+                icon: <ClockIcon size={12} />,
                 label: "Duration",
                 value: `${bookingData.duration_mins} minutes`,
               },
               {
-                icon: "💶",
+                icon: <span style={{ fontSize: 11, fontWeight: 700 }}>€</span>,
                 label: "Total",
                 value: `€${bookingData.price}`,
                 colored: true,
@@ -167,7 +168,7 @@ export default async function SuccessPage({
                     gap: 4,
                   }}
                 >
-                  <span style={{ fontSize: 12 }}>{item.icon}</span> {item.label}
+                  <span style={{ display: "flex" }}>{item.icon}</span> {item.label}
                 </p>
                 <p
                   style={{
@@ -196,7 +197,7 @@ export default async function SuccessPage({
                   gap: 4,
                 }}
               >
-                📍 Location
+                <MapPinIcon size={12} /> Location
               </p>
               <p
                 style={{
@@ -241,7 +242,7 @@ export default async function SuccessPage({
             fontWeight: 500,
           }}
         >
-          📅 Add to calendar
+          <CalendarIcon size={14} /> Add to calendar
         </a>
         <span className="hidden text-gray-300 sm:inline" aria-hidden>
           |

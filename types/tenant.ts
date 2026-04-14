@@ -11,5 +11,9 @@ export interface Tenant {
   hours: string | null;
   phone?: string | null;
   hero_image_url: string | null;
+  social_instagram: string | null;
+  social_facebook: string | null;
+  social_tiktok: string | null;
+  social_youtube: string | null;
   created_at: string;
 }

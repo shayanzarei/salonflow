@@ -1,5 +1,6 @@
 'use client';
 
+import { LogoutIcon } from '@/components/ui/Icons';
 import { signOut } from 'next-auth/react';
 
 export default function LogoutButton() {
@@ -22,7 +23,7 @@ export default function LogoutButton() {
         textAlign: 'left',
       }}
     >
-      <span style={{ fontSize: 16 }}>🚪</span>
+      <LogoutIcon size={16} />
       <span>Logout</span>
     </button>
   );

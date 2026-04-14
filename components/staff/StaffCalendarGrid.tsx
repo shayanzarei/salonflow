@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarIcon, ClockIcon, ScissorsIcon, SearchIcon, XIcon } from "@/components/ui/Icons";
 import { useState } from "react";
 
 interface Booking {
@@ -99,8 +100,8 @@ export default function StaffCalendarGrid({
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {/* Search */}
         <div className="relative min-w-0 flex-1 sm:max-w-[220px]">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
-            🔍
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <SearchIcon size={15} />
           </span>
           <input
             type="text"
@@ -342,7 +343,7 @@ export default function StaffCalendarGrid({
                                     margin: "2px 0 0",
                                   }}
                                 >
-                                  🕐{" "}
+                                  <ClockIcon size={10} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />
                                   {new Date(booking.booked_at).toLocaleTimeString(
                                     "en-US",
                                     { hour: "numeric", minute: "2-digit" }
@@ -404,12 +405,10 @@ export default function StaffCalendarGrid({
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  fontSize: 20,
                   color: "#aaa",
-                  lineHeight: 1,
                 }}
               >
-                ×
+                <XIcon size={18} />
               </button>
             </div>
 
@@ -453,9 +452,9 @@ export default function StaffCalendarGrid({
             {/* Details */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[
-                { icon: "✂", label: "Service", value: selectedBooking.service_name },
+                { icon: <ScissorsIcon size={15} />, label: "Service", value: selectedBooking.service_name },
                 {
-                  icon: "📅",
+                  icon: <CalendarIcon size={15} />,
                   label: "Date",
                   value: new Date(selectedBooking.booked_at).toLocaleDateString("en-US", {
                     weekday: "long",
@@ -464,7 +463,7 @@ export default function StaffCalendarGrid({
                   }),
                 },
                 {
-                  icon: "🕐",
+                  icon: <ClockIcon size={15} />,
                   label: "Time",
                   value: new Date(selectedBooking.booked_at).toLocaleTimeString("en-US", {
                     hour: "numeric",
@@ -472,12 +471,12 @@ export default function StaffCalendarGrid({
                   }),
                 },
                 {
-                  icon: "⏱",
+                  icon: <ClockIcon size={15} />,
                   label: "Duration",
                   value: `${selectedBooking.duration_mins} mins`,
                 },
                 {
-                  icon: "💶",
+                  icon: <span style={{ fontSize: 13, fontWeight: 600 }}>€</span>,
                   label: "Price",
                   value: `€${selectedBooking.price}`,
                   colored: true,

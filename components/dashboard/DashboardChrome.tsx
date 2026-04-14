@@ -1,8 +1,12 @@
 "use client";
 
 import LogoutButton from "@/components/dashboard/LogoutButton";
-import SidebarNav from "@/components/dashboard/SidebarNav";
+import SidebarNav, {
+  NAV_ITEMS_EXPORTED,
+} from "@/components/dashboard/SidebarNav";
+import { BellIcon, HelpCircleIcon, XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -19,6 +23,14 @@ export function DashboardChrome({
   children,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const activeLabel =
+    NAV_ITEMS_EXPORTED.find(
+      (item) =>
+        pathname === item.href ||
+        (item.href !== "/dashboard" && pathname.startsWith(item.href))
+    )?.label ?? tenantName;
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -27,8 +39,7 @@ export function DashboardChrome({
     };
   }, [menuOpen]);
 
-  const initials =
-    `${tenantName.charAt(0).toUpperCase()}${tenantName.split(" ")[1]?.charAt(0).toUpperCase() ?? ""}`;
+  const initials = `${tenantName.charAt(0).toUpperCase()}${tenantName.split(" ")[1]?.charAt(0).toUpperCase() ?? ""}`;
 
   return (
     <div className="flex min-h-screen bg-[#f5f6fa]">
@@ -72,7 +83,7 @@ export function DashboardChrome({
             onClick={() => setMenuOpen(false)}
             aria-label="Close navigation menu"
           >
-            <span className="text-xl leading-none">×</span>
+            <XIcon size={18} />
           </button>
         </div>
 
@@ -87,11 +98,10 @@ export function DashboardChrome({
           <Link
             href="/"
             onClick={() => setMenuOpen(false)}
-            className="mb-1 flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm text-gray-600 hover:bg-gray-50"
+            style={{ color: "#666" }}
+            className="mb-1 flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm hover:bg-gray-50"
           >
-            <span className="text-base" aria-hidden>
-              🌐
-            </span>
+            <HelpCircleIcon size={16} />
             <span>Help &amp; Support</span>
           </Link>
           <LogoutButton />
@@ -117,7 +127,7 @@ export function DashboardChrome({
               </span>
             </button>
             <p className="truncate text-sm font-medium text-gray-600 lg:hidden">
-              {tenantName}
+              {activeLabel}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
@@ -126,7 +136,7 @@ export function DashboardChrome({
               className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-base text-gray-600 hover:bg-gray-50 sm:h-11 sm:w-11"
               aria-label="Notifications"
             >
-              🔔
+              <BellIcon size={18} />
             </button>
             <div
               className="flex h-10 w-10 cursor-default items-center justify-center rounded-full text-sm font-semibold text-white sm:h-11 sm:w-11"

@@ -1,10 +1,11 @@
 "use client";
 
 import LogoutButton from "@/components/dashboard/LogoutButton";
+import NotificationsBell from "@/components/dashboard/NotificationsBell";
 import SidebarNav, {
   NAV_ITEMS_EXPORTED,
 } from "@/components/dashboard/SidebarNav";
-import { BellIcon, HelpCircleIcon, XIcon } from "@/components/ui/Icons";
+import { HelpCircleIcon, XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -56,7 +57,7 @@ export function DashboardChrome({
       {/* Sidebar */}
       <aside
         id="dashboard-sidebar"
-        className={`fixed left-0 top-0 z-40 flex h-screen w-[min(280px,88vw)] max-w-[280px] flex-col border-r border-gray-100 bg-white shadow-xl transition-transform duration-200 ease-out lg:w-60 lg:max-w-none lg:translate-x-0 lg:shadow-none ${
+        className={`fixed left-0 top-0 z-40 flex h-screen w-[min(280px,88vw)] max-w-[280px] flex-col border-r border-gray-100 bg-white pb-[env(safe-area-inset-bottom)] shadow-xl [height:100dvh] transition-transform duration-200 ease-out lg:w-60 lg:max-w-none lg:translate-x-0 lg:shadow-none ${
           menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -131,20 +132,15 @@ export function DashboardChrome({
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-base text-gray-600 hover:bg-gray-50 sm:h-11 sm:w-11"
-              aria-label="Notifications"
-            >
-              <BellIcon size={18} />
-            </button>
-            <div
-              className="flex h-10 w-10 cursor-default items-center justify-center rounded-full text-sm font-semibold text-white sm:h-11 sm:w-11"
+            <NotificationsBell />
+            <Link
+              href="/settings"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm font-semibold text-white sm:h-11 sm:w-11"
               style={{ background: brand }}
               title={tenantName}
             >
               {tenantName.charAt(0)}
-            </div>
+            </Link>
           </div>
         </header>
 

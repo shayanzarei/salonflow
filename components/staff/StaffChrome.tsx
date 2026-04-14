@@ -1,6 +1,7 @@
 "use client";
 
 import LogoutButton from "@/components/dashboard/LogoutButton";
+import NotificationsBell from "@/components/dashboard/NotificationsBell";
 import { XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -62,7 +63,7 @@ export function StaffChrome({ brand, staffName, salonName, children }: Props) {
 
       <aside
         id="staff-sidebar"
-        className={`fixed left-0 top-0 z-40 flex h-screen w-[min(280px,88vw)] max-w-[280px] flex-col border-r border-gray-100 bg-white shadow-xl transition-transform duration-200 ease-out lg:w-64 lg:max-w-none lg:translate-x-0 lg:shadow-none ${
+        className={`fixed left-0 top-0 z-40 flex h-screen w-[min(280px,88vw)] max-w-[280px] flex-col border-r border-gray-100 bg-white pb-[env(safe-area-inset-bottom)] shadow-xl [height:100dvh] transition-transform duration-200 ease-out lg:w-64 lg:max-w-none lg:translate-x-0 lg:shadow-none ${
           menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -124,10 +125,11 @@ export function StaffChrome({ brand, staffName, salonName, children }: Props) {
       </aside>
 
       <main className="flex min-h-screen min-w-0 flex-1 flex-col lg:ml-64">
-        <header className="sticky top-0 z-20 flex min-h-14 items-center gap-3 border-b border-gray-100 bg-white px-4 py-2 lg:hidden">
+        <header className="sticky top-0 z-20 flex min-h-14 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 py-2">
+          <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm lg:hidden"
             onClick={() => setMenuOpen(true)}
             aria-controls="staff-sidebar"
             aria-expanded={menuOpen}
@@ -142,6 +144,10 @@ export function StaffChrome({ brand, staffName, salonName, children }: Props) {
           <span className="truncate text-sm font-medium text-gray-700">
             {NAV_ITEMS.find((n) => n.href === pathname)?.label ?? "Staff portal"}
           </span>
+          </div>
+          <div className="shrink-0">
+            <NotificationsBell />
+          </div>
         </header>
 
         <div className="mx-auto min-w-0 w-full max-w-5xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">

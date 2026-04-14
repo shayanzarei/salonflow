@@ -1,10 +1,15 @@
 import { SettingsBrandingForm } from "@/components/dashboard/SettingsBrandingForm";
-import { FacebookIcon, InstagramIcon, TikTokIcon, YoutubeIcon } from "@/components/ui/Icons";
-import pool from "@/lib/db";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  TikTokIcon,
+  YoutubeIcon,
+} from "@/components/ui/Icons";
 import { authOptions } from "@/lib/auth-options";
+import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
-import Link from "next/link";
 import { getServerSession } from "next-auth/next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 async function loadSectionFlags(tenantId: string) {
@@ -95,173 +100,173 @@ export default async function SettingsPage({
         <div className="space-y-6">
           {/* Salon profile */}
           <form action="/api/settings" method="POST" className="space-y-5">
-          <input type="hidden" name="action" value="info" />
+            <input type="hidden" name="action" value="info" />
 
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h2 className="text-base font-semibold text-gray-900">
-              Salon profile
-            </h2>
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <h2 className="text-base font-semibold text-gray-900">
+                Salon profile
+              </h2>
 
-            <div className="mt-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gray-200 bg-gray-50 text-2xl font-bold text-gray-400">
-                {tenant.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={tenant.logo_url}
-                    alt=""
-                    className="h-full w-full object-cover"
+              <div className="mt-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gray-200 bg-gray-50 text-2xl font-bold text-gray-400">
+                  {tenant.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={tenant.logo_url}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    tenant.name.charAt(0)
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">
+                    <button
+                      type="button"
+                      disabled
+                      className="font-medium text-purple-600 opacity-50"
+                      title="Paste a logo URL below for now"
+                    >
+                      Upload logo
+                    </button>{" "}
+                    <span className="text-gray-400">— URL field below</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Logo URL
+                  </label>
+                  <input
+                    type="url"
+                    name="logo_url"
+                    defaultValue={tenant.logo_url ?? ""}
+                    placeholder="https://example.com/logo.png"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
                   />
-                ) : (
-                  tenant.name.charAt(0)
-                )}
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">
-                  <button
-                    type="button"
-                    disabled
-                    className="font-medium text-purple-600 opacity-50"
-                    title="Paste a logo URL below for now"
-                  >
-                    Upload logo
-                  </button>{" "}
-                  <span className="text-gray-400">— URL field below</span>
-                </p>
-              </div>
-            </div>
+                </div>
 
-            <div className="mt-5 space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Logo URL
-                </label>
-                <input
-                  type="url"
-                  name="logo_url"
-                  defaultValue={tenant.logo_url ?? ""}
-                  placeholder="https://example.com/logo.png"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Salon name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  defaultValue={tenant.name}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Booking URL slug
-                </label>
-                <div className="flex overflow-hidden rounded-lg border border-gray-200">
-                  <span className="border-r border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-400">
-                    salonflow.xyz/
-                  </span>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Salon name
+                  </label>
                   <input
                     type="text"
-                    name="slug"
+                    name="name"
                     required
-                    defaultValue={tenant.slug}
-                    className="min-w-0 flex-1 px-3 py-2.5 text-sm text-gray-900 focus:outline-none"
+                    defaultValue={tenant.name}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-400">
-                  Changing this will break existing links to your site
-                </p>
-              </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Tagline
-                </label>
-                <input
-                  type="text"
-                  name="tagline"
-                  defaultValue={tenant.tagline ?? ""}
-                  placeholder="Where beauty meets craft"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  About
-                </label>
-                <textarea
-                  name="about"
-                  defaultValue={tenant.about ?? ""}
-                  placeholder="Tell your salon's story..."
-                  rows={4}
-                  className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Address
+                    Booking URL slug
+                  </label>
+                  <div className="flex overflow-hidden rounded-lg border border-gray-200">
+                    <span className="border-r border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-400">
+                      salonflow.xyz/
+                    </span>
+                    <input
+                      type="text"
+                      name="slug"
+                      required
+                      defaultValue={tenant.slug}
+                      className="min-w-0 flex-1 px-3 py-2.5 text-sm text-gray-900 focus:outline-none"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Changing this will break existing links to your site
+                  </p>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Tagline
                   </label>
                   <input
                     type="text"
-                    name="address"
-                    defaultValue={tenant.address ?? ""}
-                    placeholder="123 Beauty Lane"
+                    name="tagline"
+                    defaultValue={tenant.tagline ?? ""}
+                    placeholder="Where beauty meets craft"
                     className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
                   />
                 </div>
+
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Contact phone
+                    About
+                  </label>
+                  <textarea
+                    name="about"
+                    defaultValue={tenant.about ?? ""}
+                    placeholder="Tell your salon's story..."
+                    rows={4}
+                    className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      defaultValue={tenant.address ?? ""}
+                      placeholder="123 Beauty Lane"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Contact phone
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      defaultValue={tenant.phone ?? ""}
+                      placeholder="+31 6 1234 5678"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Opening hours
                   </label>
                   <input
-                    type="tel"
-                    name="phone"
-                    defaultValue={tenant.phone ?? ""}
-                    placeholder="+31 6 1234 5678"
+                    type="text"
+                    name="hours"
+                    defaultValue={tenant.hours ?? ""}
+                    placeholder="Mon–Sat 9am–7pm"
                     className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Opening hours
-                </label>
-                <input
-                  type="text"
-                  name="hours"
-                  defaultValue={tenant.hours ?? ""}
-                  placeholder="Mon–Sat 9am–7pm"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-                />
+              <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
+                <Link
+                  href="/settings"
+                  className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                >
+                  Cancel
+                </Link>
+                <button
+                  type="submit"
+                  className="rounded-lg px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: brand }}
+                >
+                  Save profile
+                </button>
               </div>
             </div>
-
-            <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
-              <Link
-                href="/settings"
-                className="text-sm font-medium text-gray-500 hover:text-gray-700"
-              >
-                Cancel
-              </Link>
-              <button
-                type="submit"
-                className="rounded-lg px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
-                style={{ backgroundColor: brand }}
-              >
-                Save profile
-              </button>
-            </div>
-          </div>
-        </form>
+          </form>
 
           {/* Branding & booking site */}
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
@@ -281,19 +286,46 @@ export default async function SettingsPage({
           </div>
 
           {/* Social media */}
-          <form action="/api/settings" method="POST" className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm space-y-4">
+          <form
+            action="/api/settings"
+            method="POST"
+            className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm space-y-4"
+          >
             <input type="hidden" name="action" value="social" />
             <div>
-              <h2 className="text-base font-semibold text-gray-900">Social media</h2>
+              <h2 className="text-base font-semibold text-gray-900">
+                Social media
+              </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Links shown in the footer of your booking site (leave blank to hide)
+                Links shown in the footer of your booking site (leave blank to
+                hide)
               </p>
             </div>
             {[
-              { name: "social_instagram", label: "Instagram", placeholder: "https://instagram.com/yoursalon", icon: <InstagramIcon size={15} /> },
-              { name: "social_facebook",  label: "Facebook",  placeholder: "https://facebook.com/yoursalon", icon: <FacebookIcon size={15} /> },
-              { name: "social_tiktok",    label: "TikTok",    placeholder: "https://tiktok.com/@yoursalon",   icon: <TikTokIcon size={15} /> },
-              { name: "social_youtube",   label: "YouTube",   placeholder: "https://youtube.com/@yoursalon",  icon: <YoutubeIcon size={15} /> },
+              {
+                name: "social_instagram",
+                label: "Instagram",
+                placeholder: "https://instagram.com/yoursalon",
+                icon: <InstagramIcon size={15} />,
+              },
+              {
+                name: "social_facebook",
+                label: "Facebook",
+                placeholder: "https://facebook.com/yoursalon",
+                icon: <FacebookIcon size={15} />,
+              },
+              {
+                name: "social_tiktok",
+                label: "TikTok",
+                placeholder: "https://tiktok.com/@yoursalon",
+                icon: <TikTokIcon size={15} />,
+              },
+              {
+                name: "social_youtube",
+                label: "YouTube",
+                placeholder: "https://youtube.com/@yoursalon",
+                icon: <YoutubeIcon size={15} />,
+              },
             ].map((s) => (
               <div key={s.name}>
                 <label className="mb-1 flex items-center gap-1.5 text-sm font-medium text-gray-700">
@@ -302,7 +334,11 @@ export default async function SettingsPage({
                 <input
                   type="url"
                   name={s.name}
-                  defaultValue={(tenant as unknown as Record<string, string | null>)[s.name] ?? ""}
+                  defaultValue={
+                    (tenant as unknown as Record<string, string | null>)[
+                      s.name
+                    ] ?? ""
+                  }
                   placeholder={s.placeholder}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
                 />
@@ -342,7 +378,7 @@ export default async function SettingsPage({
               <button
                 type="button"
                 disabled
-                className="shrink-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-400"
+                className="shrink-0 cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-400"
                 title="Coming soon"
               >
                 Change
@@ -409,7 +445,9 @@ export default async function SettingsPage({
                 <p className="text-sm font-medium text-gray-900">
                   Two-factor authentication
                 </p>
-                <p className="text-xs text-gray-500">Extra security for your account</p>
+                <p className="text-xs text-gray-500">
+                  Extra security for your account
+                </p>
               </div>
               <button
                 type="button"
@@ -484,7 +522,9 @@ export default async function SettingsPage({
             </p>
             <div className="mt-5 space-y-3">
               <label className="flex cursor-not-allowed items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 opacity-60">
-                <span className="text-sm text-gray-700">New booking alerts</span>
+                <span className="text-sm text-gray-700">
+                  New booking alerts
+                </span>
                 <input type="checkbox" disabled className="h-4 w-4 rounded" />
               </label>
               <label className="flex cursor-not-allowed items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 opacity-60">

@@ -1,6 +1,7 @@
 import pool from '@/lib/db';
 import { bookingConfirmationEmail } from '@/lib/emails/booking-confirmation';
 import { sendEmail } from '@/lib/emails/send';
+import { createNotification } from '@/lib/notifications';
 import { bookableServiceSql } from '@/lib/services/bookable';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -90,6 +91,23 @@ export async function POST(req: NextRequest) {
     );
 
     const booking = result.rows[0];
+
+    await createNotification({
+      tenantId: tenant_id,
+      type: "booking_created",
+      title: "New booking confirmed",
+      message: `${client_name} booked ${service.name} with ${staff.name}.`,
+      linkUrl: `/bookings/${booking.id}`,
+      data: {
+        bookingId: booking.id,
+        serviceId: service_id,
+        staffId: staff_id,
+      },
+      recipients: [
+        { role: "owner", id: tenant_id },
+        { role: "staff", id: staff_id },
+      ],
+    });
 
     const { subject, html } = bookingConfirmationEmail({
       clientName: client_name,

@@ -80,7 +80,43 @@ export async function computeSlots(input: {
     endTotal = eh * 60 + em;
   }
 
-  // 4. Existing bookings for this staff on this LOCAL date
+  // 4. Salon-level opening hours for this day (if configured)
+  const salonHoursRes = await pool.query(
+    `SELECT start_time, end_time, is_working
+     FROM salon_working_hours
+     WHERE tenant_id = $1 AND day_of_week = $2`,
+    [tenantId, dayOfWeek]
+  );
+
+  if (!salonHoursRes.rows[0]) {
+    const anySalonHoursRes = await pool.query(
+      `SELECT COUNT(*) FROM salon_working_hours WHERE tenant_id = $1`,
+      [tenantId]
+    );
+    const hasAnySalonHours = parseInt(anySalonHoursRes.rows[0].count) > 0;
+    if (hasAnySalonHours) {
+      return [];
+    }
+  } else if (!salonHoursRes.rows[0].is_working) {
+    return [];
+  } else {
+    const { start_time, end_time } = salonHoursRes.rows[0] as {
+      start_time: string;
+      end_time: string;
+    };
+    const [sh, sm] = start_time.split(":").map(Number);
+    const [eh, em] = end_time.split(":").map(Number);
+    const salonStart = sh * 60 + sm;
+    const salonEnd = eh * 60 + em;
+
+    startTotal = Math.max(startTotal, salonStart);
+    endTotal = Math.min(endTotal, salonEnd);
+    if (startTotal >= endTotal) {
+      return [];
+    }
+  }
+
+  // 5. Existing bookings for this staff on this LOCAL date
   const bookingsRes = await pool.query(
     `SELECT b.booked_at, s.duration_mins AS svc_duration
      FROM bookings b
@@ -99,7 +135,7 @@ export async function computeSlots(input: {
     return { start: startMin, end: startMin + parseInt(b.svc_duration) };
   });
 
-  // 5. Guard against past slots for today (local comparison)
+  // 6. Guard against past slots for today (local comparison)
   const now = new Date();
   const todayLocal = [
     now.getFullYear(),
@@ -109,7 +145,7 @@ export async function computeSlots(input: {
   const isToday = date === todayLocal;
   const nowMins = isToday ? now.getHours() * 60 + now.getMinutes() : -1;
 
-  // 6. Generate ALL slots within working hours, marking availability
+  // 7. Generate ALL slots within working hours, marking availability
   const slots: Slot[] = [];
 
   for (

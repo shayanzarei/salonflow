@@ -24,6 +24,12 @@ export async function GET(req: NextRequest) {
   if (!tenant) {
     return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
   }
+  if (tenant.website_status !== "published") {
+    return NextResponse.json(
+      { error: "Booking website is not published yet" },
+      { status: 403 }
+    );
+  }
 
   const slots = await computeSlots({
     serviceId,

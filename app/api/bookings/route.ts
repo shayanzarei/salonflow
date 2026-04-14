@@ -43,6 +43,12 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (tenant.website_status !== "published") {
+      return NextResponse.json(
+        { error: "Booking website is not published yet" },
+        { status: 403 }
+      );
+    }
 
     const assignResult = await pool.query(
       `SELECT

@@ -27,11 +27,16 @@ export function DashboardChrome({
   const pathname = usePathname();
 
   const activeLabel =
-    NAV_ITEMS_EXPORTED.find(
-      (item) =>
-        pathname === item.href ||
-        (item.href !== "/dashboard" && pathname.startsWith(item.href))
-    )?.label ?? tenantName;
+    NAV_ITEMS_EXPORTED
+      .slice()
+      .sort((a, b) => b.href.length - a.href.length)
+      .find((item) => {
+        const targetPath = item.href.split("?")[0];
+        return (
+          pathname === targetPath ||
+          (targetPath !== "/dashboard" && pathname.startsWith(targetPath))
+        );
+      })?.label ?? tenantName;
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";

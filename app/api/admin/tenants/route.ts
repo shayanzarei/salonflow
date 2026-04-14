@@ -20,8 +20,12 @@ export async function POST(req: NextRequest) {
     const password_hash = await bcrypt.hash(password, 10);
 
     await pool.query(
-      `INSERT INTO tenants (name, slug, plan_tier, primary_color, password_hash, website_template, business_started_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      `INSERT INTO tenants (
+         name, slug, plan_tier, primary_color, password_hash,
+         website_template, business_started_at,
+         tenant_status, website_status, trial_started_at, trial_ends_at
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'trial', 'draft', NOW(), NOW() + INTERVAL '30 days')`,
       [
         name,
         slug,

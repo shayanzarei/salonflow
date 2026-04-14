@@ -57,6 +57,235 @@ export default async function DashboardPage() {
 
   const upcoming = upcomingBookings.rows;
   const brand = tenant.primary_color ?? "#7C3AED";
+  const websiteStatus = tenant.website_status ?? "draft";
+  const [servicesCountRes, staffCountRes, salonHoursRes, categoriesCountRes] = await Promise.all([
+    pool.query(`SELECT COUNT(*)::int AS count FROM services WHERE tenant_id = $1`, [
+      tenant.id,
+    ]),
+    pool.query(`SELECT COUNT(*)::int AS count FROM staff WHERE tenant_id = $1`, [
+      tenant.id,
+    ]),
+    pool.query(
+      `SELECT COUNT(*)::int AS count
+       FROM salon_working_hours
+       WHERE tenant_id = $1 AND is_working = true`,
+      [tenant.id]
+    ),
+    pool.query(
+      `SELECT COUNT(*)::int AS count FROM service_categories WHERE tenant_id = $1`,
+      [tenant.id]
+    ),
+  ]);
+  const servicesCount = servicesCountRes.rows[0]?.count ?? 0;
+  const staffCount = staffCountRes.rows[0]?.count ?? 0;
+  const salonWorkingDaysCount = salonHoursRes.rows[0]?.count ?? 0;
+  const categoriesCount = categoriesCountRes.rows[0]?.count ?? 0;
+  const profileComplete = Boolean(
+    tenant.tagline?.trim() &&
+      tenant.about?.trim() &&
+      tenant.address?.trim() &&
+      tenant.hours?.trim()
+  );
+  const workingHoursConfigured = salonWorkingDaysCount > 0;
+  const publishSubmitted = websiteStatus === "pending_approval";
+  const setupSteps = [
+    {
+      label: "Complete salon profile",
+      done: profileComplete,
+      href: "/settings",
+      actionLabel: "Complete profile",
+    },
+    {
+      label: "Add staff members",
+      done: staffCount > 0,
+      href: "/staff/new",
+      actionLabel: "Add first staff",
+    },
+    {
+      label: "Add category",
+      done: categoriesCount > 0,
+      href: "/services?tab=categories",
+      actionLabel: "Add category",
+    },
+    {
+      label: "Add services",
+      done: servicesCount > 0,
+      href: "/services/new",
+      actionLabel: "Add first service",
+    },
+    {
+      label: "Configure working hours",
+      done: workingHoursConfigured,
+      href: "/settings/opening-hours",
+      actionLabel: "Set working hours",
+    },
+    {
+      label: "Submit booking site",
+      done: publishSubmitted || websiteStatus === "published",
+      href: "/dashboard",
+      actionLabel: "Submit for review",
+    },
+  ].map((step, index, arr) => ({
+    ...step,
+    unlocked: index === 0 ? true : arr[index - 1].done,
+  }));
+  const completedSteps = setupSteps.filter((s) => s.done).length;
+  const progressPct = Math.round((completedSteps / setupSteps.length) * 100);
+
+  if (websiteStatus !== "published") {
+    return (
+      <div>
+        <div className="mb-5 rounded-2xl border border-gray-100 bg-white p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <h1 className="text-3xl font-bold text-gray-900">
+                Welcome to SalonFlow,{" "}
+                <span style={{ color: brand }}>{tenant.name}</span>! 👋
+              </h1>
+              <p className="mt-2 text-sm text-gray-600">
+                Let&apos;s set up your salon in a few steps so you can start
+                accepting bookings.
+              </p>
+              <div className="mt-4 flex items-center gap-3">
+                <div className="h-2 w-56 overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${progressPct}%`, background: brand }}
+                  />
+                </div>
+                <span className="text-sm font-medium text-gray-600">
+                  {completedSteps}/{setupSteps.length} completed
+                </span>
+              </div>
+            </div>
+            <div
+              className="grid h-28 w-28 place-items-center rounded-full border-8 border-gray-100 text-3xl font-bold"
+              style={{ color: brand }}
+            >
+              {progressPct}%
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px]">
+          <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+            <div className="border-b border-gray-100 px-5 py-4">
+              <h2 className="text-2xl font-semibold text-gray-900">Setup Guide</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Complete these steps to activate your booking page.
+              </p>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {setupSteps.map((step, index) => (
+                <div key={step.label} className="px-5 py-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className={`text-2xl font-semibold ${step.done ? "text-gray-400 line-through" : "text-gray-900"}`}>
+                      {index + 1}. {step.label}
+                    </p>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        step.done
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {step.done ? "Done" : "Not started"}
+                    </span>
+                  </div>
+                  {!step.done && step.unlocked && (
+                    <div className="mt-3">
+                      {step.label === "Submit booking site" ? (
+                        <form action="/api/dashboard/website/submit" method="POST">
+                          <button
+                            type="submit"
+                            className="rounded-[10px] px-4 py-2 text-sm font-semibold text-white"
+                            style={{ background: brand }}
+                          >
+                            {step.actionLabel}
+                          </button>
+                        </form>
+                      ) : (
+                        <Link
+                          href={step.href}
+                          className="inline-flex rounded-[10px] px-4 py-2 text-sm font-semibold text-white"
+                          style={{ background: brand }}
+                        >
+                          {step.actionLabel}
+                        </Link>
+                      )}
+                    </div>
+                  )}
+                  {!step.done && !step.unlocked && (
+                    <p className="mt-3 text-xs text-gray-400">
+                      Complete previous step first.
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5">
+              <h3 className="text-xl font-semibold text-gray-900">Go-Live Readiness</h3>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Must-have
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-gray-700">
+                <li>{profileComplete ? "✅" : "○"} Profile complete</li>
+                <li>{categoriesCount > 0 ? "✅" : "○"} Category added</li>
+                <li>{servicesCount > 0 ? "✅" : "○"} Services added</li>
+                <li>{staffCount > 0 ? "✅" : "○"} Staff configured</li>
+                <li>{workingHoursConfigured ? "✅" : "○"} Working hours set</li>
+              </ul>
+              <button
+                type="button"
+                className="mt-4 w-full rounded-[10px] bg-gray-200 py-2.5 text-sm font-semibold text-gray-500"
+                disabled
+              >
+                Publish Booking Site
+              </button>
+              <Link
+                href={`https://${tenant.slug}.salonflow.xyz`}
+                target="_blank"
+                className="mt-2 inline-flex w-full items-center justify-center rounded-[10px] border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-700"
+              >
+                Preview Site
+              </Link>
+            </div>
+
+            <div
+              className="rounded-2xl p-5"
+              style={{ background: `${brand}12`, border: `1px solid ${brand}22` }}
+            >
+              <h3 className="text-lg font-semibold" style={{ color: brand }}>
+                Need help setting up?
+              </h3>
+              <p className="mt-2 text-sm text-gray-600">
+                Most salons finish their initial setup in about 10 minutes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {[
+            { label: "Revenue", hint: "Data appears after bookings." },
+            { label: "Upcoming", hint: "No bookings scheduled yet." },
+            { label: "Customers", hint: "Grow your client base." },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="rounded-2xl border border-gray-100 bg-white p-5 text-center"
+            >
+              <p className="text-lg font-semibold text-gray-700">{item.label}</p>
+              <p className="mt-1 text-xs text-gray-400">{item.hint}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const statCards = [
     {
@@ -121,7 +350,6 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* Stat cards */}
       <div
         className="mb-7 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4"
       >

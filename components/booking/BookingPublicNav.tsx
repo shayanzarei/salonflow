@@ -14,10 +14,16 @@ const LINKS = [
 type Props = {
   brand: string;
   salonName: string;
+  salonLogoUrl?: string | null;
   bookHref: string;
 };
 
-export function BookingPublicNav({ brand, salonName, bookHref }: Props) {
+export function BookingPublicNav({
+  brand,
+  salonName,
+  salonLogoUrl,
+  bookHref,
+}: Props) {
   const [open, setOpen] = useState(false);
   const homeHref = "/";
 
@@ -57,10 +63,19 @@ export function BookingPublicNav({ brand, salonName, bookHref }: Props) {
             onClick={() => setOpen(false)}
           >
             <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white sm:h-10 sm:w-10"
-              style={{ background: brand }}
+              className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg text-sm font-bold text-white sm:h-10 sm:w-10"
+              style={{ background: salonLogoUrl ? "transparent" : brand }}
             >
-              {salonName.charAt(0)}
+              {salonLogoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={salonLogoUrl}
+                  alt={`${salonName} logo`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                salonName.charAt(0)
+              )}
             </div>
             <span className="truncate text-sm font-semibold text-gray-900 sm:text-base">
               {salonName}

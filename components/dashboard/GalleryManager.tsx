@@ -1,5 +1,6 @@
 "use client";
 
+import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { useState } from "react";
 
 interface GalleryItem {
@@ -81,32 +82,18 @@ export function GalleryManager({
         </p>
         <form onSubmit={addItem} className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">
-                Before image URL
-              </label>
-              <input
-                type="url"
-                placeholder="https://…"
-                value={beforeUrl}
-                onChange={(e) => setBeforeUrl(e.target.value)}
-                required
-                className="min-h-11 w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">
-                After image URL
-              </label>
-              <input
-                type="url"
-                placeholder="https://…"
-                value={afterUrl}
-                onChange={(e) => setAfterUrl(e.target.value)}
-                required
-                className="min-h-11 w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-              />
-            </div>
+            <ImageUploadField
+              label="Before image"
+              value={beforeUrl}
+              onChange={setBeforeUrl}
+              hint="Upload the before photo"
+            />
+            <ImageUploadField
+              label="After image"
+              value={afterUrl}
+              onChange={setAfterUrl}
+              hint="Upload the after photo"
+            />
           </div>
           <div className="flex gap-3">
             <input

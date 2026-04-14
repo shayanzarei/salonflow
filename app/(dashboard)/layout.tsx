@@ -27,6 +27,7 @@ export default async function DashboardLayout({
     <DashboardChrome
       brand={brand}
       tenantName={tenant.name}
+      tenantLogoUrl={tenant.logo_url}
       planTier={tenant.plan_tier}
     >
       {children}

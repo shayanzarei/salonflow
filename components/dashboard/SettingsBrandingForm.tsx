@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandingColorPicker } from "@/components/dashboard/BrandingColorPicker";
+import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -41,68 +42,13 @@ export function SettingsBrandingForm({
       </div>
 
       <div>
-        <p className="mb-2 text-sm font-medium text-gray-700">Site preview</p>
-        <div
-          className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm"
-          style={{ borderColor: `${previewColor}33` }}
-        >
-          {previewHeroImageUrl.trim() ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={previewHeroImageUrl}
-              alt="Hero preview"
-              className="h-24 w-full object-cover"
-            />
-          ) : (
-            <div
-              className="flex h-24 items-center justify-center bg-gray-200 text-xs text-gray-500"
-              style={{
-                background: `linear-gradient(135deg, ${previewColor}22 0%, #f3f4f6 100%)`,
-              }}
-            >
-              Hero image area
-            </div>
-          )}
-          <div className="space-y-3 p-4">
-            <p className="text-center text-sm font-semibold text-gray-900">
-              {salonName || "Your salon"}
-            </p>
-            <button
-              type="button"
-              className="w-full rounded-lg py-2.5 text-sm font-semibold text-white shadow-sm"
-              style={{ backgroundColor: previewColor }}
-            >
-              Book now
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">
-          Hero image URL
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="url"
-            name="hero_image_url"
-            defaultValue={heroImageUrl}
-            onChange={(e) => setPreviewHeroImageUrl(e.target.value)}
-            placeholder="https://example.com/hero.jpg"
-            className="min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-          />
-          <button
-            type="button"
-            disabled
-            className="shrink-0 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-400"
-            title="Upload coming later — paste a URL for now"
-          >
-            Upload
-          </button>
-        </div>
-        <p className="mt-1 text-xs text-gray-400">
-          Shown in the hero section of your booking site
-        </p>
+        <ImageUploadField
+          name="hero_image_url"
+          label="Hero image"
+          value={previewHeroImageUrl}
+          onChange={setPreviewHeroImageUrl}
+          hint="Shown in the hero section of your booking site"
+        />
       </div>
 
       <div className="flex items-center justify-between gap-4 border-t border-gray-100 pt-4">

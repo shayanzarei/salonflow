@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 type Props = {
   brand: string;
   tenantName: string;
+  tenantLogoUrl?: string | null;
   planTier: string;
   children: React.ReactNode;
 };
@@ -20,6 +21,7 @@ type Props = {
 export function DashboardChrome({
   brand,
   tenantName,
+  tenantLogoUrl,
   planTier,
   children,
 }: Props) {
@@ -27,8 +29,7 @@ export function DashboardChrome({
   const pathname = usePathname();
 
   const activeLabel =
-    NAV_ITEMS_EXPORTED
-      .slice()
+    NAV_ITEMS_EXPORTED.slice()
       .sort((a, b) => b.href.length - a.href.length)
       .find((item) => {
         const targetPath = item.href.split("?")[0];
@@ -69,10 +70,19 @@ export function DashboardChrome({
         <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4 lg:py-5">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-base font-bold text-white"
-              style={{ background: brand }}
+              className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl text-base font-bold text-white"
+              style={{ background: tenantLogoUrl ? "transparent" : brand }}
             >
-              {initials.slice(0, 2)}
+              {tenantLogoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={tenantLogoUrl}
+                  alt={`${tenantName} logo`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                initials.slice(0, 2)
+              )}
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-gray-900">

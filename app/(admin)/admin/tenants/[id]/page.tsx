@@ -4,6 +4,7 @@ import {
   WEBSITE_TEMPLATES,
   normalizeWebsiteTemplate,
 } from "@/lib/website-templates";
+import { UploadInput } from "@/components/ui/UploadInput";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -576,15 +577,11 @@ export default async function TenantDetailPage({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Hero image URL
-                  </label>
-                  <input
-                    type="url"
+                  <UploadInput
                     name="hero_image_url"
                     defaultValue={tenant.hero_image_url ?? ""}
-                    placeholder="https://example.com/hero.jpg"
-                    className="min-h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
+                    label="Hero image"
+                    hint="Shown in the hero section of the tenant's booking site"
                   />
                 </div>
 

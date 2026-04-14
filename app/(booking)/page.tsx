@@ -225,7 +225,12 @@ export default async function BookingHomePage({
 
   return (
     <>
-      <BookingPublicNav brand={brand} salonName={tenant.name} bookHref="/book" />
+      <BookingPublicNav
+        brand={brand}
+        salonName={tenant.name}
+        salonLogoUrl={tenant.logo_url}
+        bookHref="/book"
+      />
       <div className="bg-white font-[family-name:var(--font-sans)]">
         {/* Hero */}
         {sections.section_hero && (
@@ -552,19 +557,16 @@ export default async function BookingHomePage({
               {staffList.map((member) => (
                 <div key={member.id} className="text-center">
                   <div
-                    className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full text-3xl font-semibold text-white sm:mb-5 sm:h-28 sm:w-28 sm:text-4xl md:h-[120px] md:w-[120px] md:text-[40px]"
+                    className="relative mx-auto mb-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full text-3xl font-semibold text-white sm:mb-5 sm:h-28 sm:w-28 sm:text-4xl md:h-[120px] md:w-[120px] md:text-[40px]"
                     style={{ background: brand }}
                   >
                     {member.avatar_url ? (
                       <Image
                         src={member.avatar_url}
                         alt={member.name}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          borderRadius: "50%",
-                        }}
+                        fill
+                        sizes="120px"
+                        className="object-cover"
                       />
                     ) : (
                       member.name.charAt(0)

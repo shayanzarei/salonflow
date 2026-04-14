@@ -1,6 +1,7 @@
 "use client";
 
 import { TrashIcon, UserIcon } from "@/components/ui/Icons";
+import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -336,32 +337,12 @@ export default function StaffEditForm({
 
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <label style={labelStyle}>Custom Avatar URL</label>
-                <div style={{ position: "relative" }}>
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: 12,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      fontSize: 14,
-                      color: "#aaa",
-                    }}
-                  >
-                    🔗
-                  </span>
-                  <input
-                    type="url"
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                    placeholder="https://example.com/photo.jpg"
-                    style={{ ...inputStyle, paddingLeft: 36 }}
-                  />
-                </div>
-                <p style={{ fontSize: 12, color: "#aaa", margin: "6px 0 0" }}>
-                  Optional — paste a link to an external profile photo.
-                  Overrides the colored circle.
-                </p>
+                <ImageUploadField
+                  label="Profile photo"
+                  value={avatarUrl}
+                  onChange={setAvatarUrl}
+                  hint="Optional — upload a profile photo. Overrides the colored circle."
+                />
               </div>
 
               <div>

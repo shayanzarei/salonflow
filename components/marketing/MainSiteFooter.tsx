@@ -49,18 +49,19 @@ export default function MainSiteFooter() {
           <h4 className="mb-4 font-bold text-slate-900">Product</h4>
           <ul className="space-y-3 text-sm text-slate-500">
             <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
-                Features
-              </a>
-            </li>
-            <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
+              <a
+                href="/pricing"
+                className="transition-colors hover:text-[#0ea5b7]"
+              >
                 Pricing
               </a>
             </li>
             <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
-                Templates
+              <a
+                href="/book-demo"
+                className="transition-colors hover:text-[#0ea5b7]"
+              >
+                Book a Demo
               </a>
             </li>
           </ul>
@@ -91,17 +92,26 @@ export default function MainSiteFooter() {
           <h4 className="mb-4 font-bold text-slate-900">Company</h4>
           <ul className="space-y-3 text-sm text-slate-500">
             <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
+              <a
+                href="/about"
+                className="transition-colors hover:text-[#0ea5b7]"
+              >
                 About Us
               </a>
             </li>
             <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
+              <a
+                href="/contact"
+                className="transition-colors hover:text-[#0ea5b7]"
+              >
                 Contact
               </a>
             </li>
             <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
+              <a
+                href="/privacy"
+                className="transition-colors hover:text-[#0ea5b7]"
+              >
                 Privacy &amp; Terms
               </a>
             </li>
@@ -112,10 +122,10 @@ export default function MainSiteFooter() {
       <div className="mx-auto mt-16 flex max-w-7xl flex-col items-center justify-between border-t border-slate-100 pt-8 text-sm text-slate-400 md:flex-row">
         <p>© 2024 SoloHub Inc. All rights reserved.</p>
         <div className="mt-4 flex space-x-6 md:mt-0">
-          <a href="#" className="hover:text-slate-600">
+          <a href="/privacy" className="hover:text-slate-600">
             Privacy Policy
           </a>
-          <a href="#" className="hover:text-slate-600">
+          <a href="/terms" className="hover:text-slate-600">
             Terms of Service
           </a>
         </div>

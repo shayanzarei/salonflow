@@ -1,22 +1,24 @@
+import { RefreshIcon, SearchIcon, TagIcon } from "@/components/ui/Icons";
+
 const PAIN_POINTS = [
   {
-    title: "Chasing Payments",
-    desc: "Spending hours tracking down unpaid invoices instead of doing billable work.",
-    icon: "$",
+    title: 'The "Link in Bio" Limit',
+    desc: "Instagram and WhatsApp aren't a business strategy. Relying on DMs makes you look like a hobbyist instead of a professional.",
+    Icon: TagIcon,
     iconBg: "#FEF2F2",
     iconColor: "#EF4444",
   },
   {
-    title: "App Fatigue",
-    desc: "Paying for and switching between 5 different tools just to manage one project.",
-    icon: "◈",
+    title: "The Booking Ping-Pong",
+    desc: 'Spending your workday texting "Are you free at 3?" back and forth instead of focusing on your clients.',
+    Icon: RefreshIcon,
     iconBg: "#FFF7ED",
     iconColor: "#F97316",
   },
   {
-    title: "Lost Time",
-    desc: "Wasting 10+ hours a week on admin tasks that should be automated.",
-    icon: "◷",
+    title: "Scattered Information",
+    desc: "Wasting hours searching through emails and messages just to find a client's appointment history or service notes.",
+    Icon: SearchIcon,
     iconBg: "#FAF5FF",
     iconColor: "#A855F7",
   },
@@ -28,10 +30,11 @@ export default function MainSitePainPoints() {
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-6 text-4xl font-bold text-slate-900">
-            Running a solo business shouldn&apos;t mean doing the work of 5 people.
+            Running a solo business shouldn’t feel like a 24/7 admin job.
           </h2>
           <p className="text-xl text-slate-600">
-          You started your business for freedom, not to become a full-time administrator.
+            You started your business for freedom, not to become a full-time
+            secretary.
           </p>
         </div>
 
@@ -53,9 +56,11 @@ export default function MainSitePainPoints() {
                 className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl text-xl font-bold"
                 style={{ backgroundColor: item.iconBg, color: item.iconColor }}
               >
-                {item.icon}
+                <item.Icon size={20} />
               </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">{item.title}</h3>
+              <h3 className="mb-3 text-xl font-bold text-slate-900">
+                {item.title}
+              </h3>
               <p className="text-slate-600">{item.desc}</p>
             </article>
           ))}

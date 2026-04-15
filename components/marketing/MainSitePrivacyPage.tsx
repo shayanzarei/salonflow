@@ -1,33 +1,82 @@
+ "use client";
+
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
 import { SearchIcon, ShieldIcon } from "@/components/ui/Icons";
-
-function FileExportIcon({ className = "h-8 w-8" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
-      <path
-        d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M14 3v6h6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 11v6M9.5 14.5 12 17l2.5-2.5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+import { useEffect, useRef, useState } from "react";
 
 export default function MainSitePrivacyPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const articleRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const root = articleRef.current;
+    if (!root) return;
+
+    const clearHighlights = () => {
+      const marks = root.querySelectorAll("mark[data-policy-highlight='true']");
+      marks.forEach((mark) => {
+        const parent = mark.parentNode;
+        if (!parent) return;
+        parent.replaceChild(document.createTextNode(mark.textContent ?? ""), mark);
+        parent.normalize();
+      });
+    };
+
+    clearHighlights();
+
+    const query = searchQuery.trim();
+    if (!query) {
+      return;
+    }
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(escapedQuery, "gi");
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        if (!node.nodeValue?.trim()) return NodeFilter.FILTER_REJECT;
+        const parentEl = node.parentElement;
+        if (!parentEl) return NodeFilter.FILTER_REJECT;
+        if (parentEl.closest("mark")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+
+    const textNodes: Text[] = [];
+    let current = walker.nextNode();
+    while (current) {
+      textNodes.push(current as Text);
+      current = walker.nextNode();
+    }
+
+    textNodes.forEach((textNode) => {
+      const value = textNode.nodeValue ?? "";
+      regex.lastIndex = 0;
+      if (!regex.test(value)) return;
+
+      const frag = document.createDocumentFragment();
+      let lastIndex = 0;
+      value.replace(regex, (match, offset: number) => {
+        if (offset > lastIndex) {
+          frag.appendChild(document.createTextNode(value.slice(lastIndex, offset)));
+        }
+        const mark = document.createElement("mark");
+        mark.dataset.policyHighlight = "true";
+        mark.className = "rounded bg-yellow-200 px-0.5";
+        mark.textContent = match;
+        frag.appendChild(mark);
+        lastIndex = offset + match.length;
+        return match;
+      });
+      if (lastIndex < value.length) {
+        frag.appendChild(document.createTextNode(value.slice(lastIndex)));
+      }
+      textNode.parentNode?.replaceChild(frag, textNode);
+    });
+
+  }, [searchQuery]);
+
   return (
     <div
       className="min-h-screen bg-[#f8fafc] text-slate-900"
@@ -48,7 +97,7 @@ export default function MainSitePrivacyPage() {
         >
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ccfbf1] bg-[#ecfdfb] px-4 py-2 text-sm font-medium text-[#0ea5b7] shadow-sm">
             <ShieldIcon className="h-4 w-4" />
-            Last Updated: October 15, 2024
+            Last Updated: April 15, 2026
           </div>
           <h1 className="mb-6 text-5xl font-extrabold leading-tight tracking-tight text-slate-900 md:text-6xl lg:text-7xl">
             Privacy &amp; Terms
@@ -87,6 +136,8 @@ export default function MainSitePrivacyPage() {
               <input
                 type="text"
                 placeholder="Search policies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
               />
             </div>
@@ -113,13 +164,19 @@ export default function MainSitePrivacyPage() {
                   href="#data-collection"
                   className="block pl-4 text-sm text-slate-500 hover:text-slate-800"
                 >
-                  1.1 Data Collection
+                  1.1 Information We Collect
                 </a>
                 <a
                   href="#data-usage"
                   className="block pl-4 text-sm text-slate-500 hover:text-slate-800"
                 >
                   1.2 Data Usage
+                </a>
+                <a
+                  href="#gdpr"
+                  className="block pl-4 text-sm text-slate-500 hover:text-slate-800"
+                >
+                  1.3 AVG (GDPR) Compliance
                 </a>
                 <a
                   href="#terms"
@@ -149,16 +206,20 @@ export default function MainSitePrivacyPage() {
             </div>
           </aside>
 
-          <article className="prose prose-slate max-w-none rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:col-span-9 md:p-12">
+          <article
+            ref={articleRef}
+            className="prose prose-slate max-w-none rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:col-span-9 md:p-12"
+          >
             <div id="privacy" className="mb-16">
               <h2 className="!mt-0 mb-6 text-3xl font-extrabold text-slate-900">
                 1. Privacy Policy
               </h2>
               <p className="mb-6 text-lg text-slate-600">
-                At SoloHub, we take your privacy seriously. This policy
-                describes what personal information we collect and how we use
-                it. We are committed to ensuring that your information is secure
-                and protected according to industry standards.
+                At SoloHub, your privacy isn’t an afterthought—it’s built into
+                the code. We collect the minimum information necessary to help
+                you run your business. We are fully committed to ensuring that
+                your information is secure and protected according to the
+                highest industry and EU standards.
               </p>
 
               <h3
@@ -168,42 +229,33 @@ export default function MainSitePrivacyPage() {
                 1.1 Information We Collect
               </h3>
               <p className="mb-4 text-slate-600">
-                We collect information to provide better services to all our
-                users. The types of information we collect include:
+                We only collect data that helps us provide a better, more stable
+                service.
               </p>
               <ul className="mb-8 list-disc space-y-2 pl-6 text-slate-600">
                 <li>
-                  <strong>Account Information:</strong> Name, email address,
-                  password, and profile details when you register.
+                  <strong>Account Information:</strong> Name, business email
+                  address, and profile details you provide when you register.
+                  (If your partner’s information is added, that is collected as
+                  well).
                 </li>
                 <li>
-                  <strong>Usage Data:</strong> Information about how you
-                  interact with our platform, including features used and time
-                  spent.
+                  <strong>Business Data:</strong> Information about how you
+                  interact with our platform, including your uploaded website
+                  content (images, text) and client appointment data. This data
+                  belongs exclusively to you.
                 </li>
                 <li>
-                  <strong>Device Information:</strong> IP address, browser type,
-                  operating system, and device identifiers.
+                  <strong>Usage Data:</strong> Anonymized information about how
+                  you interact with our platform (features used, time logged)
+                  so we can fix bugs and improve stability.
                 </li>
                 <li>
                   <strong>Payment Information:</strong> Processed securely
-                  through our third-party payment providers (we do not store
-                  full credit card details).
+                  through our third-party provider (e.g., Stripe/iDEAL).
+                  SoloHub does not store your full credit card details.
                 </li>
               </ul>
-
-              <div className="my-8 rounded-r-xl border-l-4 border-[#14b8a6] bg-slate-50 p-6">
-                <h4 className="mb-2 flex items-center gap-2 font-bold text-slate-900">
-                  <ShieldIcon className="h-4 w-4 text-[#14b8a6]" />
-                  GDPR Compliance
-                </h4>
-                <p className="text-sm text-slate-600">
-                  If you are a resident of the European Economic Area (EEA), you
-                  have certain data protection rights. SoloHub aims to take
-                  reasonable steps to allow you to correct, amend, delete, or
-                  limit the use of your Personal Data.
-                </p>
-              </div>
 
               <h3
                 id="data-usage"
@@ -212,19 +264,40 @@ export default function MainSitePrivacyPage() {
                 1.2 How We Use Your Data
               </h3>
               <p className="mb-4 text-slate-600">
-                We use the collected data for various purposes, including:
+                We use data to keep SoloHub running and to improve it. We will
+                never sell your data to third parties.
               </p>
               <ul className="mb-8 list-disc space-y-2 pl-6 text-slate-600">
-                <li>To provide and maintain our Service.</li>
-                <li>To notify you about changes to our Service.</li>
-                <li>To provide customer support and respond to inquiries.</li>
+                <li>To maintain your website and booking system.</li>
+                <li>To send you essential service updates.</li>
+                <li>To provide direct 1-on-1 support from the founders.</li>
                 <li>
-                  To gather analysis or valuable information so that we can
-                  improve our Service.
+                  To gather anonymized analysis so we can make SoloHub simpler.
+                </li>
+              </ul>
+
+              <h3 id="gdpr" className="mb-4 mt-10 text-xl font-bold text-slate-800">
+                1.3 AVG (GDPR) Compliance (The Netherlands)
+              </h3>
+              <p className="mb-4 text-slate-600">
+                Because we are based in the Netherlands, we fully adhere to the
+                AVG (Algemene Verordening Gegevensbescherming). If you are a
+                resident of the European Economic Area (EEA), you have complete
+                control over your data.
+              </p>
+              <p className="mb-2 font-semibold text-slate-900">Your Rights Include:</p>
+              <ul className="mb-8 list-disc space-y-2 pl-6 text-slate-600">
+                <li>
+                  <strong>The Right to be Forgotten:</strong> You can ask us to
+                  permanently delete your personal data.
                 </li>
                 <li>
-                  To monitor the usage of our Service and detect technical
-                  issues.
+                  <strong>The Right to Portability:</strong> You can request a
+                  copy of the client and booking data you uploaded.
+                </li>
+                <li>
+                  <strong>The Right to Correction:</strong> You can update
+                  inaccurate information in your account settings.
                 </li>
               </ul>
             </div>
@@ -236,48 +309,51 @@ export default function MainSitePrivacyPage() {
                 2. Terms of Service
               </h2>
               <p className="mb-6 text-lg text-slate-600">
-                By accessing or using SoloHub, you agree to be bound by these
-                Terms. If you disagree with any part of the terms, then you may
-                not access the Service.
+                By using SoloHub, you agree to these Terms. If you disagree,
+                you are unable to use the service. Our goal is to keep these
+                terms as &quot;No-Nonsense&quot; as possible, matching the values
+                of our platform.
               </p>
 
               <h3
                 id="account"
                 className="mb-4 mt-10 text-xl font-bold text-slate-800"
               >
-                2.1 Account Terms
+                2.1 Account Terms &amp; Our Commitment
               </h3>
               <p className="mb-4 text-slate-600">
-                When you create an account with us, you must provide information
-                that is accurate, complete, and current at all times. Failure to
-                do so constitutes a breach of the Terms, which may result in
-                immediate termination of your account on our Service.
+                You must provide accurate information when creating your account.
+                Accuracy is critical, especially since this data is used for your
+                public website and client communications.
               </p>
               <p className="mb-8 text-slate-600">
-                You are responsible for safeguarding the password that you use
-                to access the Service and for any activities or actions under
-                your password.
+                You are responsible for keeping your password secure. Our
+                guarantee: SoloHub commits to a 99.9% uptime goal, because when
+                your website is down, you are not getting bookings. We reserve
+                the right to modify or terminate the Service for any reason,
+                without notice, at any time.
               </p>
 
               <h3
                 id="payment"
                 className="mb-4 mt-10 text-xl font-bold text-slate-800"
               >
-                2.2 Payment &amp; Refunds
+                2.2 Payment, Pricing &amp; Refunds
               </h3>
               <p className="mb-4 text-slate-600">
-                A valid payment method is required to process the payment for
-                your subscription. You shall provide SoloHub with accurate and
-                complete billing information. By submitting such payment
-                information, you automatically authorize SoloHub to charge all
-                subscription fees incurred through your account to any such
-                payment instruments.
+                <strong>EUR15 Lifetime Promise:</strong> If you are part of our
+                Founding Member cohort and locked in our launch price, that
+                price is your monthly rate for life, as long as your account
+                remains active.
               </p>
-              <p className="mb-8 text-slate-600">
-                Refunds are processed according to our specific refund policy
-                outlined on our Pricing page. Generally, we offer a 14-day
-                money-back guarantee for new subscriptions.
-              </p>
+              <ul className="mb-8 list-disc space-y-2 pl-6 text-slate-600">
+                <li>We require a valid payment method (e.g., SEPA, credit card).</li>
+                <li>
+                  14-Day Money-Back Guarantee: if SoloHub is not the right fit,
+                  we refund your first month&apos;s subscription within 14 days of
+                  sign-up.
+                </li>
+              </ul>
             </div>
 
             <hr className="my-12 border-slate-200" />
@@ -287,22 +363,25 @@ export default function MainSitePrivacyPage() {
                 3. Cookie Policy
               </h2>
               <p className="mb-6 text-lg text-slate-600">
-                We use cookies and similar tracking technologies to track the
-                activity on our Service and hold certain information.
+                Like almost all modern platforms, we use cookies to make your
+                experience smoother. Cookies are small files stored on your
+                device that hold certain information (e.g., keeping you logged
+                in).
               </p>
-              <p className="mb-4 text-slate-600">
-                Cookies are files with small amount of data which may include an
-                anonymous unique identifier. Cookies are sent to your browser
-                from a website and stored on your device. Tracking technologies
-                also used are beacons, tags, and scripts to collect and track
-                information and to improve and analyze our Service.
-              </p>
-              <p className="mb-8 text-slate-600">
-                You can instruct your browser to refuse all cookies or to
-                indicate when a cookie is being sent. However, if you do not
-                accept cookies, you may not be able to use some portions of our
-                Service.
-              </p>
+              <ul className="mb-8 list-disc space-y-2 pl-6 text-slate-600">
+                <li>
+                  <strong>Essential Cookies:</strong> Required for basic
+                  SoloHub functions (session and login).
+                </li>
+                <li>
+                  <strong>Performance Cookies:</strong> Help us understand
+                  feature usage in anonymized form.
+                </li>
+                <li>
+                  You can instruct your browser to refuse all cookies. If you
+                  do, some parts of the SoloHub Dashboard may not function.
+                </li>
+              </ul>
             </div>
           </article>
         </section>

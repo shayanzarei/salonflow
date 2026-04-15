@@ -8,16 +8,17 @@ export default function MainSiteHero() {
     >
       <div className="flex flex-col space-y-8 pr-0 lg:w-1/2 lg:pr-12">
         <h1 className="text-5xl font-bold leading-[1.1] tracking-tight text-slate-900 lg:text-7xl">
-          The ultimate workspace for solo professionals.
+          The all-in-one platform to run your business and grow your brand.
         </h1>
         <p className="max-w-lg text-xl leading-relaxed text-slate-600">
-          Stop juggling 10 different apps. SoloHub brings your clients, projects,
-          and invoices into one unified, beautiful platform.
+          Stop juggling 10 different apps. SoloHub gives you a professional
+          website, smart booking, and automated invoicing in one unified,
+          beautiful workspace.
         </p>
 
         <div className="flex flex-col space-y-4 pt-4 sm:flex-row sm:space-x-4 sm:space-y-0">
           <Link
-            href="/login"
+            href="/signup"
             className="flex items-center justify-center space-x-2 rounded-full bg-[#11c4b6] px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-[#11c4b6]/30 transition-colors hover:bg-[#0ea5b7]"
           >
             <span>Start Free</span>
@@ -27,23 +28,19 @@ export default function MainSiteHero() {
             href="#features"
             className="flex items-center justify-center space-x-2 rounded-full border border-slate-200 bg-white px-8 py-4 text-lg font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50"
           >
-            <span className="text-sm text-[#11c4b6]" aria-hidden>▶</span>
+            <span className="text-sm text-[#11c4b6]" aria-hidden>
+              ▶
+            </span>
             <span>See How It Works</span>
           </a>
         </div>
 
         <div className="flex items-center space-x-4 pt-4">
-          <div className="flex -space-x-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="" className="h-8 w-8 rounded-full border-2 border-white" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="" className="h-8 w-8 rounded-full border-2 border-white" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="" className="h-8 w-8 rounded-full border-2 border-white" />
-          </div>
           <div className="text-sm text-slate-600">
-            <div className="text-xs text-yellow-400">★★★★★</div>
-            <span>Trusted by 10,000+ freelancers</span>
+            <div className="text-sm font-bold">
+              🇳🇱 Direct 1-on-1 support from the founder.
+            </div>
+            <div className="text-sm">Built with care in the Netherlands.</div>
           </div>
         </div>
       </div>

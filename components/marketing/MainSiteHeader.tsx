@@ -55,7 +55,7 @@ export default function MainSiteHeader({
 
           <div className="hidden md:block">
             <Link
-              href="/login"
+              href="/signup"
               className="flex items-center justify-center space-x-2 rounded-full bg-[#11c4b6] px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-[#11c4b6]/30 transition-colors hover:bg-[#0ea5b7]"
             >
               Get Started
@@ -95,7 +95,7 @@ export default function MainSiteHeader({
               ))}
             </nav>
             <Link
-              href="/login"
+              href="/signup"
               className="mt-3 flex items-center justify-center rounded-full bg-[#11c4b6] px-6 py-3 text-sm font-semibold text-white"
               onClick={() => setMobileOpen(false)}
             >

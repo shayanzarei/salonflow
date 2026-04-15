@@ -13,12 +13,20 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
+        const loginId = credentials.email.trim().toLowerCase();
 
-        // check tenants first (salon owners + admins)
-        const tenantResult = await pool.query(
-          `SELECT * FROM tenants WHERE slug = $1`,
-          [credentials.email]
+        // check tenants first (salon owners + admins) using owner email
+        let tenantResult = await pool.query(
+          `SELECT * FROM tenants WHERE LOWER(owner_email) = $1`,
+          [loginId]
         );
+
+        // backward compatibility for legacy tenants that still log in with slug
+        if (!tenantResult.rows[0]) {
+          tenantResult = await pool.query(`SELECT * FROM tenants WHERE slug = $1`, [
+            loginId,
+          ]);
+        }
 
         if (tenantResult.rows[0]) {
           const tenant = tenantResult.rows[0];
@@ -45,8 +53,8 @@ export const authOptions: NextAuthOptions = {
           `SELECT s.*, t.slug AS tenant_slug
            FROM staff s
            JOIN tenants t ON s.tenant_id = t.id
-           WHERE s.email = $1`,
-          [credentials.email]
+           WHERE LOWER(s.email) = $1`,
+          [loginId]
         );
 
         if (staffResult.rows[0]) {

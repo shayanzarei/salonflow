@@ -1,3 +1,4 @@
+import MainSiteAbout from "@/components/marketing/MainSiteAbout";
 import MainSiteCta from "@/components/marketing/MainSiteCta";
 import MainSiteFeatures from "@/components/marketing/MainSiteFeatures";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
@@ -18,6 +19,7 @@ export default function MainSiteLanding() {
       <MainSiteHero />
       <MainSitePainPoints />
       <MainSiteFeatures />
+      <MainSiteAbout />
       <MainSiteCta />
       <MainSiteFooter />
     </div>

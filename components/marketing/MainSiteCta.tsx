@@ -9,26 +9,30 @@ export default function MainSiteCta() {
       <div className="absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#11c4b6] opacity-20 mix-blend-multiply blur-[100px]" />
       <div className="relative z-10 mx-auto max-w-3xl">
         <h2 className="mb-6 text-5xl font-bold tracking-tight text-white">
-          Ready to take back your time?
+          Ready to build a more professional business?
         </h2>
         <p className="mb-10 text-xl text-slate-300">
-          Join thousands of solo professionals who run their business on SoloHub.
+          Join the exclusive group of Dutch solo professionals launching their
+          brands on SoloHub.
         </p>
         <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
           <Link
-            href="/login"
+            href="/signup"
             className="w-full rounded-full bg-[#11c4b6] px-10 py-5 text-lg font-bold text-white shadow-lg shadow-[#11c4b6]/20 transition-colors hover:bg-[#4ddad0] sm:w-auto"
           >
-            Start your 1month free trial
+            Start your 1-month free trial
           </Link>
           <Link
-            href="/login"
+            href="/book-demo"
             className="w-full rounded-full border border-slate-700 bg-slate-800 px-10 py-5 text-lg font-bold text-white transition-colors hover:bg-slate-700 sm:w-auto"
           >
-            Book a Demo
+            Book a founders&apos; demo
           </Link>
         </div>
-        <p className="mt-6 text-sm text-slate-400">1 month free trial. No credit card required.</p>
+        <p className="mt-6 text-sm text-slate-400">
+          1 month free trial • No credit card required • Personal setup help
+          included.
+        </p>
       </div>
     </section>
   );

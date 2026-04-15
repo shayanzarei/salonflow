@@ -186,7 +186,7 @@ export default function MainSiteContactPage() {
                   <IconBook className="h-4 w-4" /> Read FAQs
                 </a>
                 <span className="text-slate-300">•</span>
-                <a href="#footer" className="flex items-center gap-2 transition-colors hover:text-[#0ea5b7]">
+                <a href="/privacy" className="flex items-center gap-2 transition-colors hover:text-[#0ea5b7]">
                   <IconShield className="h-4 w-4" /> Privacy Policy
                 </a>
               </div>
@@ -292,7 +292,7 @@ export default function MainSiteContactPage() {
 
                   <p className="mt-4 text-center text-xs text-slate-500">
                     By submitting this form, you agree to our{" "}
-                    <a href="#footer" className="text-[#0ea5b7] hover:underline">
+                    <a href="/privacy" className="text-[#0ea5b7] hover:underline">
                       Privacy Policy
                     </a>.
                   </p>

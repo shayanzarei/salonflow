@@ -1,15 +1,15 @@
 const FEATURE_ITEMS = [
   {
-    title: "Onboard Clients",
-    desc: "Send beautiful proposals and contracts that get signed in minutes.",
+    title: "Launch Your Website",
+    desc: 'Turn your "Link in Bio" into a stunning .nl website that showcases your brand and services in minutes.',
   },
   {
-    title: "Manage Work",
-    desc: "Track tasks, time, and files in dedicated client portals.",
+    title: "Automate Your Calendar",
+    desc: "Give your clients a 24/7 self-service booking experience. You stay busy; your calendar stays organized.",
   },
   {
-    title: "Get Paid Fast",
-    desc: "Automate invoices and accept payments with zero friction.",
+    title: "Manage Your Business",
+    desc: "Track your services, client notes, and upcoming schedule from one unified, beautiful dashboard.",
   },
 ];
 
@@ -20,10 +20,11 @@ export default function MainSiteFeatures() {
         <div className="flex flex-col items-center gap-16 lg:flex-row">
           <div className="lg:w-1/2">
             <h2 className="mb-6 text-4xl font-bold text-slate-900">
-            Everything you need, in one place.
+              Your professional home, all in one place.
             </h2>
             <p className="mb-10 text-xl text-slate-600">
-              SoloHub replaces your scattered tools with a single, elegant workflow designed specifically for solo professionals.
+              SoloHub replaces your scattered messages with a single, elegant
+              workflow built for independent specialists.
             </p>
 
             <div className="space-y-8">
@@ -33,7 +34,9 @@ export default function MainSiteFeatures() {
                     {index + 1}
                   </div>
                   <div>
-                    <h4 className="mb-1 text-lg font-bold text-slate-900">{item.title}</h4>
+                    <h4 className="mb-1 text-lg font-bold text-slate-900">
+                      {item.title}
+                    </h4>
                     <p className="text-slate-600">{item.desc}</p>
                   </div>
                 </div>

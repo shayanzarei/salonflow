@@ -9,6 +9,7 @@ import {
   MARKETING_BUTTON_SECONDARY,
 } from "@/components/marketing/buttonStyles";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const PLANS = [
@@ -99,8 +100,37 @@ const FAQS = [
 ];
 
 export default function MainSitePricingPage() {
+  const router = useRouter();
   const [isAnnual, setIsAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<string | null>(FAQS[0]?.q ?? null);
+  const [checkoutPlan, setCheckoutPlan] = useState<string | null>(null);
+
+  async function startCheckout(planName: string) {
+    try {
+      setCheckoutPlan(planName);
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: planName.toLowerCase(),
+          billingCycle: isAnnual ? "annual" : "monthly",
+        }),
+      });
+      const payload = (await response.json()) as {
+        url?: string;
+        error?: string;
+      };
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error ?? "Unable to start checkout.");
+      }
+      router.push(payload.url);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to start checkout. Please try again.");
+    } finally {
+      setCheckoutPlan(null);
+    }
+  }
 
   return (
     <div
@@ -207,18 +237,20 @@ export default function MainSitePricingPage() {
                         </span>
                       </div>
                     </div>
-                    <Link
-                      href="/signup"
+                    <button
+                      type="button"
+                      onClick={() => startCheckout(plan.name)}
+                      disabled={checkoutPlan === plan.name}
                       className={`mb-8 w-full rounded-full px-6 text-center ${MARKETING_BUTTON_BASE} ${
                         plan.featured
                           ? "bg-[#11c4b6] text-white shadow-md hover:bg-[#0ea5b7]"
                           : index === 0
                             ? "border border-[#9ceee5] bg-white text-[#0ea5b7] hover:bg-[#ecfdfb]"
                             : "border border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
-                      }`}
+                      } disabled:cursor-not-allowed disabled:opacity-60`}
                     >
-                      {plan.cta}
-                    </Link>
+                      {checkoutPlan === plan.name ? "Redirecting..." : plan.cta}
+                    </button>
                     <ul className="w-full space-y-4 text-left">
                       {plan.features.map((feature) => (
                         <li key={feature.label} className="flex items-start">
@@ -278,10 +310,7 @@ export default function MainSitePricingPage() {
                 anytime, no questions asked.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Link
-                  href="/book-demo"
-                  className={MARKETING_BUTTON_PRIMARY}
-                >
+                <Link href="/book-demo" className={MARKETING_BUTTON_PRIMARY}>
                   Book a Demo
                 </Link>
                 <Link
@@ -350,49 +379,71 @@ export default function MainSitePricingPage() {
                   </td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Online booking widget</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Online booking widget
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Unlimited bookings/month</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Unlimited bookings/month
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Bookings per month (Solo cap)</td>
-                  <td className="p-4 text-center font-medium text-slate-900">up to 100</td>
-                  <td className="p-4 text-center font-medium text-slate-900">Unlimited</td>
-                  <td className="p-4 text-center font-medium text-slate-900">Unlimited</td>
-                  <td className="p-4 text-center font-medium text-slate-900">Unlimited</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Bookings per month (Solo cap)
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    up to 100
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    Unlimited
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    Unlimited
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    Unlimited
+                  </td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Multi-staff booking</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Multi-staff booking
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Real-time availability engine</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Real-time availability engine
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Customer cancellation (email link)</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Customer cancellation (email link)
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Double-booking prevention</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Double-booking prevention
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
@@ -400,40 +451,67 @@ export default function MainSitePricingPage() {
                 </tr>
 
                 <tr className="bg-slate-50/30">
-                  <td colSpan={5} className="border-b border-t border-slate-200 p-4 font-bold text-slate-900">
+                  <td
+                    colSpan={5}
+                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
+                  >
                     STAFF &amp; SERVICES
                   </td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
                   <td className="p-4 pl-6 text-slate-600">Staff profiles</td>
-                  <td className="p-4 text-center font-medium text-slate-900">1 staff</td>
-                  <td className="p-4 text-center font-medium text-slate-900">up to 5</td>
-                  <td className="p-4 text-center font-medium text-slate-900">up to 15</td>
-                  <td className="p-4 text-center font-medium text-slate-900">Unlimited</td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    1 staff
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    up to 5
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    up to 15
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    Unlimited
+                  </td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Services &amp; categories</td>
-                  <td className="p-4 text-center font-medium text-slate-900">up to 15</td>
-                  <td className="p-4 text-center font-medium text-slate-900">up to 50</td>
-                  <td className="p-4 text-center font-medium text-slate-900">Unlimited</td>
-                  <td className="p-4 text-center font-medium text-slate-900">Unlimited</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Services &amp; categories
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    up to 15
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    up to 50
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    Unlimited
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-900">
+                    Unlimited
+                  </td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Staff working hours config</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Staff working hours config
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Staff portal (staff login)</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Staff portal (staff login)
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Service-to-staff assignment</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Service-to-staff assignment
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
@@ -441,33 +519,44 @@ export default function MainSitePricingPage() {
                 </tr>
 
                 <tr className="bg-slate-50/30">
-                  <td colSpan={5} className="border-b border-t border-slate-200 p-4 font-bold text-slate-900">
+                  <td
+                    colSpan={5}
+                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
+                  >
                     COMMUNICATIONS &amp; AUTOMATION
                   </td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Email booking confirmations</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Email booking confirmations
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Automated reminder emails (48h, 24h, 2h)</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Automated reminder emails (48h, 24h, 2h)
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Review request emails</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Review request emails
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">In-app notifications</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    In-app notifications
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
@@ -475,7 +564,10 @@ export default function MainSitePricingPage() {
                 </tr>
 
                 <tr className="bg-slate-50/30">
-                  <td colSpan={5} className="border-b border-t border-slate-200 p-4 font-bold text-slate-900">
+                  <td
+                    colSpan={5}
+                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
+                  >
                     CUSTOMER MANAGEMENT
                   </td>
                 </tr>
@@ -487,14 +579,18 @@ export default function MainSitePricingPage() {
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Customer segmentation (VIP, At Risk etc.)</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Customer segmentation (VIP, At Risk etc.)
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Total spend &amp; booking history per client</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Total spend &amp; booking history per client
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
@@ -502,40 +598,55 @@ export default function MainSitePricingPage() {
                 </tr>
 
                 <tr className="bg-slate-50/30">
-                  <td colSpan={5} className="border-b border-t border-slate-200 p-4 font-bold text-slate-900">
+                  <td
+                    colSpan={5}
+                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
+                  >
                     WEBSITE &amp; BRANDING
                   </td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Public booking page (subdomain)</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Public booking page (subdomain)
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Website builder (6 templates)</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Website builder (6 templates)
+                  </td>
+                  <td className="p-4 text-center text-slate-300">
+                    ✓ 1 template
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Gallery (before/after photos)</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Gallery (before/after photos)
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Public reviews display</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Public reviews display
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Custom branding (logo, colors)</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Custom branding (logo, colors)
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
@@ -550,26 +661,35 @@ export default function MainSitePricingPage() {
                 </tr>
 
                 <tr className="bg-slate-50/30">
-                  <td colSpan={5} className="border-b border-t border-slate-200 p-4 font-bold text-slate-900">
+                  <td
+                    colSpan={5}
+                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
+                  >
                     ANALYTICS &amp; REPORTING
                   </td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Dashboard overview metrics</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Dashboard overview metrics
+                  </td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Revenue &amp; customer analytics</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Revenue &amp; customer analytics
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Advanced reporting</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Advanced reporting
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
@@ -577,7 +697,10 @@ export default function MainSitePricingPage() {
                 </tr>
 
                 <tr className="bg-slate-50/30">
-                  <td colSpan={5} className="border-b border-t border-slate-200 p-4 font-bold text-slate-900">
+                  <td
+                    colSpan={5}
+                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
+                  >
                     SUPPORT
                   </td>
                 </tr>
@@ -589,14 +712,18 @@ export default function MainSitePricingPage() {
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Priority email support</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Priority email support
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                   <td className="p-4 text-center text-[#11c4b6]">✓</td>
                 </tr>
                 <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Dedicated account manager</td>
+                  <td className="p-4 pl-6 text-slate-600">
+                    Dedicated account manager
+                  </td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-slate-300">—</td>
                   <td className="p-4 text-center text-slate-300">—</td>

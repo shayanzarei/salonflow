@@ -151,7 +151,7 @@ export default function MainSitePricingPage() {
                         <span
                           className={`text-sm ${
                             feature.included
-                              ? feature.highlight
+                              ? ("highlight" in feature && feature.highlight)
                                 ? "font-medium text-slate-900"
                                 : "text-slate-600"
                               : "text-slate-400"

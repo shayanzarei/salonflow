@@ -5,6 +5,20 @@ import { reviewRequestEmail } from '@/lib/emails/review-request';
 import { sendEmail } from '@/lib/emails/send';
 import { inngest } from '@/lib/inngest';
 
+type BookingReminderRow = {
+  id: string;
+  client_name: string;
+  client_email: string;
+  service_name: string;
+  staff_name: string;
+  salon_name: string;
+  salon_address: string | null;
+  salon_slug: string;
+  booked_at: string;
+  cancellation_token: string;
+  price: string | number;
+};
+
 export const sendBookingReminders = inngest.createFunction(
   {
     id: 'send-booking-reminders',
@@ -77,7 +91,7 @@ export const sendBookingReminders = inngest.createFunction(
       ]);
 
     async function sendReminders(
-      bookings: Array<Record<string, unknown>>,
+      bookings: BookingReminderRow[],
       reminderType: '48h' | '24h' | '2h',
       flag: string
     ) {
@@ -93,7 +107,7 @@ export const sendBookingReminders = inngest.createFunction(
           bookingId: booking.id,
           salonSlug: booking.salon_slug,
           reminderType,
-          price: parseFloat(booking.price),
+          price: Number(booking.price),
         });
 
         await sendEmail({ to: booking.client_email, subject, html });

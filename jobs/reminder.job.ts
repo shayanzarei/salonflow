@@ -1,4 +1,5 @@
 import pool from '@/lib/db';
+import { demoBookingReminderEmail } from '@/lib/emails/templates/demo-booking-reminder';
 import { bookingReminderEmail } from '@/lib/emails/booking-reminder';
 import { reviewRequestEmail } from '@/lib/emails/review-request';
 import { sendEmail } from '@/lib/emails/send';
@@ -8,7 +9,7 @@ export const sendBookingReminders = inngest.createFunction(
   {
     id: 'send-booking-reminders',
     name: 'Send booking reminders',
-    triggers: [{ cron: '*/30 * * * *' }],
+    triggers: [{ cron: '*/5 * * * *' }],
   },
   async () => {
     const now = new Date();
@@ -20,6 +21,11 @@ export const sendBookingReminders = inngest.createFunction(
 
     // 24hr window
     const oneDayFrom = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    // 10min window (before demo meeting)
+    const tenMinutesFrom = new Date(now.getTime() + 10 * 60 * 1000);
+    const tenMinuteWindowStart = new Date(tenMinutesFrom.getTime() - 5 * 60 * 1000);
+    const tenMinuteWindowEnd = new Date(tenMinutesFrom.getTime() + 5 * 60 * 1000);
+
     const oneDayWindowStart = new Date(oneDayFrom.getTime() - 2 * 60 * 60 * 1000);
     const oneDayWindowEnd = new Date(oneDayFrom.getTime() + 2 * 60 * 60 * 1000);
 
@@ -71,7 +77,7 @@ export const sendBookingReminders = inngest.createFunction(
       ]);
 
     async function sendReminders(
-      bookings: any[],
+      bookings: Array<Record<string, unknown>>,
       reminderType: '48h' | '24h' | '2h',
       flag: string
     ) {
@@ -102,6 +108,71 @@ export const sendBookingReminders = inngest.createFunction(
     await sendReminders(oneDayBookings.rows, '24h', 'reminder_24h_sent');
     await sendReminders(twoHourBookings.rows, '2h', 'reminder_2h_sent');
 
+    const [demoOneDayBookings, demoTenMinuteBookings] = await Promise.all([
+      pool.query(
+        `SELECT
+           id,
+           first_name,
+           work_email,
+           focus_area,
+           scheduled_for,
+           duration_mins,
+           meeting_link
+         FROM demo_bookings
+         WHERE scheduled_for BETWEEN $1 AND $2
+           AND status IN ('scheduled', 'confirmed')
+           AND reminder_24h_sent_at IS NULL`,
+        [oneDayWindowStart, oneDayWindowEnd]
+      ),
+      pool.query(
+        `SELECT
+           id,
+           first_name,
+           work_email,
+           focus_area,
+           scheduled_for,
+           duration_mins,
+           meeting_link
+         FROM demo_bookings
+         WHERE scheduled_for BETWEEN $1 AND $2
+           AND status IN ('scheduled', 'confirmed')
+           AND reminder_10m_sent_at IS NULL`,
+        [tenMinuteWindowStart, tenMinuteWindowEnd]
+      ),
+    ]);
+
+    for (const demo of demoOneDayBookings.rows) {
+      const { subject, html } = demoBookingReminderEmail({
+        firstName: String(demo.first_name),
+        focusArea: String(demo.focus_area),
+        scheduledFor: new Date(String(demo.scheduled_for)),
+        meetingLink: String(demo.meeting_link),
+        durationMins: Number(demo.duration_mins) || 30,
+        reminderType: '24h',
+      });
+      await sendEmail({ to: String(demo.work_email), subject, html });
+      await pool.query(
+        `UPDATE demo_bookings SET reminder_24h_sent_at = NOW() WHERE id = $1`,
+        [demo.id]
+      );
+    }
+
+    for (const demo of demoTenMinuteBookings.rows) {
+      const { subject, html } = demoBookingReminderEmail({
+        firstName: String(demo.first_name),
+        focusArea: String(demo.focus_area),
+        scheduledFor: new Date(String(demo.scheduled_for)),
+        meetingLink: String(demo.meeting_link),
+        durationMins: Number(demo.duration_mins) || 30,
+        reminderType: '10m',
+      });
+      await sendEmail({ to: String(demo.work_email), subject, html });
+      await pool.query(
+        `UPDATE demo_bookings SET reminder_10m_sent_at = NOW() WHERE id = $1`,
+        [demo.id]
+      );
+    }
+
     // send review requests
     for (const booking of reviewBookings.rows) {
       const { subject, html } = reviewRequestEmail({
@@ -125,6 +196,8 @@ export const sendBookingReminders = inngest.createFunction(
       fortyEightHourReminders: twoDayBookings.rows.length,
       oneDayReminders: oneDayBookings.rows.length,
       twoHourReminders: twoHourBookings.rows.length,
+      demoOneDayReminders: demoOneDayBookings.rows.length,
+      demoTenMinuteReminders: demoTenMinuteBookings.rows.length,
       reviewRequests: reviewBookings.rows.length,
     };
   }

@@ -1,10 +1,16 @@
 import { getTenant } from "@/lib/tenant";
+import { isMainSiteHost } from "@/lib/main-site";
+import { headers } from "next/headers";
 
 export default async function BookingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const hdr = await headers();
+  const host = hdr.get("x-forwarded-host") ?? hdr.get("host");
+  if (isMainSiteHost(host)) return <>{children}</>;
+
   const tenant = await getTenant();
   if (!tenant) return <>{children}</>;
 

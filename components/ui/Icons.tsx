@@ -268,6 +268,44 @@ export function CheckCircleIcon(p: IconProps) {
   );
 }
 
+export function VideoIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <rect x="3" y="7" width="12" height="10" rx="2" />
+      <path d="M15 10l6-3v10l-6-3" />
+    </Svg>
+  );
+}
+
+export function ListCheckIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <line x1="4" y1="6" x2="13" y2="6" />
+      <line x1="4" y1="12" x2="13" y2="12" />
+      <line x1="4" y1="18" x2="13" y2="18" />
+      <path d="M17 6l1.5 1.5L21 5" />
+      <path d="M17 12l1.5 1.5L21 11" />
+    </Svg>
+  );
+}
+
+export function CircleIcon({ filled = false, ...p }: IconProps & { filled?: boolean }) {
+  return (
+    <Svg {...p}>
+      {filled ? <circle cx="12" cy="12" r="8" fill={p.color ?? "currentColor"} stroke="none" /> : <circle cx="12" cy="12" r="8" />}
+    </Svg>
+  );
+}
+
+export function ArrowLeftIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </Svg>
+  );
+}
+
 export function UserIcon(p: IconProps) {
   return (
     <Svg {...p}>
@@ -302,6 +340,15 @@ export function LogoutIcon(p: IconProps) {
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
+    </Svg>
+  );
+}
+
+export function ShieldIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path d="M12 3l8 4v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V7l8-4z" />
+      <path d="M9 12l2 2 4-4" />
     </Svg>
   );
 }

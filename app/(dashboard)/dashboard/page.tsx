@@ -83,8 +83,7 @@ export default async function DashboardPage() {
   const profileComplete = Boolean(
     tenant.tagline?.trim() &&
       tenant.about?.trim() &&
-      tenant.address?.trim() &&
-      tenant.hours?.trim()
+      tenant.address?.trim()
   );
   const workingHoursConfigured = salonWorkingDaysCount > 0;
   const publishSubmitted = websiteStatus === "pending_approval";

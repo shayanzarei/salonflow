@@ -1,0 +1,4 @@
+ALTER TABLE demo_bookings
+  ADD COLUMN IF NOT EXISTS reminder_24h_sent_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS reminder_10m_sent_at TIMESTAMPTZ;
+

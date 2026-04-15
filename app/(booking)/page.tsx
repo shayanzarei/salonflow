@@ -4,12 +4,15 @@ import { MinimalistTemplate } from "@/components/booking/templates/MinimalistTem
 import { PlayfulTemplate } from "@/components/booking/templates/PlayfulTemplate";
 import { ProfessionalTemplate } from "@/components/booking/templates/ProfessionalTemplate";
 import { UrbanTemplate } from "@/components/booking/templates/UrbanTemplate";
+import MainSiteLanding from "@/components/marketing/MainSiteLanding";
 import { ClockIcon, FacebookIcon, InstagramIcon, MapPinIcon, TikTokIcon, YoutubeIcon } from "@/components/ui/Icons";
 import { computeSlots } from "@/lib/availability";
 import pool from "@/lib/db";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import { normalizeWebsiteTemplate } from "@/lib/website-templates";
+import { isMainSiteHost } from "@/lib/main-site";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -113,6 +116,12 @@ export default async function BookingHomePage({
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
+  const hdr = await headers();
+  const host = hdr.get("x-forwarded-host") ?? hdr.get("host");
+  if (isMainSiteHost(host)) {
+    return <MainSiteLanding />;
+  }
+
   const qp = await searchParams;
   const tenant = await getTenant();
   if (!tenant) redirect("/login");

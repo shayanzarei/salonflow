@@ -2,5 +2,6 @@ export { contactReceivedAdminEmail } from "@/lib/emails/templates/contact-receiv
 export { contactReceivedUserEmail } from "@/lib/emails/templates/contact-received-user";
 export { demoBookingConfirmationEmail } from "@/lib/emails/templates/demo-booking-confirmation";
 export { demoBookingReminderEmail } from "@/lib/emails/templates/demo-booking-reminder";
+export { passwordResetEmail } from "@/lib/emails/templates/password-reset";
 export { reviewRequestEmail } from "@/lib/emails/templates/review-request";
 

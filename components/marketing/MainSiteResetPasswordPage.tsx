@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeftIcon, ArrowRightIcon, EyeIcon } from "@/components/ui/Icons";
+import { MARKETING_BUTTON_DARK } from "@/components/marketing/buttonStyles";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -148,7 +149,7 @@ export default function MainSiteResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-4 font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
+              className={`group w-full gap-2 ${MARKETING_BUTTON_DARK} disabled:cursor-not-allowed disabled:opacity-60`}
             >
               <span>{loading ? "Saving..." : "Update Password"}</span>
               <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

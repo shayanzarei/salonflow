@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { MARKETING_BUTTON_PRIMARY } from "@/components/marketing/buttonStyles";
 
 type NavKey = "home" | "pricing" | "demo" | "contact" | "privacy";
 
@@ -56,7 +57,7 @@ export default function MainSiteHeader({
           <div className="hidden md:block">
             <Link
               href="/signup"
-              className="flex items-center justify-center space-x-2 rounded-full bg-[#11c4b6] px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-[#11c4b6]/30 transition-colors hover:bg-[#0ea5b7]"
+              className={MARKETING_BUTTON_PRIMARY}
             >
               Get Started
             </Link>
@@ -96,7 +97,7 @@ export default function MainSiteHeader({
             </nav>
             <Link
               href="/signup"
-              className="mt-3 flex items-center justify-center rounded-full bg-[#11c4b6] px-6 py-3 text-sm font-semibold text-white"
+              className={`${MARKETING_BUTTON_PRIMARY} mt-3 w-full px-6`}
               onClick={() => setMobileOpen(false)}
             >
               Get Started

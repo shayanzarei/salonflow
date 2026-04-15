@@ -1,4 +1,8 @@
 import Link from "next/link";
+import {
+  MARKETING_BUTTON_GLASS,
+  MARKETING_BUTTON_PRIMARY,
+} from "@/components/marketing/buttonStyles";
 
 export default function MainSiteCta() {
   return (
@@ -18,13 +22,13 @@ export default function MainSiteCta() {
         <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
           <Link
             href="/signup"
-            className="w-full rounded-full bg-[#11c4b6] px-10 py-5 text-lg font-bold text-white shadow-lg shadow-[#11c4b6]/20 transition-colors hover:bg-[#4ddad0] sm:w-auto"
+            className={`${MARKETING_BUTTON_PRIMARY} w-full sm:w-auto`}
           >
             Start your 1-month free trial
           </Link>
           <Link
             href="/book-demo"
-            className="w-full rounded-full border border-slate-700 bg-slate-800 px-10 py-5 text-lg font-bold text-white transition-colors hover:bg-slate-700 sm:w-auto"
+            className={`${MARKETING_BUTTON_GLASS} w-full sm:w-auto`}
           >
             Book a founders&apos; demo
           </Link>

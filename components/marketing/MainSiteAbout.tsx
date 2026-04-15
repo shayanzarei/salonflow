@@ -1,5 +1,6 @@
 import { ArrowRightIcon } from "@/components/ui/Icons";
 import Link from "next/link";
+import { MARKETING_BUTTON_DARK } from "@/components/marketing/buttonStyles";
 
 export default function MainSiteAbout() {
   return (
@@ -53,7 +54,7 @@ export default function MainSiteAbout() {
             <div className="flex flex-col gap-8 sm:flex-row">
               <Link
                 href="/about"
-                className="flex items-center justify-center space-x-2 rounded-full bg-slate-900 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-colors hover:bg-slate-800"
+                className={`${MARKETING_BUTTON_DARK} space-x-2`}
               >
                 <span>Read Our Story</span>
                 <ArrowRightIcon className="h-4 w-4" />

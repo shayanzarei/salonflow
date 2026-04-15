@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { MARKETING_BUTTON_PRIMARY } from "@/components/marketing/buttonStyles";
 
 export default function MainSiteMobileStickyCta() {
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 md:hidden">
       <Link
         href="/signup"
-        className="flex w-full items-center justify-center space-x-2 rounded-full bg-[#11c4b6] py-4 font-bold text-white shadow-xl"
+        className={`${MARKETING_BUTTON_PRIMARY} w-full space-x-2 shadow-xl`}
       >
         <span>Get My Setup</span>
         <span aria-hidden>→</span>

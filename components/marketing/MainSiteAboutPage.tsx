@@ -1,6 +1,10 @@
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
 import {
+  MARKETING_BUTTON_PRIMARY,
+  MARKETING_BUTTON_SECONDARY,
+} from "@/components/marketing/buttonStyles";
+import {
   ArrowRightIcon,
   EyeIcon,
   HandIcon,
@@ -88,14 +92,14 @@ export default function MainSiteAboutPage() {
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Link
                 href="/signup"
-                className="flex items-center justify-center space-x-2 rounded-full bg-[#14b8a6] px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-[#14b8a6]/30 transition-colors hover:bg-[#0ea5b7]"
+                className={`${MARKETING_BUTTON_PRIMARY} space-x-2`}
               >
                 <span>Get Started</span>
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
               <Link
                 href="/contact"
-                className="flex items-center justify-center space-x-2 rounded-full border border-slate-200 bg-white px-8 py-4 text-lg font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50"
+                className={`${MARKETING_BUTTON_SECONDARY} space-x-2`}
               >
                 <span>Contact Us</span>
               </Link>

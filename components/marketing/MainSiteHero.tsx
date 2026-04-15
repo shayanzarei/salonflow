@@ -1,4 +1,8 @@
 import Link from "next/link";
+import {
+  MARKETING_BUTTON_PRIMARY,
+  MARKETING_BUTTON_SECONDARY,
+} from "@/components/marketing/buttonStyles";
 
 export default function MainSiteHero() {
   return (
@@ -19,14 +23,14 @@ export default function MainSiteHero() {
         <div className="flex flex-col space-y-4 pt-4 sm:flex-row sm:space-x-4 sm:space-y-0">
           <Link
             href="/signup"
-            className="flex items-center justify-center space-x-2 rounded-full bg-[#11c4b6] px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-[#11c4b6]/30 transition-colors hover:bg-[#0ea5b7]"
+            className={`${MARKETING_BUTTON_PRIMARY} space-x-2`}
           >
             <span>Start Free</span>
             <span aria-hidden>→</span>
           </Link>
           <a
             href="#features"
-            className="flex items-center justify-center space-x-2 rounded-full border border-slate-200 bg-white px-8 py-4 text-lg font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50"
+            className={`${MARKETING_BUTTON_SECONDARY} space-x-2`}
           >
             <span className="text-sm text-[#11c4b6]" aria-hidden>
               ▶

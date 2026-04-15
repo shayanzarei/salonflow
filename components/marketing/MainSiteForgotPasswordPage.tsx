@@ -5,6 +5,10 @@ import {
   ArrowRightIcon,
   ShieldIcon,
 } from "@/components/ui/Icons";
+import {
+  MARKETING_BUTTON_DARK,
+  MARKETING_BUTTON_SECONDARY,
+} from "@/components/marketing/buttonStyles";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -123,7 +127,7 @@ export default function MainSiteForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-4 font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
+            className={`group w-full gap-2 ${MARKETING_BUTTON_DARK} disabled:cursor-not-allowed disabled:opacity-60`}
           >
             <span>{loading ? "Sending..." : "Send Reset Link"}</span>
             <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -133,13 +137,13 @@ export default function MainSiteForgotPasswordPage() {
         <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Link
             href="/login"
-            className="flex items-center justify-center gap-2 rounded-xl border-2 border-slate-200 px-4 py-3 font-semibold text-slate-800 transition-colors hover:bg-slate-50"
+            className={`${MARKETING_BUTTON_SECONDARY} w-full gap-2 border-2`}
           >
             <span>Sign In</span>
           </Link>
           <Link
             href="/signup"
-            className="flex items-center justify-center gap-2 rounded-xl border-2 border-slate-200 px-4 py-3 font-semibold text-slate-800 transition-colors hover:bg-slate-50"
+            className={`${MARKETING_BUTTON_SECONDARY} w-full gap-2 border-2`}
           >
             <span>Create Account</span>
           </Link>

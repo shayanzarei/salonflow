@@ -1,6 +1,10 @@
 "use client";
 
 import { ArrowRightIcon, EyeIcon, ShieldIcon } from "@/components/ui/Icons";
+import {
+  MARKETING_BUTTON_DARK,
+  MARKETING_BUTTON_OUTLINE_DARK,
+} from "@/components/marketing/buttonStyles";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -178,7 +182,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-4 font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
+            className={`group w-full gap-2 ${MARKETING_BUTTON_DARK} disabled:cursor-not-allowed disabled:opacity-60`}
           >
             <span>{loading ? "Signing in..." : "Sign In"}</span>
             <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -199,7 +203,7 @@ export default function LoginPage() {
 
           <Link
             href="/signup"
-            className="group flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-900 px-6 py-4 font-semibold text-slate-900 transition-all hover:bg-slate-900 hover:text-white"
+            className={`group w-full gap-2 ${MARKETING_BUTTON_OUTLINE_DARK}`}
           >
             <span>Create an account</span>
             <span className="transition-transform group-hover:scale-110">

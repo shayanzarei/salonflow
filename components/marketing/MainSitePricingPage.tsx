@@ -3,6 +3,11 @@
 import MainSiteCta from "@/components/marketing/MainSiteCta";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
+import {
+  MARKETING_BUTTON_BASE,
+  MARKETING_BUTTON_PRIMARY,
+  MARKETING_BUTTON_SECONDARY,
+} from "@/components/marketing/buttonStyles";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -204,7 +209,7 @@ export default function MainSitePricingPage() {
                     </div>
                     <Link
                       href="/signup"
-                      className={`mb-8 w-full rounded-xl px-6 py-3 text-center font-bold transition-colors ${
+                      className={`mb-8 w-full rounded-full px-6 text-center ${MARKETING_BUTTON_BASE} ${
                         plan.featured
                           ? "bg-[#11c4b6] text-white shadow-md hover:bg-[#0ea5b7]"
                           : index === 0
@@ -275,13 +280,13 @@ export default function MainSitePricingPage() {
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/book-demo"
-                  className="inline-flex items-center justify-center rounded-xl bg-[#11c4b6] px-6 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#0ea5b7]"
+                  className={MARKETING_BUTTON_PRIMARY}
                 >
                   Book a Demo
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center rounded-xl border border-[#9ceee5] bg-white px-6 py-3 text-sm font-bold text-[#0ea5b7] transition-colors hover:bg-[#ecfdfb]"
+                  className={`${MARKETING_BUTTON_SECONDARY} border-[#9ceee5] text-[#0ea5b7] hover:bg-[#ecfdfb]`}
                 >
                   Start Free Trial
                 </Link>

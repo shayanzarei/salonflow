@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
       plan?: string;
       billingCycle?: string;
       email?: string;
+      trialEndsAt?: string;
     };
 
     const plan = (body.plan ?? "").toLowerCase() as PlanId;
@@ -47,6 +48,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // If the user is still in their trial, carry remaining days into the Stripe
+    // subscription so they aren't charged until the original trial end date.
+    let trialEnd: number | undefined;
+    if (body.trialEndsAt) {
+      const trialTs = Math.floor(new Date(body.trialEndsAt).getTime() / 1000);
+      const nowTs = Math.floor(Date.now() / 1000);
+      if (trialTs > nowTs) {
+        trialEnd = trialTs;
+      }
+    }
+
     const stripe = getStripeClient();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || request.nextUrl.origin;
     const baseUrl = appUrl.replace(/\/$/, "");
@@ -58,6 +70,12 @@ export async function POST(request: NextRequest) {
       cancel_url: `${baseUrl}/pricing/checkout/cancel`,
       customer_email: email || undefined,
       allow_promotion_codes: true,
+      // Stamp plan info on the subscription itself so webhooks can read it later
+      // (e.g. when the user upgrades or downgrades via the Customer Portal).
+      subscription_data: {
+        ...(trialEnd ? { trial_end: trialEnd } : {}),
+        metadata: { plan, billingCycle },
+      },
       metadata: {
         plan,
         billingCycle,

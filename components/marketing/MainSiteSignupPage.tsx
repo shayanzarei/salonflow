@@ -111,7 +111,7 @@ export default function MainSiteSignupPage() {
             Create your account
           </h1>
           <p className="mt-2 text-base text-slate-600 sm:text-lg">
-            Start your 1-month free trial. No credit card required.
+            Start your 14-day free trial. No credit card required.
           </p>
         </div>
 

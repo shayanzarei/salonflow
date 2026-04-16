@@ -107,15 +107,6 @@ export function contactReceivedUserEmail({
               </tr>
             </table>
 
-            <!-- CTA -->
-            <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom:28px;">
-              <tr>
-                <td style="background:#11C4B6;border-radius:999px;">
-                  <a href="https://solohub.nl/help" style="display:block;padding:13px 28px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;white-space:nowrap;">Visit Help Center</a>
-                </td>
-              </tr>
-            </table>
-            <p style="margin:0 0 4px;font-size:13px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">Or simply reply to this email — it comes straight to our inbox.</p>
 
           </td>
         </tr>
@@ -127,7 +118,6 @@ export function contactReceivedUserEmail({
             <p style="margin:0 0 6px;font-size:12px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">
               <a href="https://solohub.nl" style="color:#64748B;text-decoration:none;margin:0 6px;">solohub.nl</a>&nbsp;·&nbsp;
               <a href="https://solohub.nl/privacy" style="color:#64748B;text-decoration:none;margin:0 6px;">Privacy Policy</a>&nbsp;·&nbsp;
-              <a href="https://solohub.nl/contact" style="color:#64748B;text-decoration:none;margin:0 6px;">Help Center</a>
             </p>
             <p style="margin:0;font-size:11px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">SoloHub B.V. · KvK 12345678 · Herengracht 1, Amsterdam</p>
           </td>

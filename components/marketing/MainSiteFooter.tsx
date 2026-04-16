@@ -1,5 +1,9 @@
+import {
+  FacebookIcon,
+  InstagramIcon,
+  YoutubeIcon,
+} from "@/components/ui/Icons";
 import Link from "next/link";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/Icons";
 
 export default function MainSiteFooter() {
   return (
@@ -25,22 +29,13 @@ export default function MainSiteFooter() {
             The operating system for independent professionals.
           </p>
           <div className="flex space-x-4 text-slate-400">
-            <a
-              href="#"
-              className="transition-colors hover:text-[#11c4b6]"
-            >
+            <a href="#" className="transition-colors hover:text-[#11c4b6]">
               <InstagramIcon className="h-5 w-5" />
             </a>
-            <a
-              href="#"
-              className="transition-colors hover:text-[#11c4b6]"
-            >
+            <a href="#" className="transition-colors hover:text-[#11c4b6]">
               <FacebookIcon className="h-5 w-5" />
             </a>
-            <a
-              href="#"
-              className="transition-colors hover:text-[#11c4b6]"
-            >
+            <a href="#" className="transition-colors hover:text-[#11c4b6]">
               <YoutubeIcon className="h-5 w-5" />
             </a>
           </div>
@@ -72,18 +67,16 @@ export default function MainSiteFooter() {
           <h4 className="mb-4 font-bold text-slate-900">Resources</h4>
           <ul className="space-y-3 text-sm text-slate-500">
             <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
+              <a
+                href="/blog"
+                className="transition-colors hover:text-[#0ea5b7]"
+              >
                 Blog
               </a>
             </li>
             <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
-                Help Center
-              </a>
-            </li>
-            <li>
-              <a href="#" className="transition-colors hover:text-[#0ea5b7]">
-                Community
+              <a href="/faq" className="transition-colors hover:text-[#0ea5b7]">
+                FAQs
               </a>
             </li>
           </ul>

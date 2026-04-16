@@ -2,6 +2,7 @@ import pool from "@/lib/db";
 import { generateDemoMeetingLink } from "@/lib/demo-meeting-links";
 import { demoBookingConfirmationEmail } from "@/lib/emails/demo-booking-confirmation";
 import { sendEmail } from "@/lib/emails/send";
+import { sendWhatsAppNotification } from "@/lib/notify/whatsapp";
 import { NextRequest, NextResponse } from "next/server";
 
 const SLOT_OPTIONS = [
@@ -21,6 +22,19 @@ function isValidDate(value: string) {
 
 function isValidTime(value: string) {
   return /^\d{2}:\d{2}$/.test(value);
+}
+
+function formatWhatsAppScheduleLabel(date: Date) {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: DEMO_TIMEZONE,
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
 }
 
 export async function GET(req: NextRequest) {
@@ -146,12 +160,32 @@ export async function POST(req: NextRequest) {
       durationMins: booking.duration_mins,
     });
 
-    await sendEmail({
-      to: workEmail.trim().toLowerCase(),
-      subject,
-      html,
-      from: "SoloHub <bookings@solohub.nl>",
-    });
+    const scheduledForDate = new Date(booking.scheduled_for);
+    const displaySlot = formatWhatsAppScheduleLabel(scheduledForDate);
+
+    const whatsappBody = [
+      "New demo booked in SoloHub",
+      `Name: ${firstName.trim()} ${lastName.trim()}`,
+      `Email: ${workEmail.trim().toLowerCase()}`,
+      `Focus area: ${focusArea}`,
+      `When: ${displaySlot} (${DEMO_TIMEZONE})`,
+      `Duration: ${booking.duration_mins} min`,
+      `Meeting link: ${booking.meeting_link}`,
+      companyRole?.trim() ? `Role: ${companyRole.trim()}` : null,
+      goals?.trim() ? `Goals: ${goals.trim()}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    await Promise.allSettled([
+      sendEmail({
+        to: workEmail.trim().toLowerCase(),
+        subject,
+        html,
+        from: "SoloHub <bookings@solohub.nl>",
+      }),
+      sendWhatsAppNotification(whatsappBody),
+    ]);
 
     return NextResponse.json({ id: booking.id }, { status: 201 });
   } catch (error) {

@@ -1,17 +1,18 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
 import { MARKETING_BUTTON_PRIMARY } from "@/components/marketing/buttonStyles";
 import { MenuIcon, XIcon } from "@/components/ui/Icons";
+import Link from "next/link";
+import { useState } from "react";
 
-type NavKey = "home" | "pricing" | "demo" | "contact" | "privacy";
+type NavKey = "home" | "pricing" | "demo" | "faq" | "contact" | "privacy";
 
 const NAV_ITEMS = [
   { key: "home" as NavKey, label: "Home", href: "/" },
   { key: "pricing" as NavKey, label: "Pricing", href: "/pricing" },
   { key: "demo" as NavKey, label: "Book a Demo", href: "/book-demo" },
   { key: "contact" as NavKey, label: "Contact", href: "/contact" },
+  { key: "faq" as NavKey, label: "FAQ", href: "/faq" },
   { key: "privacy" as NavKey, label: "Privacy & Terms", href: "/privacy" },
 ] as const;
 
@@ -56,10 +57,7 @@ export default function MainSiteHeader({
           </nav>
 
           <div className="hidden md:block">
-            <Link
-              href="/signup"
-              className={MARKETING_BUTTON_PRIMARY}
-            >
+            <Link href="/signup" className={MARKETING_BUTTON_PRIMARY}>
               Get Started
             </Link>
           </div>

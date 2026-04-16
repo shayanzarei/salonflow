@@ -222,7 +222,8 @@ export default function MainSiteContactPage() {
                   Direct Contact
                 </h3>
                 <div className="space-y-6">
-                  <div className="flex items-start gap-4">
+                  {/* TODO: Add email contact */}
+                  {/* <div className="flex items-start gap-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ecfdfb] text-[#0ea5b7]">
                       <IconEnvelope className="h-5 w-5" />
                     </div>
@@ -240,7 +241,7 @@ export default function MainSiteContactPage() {
                         hello@solohub.com
                       </a>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="flex items-start gap-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-600">
@@ -248,15 +249,20 @@ export default function MainSiteContactPage() {
                     </div>
                     <div>
                       <h4 className="text-sm font-semibold text-slate-900">
-                        Live Chat
+                        WhatsApp Chat
                       </h4>
                       <p className="mb-2 text-sm text-slate-500">
-                        Chat with our support team in real-time.
+                        Chat with our support team in real-time via WhatsApp.
                       </p>
-                      <button className="inline-flex items-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200">
+                      <a
+                        href="https://wa.me/31683103485"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200 mt-2"
+                      >
                         Start Chat{" "}
                         <IconArrowRight className="ml-1 h-3.5 w-3.5" />
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -264,7 +270,7 @@ export default function MainSiteContactPage() {
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
                 <a
-                  href="#faqs"
+                  href="/faq"
                   className="flex items-center gap-2 transition-colors hover:text-[#0ea5b7]"
                 >
                   <IconBook className="h-4 w-4" /> Read FAQs

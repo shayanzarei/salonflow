@@ -79,7 +79,7 @@ const FAQS = [
     a: "No. Unlike competitors who take a percentage of your new clients, SoloHub charges a flat monthly fee so you keep 100% of your earnings.",
   },
   {
-    q: "Do I need a credit card to start my 30-day trial?",
+    q: "Do I need a credit card to start my 14-day trial?",
     a: "No. We believe you should see the value (and the time saved) first. You can set up your website and start taking bookings immediately without entering any payment details.",
   },
   {
@@ -302,7 +302,7 @@ export default function MainSitePricingPage() {
               <div className="pointer-events-none absolute -bottom-20 -left-12 h-52 w-52 rounded-full bg-[#67e8f9]/30 blur-3xl" />
 
               <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#0f766e]">
-                Why a 30-day trial?
+                Why a 14-day trial?
               </p>
               <h3 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
                 See the value first, then decide with confidence

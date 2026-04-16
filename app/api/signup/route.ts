@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { sendWhatsAppNotification } from "@/lib/notify/whatsapp";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
@@ -91,11 +92,19 @@ export async function POST(request: Request) {
          'trial',
          'draft',
          NOW(),
-         NOW() + INTERVAL '30 days',
+         NOW() + INTERVAL '14 days',
          false
        )
        RETURNING id, slug, name`,
       [salonName, slug, workEmail, passwordHash]
+    );
+
+    void sendWhatsAppNotification(
+      `🎉 New signup on SoloHub\n\n` +
+      `👤 ${firstName} ${lastName}\n` +
+      `📧 ${workEmail}\n` +
+      `💼 ${salonName}\n` +
+      `🏷️ ${role}`
     );
 
     return NextResponse.json(

@@ -1,373 +1,1253 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SoloHub Email Design System</title>
-  <style>
-    body { margin: 0; padding: 40px 20px; background: #F0F4F8; font-family: Inter, Arial, sans-serif; color: #0F172A; }
-    .page-title { font-size: 32px; font-weight: 800; margin: 0 0 6px; }
-    .page-sub { color: #64748B; font-size: 16px; margin: 0 0 48px; }
-    .section { margin-bottom: 56px; }
-    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #11C4B6; margin: 0 0 16px; }
-    .section-title { font-size: 22px; font-weight: 700; margin: 0 0 24px; color: #0F172A; }
-    .grid { display: flex; flex-wrap: wrap; gap: 16px; }
-    .preview-wrap { max-width: 640px; }
-    /* Dividers */
-    hr { border: none; border-top: 1px solid #E2E8F0; margin: 48px 0; }
-    /* Colour swatches */
-    .swatch-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
-    .swatch { border-radius: 10px; width: 80px; text-align: center; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .swatch-color { height: 56px; }
-    .swatch-label { font-size: 10px; padding: 6px 4px; background: white; color: #475569; line-height: 1.4; }
-    /* Type scale */
-    .type-row { display: flex; align-items: baseline; gap: 24px; margin-bottom: 20px; border-bottom: 1px solid #F1F5F9; padding-bottom: 16px; }
-    .type-meta { font-size: 11px; color: #94A3B8; min-width: 160px; }
-    code { background: #F1F5F9; border-radius: 4px; padding: 2px 6px; font-size: 12px; color: #0F172A; font-family: 'Courier New', monospace; }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SoloHub Email Design System</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 40px 20px;
+        background: #f0f4f8;
+        font-family: Inter, Arial, sans-serif;
+        color: #0f172a;
+      }
+      .page-title {
+        font-size: 32px;
+        font-weight: 800;
+        margin: 0 0 6px;
+      }
+      .page-sub {
+        color: #64748b;
+        font-size: 16px;
+        margin: 0 0 48px;
+      }
+      .section {
+        margin-bottom: 56px;
+      }
+      .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #11c4b6;
+        margin: 0 0 16px;
+      }
+      .section-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 24px;
+        color: #0f172a;
+      }
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .preview-wrap {
+        max-width: 640px;
+      }
+      /* Dividers */
+      hr {
+        border: none;
+        border-top: 1px solid #e2e8f0;
+        margin: 48px 0;
+      }
+      /* Colour swatches */
+      .swatch-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      .swatch {
+        border-radius: 10px;
+        width: 80px;
+        text-align: center;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .swatch-color {
+        height: 56px;
+      }
+      .swatch-label {
+        font-size: 10px;
+        padding: 6px 4px;
+        background: white;
+        color: #475569;
+        line-height: 1.4;
+      }
+      /* Type scale */
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 24px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 16px;
+      }
+      .type-meta {
+        font-size: 11px;
+        color: #94a3b8;
+        min-width: 160px;
+      }
+      code {
+        background: #f1f5f9;
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 12px;
+        color: #0f172a;
+        font-family: "Courier New", monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="page-title">SoloHub Email Design System</p>
+    <p class="page-sub">
+      Shared tokens, components, and patterns for all transactional email
+      templates · Version 1.0
+    </p>
 
-<p class="page-title">SoloHub Email Design System</p>
-<p class="page-sub">Shared tokens, components, and patterns for all transactional email templates · Version 1.0</p>
-
-<!-- ═══ COLOUR TOKENS ════════════════════════════════════════════════════════ -->
-<div class="section">
-  <p class="section-label">Design Tokens</p>
-  <p class="section-title">Colour System</p>
-  <div class="swatch-row">
-    <div class="swatch"><div class="swatch-color" style="background:#11C4B6;"></div><div class="swatch-label"><b>Brand Primary</b><br>#11C4B6</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#0EA5B7;"></div><div class="swatch-label"><b>Accent/Hover</b><br>#0EA5B7</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#0F172A;"></div><div class="swatch-label"><b>Dark Text</b><br>#0F172A</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#475569;"></div><div class="swatch-label"><b>Body Text</b><br>#475569</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#64748B;"></div><div class="swatch-label"><b>Muted Text</b><br>#64748B</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#94A3B8;"></div><div class="swatch-label"><b>Subtle Text</b><br>#94A3B8</div></div>
-  </div>
-  <div class="swatch-row">
-    <div class="swatch"><div class="swatch-color" style="background:#F8FCFF;"></div><div class="swatch-label"><b>Page BG</b><br>#F8FCFF</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#FFFFFF; border:1px solid #E2E8F0;"></div><div class="swatch-label"><b>Card BG</b><br>#FFFFFF</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#F0FFFE;"></div><div class="swatch-label"><b>Teal Tint</b><br>#F0FFFE</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#E6FFFE;"></div><div class="swatch-label"><b>Teal Light</b><br>#E6FFFE</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#E2E8F0;"></div><div class="swatch-label"><b>Border</b><br>#E2E8F0</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#F1F5F9;"></div><div class="swatch-label"><b>Inner BG</b><br>#F1F5F9</div></div>
-  </div>
-  <div class="swatch-row">
-    <div class="swatch"><div class="swatch-color" style="background:#10B981;"></div><div class="swatch-label"><b>Success</b><br>#10B981</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#F59E0B;"></div><div class="swatch-label"><b>Warning</b><br>#F59E0B</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#EF4444;"></div><div class="swatch-label"><b>Urgent</b><br>#EF4444</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#6366F1;"></div><div class="swatch-label"><b>Info/Stars</b><br>#6366F1</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#ECFDF5;"></div><div class="swatch-label"><b>Success BG</b><br>#ECFDF5</div></div>
-    <div class="swatch"><div class="swatch-color" style="background:#FEF3C7;"></div><div class="swatch-label"><b>Warning BG</b><br>#FEF3C7</div></div>
-  </div>
-</div>
-
-<hr />
-
-<!-- ═══ TYPOGRAPHY ════════════════════════════════════════════════════════════ -->
-<div class="section">
-  <p class="section-label">Design Tokens</p>
-  <p class="section-title">Typography Scale</p>
-  <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:32px; max-width:640px;">
-    <div class="type-row">
-      <div class="type-meta">H1 · 28px/700<br>Header title</div>
-      <div style="font-family:Inter,Arial,sans-serif;font-size:28px;font-weight:700;color:#0F172A;line-height:1.2;">Your booking is confirmed</div>
-    </div>
-    <div class="type-row">
-      <div class="type-meta">H2 · 20px/700<br>Section heading</div>
-      <div style="font-family:Inter,Arial,sans-serif;font-size:20px;font-weight:700;color:#0F172A;line-height:1.3;">Booking Details</div>
-    </div>
-    <div class="type-row">
-      <div class="type-meta">H3 · 15px/600<br>Label / metadata</div>
-      <div style="font-family:Inter,Arial,sans-serif;font-size:15px;font-weight:600;color:#0F172A;line-height:1.4;">Date &amp; Time</div>
-    </div>
-    <div class="type-row">
-      <div class="type-meta">Body · 15px/400<br>Main copy</div>
-      <div style="font-family:Inter,Arial,sans-serif;font-size:15px;color:#475569;line-height:1.7;">We received your request and our team will be in touch shortly. Thank you for choosing SoloHub.</div>
-    </div>
-    <div class="type-row">
-      <div class="type-meta">Small · 13px/400<br>Metadata / legal</div>
-      <div style="font-family:Inter,Arial,sans-serif;font-size:13px;color:#64748B;line-height:1.6;">This link expires in 60 minutes. If you did not request this, you can safely ignore this email.</div>
-    </div>
-    <div class="type-row" style="border:none; margin:0; padding:0;">
-      <div class="type-meta">Micro · 11px/400<br>Footer legal</div>
-      <div style="font-family:Inter,Arial,sans-serif;font-size:11px;color:#94A3B8;line-height:1.6;">SoloHub B.V. · KvK 12345678 · Privacy Policy · Unsubscribe</div>
-    </div>
-  </div>
-  <p style="color:#64748B;font-size:13px;margin-top:12px;">Stack: <code>Inter, Arial, Helvetica, sans-serif</code></p>
-</div>
-
-<hr />
-
-<!-- ═══ SPACING SCALE ════════════════════════════════════════════════════════ -->
-<div class="section">
-  <p class="section-label">Design Tokens</p>
-  <p class="section-title">Spacing Scale</p>
-  <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
-    <div style="text-align:center;">
-      <div style="background:#11C4B6;width:8px;height:8px;border-radius:2px;margin:0 auto 4px;"></div>
-      <div style="font-size:11px;color:#64748B;">4px<br><code>xs</code></div>
-    </div>
-    <div style="text-align:center;">
-      <div style="background:#11C4B6;width:8px;height:8px;border-radius:2px;margin:0 auto 4px;"></div>
-      <div style="font-size:11px;color:#64748B;">8px<br><code>sm</code></div>
-    </div>
-    <div style="text-align:center;">
-      <div style="background:#11C4B6;width:12px;height:12px;border-radius:2px;margin:0 auto 4px;"></div>
-      <div style="font-size:11px;color:#64748B;">12px<br><code>md</code></div>
-    </div>
-    <div style="text-align:center;">
-      <div style="background:#11C4B6;width:16px;height:16px;border-radius:2px;margin:0 auto 4px;"></div>
-      <div style="font-size:11px;color:#64748B;">16px<br><code>lg</code></div>
-    </div>
-    <div style="text-align:center;">
-      <div style="background:#11C4B6;width:24px;height:24px;border-radius:2px;margin:0 auto 4px;"></div>
-      <div style="font-size:11px;color:#64748B;">24px<br><code>xl</code></div>
-    </div>
-    <div style="text-align:center;">
-      <div style="background:#11C4B6;width:32px;height:32px;border-radius:2px;margin:0 auto 4px;"></div>
-      <div style="font-size:11px;color:#64748B;">32px<br><code>2xl</code></div>
-    </div>
-    <div style="text-align:center;">
-      <div style="background:#11C4B6;width:40px;height:40px;border-radius:2px;margin:0 auto 4px;"></div>
-      <div style="font-size:11px;color:#64748B;">40px<br><code>3xl</code></div>
-    </div>
-  </div>
-  <p style="color:#64748B;font-size:13px;margin-top:16px;">Container: <code>max-width: 600px</code> · Horizontal padding: <code>32px</code> · Vertical section gap: <code>24px</code></p>
-</div>
-
-<hr />
-
-<!-- ═══ SHARED COMPONENTS ═════════════════════════════════════════════════════ -->
-<div class="section">
-  <p class="section-label">Shared Components</p>
-  <p class="section-title">Email Shell — Header Variants</p>
-  <div class="grid">
-
-    <!-- Header: Standard teal gradient -->
-    <div>
-      <p style="font-size:12px;color:#64748B;margin:0 0 8px;">Standard — Teal gradient</p>
-      <table width="600" cellpadding="0" cellspacing="0" border="0" style="font-family:Inter,Arial,sans-serif;">
-        <tr><td style="background:linear-gradient(135deg,#11C4B6 0%,#0EA5B7 100%);padding:36px 32px;text-align:center;border-radius:16px 16px 0 0;">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr><td style="text-align:center;padding-bottom:14px;">
-              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
-                <tr><td style="width:48px;height:48px;background:#ffffff;border-radius:12px;text-align:center;vertical-align:middle;">
-                  <span style="font-size:22px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,sans-serif;display:block;line-height:48px;">S</span>
-                </td></tr>
-              </table>
-            </td></tr>
-            <tr><td style="text-align:center;">
-              <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.75);text-transform:uppercase;font-family:Inter,Arial,sans-serif;">SOLOHUB</span>
-            </td></tr>
-          </table>
-        </td></tr>
-      </table>
+    <!-- ═══ COLOUR TOKENS ════════════════════════════════════════════════════════ -->
+    <div class="section">
+      <p class="section-label">Design Tokens</p>
+      <p class="section-title">Colour System</p>
+      <div class="swatch-row">
+        <div class="swatch">
+          <div class="swatch-color" style="background: #11c4b6"></div>
+          <div class="swatch-label"><b>Brand Primary</b><br />#11C4B6</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #0ea5b7"></div>
+          <div class="swatch-label"><b>Accent/Hover</b><br />#0EA5B7</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #0f172a"></div>
+          <div class="swatch-label"><b>Dark Text</b><br />#0F172A</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #475569"></div>
+          <div class="swatch-label"><b>Body Text</b><br />#475569</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #64748b"></div>
+          <div class="swatch-label"><b>Muted Text</b><br />#64748B</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #94a3b8"></div>
+          <div class="swatch-label"><b>Subtle Text</b><br />#94A3B8</div>
+        </div>
+      </div>
+      <div class="swatch-row">
+        <div class="swatch">
+          <div class="swatch-color" style="background: #f8fcff"></div>
+          <div class="swatch-label"><b>Page BG</b><br />#F8FCFF</div>
+        </div>
+        <div class="swatch">
+          <div
+            class="swatch-color"
+            style="background: #ffffff; border: 1px solid #e2e8f0"
+          ></div>
+          <div class="swatch-label"><b>Card BG</b><br />#FFFFFF</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #f0fffe"></div>
+          <div class="swatch-label"><b>Teal Tint</b><br />#F0FFFE</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #e6fffe"></div>
+          <div class="swatch-label"><b>Teal Light</b><br />#E6FFFE</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #e2e8f0"></div>
+          <div class="swatch-label"><b>Border</b><br />#E2E8F0</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #f1f5f9"></div>
+          <div class="swatch-label"><b>Inner BG</b><br />#F1F5F9</div>
+        </div>
+      </div>
+      <div class="swatch-row">
+        <div class="swatch">
+          <div class="swatch-color" style="background: #10b981"></div>
+          <div class="swatch-label"><b>Success</b><br />#10B981</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #f59e0b"></div>
+          <div class="swatch-label"><b>Warning</b><br />#F59E0B</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #ef4444"></div>
+          <div class="swatch-label"><b>Urgent</b><br />#EF4444</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #6366f1"></div>
+          <div class="swatch-label"><b>Info/Stars</b><br />#6366F1</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #ecfdf5"></div>
+          <div class="swatch-label"><b>Success BG</b><br />#ECFDF5</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #fef3c7"></div>
+          <div class="swatch-label"><b>Warning BG</b><br />#FEF3C7</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Header: Dark navy -->
-    <div>
-      <p style="font-size:12px;color:#64748B;margin:0 0 8px;">Admin / Operational — Dark navy</p>
-      <table width="600" cellpadding="0" cellspacing="0" border="0" style="font-family:Inter,Arial,sans-serif;">
-        <tr><td style="background:#0F172A;padding:20px 32px;border-radius:16px 16px 0 0;">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <hr />
+
+    <!-- ═══ TYPOGRAPHY ════════════════════════════════════════════════════════════ -->
+    <div class="section">
+      <p class="section-label">Design Tokens</p>
+      <p class="section-title">Typography Scale</p>
+      <div
+        style="
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 32px;
+          max-width: 640px;
+        "
+      >
+        <div class="type-row">
+          <div class="type-meta">H1 · 28px/700<br />Header title</div>
+          <div
+            style="
+              font-family: Inter, Arial, sans-serif;
+              font-size: 28px;
+              font-weight: 700;
+              color: #0f172a;
+              line-height: 1.2;
+            "
+          >
+            Your booking is confirmed
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">H2 · 20px/700<br />Section heading</div>
+          <div
+            style="
+              font-family: Inter, Arial, sans-serif;
+              font-size: 20px;
+              font-weight: 700;
+              color: #0f172a;
+              line-height: 1.3;
+            "
+          >
+            Booking Details
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">H3 · 15px/600<br />Label / metadata</div>
+          <div
+            style="
+              font-family: Inter, Arial, sans-serif;
+              font-size: 15px;
+              font-weight: 600;
+              color: #0f172a;
+              line-height: 1.4;
+            "
+          >
+            Date &amp; Time
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">Body · 15px/400<br />Main copy</div>
+          <div
+            style="
+              font-family: Inter, Arial, sans-serif;
+              font-size: 15px;
+              color: #475569;
+              line-height: 1.7;
+            "
+          >
+            We received your request and our team will be in touch shortly.
+            Thank you for choosing SoloHub.
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">Small · 13px/400<br />Metadata / legal</div>
+          <div
+            style="
+              font-family: Inter, Arial, sans-serif;
+              font-size: 13px;
+              color: #64748b;
+              line-height: 1.6;
+            "
+          >
+            This link expires in 60 minutes. If you did not request this, you
+            can safely ignore this email.
+          </div>
+        </div>
+        <div class="type-row" style="border: none; margin: 0; padding: 0">
+          <div class="type-meta">Micro · 11px/400<br />Footer legal</div>
+          <div
+            style="
+              font-family: Inter, Arial, sans-serif;
+              font-size: 11px;
+              color: #94a3b8;
+              line-height: 1.6;
+            "
+          >
+            SoloHub B.V. · KvK 12345678 · Privacy Policy · Unsubscribe
+          </div>
+        </div>
+      </div>
+      <p style="color: #64748b; font-size: 13px; margin-top: 12px">
+        Stack: <code>Inter, Arial, Helvetica, sans-serif</code>
+      </p>
+    </div>
+
+    <hr />
+
+    <!-- ═══ SPACING SCALE ════════════════════════════════════════════════════════ -->
+    <div class="section">
+      <p class="section-label">Design Tokens</p>
+      <p class="section-title">Spacing Scale</p>
+      <div
+        style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap"
+      >
+        <div style="text-align: center">
+          <div
+            style="
+              background: #11c4b6;
+              width: 8px;
+              height: 8px;
+              border-radius: 2px;
+              margin: 0 auto 4px;
+            "
+          ></div>
+          <div style="font-size: 11px; color: #64748b">
+            4px<br /><code>xs</code>
+          </div>
+        </div>
+        <div style="text-align: center">
+          <div
+            style="
+              background: #11c4b6;
+              width: 8px;
+              height: 8px;
+              border-radius: 2px;
+              margin: 0 auto 4px;
+            "
+          ></div>
+          <div style="font-size: 11px; color: #64748b">
+            8px<br /><code>sm</code>
+          </div>
+        </div>
+        <div style="text-align: center">
+          <div
+            style="
+              background: #11c4b6;
+              width: 12px;
+              height: 12px;
+              border-radius: 2px;
+              margin: 0 auto 4px;
+            "
+          ></div>
+          <div style="font-size: 11px; color: #64748b">
+            12px<br /><code>md</code>
+          </div>
+        </div>
+        <div style="text-align: center">
+          <div
+            style="
+              background: #11c4b6;
+              width: 16px;
+              height: 16px;
+              border-radius: 2px;
+              margin: 0 auto 4px;
+            "
+          ></div>
+          <div style="font-size: 11px; color: #64748b">
+            16px<br /><code>lg</code>
+          </div>
+        </div>
+        <div style="text-align: center">
+          <div
+            style="
+              background: #11c4b6;
+              width: 24px;
+              height: 24px;
+              border-radius: 2px;
+              margin: 0 auto 4px;
+            "
+          ></div>
+          <div style="font-size: 11px; color: #64748b">
+            24px<br /><code>xl</code>
+          </div>
+        </div>
+        <div style="text-align: center">
+          <div
+            style="
+              background: #11c4b6;
+              width: 32px;
+              height: 32px;
+              border-radius: 2px;
+              margin: 0 auto 4px;
+            "
+          ></div>
+          <div style="font-size: 11px; color: #64748b">
+            32px<br /><code>2xl</code>
+          </div>
+        </div>
+        <div style="text-align: center">
+          <div
+            style="
+              background: #11c4b6;
+              width: 40px;
+              height: 40px;
+              border-radius: 2px;
+              margin: 0 auto 4px;
+            "
+          ></div>
+          <div style="font-size: 11px; color: #64748b">
+            40px<br /><code>3xl</code>
+          </div>
+        </div>
+      </div>
+      <p style="color: #64748b; font-size: 13px; margin-top: 16px">
+        Container: <code>max-width: 600px</code> · Horizontal padding:
+        <code>32px</code> · Vertical section gap: <code>24px</code>
+      </p>
+    </div>
+
+    <hr />
+
+    <!-- ═══ SHARED COMPONENTS ═════════════════════════════════════════════════════ -->
+    <div class="section">
+      <p class="section-label">Shared Components</p>
+      <p class="section-title">Email Shell — Header Variants</p>
+      <div class="grid">
+        <!-- Header: Standard teal gradient -->
+        <div>
+          <p style="font-size: 12px; color: #64748b; margin: 0 0 8px">
+            Standard — Teal gradient
+          </p>
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="font-family: Inter, Arial, sans-serif"
+          >
             <tr>
-              <td><span style="font-size:18px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,sans-serif;">SoloHub</span></td>
-              <td style="text-align:right;"><span style="font-size:12px;color:#64748B;font-family:Inter,Arial,sans-serif;">Internal notification</span></td>
+              <td
+                style="
+                  background: linear-gradient(135deg, #11c4b6 0%, #0ea5b7 100%);
+                  padding: 36px 32px;
+                  text-align: center;
+                  border-radius: 16px 16px 0 0;
+                "
+              >
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="text-align: center; padding-bottom: 14px">
+                      <table
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="margin: 0 auto"
+                      >
+                        <tr>
+                          <td
+                            style="
+                              width: 48px;
+                              height: 48px;
+                              background: #ffffff;
+                              border-radius: 12px;
+                              text-align: center;
+                              vertical-align: middle;
+                            "
+                          >
+                            <span
+                              style="
+                                font-size: 22px;
+                                font-weight: 800;
+                                color: #11c4b6;
+                                font-family: Inter, Arial, sans-serif;
+                                display: block;
+                                line-height: 48px;
+                              "
+                              >S</span
+                            >
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: center">
+                      <span
+                        style="
+                          font-size: 11px;
+                          font-weight: 700;
+                          letter-spacing: 0.1em;
+                          color: rgba(255, 255, 255, 0.75);
+                          text-transform: uppercase;
+                          font-family: Inter, Arial, sans-serif;
+                        "
+                        >SOLOHUB</span
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
             </tr>
           </table>
-        </td></tr>
-      </table>
-    </div>
+        </div>
 
-  </div>
-</div>
-
-<hr />
-
-<!-- CONTENT CARD -->
-<div class="section">
-  <p class="section-label">Shared Components</p>
-  <p class="section-title">Content Card — Info Block — Alert Blocks</p>
-  <div class="grid">
-
-    <!-- Info block -->
-    <div>
-      <p style="font-size:12px;color:#64748B;margin:0 0 8px;">Info / Summary block</p>
-      <table width="360" cellpadding="0" cellspacing="0" border="0" style="font-family:Inter,Arial,sans-serif;">
-        <tr><td style="background:#F8FCFF;border:1px solid #E2E8F0;border-radius:12px;padding:20px;">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr><td style="border-bottom:1px solid #E2E8F0;padding-bottom:12px;margin-bottom:12px;">
-              <span style="font-size:14px;font-weight:700;color:#0F172A;font-family:Inter,Arial,sans-serif;">Booking Details</span>
-            </td></tr>
-            <tr><td style="padding-top:12px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr><td style="padding-bottom:10px;">
-                  <span style="display:block;font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;font-family:Inter,Arial,sans-serif;">Date</span>
-                  <span style="display:block;font-size:14px;font-weight:600;color:#0F172A;font-family:Inter,Arial,sans-serif;margin-top:2px;">Monday, 12 May 2026</span>
-                </td></tr>
-                <tr><td style="padding-bottom:10px;">
-                  <span style="display:block;font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;font-family:Inter,Arial,sans-serif;">Time</span>
-                  <span style="display:block;font-size:14px;font-weight:600;color:#0F172A;font-family:Inter,Arial,sans-serif;margin-top:2px;">10:00 – 10:45 (Amsterdam)</span>
-                </td></tr>
-                <tr><td>
-                  <span style="display:block;font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;font-family:Inter,Arial,sans-serif;">Service</span>
-                  <span style="display:block;font-size:14px;font-weight:600;color:#0F172A;font-family:Inter,Arial,sans-serif;margin-top:2px;">SoloHub Demo Call</span>
-                </td></tr>
-              </table>
-            </td></tr>
+        <!-- Header: Dark navy -->
+        <div>
+          <p style="font-size: 12px; color: #64748b; margin: 0 0 8px">
+            Admin / Operational — Dark navy
+          </p>
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="font-family: Inter, Arial, sans-serif"
+          >
+            <tr>
+              <td
+                style="
+                  background: #0f172a;
+                  padding: 20px 32px;
+                  border-radius: 16px 16px 0 0;
+                "
+              >
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td>
+                      <span
+                        style="
+                          font-size: 18px;
+                          font-weight: 800;
+                          color: #11c4b6;
+                          font-family: Inter, Arial, sans-serif;
+                        "
+                        >SoloHub</span
+                      >
+                    </td>
+                    <td style="text-align: right">
+                      <span
+                        style="
+                          font-size: 12px;
+                          color: #64748b;
+                          font-family: Inter, Arial, sans-serif;
+                        "
+                        >Internal notification</span
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
           </table>
-        </td></tr>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- CONTENT CARD -->
+    <div class="section">
+      <p class="section-label">Shared Components</p>
+      <p class="section-title">Content Card — Info Block — Alert Blocks</p>
+      <div class="grid">
+        <!-- Info block -->
+        <div>
+          <p style="font-size: 12px; color: #64748b; margin: 0 0 8px">
+            Info / Summary block
+          </p>
+          <table
+            width="360"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="font-family: Inter, Arial, sans-serif"
+          >
+            <tr>
+              <td
+                style="
+                  background: #f8fcff;
+                  border: 1px solid #e2e8f0;
+                  border-radius: 12px;
+                  padding: 20px;
+                "
+              >
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td
+                      style="
+                        border-bottom: 1px solid #e2e8f0;
+                        padding-bottom: 12px;
+                        margin-bottom: 12px;
+                      "
+                    >
+                      <span
+                        style="
+                          font-size: 14px;
+                          font-weight: 700;
+                          color: #0f172a;
+                          font-family: Inter, Arial, sans-serif;
+                        "
+                        >Booking Details</span
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-top: 12px">
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                      >
+                        <tr>
+                          <td style="padding-bottom: 10px">
+                            <span
+                              style="
+                                display: block;
+                                font-size: 11px;
+                                font-weight: 600;
+                                color: #94a3b8;
+                                text-transform: uppercase;
+                                letter-spacing: 0.06em;
+                                font-family: Inter, Arial, sans-serif;
+                              "
+                              >Date</span
+                            >
+                            <span
+                              style="
+                                display: block;
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: #0f172a;
+                                font-family: Inter, Arial, sans-serif;
+                                margin-top: 2px;
+                              "
+                              >Monday, 12 May 2026</span
+                            >
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding-bottom: 10px">
+                            <span
+                              style="
+                                display: block;
+                                font-size: 11px;
+                                font-weight: 600;
+                                color: #94a3b8;
+                                text-transform: uppercase;
+                                letter-spacing: 0.06em;
+                                font-family: Inter, Arial, sans-serif;
+                              "
+                              >Time</span
+                            >
+                            <span
+                              style="
+                                display: block;
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: #0f172a;
+                                font-family: Inter, Arial, sans-serif;
+                                margin-top: 2px;
+                              "
+                              >10:00 – 10:45 (Amsterdam)</span
+                            >
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span
+                              style="
+                                display: block;
+                                font-size: 11px;
+                                font-weight: 600;
+                                color: #94a3b8;
+                                text-transform: uppercase;
+                                letter-spacing: 0.06em;
+                                font-family: Inter, Arial, sans-serif;
+                              "
+                              >Service</span
+                            >
+                            <span
+                              style="
+                                display: block;
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: #0f172a;
+                                font-family: Inter, Arial, sans-serif;
+                                margin-top: 2px;
+                              "
+                              >SoloHub Demo Call</span
+                            >
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Alert blocks column -->
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div>
+            <p style="font-size: 12px; color: #64748b; margin: 0 0 8px">
+              Success / Confirmed
+            </p>
+            <table width="360" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td
+                  style="
+                    background: #ecfdf5;
+                    border: 1px solid #a7f3d0;
+                    border-radius: 10px;
+                    padding: 14px 16px;
+                    border-left: 4px solid #10b981;
+                  "
+                >
+                  <span
+                    style="
+                      font-size: 13px;
+                      color: #065f46;
+                      font-family: Inter, Arial, sans-serif;
+                      font-weight: 600;
+                    "
+                    >&#10003;&nbsp; Your message has been received. We'll reply
+                    within 24 hours.</span
+                  >
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <p style="font-size: 12px; color: #64748b; margin: 0 0 8px">
+              Warning / Urgency
+            </p>
+            <table width="360" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td
+                  style="
+                    background: #fef3c7;
+                    border: 1px solid #fcd34d;
+                    border-radius: 10px;
+                    padding: 14px 16px;
+                    border-left: 4px solid #f59e0b;
+                  "
+                >
+                  <span
+                    style="
+                      font-size: 13px;
+                      color: #92400e;
+                      font-family: Inter, Arial, sans-serif;
+                      font-weight: 600;
+                    "
+                    >&#9201;&nbsp; Your demo starts in 10 minutes. Join
+                    now!</span
+                  >
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <p style="font-size: 12px; color: #64748b; margin: 0 0 8px">
+              Security / Notice
+            </p>
+            <table width="360" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td
+                  style="
+                    background: #f1f5f9;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 10px;
+                    padding: 14px 16px;
+                    border-left: 4px solid #64748b;
+                  "
+                >
+                  <span
+                    style="
+                      font-size: 13px;
+                      color: #475569;
+                      font-family: Inter, Arial, sans-serif;
+                    "
+                    >&#128274;&nbsp; If you didn't request this, ignore this
+                    email — your account is safe.</span
+                  >
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- CTA BUTTONS -->
+    <div class="section">
+      <p class="section-label">Shared Components</p>
+      <p class="section-title">CTA Button System</p>
+      <div
+        style="
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 32px;
+          display: flex;
+          gap: 16px;
+          align-items: center;
+          flex-wrap: wrap;
+        "
+      >
+        <!-- Primary -->
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background: #11c4b6; border-radius: 999px; padding: 0">
+              <a
+                href="#"
+                style="
+                  display: block;
+                  padding: 13px 28px;
+                  font-size: 15px;
+                  font-weight: 700;
+                  color: #ffffff;
+                  text-decoration: none;
+                  font-family: Inter, Arial, sans-serif;
+                  white-space: nowrap;
+                "
+                >Join Demo Now</a
+              >
+            </td>
+          </tr>
+        </table>
+        <!-- Secondary -->
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background: #0f172a; border-radius: 999px; padding: 0">
+              <a
+                href="#"
+                style="
+                  display: block;
+                  padding: 13px 28px;
+                  font-size: 15px;
+                  font-weight: 700;
+                  color: #ffffff;
+                  text-decoration: none;
+                  font-family: Inter, Arial, sans-serif;
+                  white-space: nowrap;
+                "
+                >Reset Password</a
+              >
+            </td>
+          </tr>
+        </table>
+        <!-- Ghost -->
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td
+              style="
+                background: #ffffff;
+                border: 2px solid #e2e8f0;
+                border-radius: 999px;
+                padding: 0;
+              "
+            >
+              <a
+                href="#"
+                style="
+                  display: block;
+                  padding: 11px 24px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #475569;
+                  text-decoration: none;
+                  font-family: Inter, Arial, sans-serif;
+                  white-space: nowrap;
+                "
+                >View Details</a
+              >
+            </td>
+          </tr>
+        </table>
+        <!-- Calendar chip -->
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td
+              style="
+                background: #f8fcff;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 0;
+              "
+            >
+              <a
+                href="#"
+                style="
+                  display: block;
+                  padding: 9px 14px;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #475569;
+                  text-decoration: none;
+                  font-family: Inter, Arial, sans-serif;
+                  white-space: nowrap;
+                "
+                >&#128197; Google Calendar</a
+              >
+            </td>
+          </tr>
+        </table>
+      </div>
+      <p style="color: #64748b; font-size: 13px; margin-top: 12px">
+        Always use <code>table</code> wrappers for buttons —
+        <code>display:block</code> inside the anchor. Never use
+        <code>border-radius</code> on <code>&lt;a&gt;</code> directly (Outlook
+        ignores it).
+      </p>
+    </div>
+
+    <hr />
+
+    <!-- BADGE / STATUS CHIPS -->
+    <div class="section">
+      <p class="section-label">Shared Components</p>
+      <p class="section-title">Status Badges &amp; Chips</p>
+      <div
+        style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center"
+      >
+        <span
+          style="
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #065f46;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: Inter, Arial, sans-serif;
+            border: 1px solid #a7f3d0;
+          "
+          >&#11044;&nbsp;Confirmed</span
+        >
+        <span
+          style="
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: Inter, Arial, sans-serif;
+            border: 1px solid #fcd34d;
+          "
+          >&#9201;&nbsp;Reminder</span
+        >
+        <span
+          style="
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: Inter, Arial, sans-serif;
+            border: 1px solid #e2e8f0;
+          "
+          >&#128274;&nbsp;Security</span
+        >
+        <span
+          style="
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: Inter, Arial, sans-serif;
+            border: 1px solid #c7d2fe;
+          "
+          >&#9733;&nbsp;Review</span
+        >
+        <span
+          style="
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #f0f9ff;
+            color: #0369a1;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: Inter, Arial, sans-serif;
+            border: 1px solid #bae6fd;
+          "
+          >&#128236;&nbsp;New Message</span
+        >
+      </div>
+      <p style="color: #64748b; font-size: 13px; margin-top: 16px">
+        Use <code>border-radius:999px</code> on a <code>&lt;td&gt;</code> for
+        pill badges in email — not on inline spans.
+      </p>
+    </div>
+
+    <hr />
+
+    <!-- FOOTER PATTERN -->
+    <div class="section">
+      <p class="section-label">Shared Components</p>
+      <p class="section-title">Standard Footer</p>
+      <table
+        width="600"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="font-family: Inter, Arial, sans-serif"
+      >
+        <tr>
+          <td
+            style="
+              background: #f8fafc;
+              border-top: 1px solid #e2e8f0;
+              padding: 24px 32px;
+              border-radius: 0 0 16px 16px;
+            "
+          >
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="text-align: center; padding-bottom: 12px">
+                  <span
+                    style="
+                      font-size: 16px;
+                      font-weight: 800;
+                      color: #11c4b6;
+                      font-family: Inter, Arial, sans-serif;
+                      letter-spacing: -0.01em;
+                    "
+                    >SoloHub</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center; padding-bottom: 8px">
+                  <a
+                    href="https://solohub.nl"
+                    style="
+                      font-size: 12px;
+                      color: #64748b;
+                      text-decoration: none;
+                      font-family: Inter, Arial, sans-serif;
+                      margin: 0 8px;
+                    "
+                    >solohub.nl</a
+                  >
+                  <span style="color: #cbd5e1">·</span>
+                  <a
+                    href="https://solohub.nl/privacy"
+                    style="
+                      font-size: 12px;
+                      color: #64748b;
+                      text-decoration: none;
+                      font-family: Inter, Arial, sans-serif;
+                      margin: 0 8px;
+                    "
+                    >Privacy Policy</a
+                  >
+                  <span style="color: #cbd5e1">·</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center">
+                  <span
+                    style="
+                      font-size: 11px;
+                      color: #94a3b8;
+                      font-family: Inter, Arial, sans-serif;
+                    "
+                    >SoloHub B.V. · KvK 12345678 · BTW NL000000000B01<br />Herengracht
+                    1, 1017 BZ Amsterdam, Nederland</span
+                  >
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
       </table>
     </div>
 
-    <!-- Alert blocks column -->
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <div>
-        <p style="font-size:12px;color:#64748B;margin:0 0 8px;">Success / Confirmed</p>
-        <table width="360" cellpadding="0" cellspacing="0" border="0">
-          <tr><td style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:14px 16px;border-left:4px solid #10B981;">
-            <span style="font-size:13px;color:#065F46;font-family:Inter,Arial,sans-serif;font-weight:600;">&#10003;&nbsp; Your message has been received. We'll reply within 24 hours.</span>
-          </td></tr>
-        </table>
+    <hr />
+
+    <!-- REUSABLE PATTERNS REFERENCE -->
+    <div class="section">
+      <p class="section-label">Pattern Library</p>
+      <p class="section-title">Reusable Section Patterns</p>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+          max-width: 740px;
+        "
+      >
+        <div
+          style="
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+          "
+        >
+          <p
+            style="
+              margin: 0 0 6px;
+              font-size: 13px;
+              font-weight: 700;
+              color: #11c4b6;
+            "
+          >
+            CONFIRMATION SUMMARY
+          </p>
+          <p
+            style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.6"
+          >
+            Info card with border-bottom header, label+value metadata rows,
+            status badge. Used in: demo-confirmation, demo-reminder.
+          </p>
+        </div>
+        <div
+          style="
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+          "
+        >
+          <p
+            style="
+              margin: 0 0 6px;
+              font-size: 13px;
+              font-weight: 700;
+              color: #11c4b6;
+            "
+          >
+            MESSAGE PREVIEW BLOCK
+          </p>
+          <p
+            style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.6"
+          >
+            Tinted background card with quoted message content. Border-left
+            accent. Used in: contact-received-user, contact-received-admin.
+          </p>
+        </div>
+        <div
+          style="
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+          "
+        >
+          <p
+            style="
+              margin: 0 0 6px;
+              font-size: 13px;
+              font-weight: 700;
+              color: #11c4b6;
+            "
+          >
+            CALENDAR ADD ROW
+          </p>
+          <p
+            style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.6"
+          >
+            Three ghost chip buttons side by side (Google, Outlook, Apple/ICS).
+            Used in: demo-confirmation.
+          </p>
+        </div>
+        <div
+          style="
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+          "
+        >
+          <p
+            style="
+              margin: 0 0 6px;
+              font-size: 13px;
+              font-weight: 700;
+              color: #11c4b6;
+            "
+          >
+            STAR RATING ROW
+          </p>
+          <p
+            style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.6"
+          >
+            5 individual star link cells, each with direct rating param in URL.
+            Table-based for Outlook compatibility. Used in: review-request.
+          </p>
+        </div>
+        <div
+          style="
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+          "
+        >
+          <p
+            style="
+              margin: 0 0 6px;
+              font-size: 13px;
+              font-weight: 700;
+              color: #11c4b6;
+            "
+          >
+            SUPPORT FOOTER LINKS
+          </p>
+          <p
+            style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.6"
+          >
+            Reschedule · Cancel · Support inline links separated by dots. Reused
+            in all demo templates.
+          </p>
+        </div>
+        <div
+          style="
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+          "
+        >
+          <p
+            style="
+              margin: 0 0 6px;
+              font-size: 13px;
+              font-weight: 700;
+              color: #11c4b6;
+            "
+          >
+            SECURITY NOTICE BLOCK
+          </p>
+          <p
+            style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.6"
+          >
+            Muted tinted block with lock icon and 'if you didn't request this'
+            safety note. Used in: password-reset.
+          </p>
+        </div>
       </div>
-      <div>
-        <p style="font-size:12px;color:#64748B;margin:0 0 8px;">Warning / Urgency</p>
-        <table width="360" cellpadding="0" cellspacing="0" border="0">
-          <tr><td style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:10px;padding:14px 16px;border-left:4px solid #F59E0B;">
-            <span style="font-size:13px;color:#92400E;font-family:Inter,Arial,sans-serif;font-weight:600;">&#9201;&nbsp; Your demo starts in 10 minutes. Join now!</span>
-          </td></tr>
-        </table>
-      </div>
-      <div>
-        <p style="font-size:12px;color:#64748B;margin:0 0 8px;">Security / Notice</p>
-        <table width="360" cellpadding="0" cellspacing="0" border="0">
-          <tr><td style="background:#F1F5F9;border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px;border-left:4px solid #64748B;">
-            <span style="font-size:13px;color:#475569;font-family:Inter,Arial,sans-serif;">&#128274;&nbsp; If you didn't request this, ignore this email — your account is safe.</span>
-          </td></tr>
-        </table>
-      </div>
     </div>
-
-  </div>
-</div>
-
-<hr />
-
-<!-- CTA BUTTONS -->
-<div class="section">
-  <p class="section-label">Shared Components</p>
-  <p class="section-title">CTA Button System</p>
-  <div style="background:white;border:1px solid #E2E8F0;border-radius:12px;padding:32px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-    <!-- Primary -->
-    <table cellpadding="0" cellspacing="0" border="0">
-      <tr><td style="background:#11C4B6;border-radius:999px;padding:0;">
-        <a href="#" style="display:block;padding:13px 28px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,sans-serif;white-space:nowrap;">Join Demo Now</a>
-      </td></tr>
-    </table>
-    <!-- Secondary -->
-    <table cellpadding="0" cellspacing="0" border="0">
-      <tr><td style="background:#0F172A;border-radius:999px;padding:0;">
-        <a href="#" style="display:block;padding:13px 28px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,sans-serif;white-space:nowrap;">Reset Password</a>
-      </td></tr>
-    </table>
-    <!-- Ghost -->
-    <table cellpadding="0" cellspacing="0" border="0">
-      <tr><td style="background:#ffffff;border:2px solid #E2E8F0;border-radius:999px;padding:0;">
-        <a href="#" style="display:block;padding:11px 24px;font-size:14px;font-weight:600;color:#475569;text-decoration:none;font-family:Inter,Arial,sans-serif;white-space:nowrap;">View Details</a>
-      </td></tr>
-    </table>
-    <!-- Calendar chip -->
-    <table cellpadding="0" cellspacing="0" border="0">
-      <tr><td style="background:#F8FCFF;border:1px solid #E2E8F0;border-radius:8px;padding:0;">
-        <a href="#" style="display:block;padding:9px 14px;font-size:12px;font-weight:600;color:#475569;text-decoration:none;font-family:Inter,Arial,sans-serif;white-space:nowrap;">&#128197; Google Calendar</a>
-      </td></tr>
-    </table>
-  </div>
-  <p style="color:#64748B;font-size:13px;margin-top:12px;">Always use <code>table</code> wrappers for buttons — <code>display:block</code> inside the anchor. Never use <code>border-radius</code> on <code>&lt;a&gt;</code> directly (Outlook ignores it).</p>
-</div>
-
-<hr />
-
-<!-- BADGE / STATUS CHIPS -->
-<div class="section">
-  <p class="section-label">Shared Components</p>
-  <p class="section-title">Status Badges &amp; Chips</p>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-    <span style="display:inline-block;padding:4px 12px;border-radius:999px;background:#ECFDF5;color:#065F46;font-size:12px;font-weight:700;font-family:Inter,Arial,sans-serif;border:1px solid #A7F3D0;">&#11044;&nbsp;Confirmed</span>
-    <span style="display:inline-block;padding:4px 12px;border-radius:999px;background:#FEF3C7;color:#92400E;font-size:12px;font-weight:700;font-family:Inter,Arial,sans-serif;border:1px solid #FCD34D;">&#9201;&nbsp;Reminder</span>
-    <span style="display:inline-block;padding:4px 12px;border-radius:999px;background:#F1F5F9;color:#475569;font-size:12px;font-weight:700;font-family:Inter,Arial,sans-serif;border:1px solid #E2E8F0;">&#128274;&nbsp;Security</span>
-    <span style="display:inline-block;padding:4px 12px;border-radius:999px;background:#EEF2FF;color:#3730A3;font-size:12px;font-weight:700;font-family:Inter,Arial,sans-serif;border:1px solid #C7D2FE;">&#9733;&nbsp;Review</span>
-    <span style="display:inline-block;padding:4px 12px;border-radius:999px;background:#F0F9FF;color:#0369A1;font-size:12px;font-weight:700;font-family:Inter,Arial,sans-serif;border:1px solid #BAE6FD;">&#128236;&nbsp;New Message</span>
-  </div>
-  <p style="color:#64748B;font-size:13px;margin-top:16px;">Use <code>border-radius:999px</code> on a <code>&lt;td&gt;</code> for pill badges in email — not on inline spans.</p>
-</div>
-
-<hr />
-
-<!-- FOOTER PATTERN -->
-<div class="section">
-  <p class="section-label">Shared Components</p>
-  <p class="section-title">Standard Footer</p>
-  <table width="600" cellpadding="0" cellspacing="0" border="0" style="font-family:Inter,Arial,sans-serif;">
-    <tr><td style="background:#F8FAFC;border-top:1px solid #E2E8F0;padding:24px 32px;border-radius:0 0 16px 16px;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="text-align:center;padding-bottom:12px;">
-            <span style="font-size:16px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,sans-serif;letter-spacing:-0.01em;">SoloHub</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="text-align:center;padding-bottom:8px;">
-            <a href="https://solohub.nl" style="font-size:12px;color:#64748B;text-decoration:none;font-family:Inter,Arial,sans-serif;margin:0 8px;">solohub.nl</a>
-            <span style="color:#CBD5E1;">·</span>
-            <a href="https://solohub.nl/privacy" style="font-size:12px;color:#64748B;text-decoration:none;font-family:Inter,Arial,sans-serif;margin:0 8px;">Privacy Policy</a>
-            <span style="color:#CBD5E1;">·</span>
-            <a href="https://solohub.nl/contact" style="font-size:12px;color:#64748B;text-decoration:none;font-family:Inter,Arial,sans-serif;margin:0 8px;">Help Center</a>
-          </td>
-        </tr>
-        <tr>
-          <td style="text-align:center;">
-            <span style="font-size:11px;color:#94A3B8;font-family:Inter,Arial,sans-serif;">SoloHub B.V. · KvK 12345678 · BTW NL000000000B01<br>Herengracht 1, 1017 BZ Amsterdam, Nederland</span>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</div>
-
-<hr />
-
-<!-- REUSABLE PATTERNS REFERENCE -->
-<div class="section">
-  <p class="section-label">Pattern Library</p>
-  <p class="section-title">Reusable Section Patterns</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:740px;">
-    <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#11C4B6;">CONFIRMATION SUMMARY</p>
-      <p style="margin:0;font-size:12px;color:#64748B;line-height:1.6;">Info card with border-bottom header, label+value metadata rows, status badge. Used in: demo-confirmation, demo-reminder.</p>
-    </div>
-    <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#11C4B6;">MESSAGE PREVIEW BLOCK</p>
-      <p style="margin:0;font-size:12px;color:#64748B;line-height:1.6;">Tinted background card with quoted message content. Border-left accent. Used in: contact-received-user, contact-received-admin.</p>
-    </div>
-    <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#11C4B6;">CALENDAR ADD ROW</p>
-      <p style="margin:0;font-size:12px;color:#64748B;line-height:1.6;">Three ghost chip buttons side by side (Google, Outlook, Apple/ICS). Used in: demo-confirmation.</p>
-    </div>
-    <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#11C4B6;">STAR RATING ROW</p>
-      <p style="margin:0;font-size:12px;color:#64748B;line-height:1.6;">5 individual star link cells, each with direct rating param in URL. Table-based for Outlook compatibility. Used in: review-request.</p>
-    </div>
-    <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#11C4B6;">SUPPORT FOOTER LINKS</p>
-      <p style="margin:0;font-size:12px;color:#64748B;line-height:1.6;">Reschedule · Cancel · Support inline links separated by dots. Reused in all demo templates.</p>
-    </div>
-    <div style="background:white;border:1px solid #E2E8F0;border-radius:10px;padding:16px;">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#11C4B6;">SECURITY NOTICE BLOCK</p>
-      <p style="margin:0;font-size:12px;color:#64748B;line-height:1.6;">Muted tinted block with lock icon and 'if you didn't request this' safety note. Used in: password-reset.</p>
-    </div>
-  </div>
-</div>
-
-</body>
+  </body>
 </html>

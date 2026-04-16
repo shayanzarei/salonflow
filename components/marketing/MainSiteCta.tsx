@@ -24,7 +24,7 @@ export default function MainSiteCta() {
             href="/signup"
             className={`${MARKETING_BUTTON_PRIMARY} w-full sm:w-auto`}
           >
-            Start your 1-month free trial
+            Start your 14-day free trial
           </Link>
           <Link
             href="/book-demo"
@@ -34,7 +34,7 @@ export default function MainSiteCta() {
           </Link>
         </div>
         <p className="mt-6 text-sm text-slate-400">
-          1 month free trial • No credit card required • Personal setup help
+          14-day free trial • No credit card required • Personal setup help
           included.
         </p>
       </div>

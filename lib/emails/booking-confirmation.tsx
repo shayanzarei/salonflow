@@ -1,55 +1,74 @@
 import { formatEUR } from "@/lib/format-currency";
 
 export function bookingConfirmationEmail({
-    clientName,
-    salonName,
-    serviceName,
-    staffName,
-    bookedAt,
-    price,
-    salonAddress,
-    cancellationToken,
-    bookingId,
-    salonSlug,
+  clientName,
+  salonName,
+  serviceName,
+  staffName,
+  bookedAt,
+  price,
+  salonAddress,
+  cancellationToken,
+  bookingId,
+  salonSlug,
 }: {
-    clientName: string;
-    salonName: string;
-    serviceName: string;
-    staffName: string;
-    bookedAt: Date;
-    price: number;
-    salonAddress: string | null;
-    cancellationToken: string;
-    bookingId: string;
-    salonSlug: string;
+  clientName: string;
+  salonName: string;
+  serviceName: string;
+  staffName: string;
+  bookedAt: Date;
+  price: number;
+  salonAddress: string | null;
+  cancellationToken: string;
+  bookingId: string;
+  salonSlug: string;
 }) {
-    const date = bookedAt.toLocaleDateString("nl-NL", {
-        timeZone: "Europe/Amsterdam",
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-    });
+  const date = bookedAt.toLocaleDateString("nl-NL", {
+    timeZone: "Europe/Amsterdam",
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
-    const time = bookedAt.toLocaleTimeString("nl-NL", {
-        timeZone: "Europe/Amsterdam",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-    });
+  const time = bookedAt.toLocaleTimeString("nl-NL", {
+    timeZone: "Europe/Amsterdam",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 
-    const cancelUrl = `https://${salonSlug}.solohub.nl/book/cancel?booking=${bookingId}&token=${cancellationToken}`;
+  const cancelUrl = `https://${salonSlug}.solohub.nl/book/cancel?booking=${bookingId}&token=${cancellationToken}`;
 
-    const safeSalonName = salonName.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-    const safeClientName = clientName.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-    const safeServiceName = serviceName.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-    const safeStaffName = staffName.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-    const safeSalonAddress = salonAddress ? salonAddress.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;") : null;
-    const safeCancelUrl = cancelUrl.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+  const safeSalonName = salonName
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+  const safeClientName = clientName
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+  const safeServiceName = serviceName
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+  const safeStaffName = staffName
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+  const safeSalonAddress = salonAddress
+    ? salonAddress
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+    : null;
+  const safeCancelUrl = cancelUrl
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;");
 
-    return {
-        subject: `Booking confirmed — ${serviceName} at ${salonName}`,
-        html: `<!DOCTYPE html>
+  return {
+    subject: `Booking confirmed — ${serviceName} at ${salonName}`,
+    html: `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -152,7 +171,9 @@ export function bookingConfirmationEmail({
               </tr>
             </table>
 
-            ${safeSalonAddress ? `
+            ${
+              safeSalonAddress
+                ? `
             <!-- Location -->
             <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom:24px;">
               <tr>
@@ -162,7 +183,9 @@ export function bookingConfirmationEmail({
                 </td>
               </tr>
             </table>
-            ` : ""}
+            `
+                : ""
+            }
 
             <!-- Cancel link -->
             <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
@@ -190,7 +213,6 @@ export function bookingConfirmationEmail({
             <p style="margin:0 0 6px;font-size:12px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">
               <a href="https://solohub.nl" style="color:#64748B;text-decoration:none;margin:0 6px;">solohub.nl</a>&nbsp;·&nbsp;
               <a href="https://solohub.nl/privacy" style="color:#64748B;text-decoration:none;margin:0 6px;">Privacy Policy</a>&nbsp;·&nbsp;
-              <a href="https://solohub.nl/contact" style="color:#64748B;text-decoration:none;margin:0 6px;">Help Center</a>
             </p>
             <p style="margin:0;font-size:11px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">SoloHub B.V. · KvK 12345678 · Herengracht 1, Amsterdam</p>
           </td>
@@ -203,5 +225,5 @@ export function bookingConfirmationEmail({
 
 </body>
 </html>`,
-    };
+  };
 }

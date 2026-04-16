@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
          website_template, business_started_at,
          tenant_status, website_status, trial_started_at, trial_ends_at
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'trial', 'draft', NOW(), NOW() + INTERVAL '30 days')`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'trial', 'draft', NOW(), NOW() + INTERVAL '14 days')`,
       [
         name,
         slug,

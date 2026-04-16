@@ -1,5 +1,4 @@
 import pool from "@/lib/db";
-import { contactReceivedAdminEmail } from "@/lib/emails/contact-received-admin";
 import { contactReceivedUserEmail } from "@/lib/emails/contact-received-user";
 import { sendEmail } from "@/lib/emails/send";
 import { sendWhatsAppNotification } from "@/lib/notify/whatsapp";
@@ -42,18 +41,8 @@ export async function POST(req: NextRequest) {
       [firstName, lastName, workEmail, topic, message]
     );
 
-    const supportInbox =
-      process.env.CONTACT_INBOX_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? "hello@solohub.nl";
-
     const userEmail = contactReceivedUserEmail({
       firstName,
-      topic,
-      message,
-    });
-    const adminEmail = contactReceivedAdminEmail({
-      firstName,
-      lastName,
-      email: workEmail,
       topic,
       message,
     });
@@ -70,12 +59,6 @@ export async function POST(req: NextRequest) {
         to: workEmail,
         subject: userEmail.subject,
         html: userEmail.html,
-        from: "SoloHub <hello@solohub.nl>",
-      }),
-      sendEmail({
-        to: supportInbox,
-        subject: adminEmail.subject,
-        html: adminEmail.html,
         from: "SoloHub <hello@solohub.nl>",
       }),
       sendWhatsAppNotification(

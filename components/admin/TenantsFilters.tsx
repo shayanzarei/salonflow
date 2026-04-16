@@ -47,9 +47,9 @@ export function TenantsFilters({ q, plan, status, template, sort }: Props) {
             className="min-h-11 w-full rounded-[10px] border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
           >
             <option value="all">Plan: All</option>
-            <option value="starter">Plan: Starter</option>
-            <option value="pro">Plan: Pro</option>
-            <option value="enterprise">Plan: Enterprise</option>
+            <option value="solo">Plan: Solo</option>
+            <option value="hub">Plan: Hub</option>
+            <option value="agency">Plan: Agency</option>
           </select>
 
           <select

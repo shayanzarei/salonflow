@@ -1,10 +1,34 @@
-export function passwordResetEmail({ resetUrl }: { resetUrl: string }) {
+export function passwordResetEmail({
+  resetUrl,
+  variant = "reset",
+}: {
+  resetUrl: string;
+  variant?: "reset" | "setup";
+}) {
   const safeResetUrl = resetUrl
     .replaceAll("&", "&amp;")
     .replaceAll('"', "&quot;");
+  const isSetup = variant === "setup";
+  const subject = isSetup
+    ? "Set up your SoloHub password"
+    : "Reset your SoloHub password";
+  const title = isSetup ? "Set up your password" : "Reset your password";
+  const intro = isSetup
+    ? "Your SoloHub workspace has been created. Click the button below to set your password and activate your account."
+    : "We received a request to reset the password for your SoloHub account. Click the button below to choose a new password.";
+  const cta = isSetup ? "Set password &#8599;" : "Reset password &#8599;";
+  const hiddenPreheader = isSetup
+    ? "Set up your SoloHub password — this link expires in 60 minutes."
+    : "Reset your SoloHub password — this link expires in 60 minutes. If you didn't request this, ignore this email.";
+  const securityTitle = isSetup
+    ? "Account setup notice"
+    : "Security notice";
+  const securityText = isSetup
+    ? "If you were not expecting this invitation, please ignore this email or contact support."
+    : "If you didn't request a password reset, you can safely ignore this email — your password will not change.";
 
   return {
-    subject: "Reset your SoloHub password",
+    subject,
     html: `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,11 +36,11 @@ export function passwordResetEmail({ resetUrl }: { resetUrl: string }) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="x-apple-disable-message-reformatting" />
   <meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
-  <title>Reset your SoloHub password</title>
+  <title>${subject}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#F8FCFF;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
 
-<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">Reset your SoloHub password — this link expires in 60 minutes. If you didn't request this, ignore this email. &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;</div>
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${hiddenPreheader} &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;</div>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background-color:#F8FCFF;">
   <tr>
@@ -45,19 +69,19 @@ export function passwordResetEmail({ resetUrl }: { resetUrl: string }) {
             <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom:20px;">
               <tr>
                 <td style="background:#F1F5F9;border:1px solid #CBD5E1;border-radius:999px;padding:5px 14px;">
-                  <span style="font-size:12px;font-weight:700;color:#334155;font-family:Inter,Arial,Helvetica,sans-serif;">&#128274;&nbsp; Password reset request</span>
+                  <span style="font-size:12px;font-weight:700;color:#334155;font-family:Inter,Arial,Helvetica,sans-serif;">&#128274;&nbsp; ${isSetup ? "Account setup request" : "Password reset request"}</span>
                 </td>
               </tr>
             </table>
 
-            <h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;line-height:1.2;">Reset your password</h1>
-            <p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.7;font-family:Inter,Arial,Helvetica,sans-serif;">We received a request to reset the password for your SoloHub account. Click the button below to choose a new password.</p>
+            <h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;line-height:1.2;">${title}</h1>
+            <p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.7;font-family:Inter,Arial,Helvetica,sans-serif;">${intro}</p>
 
             <!-- CTA -->
             <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom:24px;">
               <tr>
                 <td style="background:#0F172A;border-radius:999px;">
-                  <a href="${safeResetUrl}" style="display:block;padding:13px 28px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;white-space:nowrap;">Reset password &#8599;</a>
+                  <a href="${safeResetUrl}" style="display:block;padding:13px 28px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;white-space:nowrap;">${cta}</a>
                 </td>
               </tr>
             </table>
@@ -85,8 +109,8 @@ export function passwordResetEmail({ resetUrl }: { resetUrl: string }) {
             <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
               <tr>
                 <td style="border-top:1px solid #F1F5F9;padding-top:20px;">
-                  <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;">&#128274; Security notice</p>
-                  <p style="margin:0 0 6px;font-size:13px;color:#64748B;line-height:1.6;font-family:Inter,Arial,Helvetica,sans-serif;">If you didn't request a password reset, you can safely ignore this email — your password will not change.</p>
+                  <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;">&#128274; ${securityTitle}</p>
+                  <p style="margin:0 0 6px;font-size:13px;color:#64748B;line-height:1.6;font-family:Inter,Arial,Helvetica,sans-serif;">${securityText}</p>
                   <p style="margin:0;font-size:13px;color:#64748B;line-height:1.6;font-family:Inter,Arial,Helvetica,sans-serif;">If you're concerned about unauthorised access, please <a href="mailto:support@solohub.nl" style="color:#11C4B6;text-decoration:none;font-weight:600;">contact our support team</a>.</p>
                 </td>
               </tr>

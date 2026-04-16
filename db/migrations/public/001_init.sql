@@ -6,7 +6,7 @@ CREATE TABLE tenants (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name          TEXT NOT NULL,
   slug          TEXT NOT NULL UNIQUE,
-  plan_tier     TEXT NOT NULL DEFAULT 'starter',
+  plan_tier     TEXT NOT NULL DEFAULT 'solo',
   logo_url      TEXT,
   primary_color TEXT,
   created_at    TIMESTAMPTZ DEFAULT now()
@@ -59,4 +59,4 @@ CREATE TABLE bookings (
 
 -- Seed one test tenant
 INSERT INTO tenants (name, slug, plan_tier, primary_color)
-VALUES ('Lucy''s Salon', 'lucys-salon', 'pro', '#7C3AED');
+VALUES ('Lucy''s Salon', 'lucys-salon', 'hub', '#7C3AED');

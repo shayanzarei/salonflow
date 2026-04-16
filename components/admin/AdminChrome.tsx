@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 const NAV = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/tenants", label: "Tenants" },
+  { href: "/admin/packages", label: "Packages" },
   { href: "/admin/demo-bookings", label: "Demo Bookings" },
   { href: "/admin/contacts", label: "Contacts" },
   { href: "/admin/subscriptions", label: "Subscriptions" },

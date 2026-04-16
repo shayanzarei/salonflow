@@ -2,7 +2,11 @@ export interface Tenant {
   id: string;
   name: string;
   slug: string;
-  plan_tier: 'starter' | 'pro' | 'enterprise';
+  owner_email?: string | null;
+  owner_first_name?: string | null;
+  owner_last_name?: string | null;
+  owner_role?: string | null;
+  plan_tier: 'solo' | 'hub' | 'agency';
   logo_url: string | null;
   primary_color: string | null;
   tagline: string | null;

@@ -11,7 +11,12 @@ type QueryParams = {
   sort?: string;
 };
 
-const PLAN_OPTIONS = ["starter", "pro", "enterprise"] as const;
+const PLAN_OPTIONS = ["solo", "hub", "agency"] as const;
+const PLAN_LABELS: Record<(typeof PLAN_OPTIONS)[number], string> = {
+  solo: "Solo",
+  hub: "Hub",
+  agency: "Agency",
+};
 
 export default async function AdminTenantsPage({
   searchParams,
@@ -89,7 +94,7 @@ export default async function AdminTenantsPage({
             Tenants
           </h1>
           <p className="mt-1 text-sm text-gray-500 sm:text-base">
-            Manage salon accounts, plans, and templates.
+            Manage company accounts, plans, and templates.
           </p>
         </div>
 
@@ -155,7 +160,8 @@ export default async function AdminTenantsPage({
                     </td>
                     <td className="px-5 py-3">
                       <span className="inline-flex rounded-full bg-violet-50 px-2.5 py-1 text-xs font-medium capitalize text-violet-700">
-                        {tenant.plan_tier}
+                        {PLAN_LABELS[tenant.plan_tier as keyof typeof PLAN_LABELS] ??
+                          tenant.plan_tier}
                       </span>
                     </td>
                     <td className="px-5 py-3">

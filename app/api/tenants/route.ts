@@ -19,8 +19,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
     }
 
-    const canUseSms = await hasFeature(tenant, 'sms_reminders');
-    const canUseAnalytics = await hasFeature(tenant, 'analytics');
+    const canUseSms = await hasFeature(tenant, 'automated_reminder_emails');
+    const canUseAnalytics = await hasFeature(tenant, 'revenue_analytics');
 
     return NextResponse.json({
       tenant,

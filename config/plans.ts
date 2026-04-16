@@ -1,38 +1,22 @@
-export const PLANS = {
-  starter: {
-    label: 'Starter',
-    price: 29,
-    features: [
-      'online_booking',
-      'email_reminders',
-    ],
-  },
-  pro: {
-    label: 'Pro',
-    price: 79,
-    features: [
-      'online_booking',
-      'email_reminders',
-      'sms_reminders',
-      'analytics',
-      'custom_branding',
-    ],
-  },
-  enterprise: {
-    label: 'Enterprise',
-    price: 199,
-    features: [
-      'online_booking',
-      'email_reminders',
-      'sms_reminders',
-      'analytics',
-      'custom_branding',
-      'gift_cards',
-      'multi_location',
-      'api_access',
-    ],
-  },
-} as const;
+import { DEFAULT_PACKAGE_DEFINITIONS, PACKAGE_ENTITLEMENTS } from "@/config/packages";
+
+const booleanFeatures = PACKAGE_ENTITLEMENTS.filter((item) => item.type === "boolean");
+
+export const PLANS = Object.fromEntries(
+  DEFAULT_PACKAGE_DEFINITIONS.map((pkg) => [
+    pkg.id,
+    {
+      label: pkg.name,
+      price: pkg.monthlyPrice,
+      features: booleanFeatures
+        .filter((item) => item.defaultValues[pkg.id] === true)
+        .map((item) => item.key),
+    },
+  ])
+) as Record<
+  "solo" | "hub" | "agency",
+  { label: string; price: number; features: string[] }
+>;
 
 
 export const SITE_SECTIONS = [
@@ -48,7 +32,7 @@ export const SITE_SECTIONS = [
 
 
 export type PlanTier = keyof typeof PLANS;
-export type FeatureKey = (typeof PLANS)[PlanTier]["features"][number];
+export type FeatureKey = string;
 export type SectionKey = typeof SITE_SECTIONS[number]['key'];
 
 /** Sync plan lookup (no DB). For UI gates when tenant overrides are not needed. */

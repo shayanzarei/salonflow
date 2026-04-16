@@ -66,11 +66,15 @@ export async function POST(request: Request) {
     const slug = await generateUniqueSlug(company || `${firstName}-${lastName}`);
     const passwordHash = await bcrypt.hash(password, 10);
 
+    await pool.query("BEGIN");
     const tenant = await pool.query(
       `INSERT INTO tenants (
          name,
          slug,
          owner_email,
+         owner_first_name,
+         owner_last_name,
+         owner_role,
          plan_tier,
          primary_color,
          password_hash,
@@ -85,9 +89,12 @@ export async function POST(request: Request) {
          $1,
          $2,
          $3,
-         'starter',
-         '#11c4b6',
          $4,
+         $5,
+         $6,
+         'solo',
+         '#11c4b6',
+         $7,
          'signuture',
          'trial',
          'draft',
@@ -96,8 +103,15 @@ export async function POST(request: Request) {
          false
        )
        RETURNING id, slug, name`,
-      [salonName, slug, workEmail, passwordHash]
+      [salonName, slug, workEmail, firstName, lastName, role, passwordHash]
     );
+    const tenantId = tenant.rows[0].id as string;
+    await pool.query(
+      `INSERT INTO staff (tenant_id, name, role, email)
+       VALUES ($1, $2, $3, $4)`,
+      [tenantId, `${firstName} ${lastName}`.trim(), role, workEmail]
+    );
+    await pool.query("COMMIT");
 
     void sendWhatsAppNotification(
       `🎉 New signup on SoloHub\n\n` +
@@ -117,6 +131,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error: unknown) {
+    await pool.query("ROLLBACK").catch(() => undefined);
     const message =
       error instanceof Error ? error.message : "Unable to create account.";
 

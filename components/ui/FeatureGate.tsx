@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 import type { FeatureKey } from "@/types/features";
-import { planIncludesFeature } from "@/config/plans";
+import {
+  DEFAULT_PACKAGE_DEFINITIONS,
+  PACKAGE_ENTITLEMENTS,
+  type PackageId,
+} from "@/config/packages";
 
 type FeatureGateProps = {
   planId: string;
@@ -15,7 +19,15 @@ export function FeatureGate({
   children,
   fallback = null,
 }: FeatureGateProps) {
-  if (!planIncludesFeature(planId, feature)) {
+  const packageId = planId as PackageId;
+  const packageDef = DEFAULT_PACKAGE_DEFINITIONS.find((item) => item.id === packageId);
+  const entitlement = PACKAGE_ENTITLEMENTS.find((item) => item.key === feature);
+  const enabled =
+    packageDef &&
+    entitlement?.type === "boolean" &&
+    entitlement.defaultValues[packageId] === true;
+
+  if (!enabled) {
     return fallback;
   }
   return children;

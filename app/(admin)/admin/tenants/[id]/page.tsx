@@ -1,5 +1,7 @@
-import { PLANS, SITE_SECTIONS } from "@/config/plans";
+import { PACKAGE_ENTITLEMENTS, type PackageId } from "@/config/packages";
+import { SITE_SECTIONS } from "@/config/plans";
 import pool from "@/lib/db";
+import { getPackageMap, getTenantOverrideEntries } from "@/lib/packages";
 import {
   WEBSITE_TEMPLATES,
   normalizeWebsiteTemplate,
@@ -7,49 +9,6 @@ import {
 import { UploadInput } from "@/components/ui/UploadInput";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
-const ALL_PLAN_FEATURES = [
-  {
-    key: "online_booking",
-    label: "Online booking",
-    description: "Clients can book appointments online",
-  },
-  {
-    key: "email_reminders",
-    label: "Email reminders",
-    description: "Automated booking confirmation & reminder emails",
-  },
-  {
-    key: "sms_reminders",
-    label: "SMS reminders",
-    description: "SMS notifications for bookings",
-  },
-  {
-    key: "analytics",
-    label: "Analytics",
-    description: "Revenue, popular services & busy-hours charts",
-  },
-  {
-    key: "custom_branding",
-    label: "Custom branding",
-    description: "Custom primary colour & hero image",
-  },
-  {
-    key: "gift_cards",
-    label: "Gift cards",
-    description: "Sell & redeem gift cards",
-  },
-  {
-    key: "multi_location",
-    label: "Multi-location",
-    description: "Manage multiple salon locations",
-  },
-  {
-    key: "api_access",
-    label: "API access",
-    description: "Direct API access for integrations",
-  },
-] as const;
 
 export default async function TenantDetailPage({
   params,
@@ -87,10 +46,12 @@ export default async function TenantDetailPage({
     flagMap[row.feature] = row.enabled;
   });
 
-  // Which features the plan already includes
-  const planFeatures = new Set(
-    PLANS[tenant.plan_tier as keyof typeof PLANS]?.features ?? []
-  );
+  const packageMap = await getPackageMap();
+  const tenantPackage = packageMap[tenant.plan_tier as PackageId];
+  const overrideEntries = await getTenantOverrideEntries(id);
+  const overrideMap = Object.fromEntries(
+    overrideEntries.map((item) => [item.key, item.value])
+  ) as Record<string, boolean | number | null>;
 
   return (
     <>
@@ -427,19 +388,18 @@ export default async function TenantDetailPage({
           <div className="space-y-4">
             <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
               <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
-                <h2 className="font-semibold text-gray-900">Feature flags</h2>
+                <h2 className="font-semibold text-gray-900">Package overrides</h2>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  Override individual features for this salon regardless of
-                  plan. Features already included in their plan are shown but
-                  cannot be disabled here — downgrade the plan first.
+                  Override this tenant&apos;s package features and limits without changing
+                  the shared package defaults.
                 </p>
               </div>
               <div className="divide-y divide-gray-50">
-                {ALL_PLAN_FEATURES.map((feat) => {
-                  const inPlan = planFeatures.has(feat.key as never);
-                  // Override enabled = DB flag if set; otherwise falls back to plan
-                  const isEnabled = inPlan || (flagMap[feat.key] ?? false);
-
+                {PACKAGE_ENTITLEMENTS.map((feat) => {
+                  const packageValue = tenantPackage?.entitlements[feat.key];
+                  const overrideValue = overrideMap[feat.key];
+                  const effectiveValue =
+                    overrideValue !== undefined ? overrideValue : packageValue;
                   return (
                     <div
                       key={feat.key}
@@ -448,57 +408,90 @@ export default async function TenantDetailPage({
                       <div className="min-w-0 pr-0 sm:pr-4">
                         <p className="flex items-center gap-2 text-sm font-medium text-gray-900">
                           {feat.label}
-                          {inPlan && (
-                            <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-600">
-                              In plan
+                          <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-600">
+                            Package default
+                          </span>
+                          {overrideValue !== undefined && (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">
+                              Overridden
                             </span>
                           )}
                         </p>
                         <p className="mt-0.5 text-xs text-gray-400">
                           {feat.description}
                         </p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          Current package value:{" "}
+                          <span className="font-medium text-gray-700">
+                            {packageValue === null
+                              ? "Unlimited"
+                              : typeof packageValue === "boolean"
+                                ? packageValue
+                                  ? "Enabled"
+                                  : "Disabled"
+                                : packageValue}
+                          </span>
+                        </p>
                       </div>
-                      {inPlan ? (
-                        <div
-                          className="relative h-6 w-11 shrink-0 self-start rounded-full bg-violet-600 opacity-40 sm:self-center"
-                          aria-hidden
-                        >
-                          <span className="absolute left-[23px] top-[3px] h-[18px] w-[18px] rounded-full bg-white" />
-                        </div>
-                      ) : (
+                      {feat.type === "boolean" ? (
                         <form
-                          action="/api/admin/sections"
+                          action="/api/admin/tenant-entitlements"
                           method="POST"
                           className="shrink-0 self-start sm:self-center"
                         >
                           <input type="hidden" name="tenant_id" value={id} />
+                          <input type="hidden" name="key" value={feat.key} />
+                          <input type="hidden" name="value_type" value="boolean" />
                           <input
                             type="hidden"
-                            name="feature"
-                            value={feat.key}
-                          />
-                          <input
-                            type="hidden"
-                            name="enabled"
-                            value={isEnabled ? "false" : "true"}
+                            name="value"
+                            value={effectiveValue ? "false" : "true"}
                           />
                           <button
                             type="submit"
                             className="relative h-6 w-11 cursor-pointer rounded-full border-none transition-colors"
                             style={{
-                              background: isEnabled ? "#7C3AED" : "#D1D5DB",
+                              background: effectiveValue ? "#7C3AED" : "#D1D5DB",
                             }}
                             aria-label={
-                              isEnabled
+                              effectiveValue
                                 ? `Disable ${feat.label}`
                                 : `Enable ${feat.label}`
                             }
                           >
                             <span
                               className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white transition-[left]"
-                              style={{ left: isEnabled ? 23 : 3 }}
+                              style={{ left: effectiveValue ? 23 : 3 }}
                             />
                           </button>
+                        </form>
+                      ) : (
+                        <form
+                          action="/api/admin/tenant-entitlements"
+                          method="POST"
+                          className="w-full max-w-[180px] shrink-0 self-start sm:self-center"
+                        >
+                          <input type="hidden" name="tenant_id" value={id} />
+                          <input type="hidden" name="key" value={feat.key} />
+                          <input type="hidden" name="value_type" value="limit" />
+                          <div className="flex gap-2">
+                            <input
+                              type="number"
+                              min="0"
+                              name="value"
+                              defaultValue={
+                                effectiveValue === null ? "" : String(effectiveValue)
+                              }
+                              placeholder="Unlimited"
+                              className="min-h-10 w-full rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-violet-400"
+                            />
+                            <button
+                              type="submit"
+                              className="min-h-10 rounded-lg bg-gray-900 px-3 text-xs font-semibold text-white hover:opacity-90"
+                            >
+                              Save
+                            </button>
+                          </div>
                         </form>
                       )}
                     </div>

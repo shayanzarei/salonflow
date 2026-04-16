@@ -4,6 +4,12 @@ import MainSiteCta from "@/components/marketing/MainSiteCta";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
 import {
+  getPackageCardBullets,
+  type PackageEntitlementKey,
+  type PackageId,
+  type ResolvedPackage,
+} from "@/config/packages";
+import {
   MARKETING_BUTTON_BASE,
   MARKETING_BUTTON_PRIMARY,
   MARKETING_BUTTON_SECONDARY,
@@ -11,55 +17,7 @@ import {
 import { CheckCircleIcon, ChevronDownIcon, XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-const PLANS = [
-  {
-    name: "Solo",
-    monthlyPrice: "€17",
-    yearlyPrice: "€156",
-    subtitle: "Perfect for solo business & freelancers.",
-    cta: "Get Started",
-    featured: false,
-    features: [
-      { label: "1 Staff Profile", included: true },
-      { label: "100 Bookings/mo", included: true },
-      { label: "Professional Booking Page", included: true },
-      { label: "Website builder (1 template)", included: true },
-      { label: "Booking Confirmations", included: true },
-    ],
-  },
-  {
-    name: "Hub",
-    monthlyPrice: "€37",
-    yearlyPrice: "€348",
-    subtitle: "For small businesses with 2-5 staff members.",
-    cta: "Get Started",
-    featured: true,
-    features: [
-      { label: "Up to 5 Staff Members", included: true, highlight: true },
-      { label: "Unlimited Bookings", included: true },
-      { label: "Full Staff Portals", included: true },
-      { label: "Website Builder (6 templates)", included: true },
-      { label: "Automated Email Reminders", included: true },
-    ],
-  },
-  {
-    name: "Agency",
-    monthlyPrice: "€67",
-    yearlyPrice: "€636",
-    subtitle: "For growing businesses with +5 staff members.",
-    cta: "Get Started",
-    featured: false,
-    features: [
-      { label: "Unlimited staff members", included: true, highlight: true },
-      { label: "Unlimited Bookings", included: true },
-      { label: "Advanced Customer Data", included: true },
-      { label: "Custom Domain Support", included: true },
-      { label: "Priority Email Support", included: true },
-    ],
-  },
-] as const;
+import { Fragment, useMemo, useState } from "react";
 
 const FAQS = [
   {
@@ -68,7 +26,7 @@ const FAQS = [
   },
   {
     q: "Can each staff member have their own login?",
-    a: "Yes! Starting from our Hub plan, each team member gets a dedicated staff portal to manage their own schedules.",
+    a: "Yes. Starting from our Hub plan, each team member gets a dedicated staff portal to manage their own schedules.",
   },
   {
     q: 'What is the "Locked for Life" promise?',
@@ -80,40 +38,66 @@ const FAQS = [
   },
   {
     q: "Do I need a credit card to start my 14-day trial?",
-    a: "No. We believe you should see the value (and the time saved) first. You can set up your website and start taking bookings immediately without entering any payment details.",
+    a: "No. You can set up your website and start taking bookings immediately without entering any payment details.",
   },
   {
     q: "How easy is it to move my data from another tool?",
-    a: "If you are currently using WhatsApp, paper, or another platform like Fresha, we provide free migration assistance to help you import your client list and service data so you can be live in 10 minutes.",
+    a: "If you are currently using WhatsApp, paper, or another platform like Fresha, we provide migration assistance to help you move your core data quickly.",
   },
   {
     q: "Can my staff see my business revenue?",
-    a: "No. Each staff member gets a dedicated portal with access only to their own calendar and client notes. Sensitive financial data and salon-wide analytics are restricted to the owner's dashboard.",
+    a: "No. Staff access is limited to their own schedule and notes. Sensitive financial data stays restricted to the owner dashboard.",
   },
   {
     q: "Do I need to buy a separate domain for my website?",
-    a: "Every plan includes a free solohub.io subdomain. If you want a custom .nl domain, our Hub tier supports full domain mapping to keep your brand looking 100% professional.",
+    a: "Every plan includes a free solohub.io subdomain. If your package includes custom domain support, you can connect your own brand domain too.",
   },
   {
     q: "Is there really no fee for new clients?",
-    a: "Correct. Unlike marketplaces that take a 20-35% commission on new clients, SoloHub is a management tool. You pay a flat monthly fee and keep every cent you earn from every client.",
+    a: "Correct. SoloHub is a management tool, not a commission marketplace. You pay a flat monthly fee and keep every cent you earn.",
   },
-];
+] as const;
 
-export default function MainSitePricingPage() {
+type ComparisonSection = {
+  category: string;
+  rows: {
+    key: PackageEntitlementKey;
+    label: string;
+    values: Record<PackageId, boolean | string | number | null>;
+  }[];
+};
+
+type MainSitePricingPageProps = {
+  packages: ResolvedPackage[];
+  comparisonSections: ComparisonSection[];
+};
+
+function formatPrice(value: number) {
+  return `€${value}`;
+}
+
+export default function MainSitePricingPage({
+  packages,
+  comparisonSections,
+}: MainSitePricingPageProps) {
   const router = useRouter();
   const [isAnnual, setIsAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<string | null>(FAQS[0]?.q ?? null);
   const [checkoutPlan, setCheckoutPlan] = useState<string | null>(null);
 
-  async function startCheckout(planName: string) {
+  const activePackages = useMemo(
+    () => packages.filter((pkg) => pkg.isActive).sort((a, b) => a.sortOrder - b.sortOrder),
+    [packages]
+  );
+
+  async function startCheckout(planId: PackageId) {
     try {
-      setCheckoutPlan(planName);
+      setCheckoutPlan(planId);
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          plan: planName.toLowerCase(),
+          plan: planId,
           billingCycle: isAnnual ? "annual" : "monthly",
         }),
       });
@@ -197,15 +181,16 @@ export default function MainSitePricingPage() {
             </div>
 
             <div className="grid w-full max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
-              {PLANS.map((plan, index) => {
+              {activePackages.map((plan, index) => {
                 const shownPrice = isAnnual
-                  ? plan.yearlyPrice
-                  : plan.monthlyPrice;
+                  ? formatPrice(plan.annualPrice)
+                  : formatPrice(plan.monthlyPrice);
                 const priceSuffix = isAnnual ? "/yr" : "/mo";
+                const cardFeatures = getPackageCardBullets(plan);
 
                 return (
                   <article
-                    key={plan.name}
+                    key={plan.id}
                     className={`relative flex flex-col items-center rounded-2xl p-8 ${
                       plan.featured
                         ? "border-2 border-[#11c4b6] shadow-lg md:-translate-y-4"
@@ -233,15 +218,13 @@ export default function MainSitePricingPage() {
                         <span className="text-5xl font-bold text-slate-900">
                           {shownPrice}
                         </span>
-                        <span className="ml-2 text-slate-500">
-                          {priceSuffix}
-                        </span>
+                        <span className="ml-2 text-slate-500">{priceSuffix}</span>
                       </div>
                     </div>
                     <button
                       type="button"
-                      onClick={() => startCheckout(plan.name)}
-                      disabled={checkoutPlan === plan.name}
+                      onClick={() => startCheckout(plan.id)}
+                      disabled={checkoutPlan === plan.id}
                       className={`mb-8 w-full rounded-full px-6 text-center ${MARKETING_BUTTON_BASE} ${
                         plan.featured
                           ? "bg-[#11c4b6] text-white shadow-md hover:bg-[#0ea5b7]"
@@ -250,35 +233,15 @@ export default function MainSitePricingPage() {
                             : "border border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
                       } disabled:cursor-not-allowed disabled:opacity-60`}
                     >
-                      {checkoutPlan === plan.name ? "Redirecting..." : plan.cta}
+                      {checkoutPlan === plan.id ? "Redirecting..." : "Get Started"}
                     </button>
                     <ul className="w-full space-y-4 text-left">
-                      {plan.features.map((feature) => (
-                        <li key={feature.label} className="flex items-start">
-                          <span
-                            className={`mr-3 mt-0.5 ${
-                              feature.included
-                                ? "text-[#11c4b6]"
-                                : "text-slate-300"
-                            }`}
-                          >
-                            {feature.included ? (
-                              <CheckCircleIcon className="h-4 w-4" />
-                            ) : (
-                              <XIcon className="h-4 w-4" />
-                            )}
+                      {cardFeatures.map((feature) => (
+                        <li key={feature} className="flex items-start">
+                          <span className="mr-3 mt-0.5 text-[#11c4b6]">
+                            <CheckCircleIcon className="h-4 w-4" />
                           </span>
-                          <span
-                            className={`text-sm ${
-                              feature.included
-                                ? "highlight" in feature && feature.highlight
-                                  ? "font-medium text-slate-900"
-                                  : "text-slate-600"
-                                : "text-slate-400"
-                            }`}
-                          >
-                            {feature.label}
-                          </span>
+                          <span className="text-sm text-slate-600">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -350,404 +313,78 @@ export default function MainSitePricingPage() {
               WebkitBackdropFilter: "blur(12px)",
             }}
           >
-            <table className="w-full border-collapse text-left [&_tr>*:nth-child(5)]:hidden">
+            <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/50">
                   <th className="min-w-[260px] p-6 font-semibold text-slate-900">
                     Feature
                   </th>
-                  <th className="min-w-[120px] p-6 text-center font-semibold text-slate-900">
-                    Solo
-                  </th>
-                  <th className="min-w-[120px] p-6 text-center font-semibold text-[#0ea5b7]">
-                    Hub
-                  </th>
-                  <th className="min-w-[120px] p-6 text-center font-semibold text-slate-900">
-                    Pro
-                  </th>
-                  <th className="min-w-[140px] p-6 text-center font-semibold text-slate-900">
-                    Enterprise
-                  </th>
+                  {activePackages.map((pkg) => (
+                    <th
+                      key={pkg.id}
+                      className={`min-w-[120px] p-6 text-center font-semibold ${
+                        pkg.featured ? "text-[#0ea5b7]" : "text-slate-900"
+                      }`}
+                    >
+                      {pkg.name}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="text-sm">
-                <tr className="bg-slate-50/30">
-                  <td
-                    colSpan={5}
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(90deg, rgba(226, 253, 248, 0.8) 0%, rgba(240, 249, 255, 0.85) 50%, rgba(255, 241, 242, 0.75) 100%)",
-                    }}
-                    className="border-b border-slate-200 p-4 font-bold text-slate-900"
-                  >
-                    BOOKING &amp; APPOINTMENTS
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Online booking widget
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Unlimited bookings/month
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Bookings per month (Solo cap)
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    up to 100
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    Unlimited
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    Unlimited
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    Unlimited
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Multi-staff booking
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Real-time availability engine
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Customer cancellation (email link)
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Double-booking prevention
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-
-                <tr className="bg-slate-50/30">
-                  <td
-                    colSpan={5}
-                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
-                  >
-                    STAFF &amp; SERVICES
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Staff profiles</td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    1 staff
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    up to 5
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    up to 15
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    Unlimited
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Services &amp; categories
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    up to 15
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    up to 50
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    Unlimited
-                  </td>
-                  <td className="p-4 text-center font-medium text-slate-900">
-                    Unlimited
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Staff working hours config
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Staff portal (staff login)
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Service-to-staff assignment
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-
-                <tr className="bg-slate-50/30">
-                  <td
-                    colSpan={5}
-                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
-                  >
-                    COMMUNICATIONS &amp; AUTOMATION
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Email booking confirmations
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Automated reminder emails (48h, 24h, 2h)
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Review request emails
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    In-app notifications
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-
-                <tr className="bg-slate-50/30">
-                  <td
-                    colSpan={5}
-                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
-                  >
-                    CUSTOMER MANAGEMENT
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Customer database</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Customer segmentation (VIP, At Risk etc.)
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Total spend &amp; booking history per client
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-
-                <tr className="bg-slate-50/30">
-                  <td
-                    colSpan={5}
-                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
-                  >
-                    WEBSITE &amp; BRANDING
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Public booking page (subdomain)
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Website builder (6 templates)
-                  </td>
-                  <td className="p-4 text-center text-slate-300">
-                    ✓ 1 template
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Gallery (before/after photos)
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Public reviews display
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Custom branding (logo, colors)
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Custom domain</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-
-                <tr className="bg-slate-50/30">
-                  <td
-                    colSpan={5}
-                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
-                  >
-                    ANALYTICS &amp; REPORTING
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Dashboard overview metrics
-                  </td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Revenue &amp; customer analytics
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Advanced reporting
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-
-                <tr className="bg-slate-50/30">
-                  <td
-                    colSpan={5}
-                    className="border-b border-t border-slate-200 p-4 font-bold text-slate-900"
-                  >
-                    SUPPORT
-                  </td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Email support</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Priority email support
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">
-                    Dedicated account manager
-                  </td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 bg-slate-50/20 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">Onboarding call</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
-                <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                  <td className="p-4 pl-6 text-slate-600">SLA guarantee</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-slate-300">—</td>
-                  <td className="p-4 text-center text-[#11c4b6]">✓</td>
-                </tr>
+                {comparisonSections.map((section, sectionIndex) =>
+                  section.rows.length > 0 ? (
+                    <Fragment key={section.category}>
+                      <tr className="bg-slate-50/30">
+                        <td
+                          colSpan={activePackages.length + 1}
+                          style={{
+                            backgroundImage:
+                              sectionIndex === 0
+                                ? "linear-gradient(90deg, rgba(226, 253, 248, 0.8) 0%, rgba(240, 249, 255, 0.85) 50%, rgba(255, 241, 242, 0.75) 100%)"
+                                : undefined,
+                          }}
+                          className="border-b border-t border-slate-200 p-4 font-bold uppercase text-slate-900"
+                        >
+                          {section.category}
+                        </td>
+                      </tr>
+                      {section.rows.map((row, rowIndex) => (
+                        <tr
+                          key={row.key}
+                          className={`border-b border-slate-100 transition-colors hover:bg-slate-50/50 ${
+                            rowIndex % 2 === 1 ? "bg-slate-50/20" : ""
+                          }`}
+                        >
+                          <td className="p-4 pl-6 text-slate-600">{row.label}</td>
+                          {activePackages.map((pkg) => {
+                            const value = row.values[pkg.id];
+                            return (
+                              <td
+                                key={`${row.key}-${pkg.id}`}
+                                className="p-4 text-center font-medium text-slate-900"
+                              >
+                                {typeof value === "boolean" ? (
+                                  value ? (
+                                    <span className="inline-flex text-[#11c4b6]">
+                                      <CheckCircleIcon className="h-4 w-4" />
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex text-slate-300">
+                                      <XIcon className="h-4 w-4" />
+                                    </span>
+                                  )
+                                ) : (
+                                  value
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </Fragment>
+                  ) : null
+                )}
               </tbody>
             </table>
           </div>

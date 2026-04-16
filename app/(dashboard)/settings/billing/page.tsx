@@ -1,3 +1,5 @@
+import { getPackageCardBullets } from "@/config/packages";
+import { getPackageMap } from "@/lib/packages";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,30 +8,11 @@ export default async function BillingPage() {
   const tenant = await getTenant();
   if (!tenant) notFound();
   const brand = tenant.primary_color ?? "#7C3AED";
-
-  const planLabel =
-    tenant.plan_tier === "starter"
-      ? "Starter"
-      : tenant.plan_tier === "pro"
-        ? "Pro"
-        : "Enterprise";
-  const planPrice =
-    tenant.plan_tier === "starter"
-      ? "$19/mo"
-      : tenant.plan_tier === "pro"
-        ? "$49/mo"
-        : "Custom";
-  const planFeatures =
-    tenant.plan_tier === "starter"
-      ? ["Online booking", "Email reminders", "Up to 5 staff"]
-      : tenant.plan_tier === "pro"
-        ? [
-            "Unlimited bookings",
-            "Up to 10 staff members",
-            "SMS notifications",
-            "Analytics",
-          ]
-        : ["All features", "Dedicated support", "Custom limits"];
+  const packageMap = await getPackageMap();
+  const pkg = packageMap[tenant.plan_tier];
+  const planLabel = pkg?.name ?? tenant.plan_tier;
+  const planPrice = pkg ? `€${pkg.monthlyPrice}/mo` : "Custom";
+  const planFeatures = pkg ? getPackageCardBullets(pkg) : [];
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 pb-12">

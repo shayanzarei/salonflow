@@ -1,9 +1,8 @@
 import pool from "@/lib/db";
-import {
-  contactReceivedAdminEmail,
-  contactReceivedUserEmail,
-} from "@/lib/emails/templates";
+import { contactReceivedAdminEmail } from "@/lib/emails/contact-received-admin";
+import { contactReceivedUserEmail } from "@/lib/emails/contact-received-user";
 import { sendEmail } from "@/lib/emails/send";
+import { sendWhatsAppNotification } from "@/lib/notify/whatsapp";
 import { NextRequest, NextResponse } from "next/server";
 
 const ALLOWED_TOPICS = new Set(["sales", "support", "billing", "other"]);
@@ -59,6 +58,13 @@ export async function POST(req: NextRequest) {
       message,
     });
 
+    const TOPIC_LABELS: Record<string, string> = {
+      sales: "Sales",
+      support: "Support",
+      billing: "Billing",
+      other: "Other",
+    };
+
     await Promise.all([
       sendEmail({
         to: workEmail,
@@ -72,6 +78,13 @@ export async function POST(req: NextRequest) {
         html: adminEmail.html,
         from: "SoloHub <hello@solohub.nl>",
       }),
+      sendWhatsAppNotification(
+        `📬 New contact on SoloHub\n\n` +
+        `👤 ${firstName} ${lastName}\n` +
+        `📧 ${workEmail}\n` +
+        `🏷️ ${TOPIC_LABELS[topic] ?? topic}\n\n` +
+        `💬 ${message.slice(0, 300)}${message.length > 300 ? "…" : ""}`
+      ),
     ]);
 
     return NextResponse.json({ ok: true, id: insertResult.rows[0].id });

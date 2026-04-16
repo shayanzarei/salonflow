@@ -1,65 +1,19 @@
 "use client";
 
-import { ArrowRightIcon, EyeIcon, ShieldIcon } from "@/components/ui/Icons";
+import {
+  ArrowRightIcon,
+  BuildingIcon,
+  ChevronDownIcon,
+  EyeIcon,
+  LockIcon,
+  MailIcon,
+  ShieldIcon,
+} from "@/components/ui/Icons";
 import { MARKETING_BUTTON_DARK } from "@/components/marketing/buttonStyles";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-function MailIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="m3 7 9 6 9-6" />
-    </svg>
-  );
-}
-
-function LockMiniIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="4" y="11" width="16" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 1 1 8 0v3" />
-    </svg>
-  );
-}
-
-function BuildingIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-      <path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01M9 17h.01M15 17h.01" />
-    </svg>
-  );
-}
 
 export default function MainSiteSignupPage() {
   const router = useRouter();
@@ -237,7 +191,7 @@ export default function MainSiteSignupPage() {
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <LockMiniIcon />
+                <LockIcon size={16} />
               </span>
               <input
                 id="password"
@@ -315,9 +269,9 @@ export default function MainSiteSignupPage() {
                 <option value="small-business">Small Business Owner</option>
                 <option value="other">Other</option>
               </select>
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
-                ▾
-              </span>
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+                  <ChevronDownIcon size={16} />
+                </span>
             </div>
           </div>
 
@@ -392,7 +346,7 @@ export default function MainSiteSignupPage() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <LockMiniIcon />
+              <LockIcon size={16} />
               <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
                 GDPR Compliant
               </span>

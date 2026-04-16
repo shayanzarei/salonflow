@@ -1,5 +1,5 @@
 import pool from '@/lib/db';
-import { demoBookingReminderEmail } from '@/lib/emails/templates/demo-booking-reminder';
+import { demoBookingReminderEmail } from '@/lib/emails/demo-booking-reminder';
 import { bookingReminderEmail } from '@/lib/emails/booking-reminder';
 import { reviewRequestEmail } from '@/lib/emails/review-request';
 import { sendEmail } from '@/lib/emails/send';

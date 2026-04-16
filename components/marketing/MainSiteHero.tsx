@@ -3,6 +3,7 @@ import {
   MARKETING_BUTTON_PRIMARY,
   MARKETING_BUTTON_SECONDARY,
 } from "@/components/marketing/buttonStyles";
+import { ArrowRightIcon, PlayIcon } from "@/components/ui/Icons";
 
 export default function MainSiteHero() {
   return (
@@ -26,15 +27,13 @@ export default function MainSiteHero() {
             className={`${MARKETING_BUTTON_PRIMARY} space-x-2`}
           >
             <span>Start Free</span>
-            <span aria-hidden>→</span>
+            <ArrowRightIcon className="h-4 w-4" />
           </Link>
           <a
             href="#features"
             className={`${MARKETING_BUTTON_SECONDARY} space-x-2`}
           >
-            <span className="text-sm text-[#11c4b6]" aria-hidden>
-              ▶
-            </span>
+            <PlayIcon className="h-3.5 w-3.5 text-[#11c4b6]" />
             <span>See How It Works</span>
           </a>
         </div>

@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
 import { sendEmail } from "@/lib/emails/send";
-import { passwordResetEmail } from "@/lib/emails/templates";
+import { passwordResetEmail } from "@/lib/emails/password-reset";
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/Icons";
 
 export default function MainSiteFooter() {
   return (
@@ -26,21 +27,21 @@ export default function MainSiteFooter() {
           <div className="flex space-x-4 text-slate-400">
             <a
               href="#"
-              className="text-xl transition-colors hover:text-[#11c4b6]"
+              className="transition-colors hover:text-[#11c4b6]"
             >
-              𝕏
+              <InstagramIcon className="h-5 w-5" />
             </a>
             <a
               href="#"
-              className="text-xl transition-colors hover:text-[#11c4b6]"
+              className="transition-colors hover:text-[#11c4b6]"
             >
-              in
+              <FacebookIcon className="h-5 w-5" />
             </a>
             <a
               href="#"
-              className="text-xl transition-colors hover:text-[#11c4b6]"
+              className="transition-colors hover:text-[#11c4b6]"
             >
-              ◎
+              <YoutubeIcon className="h-5 w-5" />
             </a>
           </div>
         </div>

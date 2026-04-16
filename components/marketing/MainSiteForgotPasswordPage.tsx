@@ -3,6 +3,8 @@
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  KeyIcon,
+  MailIcon,
   ShieldIcon,
 } from "@/components/ui/Icons";
 import {
@@ -11,24 +13,6 @@ import {
 } from "@/components/marketing/buttonStyles";
 import Link from "next/link";
 import { useState } from "react";
-
-function MailIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="m3 7 9 6 9-6" />
-    </svg>
-  );
-}
 
 export default function MainSiteForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -79,9 +63,8 @@ export default function MainSiteForgotPasswordPage() {
           <ArrowLeftIcon size={14} />
           Back to login
         </Link>
-        <br />
         <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ccfbf1] text-[#0ea5b7]">
-          <span className="text-lg">🔑</span>
+          <KeyIcon className="h-5 w-5" />
         </div>
 
         <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">

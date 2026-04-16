@@ -1,6 +1,14 @@
 "use client";
 
-import { ArrowRightIcon, EyeIcon, ShieldIcon } from "@/components/ui/Icons";
+import {
+  ArrowRightIcon,
+  EyeIcon,
+  InfoIcon,
+  LockIcon,
+  MailIcon,
+  ShieldIcon,
+  SparkleIcon,
+} from "@/components/ui/Icons";
 import {
   MARKETING_BUTTON_DARK,
   MARKETING_BUTTON_OUTLINE_DARK,
@@ -9,42 +17,6 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-function MailIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="m3 7 9 6 9-6" />
-    </svg>
-  );
-}
-
-function LockMiniIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="4" y="11" width="16" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 1 1 8 0v3" />
-    </svg>
-  );
-}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -155,7 +127,7 @@ export default function LoginPage() {
             </div>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <LockMiniIcon />
+                <LockIcon size={16} />
               </span>
               <input
                 type={showPassword ? "text" : "password"}
@@ -206,16 +178,14 @@ export default function LoginPage() {
             className={`group w-full gap-2 ${MARKETING_BUTTON_OUTLINE_DARK}`}
           >
             <span>Create an account</span>
-            <span className="transition-transform group-hover:scale-110">
-              ✦
-            </span>
+            <SparkleIcon className="h-4 w-4 transition-transform group-hover:scale-110" />
           </Link>
         </div>
 
         <div className="mt-8 rounded-xl border border-blue-100 bg-blue-50 p-5">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500 text-white">
-              i
+              <InfoIcon className="h-4 w-4" />
             </div>
             <div>
               <h4 className="mb-1 text-sm font-semibold text-slate-900">
@@ -244,7 +214,7 @@ export default function LoginPage() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <LockMiniIcon />
+              <LockIcon size={16} />
               <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
                 Encrypted
               </span>

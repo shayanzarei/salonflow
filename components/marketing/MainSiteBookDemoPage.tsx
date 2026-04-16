@@ -1,8 +1,9 @@
- "use client";
+"use client";
 
 import MainSiteCta from "@/components/marketing/MainSiteCta";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
+import { ArrowRightIcon, LockIcon, SparkleIcon, UsersIcon } from "@/components/ui/Icons";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -48,9 +49,13 @@ export default function MainSiteBookDemoPage() {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
-  const [selectedDate, setSelectedDate] = useState(() => toDateInputValue(new Date()));
+  const [selectedDate, setSelectedDate] = useState(() =>
+    toDateInputValue(new Date())
+  );
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [focusArea, setFocusArea] = useState<"general_overview" | "billing_invoicing">("general_overview");
+  const [focusArea, setFocusArea] = useState<
+    "general_overview" | "billing_invoicing"
+  >("general_overview");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [workEmail, setWorkEmail] = useState("");
@@ -117,20 +122,31 @@ export default function MainSiteBookDemoPage() {
       setIsLoadingSlots(true);
       setError(null);
       try {
-        const res = await fetch(`/api/demo-bookings?date=${selectedDate}`, { cache: "no-store" });
+        const res = await fetch(`/api/demo-bookings?date=${selectedDate}`, {
+          cache: "no-store",
+        });
         const json = (await res.json()) as { slots?: Slot[]; error?: string };
-        if (!res.ok) throw new Error(json.error ?? "Failed to load availability");
+        if (!res.ok)
+          throw new Error(json.error ?? "Failed to load availability");
         if (!cancelled) {
           setSlots(json.slots ?? []);
           setSelectedTime((prev) => {
-            if (!prev) return json.slots?.find((slot) => slot.isAvailable)?.value ?? null;
-            const stillAvailable = json.slots?.some((slot) => slot.value === prev && slot.isAvailable);
-            return stillAvailable ? prev : (json.slots?.find((slot) => slot.isAvailable)?.value ?? null);
+            if (!prev)
+              return (
+                json.slots?.find((slot) => slot.isAvailable)?.value ?? null
+              );
+            const stillAvailable = json.slots?.some(
+              (slot) => slot.value === prev && slot.isAvailable
+            );
+            return stillAvailable
+              ? prev
+              : (json.slots?.find((slot) => slot.isAvailable)?.value ?? null);
           });
         }
       } catch (err) {
         if (!cancelled) {
-          const message = err instanceof Error ? err.message : "Failed to load availability";
+          const message =
+            err instanceof Error ? err.message : "Failed to load availability";
           setError(message);
           setSlots([]);
           setSelectedTime(null);
@@ -173,14 +189,20 @@ export default function MainSiteBookDemoPage() {
       if (!res.ok) throw new Error(json.error ?? "Failed to schedule demo");
       router.push(`/book-demo/confirmation${json.id ? `?id=${json.id}` : ""}`);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to schedule demo";
+      const message =
+        err instanceof Error ? err.message : "Failed to schedule demo";
       setError(message);
       if (message.toLowerCase().includes("no longer available")) {
-        const refreshRes = await fetch(`/api/demo-bookings?date=${selectedDate}`, { cache: "no-store" });
+        const refreshRes = await fetch(
+          `/api/demo-bookings?date=${selectedDate}`,
+          { cache: "no-store" }
+        );
         const refreshJson = (await refreshRes.json()) as { slots?: Slot[] };
         if (refreshRes.ok && refreshJson.slots) {
           setSlots(refreshJson.slots);
-          setSelectedTime(refreshJson.slots.find((slot) => slot.isAvailable)?.value ?? null);
+          setSelectedTime(
+            refreshJson.slots.find((slot) => slot.isAvailable)?.value ?? null
+          );
         }
       }
     } finally {
@@ -198,12 +220,20 @@ export default function MainSiteBookDemoPage() {
     >
       <MainSiteHeader active="demo" />
 
-      <main id="main-content" className="mx-auto flex w-full max-w-7xl flex-grow px-8 pb-24 pt-32">
+      <main
+        id="main-content"
+        className="mx-auto flex w-full max-w-7xl flex-grow px-8 pb-24 pt-32"
+      >
         <div className="flex w-full flex-col gap-12 lg:flex-row lg:gap-20">
-          <div id="booking-info" className="flex w-full flex-col pt-8 lg:w-5/12">
+          <div
+            id="booking-info"
+            className="flex w-full flex-col pt-8 lg:w-5/12"
+          >
             <div className="mb-8 inline-flex w-fit items-center space-x-2 rounded-full border border-slate-200 bg-white/60 px-4 py-2 shadow-sm backdrop-blur-sm">
               <span className="h-2 w-2 animate-pulse rounded-full bg-[#14b8a6]" />
-              <span className="text-sm font-medium text-slate-700">15-30 min demo</span>
+              <span className="text-sm font-medium text-slate-700">
+                15-30 min demo
+              </span>
             </div>
 
             <h1 className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight text-slate-900 lg:text-5xl">
@@ -213,30 +243,39 @@ export default function MainSiteBookDemoPage() {
             </h1>
 
             <p className="mb-10 text-lg leading-relaxed text-slate-600">
-              Get a personalized walkthrough of how SoloHub can streamline your independent business.
-              No hard sell, just a focused look at the features that matter to you.
+              Get a personalized walkthrough of how SoloHub can help you reclaim
+              your time. No corporate sales pitch—just a focused look at the
+              automation tools that will help your business thrive.
             </p>
 
             <div className="mb-12 space-y-6">
               <div className="flex items-start">
-                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ecfdfb]">
-                  <span className="text-[#0ea5b7]">◎</span>
+                <div className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#ecfdfb]">
+                  <SparkleIcon className="h-6 w-6 text-[#0ea5b7]" />
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Tailored to your workflow</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Tailored to your Craft
+                  </h3>
                   <p className="mt-1 text-slate-600">
-                    We&apos;ll focus on the tools you need: invoicing, scheduling, or client management.
+                    We’ll focus on the specific tools your business needs,
+                    whether that is the multi-template website builder,
+                    automated reminders, or staff portal management
                   </p>
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ecfdfb]">
-                  <span className="text-[#0ea5b7]">✉</span>
+                <div className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#ecfdfb]">
+                  <UsersIcon className="h-6 w-6 text-[#0ea5b7]" />
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Direct answers</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Direct Access to the Founders
+                  </h3>
                   <p className="mt-1 text-slate-600">
-                    Ask questions and get immediate answers from our product experts.
+                    Skip the call centers. Ask questions and get technical or
+                    industry-specific answers directly from Shayan and the team
+                    who built the platform.
                   </p>
                 </div>
               </div>
@@ -253,19 +292,29 @@ export default function MainSiteBookDemoPage() {
               <div className="mb-4 flex items-center">
                 <div className="flex -space-x-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="Team member" className="h-10 w-10 rounded-full border-2 border-white" />
+                  <img
+                    src="https://lh3.googleusercontent.com/a/ACg8ocIdY9K-5grmtCyN542fzz2HWDPJeIvL6NvpMs8k7aUqJOwGnKA=s288-c-no"
+                    alt="Shayan Zarei"
+                    className="h-10 w-10 rounded-full border-2 border-white"
+                  />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Team member" className="h-10 w-10 rounded-full border-2 border-white" />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Team member" className="h-10 w-10 rounded-full border-2 border-white" />
+                  <img
+                    src="https://media.licdn.com/dms/image/v2/D4E03AQFWxq6hTS1UPA/profile-displayphoto-shrink_200_200/B4EZTIfdajGYAc-/0/1738530478335?e=1778112000&v=beta&t=uD8lxGIibO7-XFicbe3s46vwTYfValY04mWA2S5hnL8"
+                    alt="Aryana Nayeri"
+                    className="h-10 w-10 rounded-full border-2 border-white"
+                  />
                 </div>
                 <div className="ml-4 text-sm text-slate-600">
-                  Chat with <span className="font-semibold text-slate-900">Sarah, Mike, or Elena</span>
+                  Chat with{" "}
+                  <span className="font-semibold text-slate-900">
+                    Shayan & Aryana
+                  </span>
                 </div>
               </div>
               <p className="text-sm italic text-slate-500">
-                &quot;We&apos;re here to help you figure out if SoloHub is the right fit. If it&apos;s not,
-                we&apos;ll tell you.&quot;
+                We built SoloHub to solve real problems at our own kitchen
+                table. We’re here to help you figure out if it’s the right fit
+                for your business. If it isn’t, we’ll be the first to tell you.
               </p>
             </div>
           </div>
@@ -280,7 +329,9 @@ export default function MainSiteBookDemoPage() {
             >
               <form className="space-y-8" onSubmit={handleSubmit}>
                 <div>
-                  <h3 className="mb-4 text-xl font-bold text-slate-900">1. What would you like to focus on?</h3>
+                  <h3 className="mb-4 text-xl font-bold text-slate-900">
+                    1. What would you like to focus on?
+                  </h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label
                       className={`flex cursor-pointer items-center rounded-xl border p-4 ${
@@ -299,7 +350,9 @@ export default function MainSiteBookDemoPage() {
                       />
                       <span
                         className={`relative mr-3 h-5 w-5 shrink-0 rounded-full border-2 ${
-                          focusArea === "general_overview" ? "border-[#14b8a6]" : "border-slate-300"
+                          focusArea === "general_overview"
+                            ? "border-[#14b8a6]"
+                            : "border-slate-300"
                         }`}
                       >
                         {focusArea === "general_overview" ? (
@@ -307,8 +360,12 @@ export default function MainSiteBookDemoPage() {
                         ) : null}
                       </span>
                       <span>
-                        <span className="block font-semibold text-slate-900">General Overview</span>
-                        <span className="mt-0.5 block text-sm text-slate-500">30 min full tour</span>
+                        <span className="block font-semibold text-slate-900">
+                          General Overview
+                        </span>
+                        <span className="mt-0.5 block text-sm text-slate-500">
+                          30 min full tour
+                        </span>
                       </span>
                     </label>
                     <label
@@ -328,7 +385,9 @@ export default function MainSiteBookDemoPage() {
                       />
                       <span
                         className={`relative mr-3 h-5 w-5 shrink-0 rounded-full border-2 ${
-                          focusArea === "billing_invoicing" ? "border-[#14b8a6]" : "border-slate-300"
+                          focusArea === "billing_invoicing"
+                            ? "border-[#14b8a6]"
+                            : "border-slate-300"
                         }`}
                       >
                         {focusArea === "billing_invoicing" ? (
@@ -336,31 +395,56 @@ export default function MainSiteBookDemoPage() {
                         ) : null}
                       </span>
                       <span>
-                        <span className="block font-semibold text-slate-900">Billing &amp; Invoicing</span>
-                        <span className="mt-0.5 block text-sm text-slate-500">15 min focused demo</span>
+                        <span className="block font-semibold text-slate-900">
+                          Billing &amp; Invoicing
+                        </span>
+                        <span className="mt-0.5 block text-sm text-slate-500">
+                          15 min focused demo
+                        </span>
                       </span>
                     </label>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="mb-4 text-xl font-bold text-slate-900">2. Select a Date &amp; Time</h3>
+                  <h3 className="mb-4 text-xl font-bold text-slate-900">
+                    2. Select a Date &amp; Time
+                  </h3>
                   <div className="flex flex-col gap-6 md:flex-row">
                     <div className="w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:w-1/2">
                       <div className="mb-4 flex items-center justify-between">
                         <button
                           type="button"
-                          onClick={() => setMonthCursor((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+                          onClick={() =>
+                            setMonthCursor(
+                              (prev) =>
+                                new Date(
+                                  prev.getFullYear(),
+                                  prev.getMonth() - 1,
+                                  1
+                                )
+                            )
+                          }
                           className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-900"
                         >
                           ‹
                         </button>
                         <span className="font-semibold text-slate-900">
-                          {MONTH_NAMES[monthCursor.getMonth()]} {monthCursor.getFullYear()}
+                          {MONTH_NAMES[monthCursor.getMonth()]}{" "}
+                          {monthCursor.getFullYear()}
                         </span>
                         <button
                           type="button"
-                          onClick={() => setMonthCursor((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+                          onClick={() =>
+                            setMonthCursor(
+                              (prev) =>
+                                new Date(
+                                  prev.getFullYear(),
+                                  prev.getMonth() + 1,
+                                  1
+                                )
+                            )
+                          }
                           className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-900"
                         >
                           ›
@@ -368,12 +452,18 @@ export default function MainSiteBookDemoPage() {
                       </div>
                       <div className="mb-2 grid grid-cols-7 gap-1 text-center">
                         {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
-                          <div key={d} className="py-1 text-xs font-medium text-slate-400">{d}</div>
+                          <div
+                            key={d}
+                            className="py-1 text-xs font-medium text-slate-400"
+                          >
+                            {d}
+                          </div>
                         ))}
                       </div>
                       <div className="grid grid-cols-7 gap-1 text-center text-sm">
                         {calendarDays.map((day, idx) => {
-                          const disabled = !day.inMonth || day.isPast || day.isWeekend;
+                          const disabled =
+                            !day.inMonth || day.isPast || day.isWeekend;
                           return (
                             <button
                               type="button"
@@ -401,32 +491,40 @@ export default function MainSiteBookDemoPage() {
 
                     <div className="flex h-[320px] w-full flex-col md:w-1/2">
                       <div className="mb-4 text-center md:text-left">
-                        <span className="font-semibold text-slate-900">{formatLongDate(selectedDateObj)}</span>
+                        <span className="font-semibold text-slate-900">
+                          {formatLongDate(selectedDateObj)}
+                        </span>
                       </div>
                       <div className="flex-grow space-y-2 overflow-y-auto pr-2">
                         {isLoadingSlots ? (
-                          <p className="text-sm text-slate-500">Loading available slots...</p>
+                          <p className="text-sm text-slate-500">
+                            Loading available slots...
+                          </p>
                         ) : (
                           slots.map((slot) => {
                             const selected = slot.value === selectedTime;
-                          return (
-                            <button
-                              type="button"
-                              key={slot.value}
-                              disabled={!slot.isAvailable}
-                              onClick={() => setSelectedTime(slot.value)}
-                              className={`w-full rounded-xl border px-4 py-3 text-center font-medium transition-colors ${
-                                selected
-                                  ? "flex items-center justify-between border-[#14b8a6] bg-[#f0fdfa] px-6 font-semibold text-[#0d9488]"
-                                  : slot.isAvailable
-                                    ? "border-slate-200 text-slate-700 hover:bg-slate-50"
-                                    : "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
-                              }`}
-                            >
-                              <span>{slot.label}</span>
-                              {selected ? <span>✓</span> : !slot.isAvailable ? <span className="text-xs">Not available</span> : null}
-                            </button>
-                          );
+                            return (
+                              <button
+                                type="button"
+                                key={slot.value}
+                                disabled={!slot.isAvailable}
+                                onClick={() => setSelectedTime(slot.value)}
+                                className={`w-full rounded-xl border px-4 py-3 text-center font-medium transition-colors ${
+                                  selected
+                                    ? "flex items-center justify-between border-[#14b8a6] bg-[#f0fdfa] px-6 font-semibold text-[#0d9488]"
+                                    : slot.isAvailable
+                                      ? "border-slate-200 text-slate-700 hover:bg-slate-50"
+                                      : "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
+                                }`}
+                              >
+                                <span>{slot.label}</span>
+                                {selected ? (
+                                  <span>✓</span>
+                                ) : !slot.isAvailable ? (
+                                  <span className="text-xs">Not available</span>
+                                ) : null}
+                              </button>
+                            );
                           })
                         )}
                       </div>
@@ -435,36 +533,81 @@ export default function MainSiteBookDemoPage() {
                 </div>
 
                 <div>
-                  <h3 className="mb-4 text-xl font-bold text-slate-900">3. Your Details</h3>
+                  <h3 className="mb-4 text-xl font-bold text-slate-900">
+                    3. Your Details
+                  </h3>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-1.5 block text-sm font-medium text-slate-700">First Name *</label>
-                        <input required value={firstName} onChange={(e) => setFirstName(e.target.value)} type="text" className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20" placeholder="Jane" />
+                        <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                          First Name *
+                        </label>
+                        <input
+                          required
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          type="text"
+                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          placeholder="Jane"
+                        />
                       </div>
                       <div>
-                        <label className="mb-1.5 block text-sm font-medium text-slate-700">Last Name *</label>
-                        <input required value={lastName} onChange={(e) => setLastName(e.target.value)} type="text" className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20" placeholder="Doe" />
+                        <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                          Last Name *
+                        </label>
+                        <input
+                          required
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          type="text"
+                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          placeholder="Doe"
+                        />
                       </div>
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-slate-700">Work Email *</label>
-                      <input required value={workEmail} onChange={(e) => setWorkEmail(e.target.value)} type="email" className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20" placeholder="jane@company.com" />
+                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                        Work Email *
+                      </label>
+                      <input
+                        required
+                        value={workEmail}
+                        onChange={(e) => setWorkEmail(e.target.value)}
+                        type="email"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                        placeholder="jane@company.com"
+                      />
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-slate-700">Company / Role</label>
-                      <input value={companyRole} onChange={(e) => setCompanyRole(e.target.value)} type="text" className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20" placeholder="Independent Consultant" />
+                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                        Company / Role
+                      </label>
+                      <input
+                        value={companyRole}
+                        onChange={(e) => setCompanyRole(e.target.value)}
+                        type="text"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                        placeholder="Independent Consultant"
+                      />
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-slate-700">What are your main goals for SoloHub?</label>
-                      <textarea value={goals} onChange={(e) => setGoals(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20" placeholder="e.g., I want to automate my invoicing and client onboarding..." />
+                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                        What are your main goals for SoloHub?
+                      </label>
+                      <textarea
+                        value={goals}
+                        onChange={(e) => setGoals(e.target.value)}
+                        rows={3}
+                        className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                        placeholder="e.g., I want to automate my invoicing and client onboarding..."
+                      />
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-4 sm:flex-row">
                   <div className="flex items-center text-sm text-slate-500">
-                    <span className="mr-2">🔒</span>
+                    <LockIcon className="mr-2 h-4 w-4" />
                     Your information is secure.
                   </div>
                   <button
@@ -473,7 +616,7 @@ export default function MainSiteBookDemoPage() {
                     className="flex w-full items-center justify-center space-x-2 rounded-xl bg-[#14b8a6] px-8 py-3.5 font-bold text-white shadow-lg shadow-[#14b8a6]/20 transition-colors hover:bg-[#0ea5b7] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                   >
                     <span>Schedule Demo</span>
-                    <span aria-hidden>→</span>
+                    <ArrowRightIcon className="h-4 w-4" />
                   </button>
                 </div>
                 {error ? <p className="text-sm text-red-600">{error}</p> : null}

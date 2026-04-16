@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SoloHub Email System — Developer Handoff</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, -apple-system, BlinkMacSystemFont, Arial, sans-serif; background: #F8FCFF; color: #0F172A; line-height: 1.6; }
+    .page { max-width: 900px; margin: 0 auto; padding: 48px 32px; }
+    h1 { font-size: 32px; font-weight: 800; color: #0F172A; margin-bottom: 6px; }
+    h2 { font-size: 18px; font-weight: 800; color: #0F172A; margin: 36px 0 14px; padding-bottom: 8px; border-bottom: 2px solid #E2E8F0; }
+    h3 { font-size: 14px; font-weight: 700; color: #0F172A; margin: 20px 0 8px; }
+    p { font-size: 14px; color: #475569; line-height: 1.7; margin-bottom: 10px; }
+    .subtitle { font-size: 15px; color: #64748B; margin-bottom: 36px; }
+    .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+    .badge-teal { background: #E0F9F7; color: #0D6E68; }
+    .badge-navy { background: #1E293B; color: #94A3B8; }
+    .badge-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; }
+    .badge-green { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+    .badge-gray { background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; }
+    table.spec { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 12px; }
+    table.spec th { background: #F8FAFC; font-weight: 700; color: #475569; text-align: left; padding: 10px 14px; border: 1px solid #E2E8F0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+    table.spec td { padding: 10px 14px; border: 1px solid #E2E8F0; vertical-align: top; }
+    table.spec tr:nth-child(even) td { background: #F8FAFC; }
+    code { font-family: 'SF Mono', 'Fira Code', Consolas, monospace; font-size: 12px; background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 4px; padding: 1px 6px; color: #0F172A; }
+    .code-block { background: #0F172A; color: #E2E8F0; border-radius: 10px; padding: 16px 20px; font-family: 'SF Mono', 'Fira Code', Consolas, monospace; font-size: 12px; line-height: 1.7; margin: 12px 0 20px; overflow-x: auto; }
+    .code-block .token-key { color: #11C4B6; }
+    .code-block .token-str { color: #A7F3D0; }
+    .code-block .token-comment { color: #475569; }
+    .template-card { background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+    .template-card .num { display: inline-block; background: #11C4B6; color: #0F172A; font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; margin-right: 8px; }
+    .template-card .title { font-size: 15px; font-weight: 700; color: #0F172A; }
+    .template-card .filename { font-size: 12px; color: #64748B; margin: 4px 0 12px; }
+    .token-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .token { font-size: 12px; font-weight: 600; background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; border-radius: 6px; padding: 3px 10px; font-family: 'SF Mono', 'Fira Code', Consolas, monospace; }
+    .warn { font-size: 12px; font-weight: 600; background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; border-radius: 6px; padding: 3px 10px; }
+    .section-intro { font-size: 14px; color: #64748B; margin-bottom: 16px; }
+    .checklist li { font-size: 13px; color: #334155; line-height: 1.7; list-style: none; padding-left: 20px; position: relative; }
+    .checklist li::before { content: "✓"; position: absolute; left: 0; color: #11C4B6; font-weight: 700; }
+    .checklist { margin: 8px 0 20px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    hr { border: none; border-top: 1px solid #E2E8F0; margin: 32px 0; }
+    .alert-info { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #1E40AF; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Title -->
+  <h1>SoloHub Email System</h1>
+  <p class="subtitle">Developer Handoff Specs &mdash; v1.0 &mdash; April 2026</p>
+
+  <div class="alert-info">
+    &#128276; All templates live in <code>lib/emails/templates/</code>. Send via <strong>Resend</strong> using the existing <code>resend.emails.send()</code> helper. Reminders are scheduled through <strong>Inngest</strong>.
+  </div>
+
+  <!-- ── 1. TEMPLATE REGISTRY ─────────────────────────────────────── -->
+  <h2>1. Template Registry</h2>
+  <p class="section-intro">Eight files in the design system — one design reference, seven production templates.</p>
+
+  <div class="template-card">
+    <span class="num">01</span><span class="title">Contact Received — User</span>
+    <p class="filename">lib/emails/templates/contact-received-user.ts &nbsp;·&nbsp; design: email-design-system/01-contact-received-user.html</p>
+    <table class="spec">
+      <tr>
+        <th>Subject line (option A)</th>
+        <td>We received your message — SoloHub</td>
+      </tr>
+      <tr>
+        <th>Subject line (option B)</th>
+        <td>Got it, {{firstName}} — we'll be in touch soon ✉️</td>
+      </tr>
+      <tr>
+        <th>Preheader</th>
+        <td>We got your message, {{firstName}}. Our team will reply soon.</td>
+      </tr>
+      <tr>
+        <th>Audience</th>
+        <td>End user who submitted the contact form</td>
+      </tr>
+      <tr>
+        <th>Trigger</th>
+        <td>POST /api/contact — on successful form save</td>
+      </tr>
+      <tr>
+        <th>Header style</th>
+        <td>Teal gradient (#11C4B6 → #0EA5B7)</td>
+      </tr>
+    </table>
+    <div class="token-list">
+      <span class="token">{{firstName}}</span>
+      <span class="token">{{topicLabel}}</span>
+      <span class="token">{{message}}</span>
+    </div>
+  </div>
+
+  <div class="template-card">
+    <span class="num">02</span><span class="title">Contact Received — Admin</span>
+    <p class="filename">lib/emails/templates/contact-received-admin.ts &nbsp;·&nbsp; design: email-design-system/02-contact-received-admin.html</p>
+    <table class="spec">
+      <tr>
+        <th>Subject line (option A)</th>
+        <td>New contact: {{topicLabel}} from {{firstName}} {{lastName}}</td>
+      </tr>
+      <tr>
+        <th>Subject line (option B)</th>
+        <td>[SoloHub] {{firstName}} {{lastName}} sent a message — {{topicLabel}}</td>
+      </tr>
+      <tr>
+        <th>Preheader</th>
+        <td>{{firstName}} {{lastName}} sent a message — topic: {{topicLabel}}. Reply directly to this email.</td>
+      </tr>
+      <tr>
+        <th>Audience</th>
+        <td>Internal — your support inbox (support@solohub.nl)</td>
+      </tr>
+      <tr>
+        <th>Trigger</th>
+        <td>POST /api/contact — same handler, second send() call</td>
+      </tr>
+      <tr>
+        <th>Header style</th>
+        <td>Dark navy (#0F172A) — signals internal/operational email</td>
+      </tr>
+    </table>
+    <div class="token-list">
+      <span class="token">{{firstName}}</span>
+      <span class="token">{{lastName}}</span>
+      <span class="token">{{email}}</span>
+      <span class="token">{{topicLabel}}</span>
+      <span class="token">{{message}}</span>
+    </div>
+  </div>
+
+  <div class="template-card">
+    <span class="num">03</span><span class="title">Demo Booking Confirmation</span>
+    <p class="filename">lib/emails/templates/demo-booking-confirmation.ts &nbsp;·&nbsp; design: email-design-system/03-demo-booking-confirmation.html</p>
+    <table class="spec">
+      <tr>
+        <th>Subject line (option A)</th>
+        <td>Your SoloHub demo is confirmed — {{dateShort}} at {{timeDisplay}} 🎉</td>
+      </tr>
+      <tr>
+        <th>Subject line (option B)</th>
+        <td>You're booked in, {{firstName}}! SoloHub demo — {{dateShort}}</td>
+      </tr>
+      <tr>
+        <th>Preheader</th>
+        <td>Your demo is locked in, {{firstName}}! {{dateShort}} at {{timeDisplay}} (Amsterdam). Add to your calendar so you don't miss it.</td>
+      </tr>
+      <tr>
+        <th>Audience</th>
+        <td>Prospect who booked a demo</td>
+      </tr>
+      <tr>
+        <th>Trigger</th>
+        <td>POST /api/demo — on successful booking save; also schedule Inngest reminder events</td>
+      </tr>
+      <tr>
+        <th>Calendar URLs</th>
+        <td>Build at send-time: <code>googleCalendarUrl</code>, <code>outlookCalendarUrl</code>, <code>icsUrl</code></td>
+      </tr>
+    </table>
+    <div class="token-list">
+      <span class="token">{{firstName}}</span>
+      <span class="token">{{focusArea}}</span>
+      <span class="token">{{dateDisplay}}</span>
+      <span class="token">{{dateShort}}</span>
+      <span class="token">{{timeDisplay}}</span>
+      <span class="token">{{durationMins}}</span>
+      <span class="token">{{meetingLink}}</span>
+      <span class="token">{{googleCalendarUrl}}</span>
+      <span class="token">{{outlookCalendarUrl}}</span>
+      <span class="token">{{icsUrl}}</span>
+    </div>
+  </div>
+
+  <div class="template-card">
+    <span class="num">04</span><span class="title">Demo Reminder — 24 hours</span>
+    <p class="filename">lib/emails/templates/demo-booking-reminder.ts (reminderType: "24h") &nbsp;·&nbsp; design: 04-demo-booking-reminder-24h.html</p>
+    <table class="spec">
+      <tr>
+        <th>Subject line (option A)</th>
+        <td>Your SoloHub demo is tomorrow at {{timeDisplay}} ⏰</td>
+      </tr>
+      <tr>
+        <th>Subject line (option B)</th>
+        <td>See you tomorrow, {{firstName}} — SoloHub demo at {{timeDisplay}}</td>
+      </tr>
+      <tr>
+        <th>Preheader</th>
+        <td>Your SoloHub demo is tomorrow at {{timeDisplay}}, {{firstName}}. Here's your link and everything you need.</td>
+      </tr>
+      <tr>
+        <th>Trigger</th>
+        <td>Inngest scheduled event — 24 h before <code>scheduledFor</code></td>
+      </tr>
+      <tr>
+        <th>Urgency level</th>
+        <td>Moderate — orange reminder badge, friendly tone</td>
+      </tr>
+    </table>
+    <div class="token-list">
+      <span class="token">{{firstName}}</span>
+      <span class="token">{{focusArea}}</span>
+      <span class="token">{{dateDisplay}}</span>
+      <span class="token">{{timeDisplay}}</span>
+      <span class="token">{{durationMins}}</span>
+      <span class="token">{{meetingLink}}</span>
+    </div>
+  </div>
+
+  <div class="template-card">
+    <span class="num">05</span><span class="title">Demo Reminder — 10 minutes</span>
+    <p class="filename">lib/emails/templates/demo-booking-reminder.ts (reminderType: "10m") &nbsp;·&nbsp; design: 05-demo-booking-reminder-10m.html</p>
+    <table class="spec">
+      <tr>
+        <th>Subject line (option A)</th>
+        <td>🔔 10 minutes, {{firstName}} — your SoloHub demo is starting now!</td>
+      </tr>
+      <tr>
+        <th>Subject line (option B)</th>
+        <td>Your demo starts in 10 min — join here 🚀</td>
+      </tr>
+      <tr>
+        <th>Preheader</th>
+        <td>🚨 10 minutes, {{firstName}}! Your SoloHub demo link is right here — click to join now.</td>
+      </tr>
+      <tr>
+        <th>Trigger</th>
+        <td>Inngest scheduled event — 10 min before <code>scheduledFor</code></td>
+      </tr>
+      <tr>
+        <th>Urgency level</th>
+        <td>High — orange urgency banner, large CTA button, trouble-joining alert</td>
+      </tr>
+    </table>
+    <div class="token-list">
+      <span class="token">{{firstName}}</span>
+      <span class="token">{{timeDisplay}}</span>
+      <span class="token">{{durationMins}}</span>
+      <span class="token">{{meetingLink}}</span>
+    </div>
+  </div>
+
+  <div class="template-card">
+    <span class="num">06</span><span class="title">Password Reset</span>
+    <p class="filename">lib/emails/templates/password-reset.ts &nbsp;·&nbsp; design: email-design-system/06-password-reset.html</p>
+    <table class="spec">
+      <tr>
+        <th>Subject line (option A)</th>
+        <td>Reset your SoloHub password</td>
+      </tr>
+      <tr>
+        <th>Subject line (option B)</th>
+        <td>🔒 Password reset link — expires in 60 minutes</td>
+      </tr>
+      <tr>
+        <th>Preheader</th>
+        <td>Reset your SoloHub password — this link expires in 60 minutes. If you didn't request this, ignore this email.</td>
+      </tr>
+      <tr>
+        <th>Trigger</th>
+        <td>POST /api/auth/forgot-password — on valid email lookup</td>
+      </tr>
+      <tr>
+        <th>Header style</th>
+        <td>Dark navy — security-first visual signal</td>
+      </tr>
+      <tr>
+        <th>Link expiry</th>
+        <td>60 minutes — enforce server-side, display in email</td>
+      </tr>
+    </table>
+    <div class="token-list">
+      <span class="token">{{resetUrl}}</span>
+    </div>
+  </div>
+
+  <div class="template-card">
+    <span class="num">07</span><span class="title">Review Request</span>
+    <p class="filename">lib/emails/review-request.ts &nbsp;·&nbsp; design: email-design-system/07-review-request.html</p>
+    <table class="spec">
+      <tr>
+        <th>Subject line (option A)</th>
+        <td>How was your {{serviceName}} at {{salonName}}, {{clientName}}? ⭐</td>
+      </tr>
+      <tr>
+        <th>Subject line (option B)</th>
+        <td>{{staffName}} would love your feedback — 10 seconds, that's all!</td>
+      </tr>
+      <tr>
+        <th>Preheader</th>
+        <td>{{clientName}}, how was your {{serviceName}} with {{staffName}}? Tap a star to leave your review ⭐</td>
+      </tr>
+      <tr>
+        <th>Trigger</th>
+        <td>Inngest event — ~2 hours after booking end time</td>
+      </tr>
+      <tr>
+        <th>Star URL pattern</th>
+        <td><code>{{reviewUrl}}&amp;rating=N</code> where N = 1–5</td>
+      </tr>
+      <tr>
+        <th>Review URL format</th>
+        <td><code>https://{{salonSlug}}.solohub.nl/review?booking={{bookingId}}&amp;token={{reviewToken}}</code></td>
+      </tr>
+    </table>
+    <div class="token-list">
+      <span class="token">{{clientName}}</span>
+      <span class="token">{{salonName}}</span>
+      <span class="token">{{serviceName}}</span>
+      <span class="token">{{staffName}}</span>
+      <span class="token">{{bookingId}}</span>
+      <span class="token">{{reviewToken}}</span>
+      <span class="token">{{salonSlug}}</span>
+      <span class="token">{{reviewUrl}}</span>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- ── 2. COMPONENT MAP ──────────────────────────────────────────── -->
+  <h2>2. Component Map</h2>
+  <p class="section-intro">All components are implemented as inline-style table fragments. No external CSS files — everything is in-line for Gmail/Outlook compatibility.</p>
+
+  <table class="spec">
+    <tr>
+      <th>Component</th>
+      <th>Used in</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td><strong>Teal gradient header</strong></td>
+      <td>01, 03, 04, 05, 07</td>
+      <td><code>linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)</code> · White "S" logo mark</td>
+    </tr>
+    <tr>
+      <td><strong>Dark navy header</strong></td>
+      <td>02, 06</td>
+      <td><code>#0F172A</code> bg · Teal "S" logo mark · Used for internal/security emails</td>
+    </tr>
+    <tr>
+      <td><strong>Urgency banner</strong></td>
+      <td>02, 05</td>
+      <td>02: teal <code>#11C4B6</code> · 05: orange <code>#F97316</code> · Full-width strip below header</td>
+    </tr>
+    <tr>
+      <td><strong>Status badge</strong></td>
+      <td>01 (green), 04 (orange), 05 (—), 06 (gray)</td>
+      <td>Pill-shaped <code>border-radius:999px</code> table cell · Colour signals intent</td>
+    </tr>
+    <tr>
+      <td><strong>Info card</strong></td>
+      <td>01, 02, 03, 04</td>
+      <td><code>#F8FCFF</code> bg, <code>#E2E8F0</code> border, <code>border-radius:12px</code></td>
+    </tr>
+    <tr>
+      <td><strong>Quoted message block</strong></td>
+      <td>01, 02</td>
+      <td>White bg, <code>border-left:3px solid #11C4B6</code>, <code>border-radius: 0 8px 8px 0</code></td>
+    </tr>
+    <tr>
+      <td><strong>Icon row</strong></td>
+      <td>03</td>
+      <td>32×32 <code>#E0F9F7</code> rounded tile + label + value · 3 rows (date, duration, focus)</td>
+    </tr>
+    <tr>
+      <td><strong>Calendar chip buttons</strong></td>
+      <td>03</td>
+      <td>Gray pill chips — Google / Outlook / Apple ICS · Side by side table cells</td>
+    </tr>
+    <tr>
+      <td><strong>Primary CTA button</strong></td>
+      <td>All except 02</td>
+      <td>Teal <code>#11C4B6</code> bg, white text, <code>border-radius:999px</code> on <code>&lt;td&gt;</code> not <code>&lt;a&gt;</code></td>
+    </tr>
+    <tr>
+      <td><strong>Navy CTA button</strong></td>
+      <td>02, 06</td>
+      <td>Navy <code>#0F172A</code> bg · Used for internal action or security-context reply</td>
+    </tr>
+    <tr>
+      <td><strong>Alert block — warning</strong></td>
+      <td>04, 05</td>
+      <td><code>#FFF7ED</code> bg, <code>#FED7AA</code> border · Orange tones</td>
+    </tr>
+    <tr>
+      <td><strong>Alert block — success tip</strong></td>
+      <td>04</td>
+      <td><code>#F0FDF4</code> bg, <code>#BBF7D0</code> border · Green tones</td>
+    </tr>
+    <tr>
+      <td><strong>Star rating row</strong></td>
+      <td>07</td>
+      <td>5× <code>&lt;td&gt;</code> with <code>&lt;a href="...&amp;rating=N"&gt;</code> · Star 5 highlighted teal · Amber bg container</td>
+    </tr>
+    <tr>
+      <td><strong>Standard footer</strong></td>
+      <td>All (user-facing)</td>
+      <td><code>#F8FAFC</code> bg, SoloHub wordmark teal, links row, KvK line</td>
+    </tr>
+    <tr>
+      <td><strong>Internal footer</strong></td>
+      <td>02</td>
+      <td>Dark navy <code>#0F172A</code>, "do not forward" notice</td>
+    </tr>
+  </table>
+
+  <hr />
+
+  <!-- ── 3. DYNAMIC PLACEHOLDER REFERENCE ─────────────────────────── -->
+  <h2>3. Dynamic Placeholder Reference</h2>
+  <p class="section-intro">All placeholders use <code>{{doubleHangleBraces}}</code> notation. Escape HTML before injection — use your existing <code>escapeHtml()</code> helper.</p>
+
+  <table class="spec">
+    <tr>
+      <th>Placeholder</th>
+      <th>Type</th>
+      <th>Example value</th>
+      <th>Used in</th>
+    </tr>
+    <tr>
+      <td><code>{{firstName}}</code></td>
+      <td>String</td>
+      <td>Sophie</td>
+      <td>01, 02, 03, 04, 05</td>
+    </tr>
+    <tr>
+      <td><code>{{lastName}}</code></td>
+      <td>String</td>
+      <td>de Vries</td>
+      <td>02</td>
+    </tr>
+    <tr>
+      <td><code>{{email}}</code></td>
+      <td>Email</td>
+      <td>sophie@devries.nl</td>
+      <td>02</td>
+    </tr>
+    <tr>
+      <td><code>{{topicLabel}}</code></td>
+      <td>String</td>
+      <td>Pricing &amp; Plans</td>
+      <td>01, 02</td>
+    </tr>
+    <tr>
+      <td><code>{{message}}</code></td>
+      <td>String (HTML-escaped)</td>
+      <td>I'd like to know more about...</td>
+      <td>01, 02</td>
+    </tr>
+    <tr>
+      <td><code>{{focusArea}}</code></td>
+      <td>String</td>
+      <td>Online booking &amp; calendar</td>
+      <td>03, 04</td>
+    </tr>
+    <tr>
+      <td><code>{{dateDisplay}}</code></td>
+      <td>Formatted date string</td>
+      <td>Wednesday 23 April 2026</td>
+      <td>03, 04</td>
+    </tr>
+    <tr>
+      <td><code>{{dateShort}}</code></td>
+      <td>Short date string</td>
+      <td>23 Apr</td>
+      <td>03 (subject)</td>
+    </tr>
+    <tr>
+      <td><code>{{timeDisplay}}</code></td>
+      <td>Time range string</td>
+      <td>14:00–14:30</td>
+      <td>03, 04, 05</td>
+    </tr>
+    <tr>
+      <td><code>{{durationMins}}</code></td>
+      <td>Number</td>
+      <td>30</td>
+      <td>03, 04, 05</td>
+    </tr>
+    <tr>
+      <td><code>{{meetingLink}}</code></td>
+      <td>URL</td>
+      <td>https://meet.google.com/xyz-abc</td>
+      <td>03, 04, 05</td>
+    </tr>
+    <tr>
+      <td><code>{{googleCalendarUrl}}</code></td>
+      <td>URL (built server-side)</td>
+      <td>https://calendar.google.com/calendar/r/eventedit?...</td>
+      <td>03</td>
+    </tr>
+    <tr>
+      <td><code>{{outlookCalendarUrl}}</code></td>
+      <td>URL (built server-side)</td>
+      <td>https://outlook.live.com/calendar/0/deeplink/compose?...</td>
+      <td>03</td>
+    </tr>
+    <tr>
+      <td><code>{{icsUrl}}</code></td>
+      <td>URL — ICS download endpoint</td>
+      <td>https://solohub.nl/api/demo/ics?id=...</td>
+      <td>03</td>
+    </tr>
+    <tr>
+      <td><code>{{resetUrl}}</code></td>
+      <td>URL (signed, short-lived)</td>
+      <td>https://solohub.nl/auth/reset?token=...</td>
+      <td>06</td>
+    </tr>
+    <tr>
+      <td><code>{{clientName}}</code></td>
+      <td>String</td>
+      <td>Emma Bakker</td>
+      <td>07</td>
+    </tr>
+    <tr>
+      <td><code>{{salonName}}</code></td>
+      <td>String</td>
+      <td>Salon Bloom</td>
+      <td>07</td>
+    </tr>
+    <tr>
+      <td><code>{{serviceName}}</code></td>
+      <td>String</td>
+      <td>Balayage &amp; Toner</td>
+      <td>07</td>
+    </tr>
+    <tr>
+      <td><code>{{staffName}}</code></td>
+      <td>String</td>
+      <td>Lisa</td>
+      <td>07</td>
+    </tr>
+    <tr>
+      <td><code>{{bookingId}}</code></td>
+      <td>UUID / String</td>
+      <td>bk_01JR...</td>
+      <td>07</td>
+    </tr>
+    <tr>
+      <td><code>{{reviewToken}}</code></td>
+      <td>Signed token (string)</td>
+      <td>eyJhbGc...</td>
+      <td>07</td>
+    </tr>
+    <tr>
+      <td><code>{{salonSlug}}</code></td>
+      <td>Subdomain slug</td>
+      <td>salonbloom</td>
+      <td>07</td>
+    </tr>
+    <tr>
+      <td><code>{{reviewUrl}}</code></td>
+      <td>URL (base, no rating)</td>
+      <td>https://salonbloom.solohub.nl/review?booking=...&amp;token=...</td>
+      <td>07</td>
+    </tr>
+  </table>
+
+  <hr />
+
+  <!-- ── 4. IMPLEMENTATION CHECKLIST ──────────────────────────────── -->
+  <h2>4. Implementation Checklist</h2>
+
+  <h3>&#128296; Each template TypeScript file must:</h3>
+  <ul class="checklist">
+    <li>Accept strongly-typed args interface (not <code>any</code>)</li>
+    <li>Run all user-supplied strings through <code>escapeHtml()</code> before injection</li>
+    <li>Return <code>{ subject: string; html: string }</code></li>
+    <li>Never use external CSS links — all styles must be inline</li>
+    <li>Include the hidden preheader <code>&lt;div&gt;</code> with zero-width non-joiners padding</li>
+    <li>Wrap all layout in role="presentation" tables, never <code>&lt;div&gt;</code> layout</li>
+  </ul>
+
+  <h3>&#128197; Calendar URL builder (for template 03)</h3>
+  <div class="code-block">
+<span class="token-comment">// lib/emails/helpers/calendarUrls.ts</span>
+<span class="token-key">export</span> function buildGoogleCalUrl(title: string, start: Date, end: Date, location: string) {
+  <span class="token-key">const</span> fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+  <span class="token-key">const</span> p = <span class="token-key">new</span> URLSearchParams({
+    action: <span class="token-str">'TEMPLATE'</span>,
+    text: title,
+    dates: `${fmt(start)}/${fmt(end)}`,
+    location,
+  })
+  <span class="token-key">return</span> `https://calendar.google.com/calendar/r/eventedit?${p}`
+}
+
+<span class="token-key">export</span> function buildOutlookUrl(title: string, start: Date, end: Date) {
+  <span class="token-key">const</span> fmt = (d: Date) => d.toISOString()
+  <span class="token-key">const</span> p = <span class="token-key">new</span> URLSearchParams({
+    path: <span class="token-str">'/calendar/action/compose'</span>,
+    rru: <span class="token-str">'addevent'</span>,
+    subject: title,
+    startdt: fmt(start),
+    enddt: fmt(end),
+  })
+  <span class="token-key">return</span> `https://outlook.live.com/calendar/0/deeplink/compose?${p}`
+}
+
+<span class="token-comment">// ICS — serve via /api/demo/ics?id=&lt;demoId&gt;</span>
+<span class="token-comment">// Set Content-Type: text/calendar; charset=utf-8</span>
+  </div>
+
+  <h3>&#128276; Inngest reminder scheduling (templates 04 + 05)</h3>
+  <div class="code-block">
+<span class="token-comment">// In your demo booking Inngest function:</span>
+<span class="token-key">await</span> inngest.send([
+  {
+    name: <span class="token-str">'demo/reminder.send'</span>,
+    data: { demoId, reminderType: <span class="token-str">'24h'</span> },
+    ts: scheduledFor.getTime() - 24 * 60 * 60 * 1000,
+  },
+  {
+    name: <span class="token-str">'demo/reminder.send'</span>,
+    data: { demoId, reminderType: <span class="token-str">'10m'</span> },
+    ts: scheduledFor.getTime() - 10 * 60 * 1000,
+  },
+])
+  </div>
+
+  <h3>&#11088; Review email timing</h3>
+  <div class="code-block">
+<span class="token-comment">// Fire ~2 hours after appointment end</span>
+<span class="token-key">await</span> inngest.send({
+  name: <span class="token-str">'booking/review-request.send'</span>,
+  data: { bookingId },
+  ts: bookingEndTime.getTime() + 2 * 60 * 60 * 1000,
+})
+  </div>
+
+  <hr />
+
+  <!-- ── 5. EMAIL CLIENT COMPATIBILITY ────────────────────────────── -->
+  <h2>5. Email Client Compatibility Notes</h2>
+
+  <table class="spec">
+    <tr>
+      <th>Rule</th>
+      <th>Reason</th>
+    </tr>
+    <tr>
+      <td>Never use <code>border-radius</code> on <code>&lt;a&gt;</code> tags</td>
+      <td>Outlook ignores it — apply to parent <code>&lt;td&gt;</code> instead</td>
+    </tr>
+    <tr>
+      <td>All layout via <code>&lt;table&gt;</code>, not <code>&lt;div&gt;</code></td>
+      <td>Outlook 2013–2021 uses Word rendering engine, breaks flex/grid</td>
+    </tr>
+    <tr>
+      <td>Include <code>role="presentation"</code> on all layout tables</td>
+      <td>Screen-reader accessibility; suppresses table role announcements</td>
+    </tr>
+    <tr>
+      <td>Use <code>bgcolor</code> attribute alongside CSS <code>background-color</code></td>
+      <td>Outlook 2007 ignores inline CSS backgrounds</td>
+    </tr>
+    <tr>
+      <td>Gradients degrade gracefully in Outlook</td>
+      <td>Add a fallback <code>background-color</code> (use <code>#11C4B6</code>). MSO conditional comments provided in all headers</td>
+    </tr>
+    <tr>
+      <td>Keep width at <code>max-width:600px</code></td>
+      <td>Gmail clips emails over ~102 KB; 600 px is safe for all clients</td>
+    </tr>
+    <tr>
+      <td>Emoji in subject lines</td>
+      <td>Render fine on iOS/Android/Mac Mail. Avoid in Outlook-first B2B contexts (option A subjects are emoji-free)</td>
+    </tr>
+    <tr>
+      <td><code>font-family</code> fallback stack</td>
+      <td>Always: <code>Inter, Arial, Helvetica, sans-serif</code> — Inter loads on Apple/web Gmail, Arial as universal fallback</td>
+    </tr>
+    <tr>
+      <td>Star rating links (template 07)</td>
+      <td>Each star is a separate <code>&lt;a&gt;</code> in its own <code>&lt;td&gt;</code> — do NOT use <code>display:flex</code> or background-image stars</td>
+    </tr>
+    <tr>
+      <td>Pre-header padding</td>
+      <td>Always add <code>&amp;zwnj;&amp;nbsp;</code> pairs after the preview text to prevent Gmail from pulling body text into the preheader slot</td>
+    </tr>
+  </table>
+
+  <hr />
+
+  <!-- ── 6. BRAND TOKENS ───────────────────────────────────────────── -->
+  <h2>6. Brand Token Quick Reference</h2>
+
+  <table class="spec">
+    <tr>
+      <th>Token</th>
+      <th>Hex</th>
+      <th>Usage</th>
+    </tr>
+    <tr>
+      <td><strong>Brand primary</strong></td>
+      <td><code>#11C4B6</code></td>
+      <td>CTA buttons, teal header, accents, star highlight, logo S bg</td>
+    </tr>
+    <tr>
+      <td><strong>Brand secondary</strong></td>
+      <td><code>#0EA5B7</code></td>
+      <td>Gradient end, border accents</td>
+    </tr>
+    <tr>
+      <td><strong>Dark navy</strong></td>
+      <td><code>#0F172A</code></td>
+      <td>Security headers, navy CTA, H1 text</td>
+    </tr>
+    <tr>
+      <td><strong>Body text</strong></td>
+      <td><code>#475569</code></td>
+      <td>Paragraph copy</td>
+    </tr>
+    <tr>
+      <td><strong>Muted text</strong></td>
+      <td><code>#94A3B8</code></td>
+      <td>Labels, captions, footer secondary</td>
+    </tr>
+    <tr>
+      <td><strong>Page bg</strong></td>
+      <td><code>#F8FCFF</code></td>
+      <td>Email body background, info card bg</td>
+    </tr>
+    <tr>
+      <td><strong>Card border</strong></td>
+      <td><code>#E2E8F0</code></td>
+      <td>Card borders, dividers</td>
+    </tr>
+    <tr>
+      <td><strong>Success green</strong></td>
+      <td><code>#ECFDF5 / #065F46</code></td>
+      <td>Success badge bg / text</td>
+    </tr>
+    <tr>
+      <td><strong>Warning orange</strong></td>
+      <td><code>#FFF7ED / #9A3412</code></td>
+      <td>Warning alerts, reminder badge bg / text</td>
+    </tr>
+    <tr>
+      <td><strong>Urgency orange</strong></td>
+      <td><code>#F97316</code></td>
+      <td>10-minute reminder urgency banner</td>
+    </tr>
+  </table>
+
+  <p style="margin-top:32px;font-size:12px;color:#94A3B8;">SoloHub Email Design System v1.0 &mdash; Generated April 2026 &mdash; For internal use only</p>
+
+</div>
+</body>
+</html>

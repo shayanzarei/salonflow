@@ -8,6 +8,7 @@ import {
   MARKETING_BUTTON_PRIMARY,
   MARKETING_BUTTON_SECONDARY,
 } from "@/components/marketing/buttonStyles";
+import { CheckCircleIcon, ChevronDownIcon, XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -255,13 +256,17 @@ export default function MainSitePricingPage() {
                       {plan.features.map((feature) => (
                         <li key={feature.label} className="flex items-start">
                           <span
-                            className={`mr-3 mt-1 text-sm ${
+                            className={`mr-3 mt-0.5 ${
                               feature.included
                                 ? "text-[#11c4b6]"
                                 : "text-slate-300"
                             }`}
                           >
-                            {feature.included ? "✓" : "✕"}
+                            {feature.included ? (
+                              <CheckCircleIcon className="h-4 w-4" />
+                            ) : (
+                              <XIcon className="h-4 w-4" />
+                            )}
                           </span>
                           <span
                             className={`text-sm ${
@@ -788,15 +793,13 @@ export default function MainSitePricingPage() {
                     >
                       {faq.q}
                     </h4>
-                    <span
-                      className={`transition-transform duration-200 ${
+                    <ChevronDownIcon
+                      className={`h-5 w-5 transition-transform duration-200 ${
                         openFaq === faq.q
                           ? "rotate-180 text-[#11c4b6]"
                           : "text-slate-400"
                       }`}
-                    >
-                      ⌄
-                    </span>
+                    />
                   </button>
                   {openFaq === faq.q ? (
                     <p className="mt-4 leading-relaxed text-slate-600">

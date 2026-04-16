@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
 import { generateDemoMeetingLink } from "@/lib/demo-meeting-links";
-import { demoBookingConfirmationEmail } from "@/lib/emails/templates/demo-booking-confirmation";
+import { demoBookingConfirmationEmail } from "@/lib/emails/demo-booking-confirmation";
 import { sendEmail } from "@/lib/emails/send";
 import { NextRequest, NextResponse } from "next/server";
 

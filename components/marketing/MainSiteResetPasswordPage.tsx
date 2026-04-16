@@ -1,19 +1,15 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon, EyeIcon } from "@/components/ui/Icons";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  EyeIcon,
+  LockIcon,
+} from "@/components/ui/Icons";
 import { MARKETING_BUTTON_DARK } from "@/components/marketing/buttonStyles";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-
-function LockMiniIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <rect x="4" y="11" width="16" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 1 1 8 0v3" />
-    </svg>
-  );
-}
 
 export default function MainSiteResetPasswordPage() {
   const router = useRouter();
@@ -89,7 +85,7 @@ export default function MainSiteResetPasswordPage() {
               </label>
               <div className="relative">
                 <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  <LockMiniIcon />
+                  <LockIcon size={16} />
                 </span>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -117,7 +113,7 @@ export default function MainSiteResetPasswordPage() {
               </label>
               <div className="relative">
                 <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  <LockMiniIcon />
+                  <LockIcon size={16} />
                 </span>
                 <input
                   type={showConfirmPassword ? "text" : "password"}

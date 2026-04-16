@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { RefreshIcon, UploadCloudIcon } from "@/components/ui/Icons";
 
 interface ImageUploadFieldProps {
   /** Optional form field name to include as hidden input */
@@ -123,7 +124,7 @@ export function ImageUploadField({
       >
         {uploading ? (
           <>
-            <UploadSpinner />
+            <RefreshIcon className="h-5 w-5 animate-spin text-violet-600" />
             <span style={{ fontSize: 12, color: "#6B7280", fontWeight: 500 }}>
               Uploading…
             </span>
@@ -131,7 +132,9 @@ export function ImageUploadField({
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <UploadIcon active={dragOver} />
+              <UploadCloudIcon
+                className={`h-[18px] w-[18px] ${dragOver ? "text-violet-600" : "text-slate-400"}`}
+              />
               <span
                 style={{
                   fontSize: 13,
@@ -168,42 +171,3 @@ export function ImageUploadField({
   );
 }
 
-function UploadIcon({ active }: { active?: boolean }) {
-  const color = active ? "#7C3AED" : "#9CA3AF";
-  return (
-    <svg
-      width={18}
-      height={18}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <polyline points="16 16 12 12 8 16" />
-      <line x1="12" y1="12" x2="12" y2="21" />
-      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
-    </svg>
-  );
-}
-
-function UploadSpinner() {
-  return (
-    <svg
-      width={20}
-      height={20}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#7C3AED"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      aria-hidden
-      style={{ animation: "spin 0.8s linear infinite" }}
-    >
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      <path d="M12 2a10 10 0 0 1 10 10" />
-    </svg>
-  );
-}

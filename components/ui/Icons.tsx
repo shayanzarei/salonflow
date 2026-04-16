@@ -361,3 +361,87 @@ export function ShieldIcon(p: IconProps) {
     </Svg>
   );
 }
+
+export function MailIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </Svg>
+  );
+}
+
+export function LockIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <rect x="4" y="11" width="16" height="10" rx="2" />
+      <path d="M8 11V8a4 4 0 1 1 8 0v3" />
+    </Svg>
+  );
+}
+
+export function BuildingIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01M9 17h.01M15 17h.01" />
+    </Svg>
+  );
+}
+
+export function MenuIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </Svg>
+  );
+}
+
+export function ChevronDownIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <polyline points="6 9 12 15 18 9" />
+    </Svg>
+  );
+}
+
+export function PlayIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <polygon points="8 5 19 12 8 19 8 5" fill={p.color ?? "currentColor"} stroke="none" />
+    </Svg>
+  );
+}
+
+export function KeyIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <circle cx="8" cy="15" r="4" />
+      <path d="M12 15h9" />
+      <path d="M18 11v4" />
+      <path d="M21 13v2" />
+    </Svg>
+  );
+}
+
+export function InfoIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 10v6" />
+      <line x1="12" y1="7" x2="12.01" y2="7" strokeWidth="2.5" strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function UploadCloudIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <polyline points="16 16 12 12 8 16" />
+      <line x1="12" y1="12" x2="12" y2="21" />
+      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+    </Svg>
+  );
+}

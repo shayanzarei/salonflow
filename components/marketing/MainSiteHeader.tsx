@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { MARKETING_BUTTON_PRIMARY } from "@/components/marketing/buttonStyles";
+import { MenuIcon, XIcon } from "@/components/ui/Icons";
 
 type NavKey = "home" | "pricing" | "demo" | "contact" | "privacy";
 
@@ -69,7 +70,11 @@ export default function MainSiteHeader({
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             onClick={() => setMobileOpen((v) => !v)}
           >
-            <span aria-hidden>{mobileOpen ? "✕" : "☰"}</span>
+            {mobileOpen ? (
+              <XIcon className="h-6 w-6" />
+            ) : (
+              <MenuIcon className="h-6 w-6" />
+            )}
           </button>
         </div>
       </header>

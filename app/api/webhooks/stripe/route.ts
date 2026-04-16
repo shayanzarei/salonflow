@@ -76,28 +76,30 @@ export async function POST(request: Request) {
       const subscriptionId =
         typeof session.subscription === "string" ? session.subscription : null;
       if (customerId && customerEmail) {
-        await runProvisioningJob({
+        const provisionResult = await runProvisioningJob({
           stripeCustomerId: customerId,
           customerEmail,
           stripeSubscriptionId: subscriptionId,
           plan: session.metadata?.plan ?? null,
         });
-      }
 
-      if (insertedLog && customerEmail) {
-        const { subject, html } = subscriptionConfirmationEmail({
-          email: customerEmail,
-          plan: session.metadata?.plan ?? null,
-          billingCycle: session.metadata?.billingCycle ?? null,
-          amountCents: session.amount_total,
-          currency: session.currency,
-        });
-        await sendEmail({
-          to: customerEmail,
-          subject,
-          html,
-          from: "SoloHub <hello@solohub.nl>",
-        });
+        // Send confirmation email only for newly created accounts (webhook path).
+        // Existing accounts were already emailed from the checkout success page.
+        if (provisionResult.ok && provisionResult.created && customerEmail) {
+          const { subject, html } = subscriptionConfirmationEmail({
+            email: customerEmail,
+            plan: session.metadata?.plan ?? null,
+            billingCycle: session.metadata?.billingCycle ?? null,
+            amountCents: session.amount_total,
+            currency: session.currency,
+          });
+          await sendEmail({
+            to: customerEmail,
+            subject,
+            html,
+            from: "SoloHub <hello@solohub.nl>",
+          });
+        }
       }
     }
 

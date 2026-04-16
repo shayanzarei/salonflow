@@ -1,4 +1,6 @@
 import { runProvisioningJob } from "@/jobs/provisioning.job";
+import { subscriptionConfirmationEmail } from "@/lib/emails/subscription-confirmation";
+import { sendEmail } from "@/lib/emails/send";
 import { getStripeClient } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -36,13 +38,32 @@ export async function GET(request: NextRequest) {
 
       if (customerId && customerEmail) {
         try {
-          await runProvisioningJob({
+          const result = await runProvisioningJob({
             stripeCustomerId: customerId,
             customerEmail,
             stripeSubscriptionId: subscriptionId,
             plan: session.metadata?.plan ?? null,
           });
           provisioned = true;
+
+          // Send confirmation email now that account is active.
+          // Skip if this was an existing account re-linked (webhook already sent it),
+          // but always send for newly created accounts.
+          if (result.ok) {
+            const { subject, html } = subscriptionConfirmationEmail({
+              email: customerEmail,
+              plan: session.metadata?.plan ?? null,
+              billingCycle: session.metadata?.billingCycle ?? null,
+              amountCents: session.amount_total,
+              currency: session.currency,
+            });
+            await sendEmail({
+              to: customerEmail,
+              subject,
+              html,
+              from: "SoloHub <hello@solohub.nl>",
+            });
+          }
         } catch (err) {
           provisioningError =
             err instanceof Error ? err.message : "Provisioning failed";

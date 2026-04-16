@@ -1,4 +1,5 @@
 import { runProvisioningJob } from "@/jobs/provisioning.job";
+import { insertStripePaymentLog } from "@/lib/stripe-payment-logs";
 import { getStripeClient } from "@/lib/stripe";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-options";
@@ -53,6 +54,29 @@ export async function POST(request: NextRequest) {
       customerEmail,
       stripeSubscriptionId: subscriptionId,
       plan: checkoutSession.metadata?.plan ?? null,
+    });
+
+    // Also upsert a complete payment log with full session data so the
+    // admin panel shows email, amount, and customer ID correctly.
+    await insertStripePaymentLog({
+      source: "webhook",
+      event_type: "checkout.session.completed",
+      stripe_event_id: `manual_resync_${sessionId}`,
+      checkout_session_id: sessionId,
+      customer_id: customerId,
+      subscription_id: subscriptionId,
+      customer_email: customerEmail,
+      amount_cents: checkoutSession.amount_total,
+      currency: checkoutSession.currency ?? null,
+      plan: checkoutSession.metadata?.plan ?? null,
+      billing_cycle: checkoutSession.metadata?.billingCycle ?? null,
+      payment_status: checkoutSession.payment_status,
+      livemode: checkoutSession.livemode,
+      metadata: {
+        mode: checkoutSession.mode,
+        status: checkoutSession.status,
+        resynced_by_admin: true,
+      },
     });
 
     return NextResponse.json({ ok: true, ...result });

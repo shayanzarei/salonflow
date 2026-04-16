@@ -445,3 +445,29 @@ export function UploadCloudIcon(p: IconProps) {
     </Svg>
   );
 }
+
+export function CommentsIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path d="M7 16l-3 3V7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9H7z" />
+      <path d="M17 10h1a2 2 0 0 1 2 2v7l-3-3h-5a2 2 0 0 1-2-2v-1" />
+    </Svg>
+  );
+}
+
+export function BookIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path d="M4 6a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2V6z" />
+      <path d="M18 20v-4H6a2 2 0 0 0-2 2" />
+    </Svg>
+  );
+}
+
+export function PaperPlaneIcon(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <path d="M21 3L3 11l7 2 2 7 9-17z" />
+    </Svg>
+  );
+}

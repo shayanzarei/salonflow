@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Category {
   id: string;
@@ -11,10 +12,13 @@ interface Category {
 export function CategoriesTab({
   initialCategories,
   brand,
+  redirectTo,
 }: {
   initialCategories: Category[];
   brand: string;
+  redirectTo?: string;
 }) {
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -41,6 +45,10 @@ export function CategoriesTab({
         setCategories((prev) => [...prev, cat]);
         setName("");
         setDescription("");
+        if (redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")) {
+          router.push(redirectTo);
+          return;
+        }
       }
     } catch {
       setError("Network error");

@@ -1,4 +1,9 @@
-import { CalendarIcon, ClockIcon, UsersIcon } from "@/components/ui/Icons";
+import {
+  ArrowRightIcon,
+  CalendarIcon,
+  ClockIcon,
+  UsersIcon,
+} from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -58,71 +63,60 @@ export default async function DashboardPage() {
   const upcoming = upcomingBookings.rows;
   const brand = tenant.primary_color ?? "#7C3AED";
   const websiteStatus = tenant.website_status ?? "draft";
-  const [servicesCountRes, staffCountRes, salonHoursRes, categoriesCountRes] = await Promise.all([
-    pool.query(`SELECT COUNT(*)::int AS count FROM services WHERE tenant_id = $1`, [
-      tenant.id,
-    ]),
-    pool.query(`SELECT COUNT(*)::int AS count FROM staff WHERE tenant_id = $1`, [
-      tenant.id,
-    ]),
-    pool.query(
-      `SELECT COUNT(*)::int AS count
+  const [servicesCountRes, salonHoursRes, categoriesCountRes] =
+    await Promise.all([
+      pool.query(
+        `SELECT COUNT(*)::int AS count FROM services WHERE tenant_id = $1`,
+        [tenant.id]
+      ),
+      pool.query(
+        `SELECT COUNT(*)::int AS count
        FROM salon_working_hours
        WHERE tenant_id = $1 AND is_working = true`,
-      [tenant.id]
-    ),
-    pool.query(
-      `SELECT COUNT(*)::int AS count FROM service_categories WHERE tenant_id = $1`,
-      [tenant.id]
-    ),
-  ]);
+        [tenant.id]
+      ),
+      pool.query(
+        `SELECT COUNT(*)::int AS count FROM service_categories WHERE tenant_id = $1`,
+        [tenant.id]
+      ),
+    ]);
   const servicesCount = servicesCountRes.rows[0]?.count ?? 0;
-  const staffCount = staffCountRes.rows[0]?.count ?? 0;
   const salonWorkingDaysCount = salonHoursRes.rows[0]?.count ?? 0;
   const categoriesCount = categoriesCountRes.rows[0]?.count ?? 0;
   const profileComplete = Boolean(
-    tenant.tagline?.trim() &&
-      tenant.about?.trim() &&
-      tenant.address?.trim()
+    tenant.tagline?.trim() && tenant.about?.trim() && tenant.address?.trim()
   );
   const workingHoursConfigured = salonWorkingDaysCount > 0;
   const publishSubmitted = websiteStatus === "pending_approval";
+  const setupComplete =
+    profileComplete &&
+    categoriesCount > 0 &&
+    servicesCount > 0 &&
+    workingHoursConfigured;
   const setupSteps = [
     {
       label: "Complete salon profile",
       done: profileComplete,
-      href: "/settings",
+      href: "/settings?redirect_to=/dashboard",
       actionLabel: "Complete profile",
-    },
-    {
-      label: "Add staff members",
-      done: staffCount > 0,
-      href: "/staff/new",
-      actionLabel: "Add first staff",
     },
     {
       label: "Add category",
       done: categoriesCount > 0,
-      href: "/services?tab=categories",
+      href: "/services?tab=categories&redirect_to=/dashboard",
       actionLabel: "Add category",
     },
     {
       label: "Add services",
       done: servicesCount > 0,
-      href: "/services/new",
+      href: "/services/new?redirect_to=/dashboard",
       actionLabel: "Add first service",
     },
     {
       label: "Configure working hours",
       done: workingHoursConfigured,
-      href: "/settings/opening-hours",
+      href: "/settings/opening-hours?redirect_to=/dashboard",
       actionLabel: "Set working hours",
-    },
-    {
-      label: "Submit booking site",
-      done: publishSubmitted || websiteStatus === "published",
-      href: "/dashboard",
-      actionLabel: "Submit for review",
     },
   ].map((step, index, arr) => ({
     ...step,
@@ -169,7 +163,9 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px]">
           <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
             <div className="border-b border-gray-100 px-5 py-4">
-              <h2 className="text-2xl font-semibold text-gray-900">Setup Guide</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Setup Guide
+              </h2>
               <p className="mt-1 text-sm text-gray-500">
                 Complete these steps to activate your booking page.
               </p>
@@ -178,7 +174,9 @@ export default async function DashboardPage() {
               {setupSteps.map((step, index) => (
                 <div key={step.label} className="px-5 py-4">
                   <div className="flex items-center justify-between gap-3">
-                    <p className={`text-2xl font-semibold ${step.done ? "text-gray-400 line-through" : "text-gray-900"}`}>
+                    <p
+                      className={`text-2xl font-semibold ${step.done ? "text-gray-400 line-through" : "text-gray-900"}`}
+                    >
                       {index + 1}. {step.label}
                     </p>
                     <span
@@ -194,7 +192,10 @@ export default async function DashboardPage() {
                   {!step.done && step.unlocked && (
                     <div className="mt-3">
                       {step.label === "Submit booking site" ? (
-                        <form action="/api/dashboard/website/submit" method="POST">
+                        <form
+                          action="/api/dashboard/website/submit"
+                          method="POST"
+                        >
                           <button
                             type="submit"
                             className="rounded-[10px] px-4 py-2 text-sm font-semibold text-white"
@@ -226,7 +227,9 @@ export default async function DashboardPage() {
 
           <div className="space-y-4">
             <div className="rounded-2xl border border-gray-100 bg-white p-5">
-              <h3 className="text-xl font-semibold text-gray-900">Go-Live Readiness</h3>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Go-Live Readiness
+              </h3>
               <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
                 Must-have
               </p>
@@ -234,28 +237,54 @@ export default async function DashboardPage() {
                 <li>{profileComplete ? "✅" : "○"} Profile complete</li>
                 <li>{categoriesCount > 0 ? "✅" : "○"} Category added</li>
                 <li>{servicesCount > 0 ? "✅" : "○"} Services added</li>
-                <li>{staffCount > 0 ? "✅" : "○"} Staff configured</li>
                 <li>{workingHoursConfigured ? "✅" : "○"} Working hours set</li>
               </ul>
-              <button
-                type="button"
-                className="mt-4 w-full rounded-[10px] bg-gray-200 py-2.5 text-sm font-semibold text-gray-500"
-                disabled
-              >
-                Publish Booking Site
-              </button>
-              <Link
-                href={`https://${tenant.slug}.solohub.nl`}
-                target="_blank"
-                className="mt-2 inline-flex w-full items-center justify-center rounded-[10px] border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-700"
-              >
-                Preview Site
-              </Link>
+              {publishSubmitted ? (
+                <div className="mt-4 space-y-3">
+                  <button
+                    type="button"
+                    className="w-full rounded-[10px] bg-amber-100 py-2.5 text-sm font-semibold text-amber-800"
+                    disabled
+                  >
+                    Pending SoloHub Approval
+                  </button>
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
+                    Everything is completed from your side. Your booking site is
+                    currently under review by SoloHub and will go live after
+                    approval.
+                  </div>
+                </div>
+              ) : setupComplete ? (
+                <form
+                  action="/api/dashboard/website/submit"
+                  method="POST"
+                  className="mt-4"
+                >
+                  <button
+                    type="submit"
+                    className="w-full rounded-[10px] py-2.5 text-sm font-semibold text-white"
+                    style={{ background: brand }}
+                  >
+                    Publish Booking Site
+                  </button>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  className="mt-4 w-full rounded-[10px] bg-gray-200 py-2.5 text-sm font-semibold text-gray-500"
+                  disabled
+                >
+                  Publish Booking Site
+                </button>
+              )}
             </div>
 
             <div
               className="rounded-2xl p-5"
-              style={{ background: `${brand}12`, border: `1px solid ${brand}22` }}
+              style={{
+                background: `${brand}12`,
+                border: `1px solid ${brand}22`,
+              }}
             >
               <h3 className="text-lg font-semibold" style={{ color: brand }}>
                 Need help setting up?
@@ -263,6 +292,15 @@ export default async function DashboardPage() {
               <p className="mt-2 text-sm text-gray-600">
                 Most salons finish their initial setup in about 10 minutes.
               </p>
+              <a
+                href="https://wa.me/31683103485"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200 mt-4"
+              >
+                Start WhatsApp Chat{" "}
+                <ArrowRightIcon className="ml-1 h-3.5 w-3.5" />
+              </a>
             </div>
           </div>
         </div>
@@ -277,7 +315,9 @@ export default async function DashboardPage() {
               key={item.label}
               className="rounded-2xl border border-gray-100 bg-white p-5 text-center"
             >
-              <p className="text-lg font-semibold text-gray-700">{item.label}</p>
+              <p className="text-lg font-semibold text-gray-700">
+                {item.label}
+              </p>
               <p className="mt-1 text-xs text-gray-400">{item.hint}</p>
             </div>
           ))}
@@ -317,7 +357,11 @@ export default async function DashboardPage() {
     {
       label: "Total Revenue",
       value: `€${stats.revenue.toLocaleString("en", { minimumFractionDigits: 0 })}`,
-      icon: <span style={{ fontSize: 16, fontWeight: 700, color: "#10B981" }}>€</span>,
+      icon: (
+        <span style={{ fontSize: 16, fontWeight: 700, color: "#10B981" }}>
+          €
+        </span>
+      ),
       iconBg: "#F0FDF4",
       change: "+18%",
       changeBg: "#ECFDF5",
@@ -349,9 +393,7 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <div
-        className="mb-7 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4"
-      >
+      <div className="mb-7 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
         {statCards.map((stat) => (
           <div
             key={stat.label}
@@ -463,129 +505,143 @@ export default async function DashboardPage() {
         ) : (
           <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
             <table className="w-full min-w-[640px] border-collapse">
-            <thead>
-              <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
-                {["Client", "Service", "Staff", "Date & Time"].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: "12px 24px",
-                      textAlign: "left",
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: "#aaa",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {upcoming.map((booking) => (
-                <tr
-                  key={booking.id}
-                  style={{ borderBottom: "1px solid #f9f9f9" }}
-                >
-                  <td style={{ padding: "16px 24px" }}>
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 10 }}
-                    >
-                      <div
-                        style={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: "50%",
-                          background: brand,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "white",
-                          fontWeight: 600,
-                          fontSize: 14,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {booking.client_name.charAt(0)}
-                      </div>
-                      <div>
-                        <p
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 500,
-                            color: "#111",
-                            margin: 0,
-                          }}
-                        >
-                          {booking.client_name}
-                        </p>
-                        <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
-                          {booking.client_email}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ padding: "16px 24px" }}>
-                    <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
-                      {booking.service_name}
-                    </p>
-                    <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
-                      {booking.duration_mins} min · €{booking.price}
-                    </p>
-                  </td>
-                  <td style={{ padding: "16px 24px" }}>
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 8 }}
-                    >
-                      <div
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: "50%",
-                          background: "#f0f0f0",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: "#555",
-                        }}
-                      >
-                        {booking.staff_name.charAt(0)}
-                      </div>
-                      <span style={{ fontSize: 14, color: "#333" }}>
-                        {booking.staff_name}
-                      </span>
-                    </div>
-                  </td>
-                  <td style={{ padding: "16px 24px" }}>
-                    <p
+              <thead>
+                <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
+                  {["Client", "Service", "Staff", "Date & Time"].map((h) => (
+                    <th
+                      key={h}
                       style={{
-                        fontSize: 14,
+                        padding: "12px 24px",
+                        textAlign: "left",
+                        fontSize: 12,
                         fontWeight: 500,
-                        color: "#111",
-                        margin: 0,
+                        color: "#aaa",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
                       }}
                     >
-                      {new Date(booking.booked_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                    <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
-                      {new Date(booking.booked_at).toLocaleTimeString("en-US", {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </td>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {upcoming.map((booking) => (
+                  <tr
+                    key={booking.id}
+                    style={{ borderBottom: "1px solid #f9f9f9" }}
+                  >
+                    <td style={{ padding: "16px 24px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: "50%",
+                            background: brand,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
+                            fontWeight: 600,
+                            fontSize: 14,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {booking.client_name.charAt(0)}
+                        </div>
+                        <div>
+                          <p
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 500,
+                              color: "#111",
+                              margin: 0,
+                            }}
+                          >
+                            {booking.client_name}
+                          </p>
+                          <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                            {booking.client_email}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: "16px 24px" }}>
+                      <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                        {booking.service_name}
+                      </p>
+                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                        {booking.duration_mins} min · €{booking.price}
+                      </p>
+                    </td>
+                    <td style={{ padding: "16px 24px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: "50%",
+                            background: "#f0f0f0",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: "#555",
+                          }}
+                        >
+                          {booking.staff_name.charAt(0)}
+                        </div>
+                        <span style={{ fontSize: 14, color: "#333" }}>
+                          {booking.staff_name}
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ padding: "16px 24px" }}>
+                      <p
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 500,
+                          color: "#111",
+                          margin: 0,
+                        }}
+                      >
+                        {new Date(booking.booked_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
+                      </p>
+                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                        {new Date(booking.booked_at).toLocaleTimeString(
+                          "en-US",
+                          {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

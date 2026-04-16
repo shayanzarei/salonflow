@@ -16,7 +16,7 @@ import {
 } from "@/components/marketing/buttonStyles";
 import { CheckCircleIcon, ChevronDownIcon, XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useMemo, useState } from "react";
 
 const FAQS = [
@@ -81,9 +81,16 @@ export default function MainSitePricingPage({
   comparisonSections,
 }: MainSitePricingPageProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isAnnual, setIsAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<string | null>(FAQS[0]?.q ?? null);
   const [checkoutPlan, setCheckoutPlan] = useState<string | null>(null);
+  const checkoutResult = searchParams.get("checkout");
+  const showCheckoutSuccess =
+    checkoutResult === "success" || checkoutResult === "succeeded";
+  const showCheckoutCancelled =
+    checkoutResult === "cancelled" || checkoutResult === "canceled";
+  const showCheckoutFailed = checkoutResult === "failed";
 
   const activePackages = useMemo(
     () => packages.filter((pkg) => pkg.isActive).sort((a, b) => a.sortOrder - b.sortOrder),
@@ -128,6 +135,41 @@ export default function MainSitePricingPage({
       <MainSiteHeader active="pricing" />
 
       <main className="pt-32">
+        {showCheckoutSuccess ? (
+          <section className="mx-auto w-full max-w-7xl px-8 pt-6">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-emerald-900">
+              <p className="text-sm font-semibold sm:text-base">
+                Payment received. Thank you for subscribing to SoloHub.
+              </p>
+              <p className="mt-1 text-xs text-emerald-800 sm:text-sm">
+                If you paid with iDEAL or another bank redirect, activation may finish shortly
+                after Stripe webhook confirmation.
+              </p>
+            </div>
+          </section>
+        ) : null}
+        {showCheckoutCancelled ? (
+          <section className="mx-auto w-full max-w-7xl px-8 pt-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-6 py-4 text-slate-900">
+              <p className="text-sm font-semibold sm:text-base">Checkout was cancelled.</p>
+              <p className="mt-1 text-xs text-slate-700 sm:text-sm">
+                No charge was made. You can choose a plan and try again anytime.
+              </p>
+            </div>
+          </section>
+        ) : null}
+        {showCheckoutFailed ? (
+          <section className="mx-auto w-full max-w-7xl px-8 pt-6">
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-4 text-rose-900">
+              <p className="text-sm font-semibold sm:text-base">
+                Payment did not complete successfully.
+              </p>
+              <p className="mt-1 text-xs text-rose-800 sm:text-sm">
+                You were not charged. Please retry checkout or contact us for help.
+              </p>
+            </div>
+          </section>
+        ) : null}
         <section
           id="pricing-hero"
           className="mx-auto w-full max-w-7xl px-8 pb-20 pt-40 text-center"

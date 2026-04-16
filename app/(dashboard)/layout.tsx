@@ -1,5 +1,6 @@
 import { DashboardChrome } from "@/components/dashboard/DashboardChrome";
 import { authOptions } from "@/lib/auth-options";
+import { hasPackageFeature } from "@/lib/packages";
 import { getTenant } from "@/lib/tenant";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
   if (!tenant) notFound();
 
   const brand = tenant.primary_color ?? "#7C3AED";
+  const galleryEnabled = await hasPackageFeature(tenant, "gallery");
 
   return (
     <DashboardChrome
@@ -29,6 +31,7 @@ export default async function DashboardLayout({
       tenantName={tenant.name}
       tenantLogoUrl={tenant.logo_url}
       planTier={tenant.plan_tier}
+      galleryEnabled={galleryEnabled}
     >
       {children}
     </DashboardChrome>

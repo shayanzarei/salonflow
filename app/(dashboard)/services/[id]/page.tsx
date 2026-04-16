@@ -2,6 +2,7 @@ import {
   ServiceActiveToggle,
   ServiceDurationField,
 } from "@/components/dashboard/ServiceEditFormExtras";
+import { ServiceImageField } from "@/components/dashboard/ServiceImageField";
 import { CalendarIcon, ClockIcon, StarIcon, TrendingUpIcon, TrashIcon, UsersIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getCategoryStyle } from "@/lib/service-categories";
@@ -570,6 +571,8 @@ export default async function ServiceDetailPage({
             >
               <input type="hidden" name="id" value={id} />
 
+              <ServiceImageField initialValue={detail.imageUrl ?? ""} />
+
               <div>
                 <label
                   style={{
@@ -652,12 +655,12 @@ export default async function ServiceDetailPage({
                     }}
                   >
                     No categories yet —{" "}
-                    <a
+                    <Link
                       href="/services?tab=categories"
                       style={{ color: brand, textDecoration: "none", fontWeight: 500 }}
                     >
                       create one first
-                    </a>
+                    </Link>
                   </div>
                 )}
               </div>

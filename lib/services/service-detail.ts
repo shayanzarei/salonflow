@@ -6,6 +6,7 @@ export const INDUSTRY_AVG_CANCELLATION_PCT = 5.5;
 export type ServiceDetailApi = {
   id: string;
   name: string;
+  imageUrl: string | null;
   category: string;
   category_id: string | null;
   category_name: string | null;
@@ -153,6 +154,7 @@ export async function loadServiceDetail(
   return {
     id: row.id,
     name: row.name,
+    imageUrl: row.image_url ?? null,
     category,
     category_id,
     category_name,

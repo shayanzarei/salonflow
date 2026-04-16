@@ -279,19 +279,24 @@ export const NAV_ITEMS_EXPORTED = [...MENU_ITEMS, ...SETTINGS_ITEMS];
 
 export default function SidebarNav({
   brandColor,
+  galleryEnabled,
   onNavigateAction,
 }: {
   brandColor: string;
+  galleryEnabled: boolean;
   onNavigateAction?: () => void;
 }) {
   const pathname = usePathname();
+  const visibleMenuItems = galleryEnabled
+    ? MENU_ITEMS
+    : MENU_ITEMS.filter((item) => item.href !== "/gallery");
 
   return (
     <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <p className="px-3 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400">
         Menu
       </p>
-      {MENU_ITEMS.map((item) => {
+      {visibleMenuItems.map((item) => {
         const isActive =
           pathname === item.href ||
           (item.href !== "/dashboard" && pathname.startsWith(item.href));

@@ -7,26 +7,33 @@ import { useState } from "react";
 
 interface Tenant {
   name: string;
-  slug: string;
   tagline: string | null;
   about: string | null;
   address: string | null;
   phone: string | null;
   logo_url: string | null;
   hero_image_url: string | null;
+  about_image_url: string | null;
   primary_color: string | null;
 }
 
-export function SettingsProfileForm({ tenant }: { tenant: Tenant }) {
+export function SettingsProfileForm({
+  tenant,
+  redirectTo = "/settings",
+}: {
+  tenant: Tenant;
+  redirectTo?: string;
+}) {
   const brand = tenant.primary_color ?? "#7C3AED";
   const [previewColor, setPreviewColor] = useState(brand);
   const [logoUrl, setLogoUrl] = useState(tenant.logo_url ?? "");
   const [heroUrl, setHeroUrl] = useState(tenant.hero_image_url ?? "");
+  const [aboutImageUrl, setAboutImageUrl] = useState(tenant.about_image_url ?? "");
 
   return (
     <form action="/api/settings" method="POST" className="space-y-5">
       <input type="hidden" name="action" value="profile_and_branding" />
-      <input type="hidden" name="redirect_to" value="/settings" />
+      <input type="hidden" name="redirect_to" value={redirectTo} />
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <h2 className="text-base font-semibold text-gray-900">Salon profile</h2>
 
@@ -54,26 +61,12 @@ export function SettingsProfileForm({ tenant }: { tenant: Tenant }) {
 
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Booking URL slug
-            </label>
-            <div className="flex overflow-hidden rounded-lg border border-gray-200">
-              <span className="border-r border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-400">
-                SoloHub.nl/
-              </span>
-              <input
-                type="text"
-                name="slug"
-                required
-                defaultValue={tenant.slug}
-                className="min-w-0 flex-1 px-3 py-2.5 text-sm text-gray-900 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
               Tagline
             </label>
+            <p className="mb-2 text-xs text-gray-500">
+              A short sentence that describes your business. It is shown near
+              your salon name on the public booking site.
+            </p>
             <input
               type="text"
               name="tagline"
@@ -150,6 +143,14 @@ export function SettingsProfileForm({ tenant }: { tenant: Tenant }) {
               value={heroUrl}
               onChange={setHeroUrl}
               hint="Shown in the hero section of your booking site"
+            />
+
+            <ImageUploadField
+              name="about_image_url"
+              label="About section image"
+              value={aboutImageUrl}
+              onChange={setAboutImageUrl}
+              hint="Shown beside your About text on the booking site"
             />
           </div>
         </div>

@@ -476,12 +476,20 @@ export default async function BookingHomePage({
                   key={service.id}
                   className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md"
                 >
-                  {/* Service image placeholder */}
                   <div
-                    className="flex h-40 items-center justify-center sm:h-48 lg:h-[200px]"
+                    className="flex h-40 items-center justify-center overflow-hidden sm:h-48 lg:h-[200px]"
                     style={{ background: "#f8f7f5" }}
                   >
-                    <p style={{ color: "#ccc", fontSize: 13 }}>Service photo</p>
+                    {service.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={service.image_url}
+                        alt={service.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <p style={{ color: "#ccc", fontSize: 13 }}>Service photo</p>
+                    )}
                   </div>
                   <div className="p-4 sm:p-5 md:p-6">
                     <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
@@ -689,7 +697,16 @@ export default async function BookingHomePage({
         <section id="about" className="bg-[#fafafa] py-12 sm:py-16 md:py-24 lg:py-[100px]">
           <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 sm:gap-12 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-10 xl:gap-20">
             <div className="order-2 flex min-h-[220px] items-center justify-center overflow-hidden rounded-2xl bg-[#f0ebe4] sm:min-h-[280px] lg:order-1 lg:min-h-[360px] lg:h-[400px]">
-              <p className="text-sm text-[#B8A898]">Salon photo</p>
+              {tenant.about_image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={tenant.about_image_url}
+                  alt={`${tenant.name} salon`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <p className="text-sm text-[#B8A898]">Salon photo</p>
+              )}
             </div>
             <div className="order-1 min-w-0 lg:order-2">
               <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-gray-500">

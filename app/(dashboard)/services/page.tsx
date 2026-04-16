@@ -7,6 +7,7 @@ import {
   TrophyIcon,
 } from "@/components/ui/Icons";
 import pool from "@/lib/db";
+import { getPackageLimit } from "@/lib/packages";
 import { getCategoryStyle } from "@/lib/service-categories";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
@@ -17,16 +18,20 @@ const PAGE_SIZE = 10;
 export default async function ServicesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; tab?: string }>;
+  searchParams: Promise<{ page?: string; tab?: string; redirect_to?: string }>;
 }) {
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const { page, tab } = await searchParams;
+  const { page, tab, redirect_to } = await searchParams;
   const activeTab = tab === "categories" ? "categories" : "services";
   const currentPage = parseInt(page ?? "1");
   const offset = (currentPage - 1) * PAGE_SIZE;
   const brand = tenant.primary_color ?? "#7C3AED";
+  const redirectTo =
+    redirect_to && redirect_to.startsWith("/") && !redirect_to.startsWith("//")
+      ? redirect_to
+      : "";
 
   const [servicesResult, countResult, statsResult, categoriesResult] =
     await Promise.all([
@@ -65,6 +70,8 @@ export default async function ServicesPage({
 
   const services = servicesResult.rows;
   const totalCount = parseInt(countResult.rows[0].count);
+  const maxServices = await getPackageLimit(tenant, "max_services");
+  const canAddService = maxServices === null || totalCount < maxServices;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
   const stats = statsResult.rows[0];
   const categories = categoriesResult.rows;
@@ -92,29 +99,34 @@ export default async function ServicesPage({
             {totalCount} Services
           </span>
         </div>
-        {activeTab === "services" && (
-          <Link
-            href="/services/new"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "10px 18px",
-              background: brand,
-              color: "white",
-              borderRadius: 10,
-              fontSize: 14,
-              fontWeight: 500,
-              textDecoration: "none",
-            }}
-          >
-            <PlusIcon
-              size={14}
-              style={{ display: "inline", verticalAlign: "middle" }}
-            />
-            Add Service
-          </Link>
-        )}
+        {activeTab === "services" &&
+          (canAddService ? (
+            <Link
+              href={`/services/new${redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : ""}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "10px 18px",
+                background: brand,
+                color: "white",
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 500,
+                textDecoration: "none",
+              }}
+            >
+              <PlusIcon
+                size={14}
+                style={{ display: "inline", verticalAlign: "middle" }}
+              />
+              Add Service
+            </Link>
+          ) : (
+            <span className="inline-flex items-center rounded-[10px] bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500">
+              Service limit reached ({maxServices})
+            </span>
+          ))}
       </div>
 
       {/* Tabs */}
@@ -126,7 +138,9 @@ export default async function ServicesPage({
           <Link
             key={t.key}
             href={
-              t.key === "services" ? "/services" : "/services?tab=categories"
+              t.key === "services"
+                ? `/services${redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : ""}`
+                : `/services?tab=categories${redirectTo ? `&redirect_to=${encodeURIComponent(redirectTo)}` : ""}`
             }
             className="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             style={
@@ -142,7 +156,11 @@ export default async function ServicesPage({
 
       {/* Categories tab */}
       {activeTab === "categories" && (
-        <CategoriesTab initialCategories={categories} brand={brand} />
+        <CategoriesTab
+          initialCategories={categories}
+          brand={brand}
+          redirectTo={redirectTo}
+        />
       )}
 
       {/* Services tab content below */}
@@ -414,30 +432,36 @@ export default async function ServicesPage({
                         >
                           Add your first service to start accepting bookings
                         </p>
-                        <Link
-                          href="/services/new"
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 6,
-                            padding: "10px 20px",
-                            background: brand,
-                            color: "white",
-                            borderRadius: 10,
-                            fontSize: 14,
-                            fontWeight: 500,
-                            textDecoration: "none",
-                          }}
-                        >
-                          <PlusIcon
-                            size={14}
+                        {canAddService ? (
+                          <Link
+                            href={`/services/new${redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : ""}`}
                             style={{
-                              display: "inline",
-                              verticalAlign: "middle",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              padding: "10px 20px",
+                              background: brand,
+                              color: "white",
+                              borderRadius: 10,
+                              fontSize: 14,
+                              fontWeight: 500,
+                              textDecoration: "none",
                             }}
-                          />
-                          Add Service
-                        </Link>
+                          >
+                            <PlusIcon
+                              size={14}
+                              style={{
+                                display: "inline",
+                                verticalAlign: "middle",
+                              }}
+                            />
+                            Add Service
+                          </Link>
+                        ) : (
+                          <span className="inline-flex items-center rounded-[10px] bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500">
+                            Service limit reached ({maxServices})
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ) : (

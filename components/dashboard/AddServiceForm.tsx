@@ -1,6 +1,7 @@
 "use client";
 
 import { ScissorsIcon } from "@/components/ui/Icons";
+import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import {
   ServiceActiveToggle,
   ServiceDurationField,
@@ -25,15 +26,18 @@ export function AddServiceForm({
   brand,
   staff,
   categories = [],
+  redirectTo = "",
 }: {
   brand: string;
   staff: StaffRow[];
   categories?: CategoryRow[];
+  redirectTo?: string;
 }) {
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [categoryName, setCategoryName] = useState("");
   const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [price, setPrice] = useState("");
   const [durationMins, setDurationMins] = useState(60);
   const [showOnSite, setShowOnSite] = useState(true);
@@ -67,6 +71,7 @@ export function AddServiceForm({
 
   return (
     <form action="/api/services" method="POST">
+      <input type="hidden" name="redirect_to" value={redirectTo} />
       <div className="grid grid-cols-1 gap-6 lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] xl:items-start">
         <div className="flex min-w-0 flex-col gap-5">
           <section
@@ -219,6 +224,14 @@ export function AddServiceForm({
                   }}
                 />
               </div>
+
+              <ImageUploadField
+                name="image_url"
+                label="Service image (optional)"
+                value={imageUrl}
+                onChange={setImageUrl}
+                hint="Shown on your booking page service card"
+              />
             </div>
           </section>
 
@@ -514,6 +527,20 @@ export function AddServiceForm({
                 background: "#fafafa",
               }}
             >
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageUrl}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: 120,
+                    objectFit: "cover",
+                    borderRadius: 10,
+                    marginBottom: 12,
+                  }}
+                />
+              ) : null}
               <span
                 style={{
                   display: "inline-flex",

@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     const price = formData.get("price") as string;
     const duration_mins = formData.get("duration_mins") as string;
     const categoryId = (formData.get("category_id") as string)?.trim() || null;
+    const imageUrl = (formData.get("image_url") as string)?.trim() ?? "";
     const is_active = formData.get("is_active") === "true";
 
     await pool.query(
@@ -30,15 +31,17 @@ export async function POST(req: NextRequest) {
          duration_mins = $4,
          category_id = $5,
          category = CASE WHEN $5::uuid IS NOT NULL THEN NULL ELSE category END,
-         is_active = $6,
+         image_url = NULLIF($6, ''),
+         is_active = $7,
          is_draft = false
-       WHERE id = $7 AND tenant_id = $8`,
+       WHERE id = $8 AND tenant_id = $9`,
       [
         name,
         description,
         parseFloat(price),
         parseInt(duration_mins, 10),
         categoryId,
+        imageUrl,
         is_active,
         id,
         tenant.id,

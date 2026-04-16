@@ -17,6 +17,11 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const saveIntent = (formData.get("save_intent") as string) || "publish";
     const isDraft = saveIntent === "draft";
+    const redirectToRaw = (formData.get("redirect_to") as string) ?? "";
+    const redirectTo =
+      redirectToRaw.startsWith("/") && !redirectToRaw.startsWith("//")
+        ? redirectToRaw
+        : "";
 
     const nameRaw = (formData.get("name") as string) ?? "";
     const name = nameRaw.trim();
@@ -29,6 +34,7 @@ export async function POST(req: NextRequest) {
     const durationRaw = formData.get("duration_mins") as string;
     const categoryRaw = (formData.get("category") as string)?.trim() ?? "";
     const categoryId = (formData.get("category_id") as string)?.trim() || null;
+    const imageUrl = (formData.get("image_url") as string)?.trim() ?? "";
     const is_active = formData.get("is_active") === "true";
 
     let price: number;
@@ -79,9 +85,9 @@ export async function POST(req: NextRequest) {
 
       const insert = await client.query(
         `INSERT INTO services (
-           tenant_id, name, description, price, duration_mins, category, category_id, is_active, is_draft
+           tenant_id, name, description, price, duration_mins, category, category_id, image_url, is_active, is_draft
          )
-         VALUES ($1, $2, NULLIF($3, ''), $4, $5, $6, $7, $8, $9)
+         VALUES ($1, $2, NULLIF($3, ''), $4, $5, $6, $7, NULLIF($8, ''), $9, $10)
          RETURNING id`,
         [
           tenant.id,
@@ -91,6 +97,7 @@ export async function POST(req: NextRequest) {
           duration_mins,
           category,
           categoryId,
+          imageUrl,
           is_active,
           isDraft,
         ]
@@ -117,6 +124,9 @@ export async function POST(req: NextRequest) {
 
       await client.query("COMMIT");
 
+      if (redirectTo) {
+        return NextResponse.redirect(new URL(redirectTo, req.url));
+      }
       return NextResponse.redirect(new URL(`/services/${serviceId}`, req.url));
     } catch (inner: unknown) {
       await client.query("ROLLBACK");

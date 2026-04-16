@@ -1,4 +1,5 @@
 import { getStripeClient } from "@/lib/stripe";
+import { insertStripePaymentLog } from "@/lib/stripe-payment-logs";
 import { NextRequest, NextResponse } from "next/server";
 
 type PlanId = "solo" | "hub" | "agency";
@@ -53,14 +54,26 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${baseUrl}/pricing?checkout=success`,
-      cancel_url: `${baseUrl}/pricing?checkout=cancelled`,
+      success_url: `${baseUrl}/pricing/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/pricing/checkout/cancel`,
       customer_email: email || undefined,
       allow_promotion_codes: true,
       metadata: {
         plan,
         billingCycle,
       },
+    });
+
+    await insertStripePaymentLog({
+      source: "api",
+      event_type: "checkout.session.created",
+      checkout_session_id: session.id,
+      customer_email: email ?? null,
+      plan,
+      billing_cycle: billingCycle,
+      payment_status: session.payment_status,
+      livemode: session.livemode,
+      metadata: { price_id: priceId },
     });
 
     return NextResponse.json({ url: session.url });

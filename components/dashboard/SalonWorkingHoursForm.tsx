@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const DAYS = [
   { day: 1, label: "Monday" },
@@ -41,10 +42,13 @@ const DEFAULT_DAY = { start_time: "09:00", end_time: "17:00", is_working: false 
 export default function SalonWorkingHoursForm({
   brand,
   initialHours,
+  redirectTo = "",
 }: {
   brand: string;
   initialHours: DayHours[];
+  redirectTo?: string;
 }) {
+  const router = useRouter();
   const [hours, setHours] = useState<
     Record<number, Omit<DayHours, "day_of_week">>
   >(() => {
@@ -92,7 +96,7 @@ export default function SalonWorkingHoursForm({
       const response = await fetch("/api/settings/opening-hours", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ hours: payload }),
+        body: JSON.stringify({ hours: payload, redirect_to: redirectTo }),
       });
 
       if (!response.ok) {
@@ -103,6 +107,10 @@ export default function SalonWorkingHoursForm({
       }
 
       setSaved(true);
+      if (redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")) {
+        router.push(redirectTo);
+        return;
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
     } finally {

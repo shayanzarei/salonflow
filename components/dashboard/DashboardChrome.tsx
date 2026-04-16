@@ -15,6 +15,7 @@ type Props = {
   tenantName: string;
   tenantLogoUrl?: string | null;
   planTier: string;
+  galleryEnabled: boolean;
   children: React.ReactNode;
 };
 
@@ -23,6 +24,7 @@ export function DashboardChrome({
   tenantName,
   tenantLogoUrl,
   planTier,
+  galleryEnabled,
   children,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -106,6 +108,7 @@ export function DashboardChrome({
         <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-3">
           <SidebarNav
             brandColor={brand}
+            galleryEnabled={galleryEnabled}
             onNavigateAction={() => setMenuOpen(false)}
           />
         </div>

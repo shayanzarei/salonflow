@@ -3,6 +3,25 @@ import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * GET /api/settings
+ * Returns the current tenant's billing-relevant fields.
+ */
+export async function GET() {
+  const tenant = await getTenant();
+  if (!tenant) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return NextResponse.json({
+    plan_tier: tenant.plan_tier,
+    tenant_status: tenant.tenant_status,
+    trial_ends_at: tenant.trial_ends_at,
+    stripe_customer_id: tenant.stripe_customer_id ?? null,
+    stripe_subscription_id: tenant.stripe_subscription_id ?? null,
+    primary_color: tenant.primary_color ?? null,
+  });
+}
+
 export async function POST(req: NextRequest) {
   const guard = await requireOwner();
   if (guard.error) return guard.error;
@@ -15,12 +34,16 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const action = formData.get("action") as string;
-    const redirectTo =
+    const redirectRaw =
       (formData.get("redirect_to") as string | null) || "/settings";
+    const redirectTo =
+      redirectRaw.startsWith("/") && !redirectRaw.startsWith("//")
+        ? redirectRaw
+        : "/settings";
 
     if (action === "profile") {
       const name = formData.get("name") as string;
-      const slug = formData.get("slug") as string;
+      const slug = tenant.slug;
       const tagline = formData.get("tagline") as string;
       const about = formData.get("about") as string;
       const address = formData.get("address") as string;
@@ -43,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     if (action === "profile_and_branding") {
       const name = formData.get("name") as string;
-      const slug = formData.get("slug") as string;
+      const slug = tenant.slug;
       const tagline = formData.get("tagline") as string;
       const about = formData.get("about") as string;
       const address = formData.get("address") as string;
@@ -51,6 +74,7 @@ export async function POST(req: NextRequest) {
       const logo_url = formData.get("logo_url") as string;
       const primary_color = (formData.get("primary_color") as string)?.trim();
       const hero_image_url = formData.get("hero_image_url") as string;
+      const about_image_url = formData.get("about_image_url") as string;
 
       const color =
         primary_color && /^#[0-9A-Fa-f]{6}$/.test(primary_color)
@@ -67,8 +91,9 @@ export async function POST(req: NextRequest) {
            phone = NULLIF($6, ''),
            logo_url = NULLIF($7, ''),
            primary_color = $8,
-           hero_image_url = NULLIF($9, '')
-         WHERE id = $10`,
+           hero_image_url = NULLIF($9, ''),
+           about_image_url = NULLIF($10, '')
+         WHERE id = $11`,
         [
           name,
           slug,
@@ -79,6 +104,7 @@ export async function POST(req: NextRequest) {
           logo_url,
           color,
           hero_image_url,
+          about_image_url,
           tenant.id,
         ]
       );
@@ -86,7 +112,7 @@ export async function POST(req: NextRequest) {
 
     if (action === "info") {
       const name = formData.get("name") as string;
-      const slug = formData.get("slug") as string;
+      const slug = tenant.slug;
       const tagline = formData.get("tagline") as string;
       const about = formData.get("about") as string;
       const address = formData.get("address") as string;

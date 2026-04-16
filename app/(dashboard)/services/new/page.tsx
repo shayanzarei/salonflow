@@ -4,9 +4,18 @@ import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export default async function NewServicePage() {
+export default async function NewServicePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect_to?: string }>;
+}) {
   const tenant = await getTenant();
   if (!tenant) notFound();
+  const { redirect_to } = await searchParams;
+  const redirectTo =
+    redirect_to && redirect_to.startsWith("/") && !redirect_to.startsWith("//")
+      ? redirect_to
+      : "";
 
   const brand = tenant.primary_color ?? "#7C3AED";
 
@@ -53,7 +62,12 @@ export default async function NewServicePage() {
         </p>
       </div>
 
-      <AddServiceForm brand={brand} staff={staffResult.rows} categories={categoriesResult.rows} />
+      <AddServiceForm
+        brand={brand}
+        staff={staffResult.rows}
+        categories={categoriesResult.rows}
+        redirectTo={redirectTo}
+      />
     </div>
   );
 }

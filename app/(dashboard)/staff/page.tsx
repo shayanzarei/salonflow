@@ -6,6 +6,7 @@ import {
   UsersIcon,
 } from "@/components/ui/Icons";
 import pool from "@/lib/db";
+import { getPackageLimit } from "@/lib/packages";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,6 +44,8 @@ export default async function StaffPage() {
   );
 
   const staffList = staffResult.rows;
+  const maxStaff = await getPackageLimit(tenant, "max_staff");
+  const canAddStaff = maxStaff === null || staffList.length < maxStaff;
   const totalWeekAppointments = staffList.reduce(
     (sum, s) => sum + parseInt(s.week_appointments),
     0
@@ -69,17 +72,23 @@ export default async function StaffPage() {
             {staffList.length} Team Members
           </span>
         </div>
-        <Link
-          href="/staff/new"
-          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] px-4 py-2.5 text-sm font-medium text-white no-underline"
-          style={{ background: brand }}
-        >
-          <PlusIcon
-            size={14}
-            style={{ display: "inline", verticalAlign: "middle" }}
-          />
-          Add Staff Member
-        </Link>
+        {canAddStaff ? (
+          <Link
+            href="/staff/new"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] px-4 py-2.5 text-sm font-medium text-white no-underline"
+            style={{ background: brand }}
+          >
+            <PlusIcon
+              size={14}
+              style={{ display: "inline", verticalAlign: "middle" }}
+            />
+            Add Staff Member
+          </Link>
+        ) : (
+          <span className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-[10px] bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500">
+            Staff limit reached ({maxStaff})
+          </span>
+        )}
       </div>
 
       {/* Stats cards */}
@@ -198,27 +207,33 @@ export default async function StaffPage() {
             <p style={{ fontSize: 14, color: "#888", margin: "0 0 20px" }}>
               Add your first staff member to get started
             </p>
-            <Link
-              href="/staff/new"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "10px 20px",
-                background: brand,
-                color: "white",
-                borderRadius: 10,
-                fontSize: 14,
-                fontWeight: 500,
-                textDecoration: "none",
-              }}
-            >
-              <PlusIcon
-                size={14}
-                style={{ display: "inline", verticalAlign: "middle" }}
-              />
-              Add Staff Member
-            </Link>
+            {canAddStaff ? (
+              <Link
+                href="/staff/new"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "10px 20px",
+                  background: brand,
+                  color: "white",
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  textDecoration: "none",
+                }}
+              >
+                <PlusIcon
+                  size={14}
+                  style={{ display: "inline", verticalAlign: "middle" }}
+                />
+                Add Staff Member
+              </Link>
+            ) : (
+              <span className="inline-flex items-center rounded-[10px] bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500">
+                Staff limit reached ({maxStaff})
+              </span>
+            )}
           </div>
         ) : (
           <div>

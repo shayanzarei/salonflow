@@ -6,6 +6,8 @@ export interface Tenant {
   owner_first_name?: string | null;
   owner_last_name?: string | null;
   owner_role?: string | null;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
   plan_tier: 'solo' | 'hub' | 'agency';
   logo_url: string | null;
   primary_color: string | null;
@@ -15,6 +17,7 @@ export interface Tenant {
   hours: string | null;
   phone?: string | null;
   hero_image_url: string | null;
+  about_image_url: string | null;
   social_instagram: string | null;
   social_facebook: string | null;
   social_tiktok: string | null;

@@ -92,7 +92,7 @@ export async function POST(request: Request) {
          $4,
          $5,
          $6,
-         'solo',
+         'hub',
          '#11c4b6',
          $7,
          'signuture',

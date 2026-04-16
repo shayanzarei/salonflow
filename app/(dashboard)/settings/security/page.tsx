@@ -41,13 +41,13 @@ export default async function SecurityPage({
       ) : null}
 
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50/80 px-4 py-3">
-          <div>
+        <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-100 bg-gray-50/80 px-4 py-3">
+          <div className="flex flex-col gap-1">
             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
               Login
             </p>
             <p className="text-sm font-medium text-gray-900">
-              {session?.user?.email ?? tenant.slug}
+              {tenant.owner_email}
             </p>
             <p className="text-xs text-gray-500">
               You sign in with this ID and your password
@@ -61,7 +61,9 @@ export default async function SecurityPage({
           className="mt-6 space-y-4 border-t border-gray-100 pt-6"
         >
           <input type="hidden" name="redirect_to" value="/settings/security" />
-          <h2 className="text-sm font-semibold text-gray-800">Change password</h2>
+          <h2 className="text-sm font-semibold text-gray-800">
+            Change password
+          </h2>
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-600">
               Current password

@@ -1,6 +1,7 @@
 import { runProvisioningJob } from "@/jobs/provisioning.job";
 import { subscriptionConfirmationEmail } from "@/lib/emails/subscription-confirmation";
 import { sendEmail } from "@/lib/emails/send";
+import { insertStripePaymentLog } from "@/lib/stripe-payment-logs";
 import { getStripeClient } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -46,9 +47,31 @@ export async function GET(request: NextRequest) {
           });
           provisioned = true;
 
+          // Insert a complete payment log so admin panel and billing history
+          // both show the correct email, amount, and status.
+          // Uses the session ID as idempotency key — safe to run multiple times.
+          await insertStripePaymentLog({
+            source: "api",
+            event_type: "checkout.session.completed",
+            stripe_event_id: `success_page_${sessionId}`,
+            checkout_session_id: sessionId,
+            customer_id: customerId,
+            subscription_id: subscriptionId,
+            customer_email: customerEmail,
+            amount_cents: session.amount_total,
+            currency: session.currency ?? null,
+            plan: session.metadata?.plan ?? null,
+            billing_cycle: session.metadata?.billingCycle ?? null,
+            payment_status: session.payment_status,
+            livemode: session.livemode,
+            metadata: {
+              mode: session.mode,
+              status: session.status,
+              source: "checkout_success_page",
+            },
+          });
+
           // Send confirmation email now that account is active.
-          // Skip if this was an existing account re-linked (webhook already sent it),
-          // but always send for newly created accounts.
           if (result.ok) {
             const { subject, html } = subscriptionConfirmationEmail({
               email: customerEmail,

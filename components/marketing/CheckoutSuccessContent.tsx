@@ -17,6 +17,8 @@ type SessionPayload = {
   billing_cycle: string | null;
   amount_total: number | null;
   currency: string | null;
+  provisioned: boolean;
+  provisioning_error: string | null;
   error?: string;
 };
 
@@ -80,19 +82,21 @@ export function CheckoutSuccessContent({ sessionId }: { sessionId: string }) {
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
           {loading
-            ? "Confirming your payment…"
+            ? "Setting up your account…"
             : pendingAsync
               ? "Almost there"
-              : "You are all set"}
+              : "You're all set!"}
         </h1>
         <p className="mt-3 text-sm text-slate-600 sm:text-base">
           {loading
-            ? "Hang tight while we verify your checkout session with Stripe."
+            ? "Confirming your payment and activating your subscription…"
             : error
               ? error
               : pendingAsync
-                ? "Your bank is still confirming this payment (for example iDEAL). This page will reflect the final status once Stripe marks the session complete—you will also get webhook-driven confirmation on our side."
-                : "Thank you for subscribing to SoloHub. We will email you when your workspace is ready."}
+                ? "Your bank is still confirming this payment. Your account will be activated automatically once it clears."
+                : data?.provisioned
+                  ? "Your subscription is active. Sign in below to access your account."
+                  : "Payment confirmed. If your account isn't updated yet, please contact support."}
         </p>
 
         {!loading && !error && data && (
@@ -139,17 +143,21 @@ export function CheckoutSuccessContent({ sessionId }: { sessionId: string }) {
         )}
 
         <div className="mt-10 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
+          {!loading && !error && data?.provisioned && (
+            <Link
+              href="/login"
+              className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${MARKETING_BUTTON_PRIMARY}`}
+            >
+              Sign in to your account →
+            </Link>
+          )}
           <Link
             href="/contact"
-            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${MARKETING_BUTTON_PRIMARY}`}
+            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${
+              data?.provisioned ? MARKETING_BUTTON_SECONDARY : MARKETING_BUTTON_PRIMARY
+            }`}
           >
             Talk to us
-          </Link>
-          <Link
-            href="/pricing"
-            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${MARKETING_BUTTON_SECONDARY}`}
-          >
-            Back to pricing
           </Link>
         </div>
       </div>

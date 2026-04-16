@@ -23,6 +23,9 @@ export async function GET(request: NextRequest) {
       (session.payment_status === "paid" ||
         session.payment_status === "no_payment_required");
 
+    let provisioned = false;
+    let provisioningError: string | null = null;
+
     if (isPaid) {
       const customerEmail =
         session.customer_details?.email ?? session.customer_email ?? null;
@@ -32,16 +35,19 @@ export async function GET(request: NextRequest) {
         typeof session.subscription === "string" ? session.subscription : null;
 
       if (customerId && customerEmail) {
-        // Fire-and-forget — don't block the response.
-        // The provisioning job is idempotent so running it twice is safe.
-        void runProvisioningJob({
-          stripeCustomerId: customerId,
-          customerEmail,
-          stripeSubscriptionId: subscriptionId,
-          plan: session.metadata?.plan ?? null,
-        }).catch((err) =>
-          console.error("[checkout/session] provisioning fallback error", err)
-        );
+        try {
+          await runProvisioningJob({
+            stripeCustomerId: customerId,
+            customerEmail,
+            stripeSubscriptionId: subscriptionId,
+            plan: session.metadata?.plan ?? null,
+          });
+          provisioned = true;
+        } catch (err) {
+          provisioningError =
+            err instanceof Error ? err.message : "Provisioning failed";
+          console.error("[checkout/session] provisioning error", err);
+        }
       }
     }
 
@@ -54,6 +60,8 @@ export async function GET(request: NextRequest) {
       billing_cycle: session.metadata?.billingCycle ?? null,
       amount_total: session.amount_total,
       currency: session.currency,
+      provisioned,
+      provisioning_error: provisioningError,
     });
   } catch (error: unknown) {
     const message =

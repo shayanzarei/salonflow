@@ -15,10 +15,12 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
     }
 
-    if (!tenant.stripe_customer_id) {
+    if (!tenant.stripe_customer_id && !tenant.owner_email) {
       return NextResponse.json({ payments: [] });
     }
 
+    // Primary lookup by stripe_customer_id; fall back to owner_email
+    // so payments show up even before provisioning has linked the IDs.
     const result = await pool.query(
       `SELECT
          id,
@@ -33,7 +35,11 @@ export async function GET() {
          checkout_session_id,
          livemode
        FROM stripe_payment_logs
-       WHERE customer_id = $1
+       WHERE (
+         ($1::text IS NOT NULL AND customer_id = $1)
+         OR
+         ($2::text IS NOT NULL AND LOWER(customer_email) = LOWER($2))
+       )
          AND event_type IN (
            'checkout.session.completed',
            'invoice.paid',
@@ -41,7 +47,7 @@ export async function GET() {
          )
        ORDER BY created_at DESC
        LIMIT 50`,
-      [tenant.stripe_customer_id]
+      [tenant.stripe_customer_id ?? null, tenant.owner_email ?? null]
     );
 
     return NextResponse.json({ payments: result.rows });

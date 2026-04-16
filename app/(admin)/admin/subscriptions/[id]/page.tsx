@@ -1,10 +1,12 @@
-import pool from "@/lib/db";
+"use client";
+
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type PaymentDetailRow = {
   id: string;
-  created_at: Date;
+  created_at: string;
   source: string;
   event_type: string;
   stripe_event_id: string | null;
@@ -24,7 +26,7 @@ type PaymentDetailRow = {
   metadata: Record<string, unknown>;
 };
 
-function detailItem(label: string, value: string | null) {
+function DetailItem({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3">
       <p className="text-[11px] uppercase tracking-wide text-gray-500">{label}</p>
@@ -33,42 +35,61 @@ function detailItem(label: string, value: string | null) {
   );
 }
 
-export default async function AdminPaymentDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default function AdminPaymentDetailPage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
 
-  const result = await pool.query(
-    `SELECT
-      id,
-      created_at,
-      source,
-      event_type,
-      stripe_event_id,
-      checkout_session_id,
-      payment_intent_id,
-      invoice_id,
-      customer_id,
-      subscription_id,
-      customer_email,
-      amount_cents,
-      currency,
-      plan,
-      billing_cycle,
-      payment_status,
-      livemode,
-      message,
-      metadata
-    FROM stripe_payment_logs
-    WHERE id = $1
-    LIMIT 1`,
-    [id]
-  );
+  const [row, setRow] = useState<PaymentDetailRow | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [resyncing, setResyncing] = useState(false);
+  const [resyncResult, setResyncResult] = useState<string | null>(null);
 
-  const row = result.rows[0] as PaymentDetailRow | undefined;
-  if (!row) notFound();
+  useEffect(() => {
+    fetch(`/api/admin/subscriptions/${id}`)
+      .then((r) => r.json())
+      .then((data) => { setRow(data.row ?? null); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [id]);
+
+  async function handleResync() {
+    if (!row?.checkout_session_id) return;
+    setResyncing(true);
+    setResyncResult(null);
+    try {
+      const res = await fetch("/api/admin/stripe/provision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: row.checkout_session_id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setResyncResult(`❌ ${data.error ?? "Failed"}`);
+      } else {
+        setResyncResult(
+          data.created
+            ? "✅ New account created and setup email sent."
+            : "✅ Existing account updated — plan and Stripe IDs linked."
+        );
+      }
+    } catch {
+      setResyncResult("❌ Network error");
+    } finally {
+      setResyncing(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 w-48 rounded bg-gray-100" />
+        <div className="h-64 rounded-2xl bg-gray-100" />
+      </div>
+    );
+  }
+
+  if (!row) {
+    return <p className="text-sm text-gray-500">Payment log not found.</p>;
+  }
 
   const amount =
     row.amount_cents != null && row.currency
@@ -86,6 +107,11 @@ export default async function AdminPaymentDetailPage({
     null;
   const shownEmail = row.customer_email ?? metadataEmail ?? null;
 
+  const canResync =
+    row.checkout_session_id !== null &&
+    (row.event_type === "checkout.session.completed" ||
+      row.event_type === "checkout.session.created");
+
   return (
     <div className="min-w-0">
       <div className="mb-6 flex items-center justify-between gap-3">
@@ -102,6 +128,28 @@ export default async function AdminPaymentDetailPage({
           Back to payments
         </Link>
       </div>
+
+      {/* Resync banner */}
+      {canResync && (
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Manual provisioning</p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              If the webhook was missed, click resync to manually link this checkout to the user account.
+            </p>
+            {resyncResult && (
+              <p className="mt-1.5 text-sm font-medium text-gray-800">{resyncResult}</p>
+            )}
+          </div>
+          <button
+            onClick={handleResync}
+            disabled={resyncing}
+            className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-60"
+          >
+            {resyncing ? "Running…" : "Resync provisioning"}
+          </button>
+        </div>
+      )}
 
       <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-6">
         <div className="mb-5 flex flex-wrap items-center gap-2">
@@ -122,33 +170,35 @@ export default async function AdminPaymentDetailPage({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {detailItem("Log Id", row.id)}
-          {detailItem(
-            "Created at",
-            new Date(row.created_at).toLocaleString("en-US", {
+          <DetailItem label="Log Id" value={row.id} />
+          <DetailItem
+            label="Created at"
+            value={new Date(row.created_at).toLocaleString("en-US", {
               month: "short",
               day: "2-digit",
               year: "numeric",
               hour: "2-digit",
               minute: "2-digit",
               second: "2-digit",
-            })
-          )}
-          {detailItem("Email", shownEmail)}
-          {detailItem("Amount", amount)}
-          {detailItem(
-            "Plan",
-            row.plan
-              ? `${row.plan}${row.billing_cycle ? ` · ${row.billing_cycle}` : ""}`
-              : null
-          )}
-          {detailItem("Stripe Event Id", row.stripe_event_id)}
-          {detailItem("Checkout Session Id", row.checkout_session_id)}
-          {detailItem("Payment Intent Id", row.payment_intent_id)}
-          {detailItem("Invoice Id", row.invoice_id)}
-          {detailItem("Customer Id", row.customer_id)}
-          {detailItem("Subscription Id", row.subscription_id)}
-          {detailItem("Message", row.message)}
+            })}
+          />
+          <DetailItem label="Email" value={shownEmail} />
+          <DetailItem label="Amount" value={amount} />
+          <DetailItem
+            label="Plan"
+            value={
+              row.plan
+                ? `${row.plan}${row.billing_cycle ? ` · ${row.billing_cycle}` : ""}`
+                : null
+            }
+          />
+          <DetailItem label="Stripe Event Id" value={row.stripe_event_id} />
+          <DetailItem label="Checkout Session Id" value={row.checkout_session_id} />
+          <DetailItem label="Payment Intent Id" value={row.payment_intent_id} />
+          <DetailItem label="Invoice Id" value={row.invoice_id} />
+          <DetailItem label="Customer Id" value={row.customer_id} />
+          <DetailItem label="Subscription Id" value={row.subscription_id} />
+          <DetailItem label="Message" value={row.message} />
         </div>
 
         <div className="mt-6">

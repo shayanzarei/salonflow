@@ -1,7 +1,13 @@
+import { runProvisioningJob } from "@/jobs/provisioning.job";
 import { getStripeClient } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
 
-/** Public read of a completed Checkout Session (marketing success page). */
+/** Public read of a completed Checkout Session (marketing success page).
+ *
+ * Also acts as a provisioning fallback: if the session is complete and paid
+ * but the webhook hasn't fired yet (e.g. local dev without stripe listen),
+ * this triggers provisioning so the user's plan updates immediately.
+ */
 export async function GET(request: NextRequest) {
   const sessionId = request.nextUrl.searchParams.get("session_id")?.trim();
   if (!sessionId || !sessionId.startsWith("cs_")) {
@@ -11,6 +17,33 @@ export async function GET(request: NextRequest) {
   try {
     const stripe = getStripeClient();
     const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    const isPaid =
+      session.status === "complete" &&
+      (session.payment_status === "paid" ||
+        session.payment_status === "no_payment_required");
+
+    if (isPaid) {
+      const customerEmail =
+        session.customer_details?.email ?? session.customer_email ?? null;
+      const customerId =
+        typeof session.customer === "string" ? session.customer : null;
+      const subscriptionId =
+        typeof session.subscription === "string" ? session.subscription : null;
+
+      if (customerId && customerEmail) {
+        // Fire-and-forget — don't block the response.
+        // The provisioning job is idempotent so running it twice is safe.
+        void runProvisioningJob({
+          stripeCustomerId: customerId,
+          customerEmail,
+          stripeSubscriptionId: subscriptionId,
+          plan: session.metadata?.plan ?? null,
+        }).catch((err) =>
+          console.error("[checkout/session] provisioning fallback error", err)
+        );
+      }
+    }
 
     return NextResponse.json({
       status: session.status,

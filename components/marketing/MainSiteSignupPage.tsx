@@ -19,6 +19,7 @@ export default function MainSiteSignupPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false); // hides form, shows loading screen
   const [error, setError] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -35,6 +36,9 @@ export default function MainSiteSignupPage() {
       setLoading(false);
       return;
     }
+
+    // Switch to loading screen immediately — don't leave the user staring at the form
+    setSubmitted(true);
 
     const firstName = String(formData.get("first-name") ?? "").trim();
     const lastName = String(formData.get("last-name") ?? "").trim();
@@ -64,11 +68,25 @@ export default function MainSiteSignupPage() {
         throw new Error(payload?.error ?? "Unable to create account.");
       }
 
+      // Account created — redirect to email verification page.
+      // The user cannot sign in until they click the link in their inbox.
+      if (payload.pendingVerification) {
+        const dest = `/verify-email${payload.email ? `?email=${encodeURIComponent(payload.email)}` : ""}`;
+        router.push(dest);
+        return;
+      }
+
+      // Fallback: try to sign in immediately (should not normally reach here)
       const signInResult = await signIn("credentials", {
         email: workEmail,
         password,
         redirect: false,
       });
+
+      if (signInResult?.error === "VerifyEmail") {
+        router.push(`/verify-email?email=${encodeURIComponent(workEmail)}`);
+        return;
+      }
 
       if (signInResult?.error) {
         router.push("/login");
@@ -77,6 +95,8 @@ export default function MainSiteSignupPage() {
 
       router.push("/dashboard");
     } catch (submitError: unknown) {
+      // Revert to the form so the user can see and fix the error
+      setSubmitted(false);
       setError(
         submitError instanceof Error
           ? submitError.message
@@ -85,6 +105,79 @@ export default function MainSiteSignupPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // ── Loading screen — shown immediately after form submit ──────────────────
+  if (submitted) {
+    return (
+      <div
+        className="flex min-h-screen flex-col items-center justify-center px-4 py-10"
+        style={{
+          backgroundImage:
+            "radial-gradient(at 25% 10%, hsla(186,100%,93%,0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(173,100%,90%,0.4) 0px, transparent 50%)",
+          backgroundColor: "#f8fcff",
+        }}
+      >
+        <div className="mx-auto w-full max-w-sm rounded-3xl border border-slate-100 bg-white/90 p-10 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm text-center">
+
+          {/* Spinner */}
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center">
+            <svg
+              className="h-16 w-16 animate-spin"
+              viewBox="0 0 64 64"
+              fill="none"
+            >
+              <circle
+                cx="32" cy="32" r="28"
+                stroke="#e2e8f0"
+                strokeWidth="5"
+              />
+              <path
+                d="M32 4a28 28 0 0 1 28 28"
+                stroke="url(#spin-grad)"
+                strokeWidth="5"
+                strokeLinecap="round"
+              />
+              <defs>
+                <linearGradient id="spin-grad" x1="32" y1="4" x2="60" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#11C4B6" />
+                  <stop offset="1" stopColor="#0EA5B7" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+
+          <h2 className="mb-2 text-xl font-bold text-slate-900">
+            Setting up your workspace…
+          </h2>
+          <p className="mb-8 text-sm leading-relaxed text-slate-500">
+            Creating your account and sending your verification email. This only takes a second.
+          </p>
+
+          {/* Animated steps */}
+          <div className="space-y-3 text-left">
+            {[
+              "Creating your account",
+              "Preparing your workspace",
+              "Sending verification email",
+            ].map((step, i) => (
+              <div key={step} className="flex items-center gap-3">
+                <span
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{
+                    background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)",
+                    animationDelay: `${i * 0.4}s`,
+                  }}
+                >
+                  ✓
+                </span>
+                <span className="text-sm text-slate-600">{step}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

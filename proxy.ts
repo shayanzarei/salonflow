@@ -8,6 +8,7 @@ import pool from "@/lib/db";
 const ALWAYS_ALLOWED = [
   "/login",
   "/signup",
+  "/verify-email",
   "/reset-password",
   "/forgot-password",
   "/pricing",

@@ -23,9 +23,10 @@ export const authOptions: NextAuthOptions = {
 
         // backward compatibility for legacy tenants that still log in with slug
         if (!tenantResult.rows[0]) {
-          tenantResult = await pool.query(`SELECT * FROM tenants WHERE slug = $1`, [
-            loginId,
-          ]);
+          tenantResult = await pool.query(
+            `SELECT * FROM tenants WHERE slug = $1`,
+            [loginId]
+          );
         }
 
         if (tenantResult.rows[0]) {
@@ -35,6 +36,11 @@ export const authOptions: NextAuthOptions = {
             tenant.password_hash
           );
           if (!passwordMatch) return null;
+
+          // Block sign-in until the owner verifies their email address.
+          if (tenant.tenant_status === "pending_verification") {
+            throw new Error("VerifyEmail");
+          }
 
           return {
             id: tenant.id,

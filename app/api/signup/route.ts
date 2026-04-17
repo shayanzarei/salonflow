@@ -1,7 +1,12 @@
 import pool from "@/lib/db";
+import { emailVerificationEmail } from "@/lib/emails/email-verification";
+import { sendEmail } from "@/lib/emails/send";
 import { sendWhatsAppNotification } from "@/lib/notify/whatsapp";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { NextResponse } from "next/server";
+
+const VERIFICATION_TOKEN_TTL_HOURS = 24;
 
 type SignupPayload = {
   firstName?: string;
@@ -37,6 +42,12 @@ async function generateUniqueSlug(baseInput: string) {
   }
 }
 
+function buildVerifyUrl(token: string) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  const base = appUrl ? appUrl.replace(/\/$/, "") : "http://localhost:3000";
+  return `${base}/api/auth/verify-email?token=${token}`;
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as SignupPayload;
@@ -67,6 +78,7 @@ export async function POST(request: Request) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     await pool.query("BEGIN");
+
     const tenant = await pool.query(
       `INSERT INTO tenants (
          name,
@@ -86,17 +98,12 @@ export async function POST(request: Request) {
          is_admin
        )
        VALUES (
-         $1,
-         $2,
-         $3,
-         $4,
-         $5,
-         $6,
+         $1, $2, $3, $4, $5, $6,
          'hub',
          '#11c4b6',
          $7,
-         'signuture',
-         'trial',
+         'signature',
+         'pending_verification',
          'draft',
          NOW(),
          NOW() + INTERVAL '14 days',
@@ -105,28 +112,54 @@ export async function POST(request: Request) {
        RETURNING id, slug, name`,
       [salonName, slug, workEmail, firstName, lastName, role, passwordHash]
     );
+
     const tenantId = tenant.rows[0].id as string;
+
     await pool.query(
       `INSERT INTO staff (tenant_id, name, role, email)
        VALUES ($1, $2, $3, $4)`,
       [tenantId, `${firstName} ${lastName}`.trim(), role, workEmail]
     );
+
+    // Generate email verification token
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    await pool.query(
+      `INSERT INTO email_verification_tokens (tenant_id, token_hash, expires_at)
+       VALUES ($1, $2, NOW() + ($3::text || ' hours')::interval)`,
+      [tenantId, tokenHash, VERIFICATION_TOKEN_TTL_HOURS]
+    );
+
     await pool.query("COMMIT");
 
+    // Send verification email fire-and-forget — the account is already created so
+    // we don't block the HTTP response on the email provider's latency.
+    // Failures are logged to console; user can always resend from /verify-email.
+    const verifyUrl = buildVerifyUrl(rawToken);
+    const { subject, html } = emailVerificationEmail({ verifyUrl });
+    void sendEmail({
+      to: workEmail,
+      subject,
+      html,
+      from: "SoloHub <hello@solohub.nl>",
+    }).catch((err) => console.error("[signup] verification email failed", err));
+
+    // Fire-and-forget WhatsApp notification to founder
     void sendWhatsAppNotification(
       `🎉 New signup on SoloHub\n\n` +
       `👤 ${firstName} ${lastName}\n` +
       `📧 ${workEmail}\n` +
       `💼 ${salonName}\n` +
-      `🏷️ ${role}`
+      `🏷️ ${role}\n` +
+      `⏳ Awaiting email verification`
     );
 
     return NextResponse.json(
       {
         ok: true,
-        tenantId: tenant.rows[0].id,
-        slug: tenant.rows[0].slug,
-        tenantName: tenant.rows[0].name,
+        pendingVerification: true,
+        email: workEmail,
       },
       { status: 201 }
     );

@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth-options";
 import { getTenant } from "@/lib/tenant";
+import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
 import { getServerSession } from "next-auth/next";
 import { notFound } from "next/navigation";
 
@@ -40,7 +41,7 @@ export default async function SecurityPage({
         </div>
       ) : null}
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm" id="password">
         <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-100 bg-gray-50/80 px-4 py-3">
           <div className="flex flex-col gap-1">
             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
@@ -111,6 +112,11 @@ export default async function SecurityPage({
           </button>
         </form>
       </div>
+      {/* ── Danger zone ──────────────────────────────────────────────────── */}
+      <DeleteAccountSection
+        slug={tenant.slug as string}
+        tenantName={tenant.name as string}
+      />
     </div>
   );
 }

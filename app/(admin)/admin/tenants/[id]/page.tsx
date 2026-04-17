@@ -7,6 +7,7 @@ import {
   normalizeWebsiteTemplate,
 } from "@/lib/website-templates";
 import { UploadInput } from "@/components/ui/UploadInput";
+import AdminDeleteTenantButton from "@/components/admin/AdminDeleteTenantButton";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -300,6 +301,13 @@ export default async function TenantDetailPage({
                 </form>
               </div>
             </div>
+
+            {/* Danger zone */}
+            <AdminDeleteTenantButton
+              tenantId={id}
+              tenantName={tenant.name}
+              tenantSlug={tenant.slug}
+            />
 
             {/* Website sections */}
             <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">

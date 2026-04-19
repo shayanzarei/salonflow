@@ -1,5 +1,6 @@
 import pool from '@/lib/db';
 import { bookingConfirmationEmail } from '@/lib/emails/booking-confirmation';
+import { bookingStaffNotificationEmail } from '@/lib/emails/booking-staff-notification';
 import { sendEmail } from '@/lib/emails/send';
 import { createNotification } from '@/lib/notifications';
 import { bookableServiceSql } from '@/lib/services/bookable';
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await pool.query(
-      `INSERT INTO bookings 
+      `INSERT INTO bookings
         (tenant_id, service_id, staff_id, booked_at, client_name, client_email, client_phone, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'confirmed')
        RETURNING *`,
@@ -98,12 +99,17 @@ export async function POST(req: NextRequest) {
 
     const booking = result.rows[0];
 
-    await createNotification({
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.solohub.nl').replace(/\/$/, '');
+    const bookingDashboardUrl = `${appUrl}/bookings`;
+
+    // ── In-platform notifications (owner + assigned staff) ────────────────────
+    // Fire-and-forget — a notification failure must never block the booking response.
+    void createNotification({
       tenantId: tenant_id,
       type: "booking_created",
       title: "New booking confirmed",
       message: `${client_name} booked ${service.name} with ${staff.name}.`,
-      linkUrl: `/bookings/${booking.id}`,
+      linkUrl: `/bookings`,
       data: {
         bookingId: booking.id,
         serviceId: service_id,
@@ -113,9 +119,10 @@ export async function POST(req: NextRequest) {
         { role: "owner", id: tenant_id },
         { role: "staff", id: staff_id },
       ],
-    });
+    }).catch((err) => console.error('[booking] createNotification failed', err));
 
-    const { subject, html } = bookingConfirmationEmail({
+    // ── Email to client — booking confirmation ────────────────────────────────
+    const { subject: clientSubject, html: clientHtml } = bookingConfirmationEmail({
       clientName: client_name,
       salonName: tenant.name,
       serviceName: service.name,
@@ -128,11 +135,64 @@ export async function POST(req: NextRequest) {
       salonSlug: tenant.slug,
     });
 
-    await sendEmail({
+    void sendEmail({
       to: client_email,
-      subject,
-      html,
-    });
+      subject: clientSubject,
+      html: clientHtml,
+    }).catch((err) => console.error('[booking] client confirmation email failed', err));
+
+    // ── Email to owner — new booking alert ────────────────────────────────────
+    const ownerEmail = tenant.owner_email as string | null;
+    if (ownerEmail) {
+      const { subject: ownerSubject, html: ownerHtml } = bookingStaffNotificationEmail({
+        recipientName: tenant.owner_first_name ?? tenant.name,
+        recipientRole: 'owner',
+        salonName: tenant.name,
+        clientName: client_name,
+        clientEmail: client_email,
+        clientPhone: client_phone,
+        serviceName: service.name,
+        staffName: staff.name,
+        bookedAt: new Date(booked_at),
+        durationMins: service.duration_mins,
+        price: parseFloat(service.price),
+        dashboardUrl: bookingDashboardUrl,
+      });
+
+      void sendEmail({
+        to: ownerEmail,
+        subject: ownerSubject,
+        html: ownerHtml,
+        from: 'SoloHub <bookings@solohub.nl>',
+      }).catch((err) => console.error('[booking] owner notification email failed', err));
+    }
+
+    // ── Email to assigned staff member — only if they have an email and it
+    //    differs from the owner (avoid duplicate email to solo operators) ──────
+    const staffEmail = staff.email as string | null;
+    if (staffEmail && staffEmail.toLowerCase() !== ownerEmail?.toLowerCase()) {
+      const { subject: staffSubject, html: staffHtml } = bookingStaffNotificationEmail({
+        recipientName: staff.name,
+        recipientRole: 'staff',
+        salonName: tenant.name,
+        clientName: client_name,
+        clientEmail: client_email,
+        clientPhone: client_phone,
+        serviceName: service.name,
+        staffName: staff.name,
+        bookedAt: new Date(booked_at),
+        durationMins: service.duration_mins,
+        price: parseFloat(service.price),
+        dashboardUrl: bookingDashboardUrl,
+      });
+
+      void sendEmail({
+        to: staffEmail,
+        subject: staffSubject,
+        html: staffHtml,
+        from: 'SoloHub <bookings@solohub.nl>',
+      }).catch((err) => console.error('[booking] staff notification email failed', err));
+    }
 
     return NextResponse.redirect(
       new URL(`/book/success?booking=${booking.id}`, req.url)

@@ -1,14 +1,16 @@
 "use client";
 
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import LogoutButton from "@/components/dashboard/LogoutButton";
 import NotificationsBell from "@/components/dashboard/NotificationsBell";
-import SidebarNav, {
-  NAV_ITEMS_EXPORTED,
-} from "@/components/dashboard/SidebarNav";
+import SidebarNav from "@/components/dashboard/SidebarNav";
+import { dashboardTitleFromPath } from "@/lib/i18n/dashboard-nav";
+import { useLocale } from "@/lib/i18n/context";
+import { fillTemplate } from "@/lib/i18n/interpolate";
 import { HelpCircleIcon, XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Props = {
   brand: string;
@@ -29,17 +31,12 @@ export function DashboardChrome({
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { t } = useLocale();
 
-  const activeLabel =
-    NAV_ITEMS_EXPORTED.slice()
-      .sort((a, b) => b.href.length - a.href.length)
-      .find((item) => {
-        const targetPath = item.href.split("?")[0];
-        return (
-          pathname === targetPath ||
-          (targetPath !== "/dashboard" && pathname.startsWith(targetPath))
-        );
-      })?.label ?? tenantName;
+  const activeLabel = useMemo(
+    () => dashboardTitleFromPath(pathname, t, tenantName),
+    [pathname, t, tenantName]
+  );
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -55,7 +52,7 @@ export function DashboardChrome({
       {/* Mobile overlay */}
       <button
         type="button"
-        aria-label={menuOpen ? "Close menu" : ""}
+        aria-label={menuOpen ? t.dashboard.chrome.closeNavMenu : ""}
         className={`fixed inset-0 z-30 bg-black/40 transition-opacity lg:pointer-events-none lg:hidden ${
           menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
@@ -91,7 +88,9 @@ export function DashboardChrome({
                 {tenantName}
               </p>
               <p className="truncate text-xs capitalize text-gray-500">
-                {planTier} Plan
+                {fillTemplate(t.dashboard.chrome.planLineTemplate, {
+                  tier: planTier,
+                })}
               </p>
             </div>
           </div>
@@ -99,7 +98,7 @@ export function DashboardChrome({
             type="button"
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden"
             onClick={() => setMenuOpen(false)}
-            aria-label="Close navigation menu"
+            aria-label={t.dashboard.chrome.closeNavMenu}
           >
             <XIcon size={18} />
           </button>
@@ -114,6 +113,9 @@ export function DashboardChrome({
         </div>
 
         <div className="border-t border-gray-100 px-3 py-3">
+          <div className="mb-2 flex justify-center px-3 lg:hidden">
+            <LanguageSwitcher variant="light" />
+          </div>
           <Link
             href="/"
             onClick={() => setMenuOpen(false)}
@@ -121,7 +123,7 @@ export function DashboardChrome({
             className="mb-1 flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm hover:bg-gray-50"
           >
             <HelpCircleIcon size={16} />
-            <span>Help &amp; Support</span>
+            <span>{t.sidebar.helpSupport}</span>
           </Link>
           <LogoutButton />
         </div>
@@ -137,7 +139,7 @@ export function DashboardChrome({
               onClick={() => setMenuOpen(true)}
               aria-expanded={menuOpen}
               aria-controls="dashboard-sidebar"
-              aria-label="Open navigation menu"
+              aria-label={t.dashboard.chrome.openNavMenu}
             >
               <span className="flex flex-col gap-1" aria-hidden>
                 <span className="block h-0.5 w-5 rounded-full bg-current" />
@@ -150,6 +152,7 @@ export function DashboardChrome({
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <LanguageSwitcher variant="light" />
             <NotificationsBell />
             <Link
               href="/settings"

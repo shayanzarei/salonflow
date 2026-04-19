@@ -1,11 +1,16 @@
+"use client";
+
 import {
   MARKETING_BUTTON_PRIMARY,
   MARKETING_BUTTON_SECONDARY,
 } from "@/components/marketing/buttonStyles";
 import { ArrowRightIcon, PlayIcon } from "@/components/ui/Icons";
+import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 
 export default function MainSiteHero() {
+  const { t } = useLocale();
+  const w = t.website;
   return (
     <section
       id="hero"
@@ -14,12 +19,10 @@ export default function MainSiteHero() {
       {/* ── Left: copy ───────────────────────────────────────────────────── */}
       <div className="flex flex-col space-y-8 pr-0 lg:w-1/2 lg:pr-12">
         <h1 className="text-5xl font-bold leading-[1.1] tracking-tight text-slate-900 lg:text-7xl">
-          The all-in-one platform to run your business and grow your brand.
+          {w.heroTitle}
         </h1>
         <p className="max-w-lg text-xl leading-relaxed text-slate-600">
-          Stop juggling 10 different apps. SoloHub gives you a professional
-          website, smart booking, and automated invoicing in one unified,
-          beautiful workspace.
+          {w.heroBody}
         </p>
 
         <div className="flex flex-col space-y-4 pt-4 sm:flex-row sm:space-x-4 sm:space-y-0">
@@ -27,7 +30,7 @@ export default function MainSiteHero() {
             href="/signup"
             className={`${MARKETING_BUTTON_PRIMARY} space-x-2`}
           >
-            <span>Start Free</span>
+            <span>{w.heroStartFree}</span>
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
           <a
@@ -35,16 +38,16 @@ export default function MainSiteHero() {
             className={`${MARKETING_BUTTON_SECONDARY} space-x-2`}
           >
             <PlayIcon className="h-3.5 w-3.5 text-[#11c4b6]" />
-            <span>See How It Works</span>
+            <span>{w.heroSeeHow}</span>
           </a>
         </div>
 
         <div className="flex items-center space-x-4 pt-4">
           <div className="text-sm text-slate-600">
             <div className="text-sm font-bold">
-              🇳🇱 Direct 1-on-1 support from the founder.
+              🇳🇱 {w.heroSupport}
             </div>
-            <div className="text-sm">Built with care in the Netherlands.</div>
+            <div className="text-sm">{w.heroBuiltInNl}</div>
           </div>
         </div>
       </div>
@@ -63,8 +66,8 @@ export default function MainSiteHero() {
             ✅
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-900">New booking</p>
-            <p className="text-[10px] text-gray-400">Just now · Lisa K.</p>
+            <p className="text-xs font-bold text-gray-900">{w.heroBadgeTitle}</p>
+            <p className="text-[10px] text-gray-400">{w.heroBadgeMeta}</p>
           </div>
         </div>
 

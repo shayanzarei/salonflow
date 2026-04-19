@@ -1,24 +1,30 @@
 "use client";
 
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import LogoutButton from "@/components/dashboard/LogoutButton";
+import { useLocale } from "@/lib/i18n/context";
 import { XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-
-const NAV = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/tenants", label: "Tenants" },
-  { href: "/admin/packages", label: "Packages" },
-  { href: "/admin/demo-bookings", label: "Demo Bookings" },
-  { href: "/admin/contacts", label: "Contacts" },
-  { href: "/admin/subscriptions", label: "Payments" },
-  { href: "/admin/settings", label: "Settings" },
-];
+import { useEffect, useMemo, useState } from "react";
 
 export function AdminChrome({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { t } = useLocale();
+
+  const NAV = useMemo(
+    () => [
+      { href: "/admin", label: t.admin.overview },
+      { href: "/admin/tenants", label: t.admin.tenants },
+      { href: "/admin/packages", label: t.admin.packages },
+      { href: "/admin/demo-bookings", label: t.admin.demoBookings },
+      { href: "/admin/contacts", label: t.admin.contacts },
+      { href: "/admin/subscriptions", label: t.admin.payments },
+      { href: "/admin/settings", label: t.admin.settings },
+    ],
+    [t]
+  );
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -53,7 +59,7 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
               <p className="truncate text-sm font-semibold text-gray-900">
                 SoloHub
               </p>
-              <p className="truncate text-xs text-gray-400">Super Admin</p>
+              <p className="truncate text-xs text-gray-400">{t.admin.superAdmin}</p>
             </div>
           </div>
           <button
@@ -110,9 +116,11 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
               <span className="block h-0.5 w-5 rounded-full bg-current" />
             </span>
           </button>
-          <p className="truncate text-sm font-medium text-gray-600" />
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3">
+            <LanguageSwitcher variant="light" />
+          </div>
 
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white sm:h-11 sm:w-11">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white sm:h-11 sm:w-11">
             S
           </div>
         </header>

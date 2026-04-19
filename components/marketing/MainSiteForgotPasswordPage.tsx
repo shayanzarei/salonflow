@@ -11,10 +11,14 @@ import {
   MARKETING_BUTTON_DARK,
   MARKETING_BUTTON_SECONDARY,
 } from "@/components/marketing/buttonStyles";
+import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function MainSiteForgotPasswordPage() {
+  const { t } = useLocale();
+  const a = t.auth;
+  const f = t.authFlow;
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,7 +44,7 @@ export default function MainSiteForgotPasswordPage() {
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "Unable to send reset link."
+          : f.forgotSendErrorFallback
       );
     } finally {
       setLoading(false);
@@ -61,24 +65,23 @@ export default function MainSiteForgotPasswordPage() {
           className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
         >
           <ArrowLeftIcon size={14} />
-          Back to login
+          {f.backToLogin}
         </Link>
         <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ccfbf1] text-[#0ea5b7]">
           <KeyIcon className="h-5 w-5" />
         </div>
 
         <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-          Reset your password
+          {f.forgotTitle}
         </h1>
         <p className="mt-2 text-base text-slate-600 sm:text-lg">
-          Enter your email address and we&apos;ll send you a link to reset your
-          password.
+          {f.forgotSubtitle}
         </p>
 
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
-              Email Address
+              {a.email}
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -89,13 +92,11 @@ export default function MainSiteForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="you@company.com"
+                placeholder={f.forgotEmailPlaceholder}
                 className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
               />
             </div>
-            <p className="mt-2 text-sm text-slate-500">
-              We&apos;ll send a password reset link to this email address
-            </p>
+            <p className="mt-2 text-sm text-slate-500">{f.forgotEmailHint}</p>
           </div>
 
           {done ? (
@@ -112,7 +113,7 @@ export default function MainSiteForgotPasswordPage() {
             disabled={loading}
             className={`group w-full gap-2 ${MARKETING_BUTTON_DARK} disabled:cursor-not-allowed disabled:opacity-60`}
           >
-            <span>{loading ? "Sending..." : "Send Reset Link"}</span>
+            <span>{loading ? f.forgotSending : f.forgotSendLink}</span>
             <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </form>
@@ -122,13 +123,13 @@ export default function MainSiteForgotPasswordPage() {
             href="/login"
             className={`${MARKETING_BUTTON_SECONDARY} w-full gap-2 border-2`}
           >
-            <span>Sign In</span>
+            <span>{a.signIn}</span>
           </Link>
           <Link
             href="/signup"
             className={`${MARKETING_BUTTON_SECONDARY} w-full gap-2 border-2`}
           >
-            <span>Create Account</span>
+            <span>{a.createAccount}</span>
           </Link>
         </div>
 
@@ -139,12 +140,10 @@ export default function MainSiteForgotPasswordPage() {
             </div>
             <div>
               <h4 className="mb-1 text-sm font-semibold text-slate-900">
-                Security Notice
+                {f.forgotSecurityTitle}
               </h4>
               <p className="text-sm leading-relaxed text-slate-600">
-                For your security, if you didn&apos;t request this password
-                reset, please ignore this message or contact our support team
-                immediately.
+                {f.forgotSecurityBody}
               </p>
             </div>
           </div>

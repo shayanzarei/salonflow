@@ -10,12 +10,15 @@ import {
   ShieldIcon,
 } from "@/components/ui/Icons";
 import { MARKETING_BUTTON_DARK } from "@/components/marketing/buttonStyles";
+import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function MainSiteSignupPage() {
+  const { t } = useLocale();
+  const a = t.auth;
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,7 +35,7 @@ export default function MainSiteSignupPage() {
     const termsAccepted = formData.get("terms") === "on";
 
     if (!termsAccepted) {
-      setError("Please accept Terms of Service and Privacy Policy.");
+      setError(t.authFlow.signupTermsError);
       setLoading(false);
       return;
     }
@@ -148,18 +151,18 @@ export default function MainSiteSignupPage() {
           </div>
 
           <h2 className="mb-2 text-xl font-bold text-slate-900">
-            Setting up your workspace…
+            {a.signupCreateWorkspace}
           </h2>
           <p className="mb-8 text-sm leading-relaxed text-slate-500">
-            Creating your account and sending your verification email. This only takes a second.
+            {a.signupCreateWorkspaceBody}
           </p>
 
           {/* Animated steps */}
           <div className="space-y-3 text-left">
             {[
-              "Creating your account",
-              "Preparing your workspace",
-              "Sending verification email",
+              a.signupStep1,
+              a.signupStep2,
+              a.signupStep3,
             ].map((step, i) => (
               <div key={step} className="flex items-center gap-3">
                 <span
@@ -201,10 +204,10 @@ export default function MainSiteSignupPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-            Create your account
+            {a.signupTitle}
           </h1>
           <p className="mt-2 text-base text-slate-600 sm:text-lg">
-            Start your 14-day free trial. No credit card required.
+            {a.signupSubtitle}
           </p>
         </div>
 
@@ -224,7 +227,7 @@ export default function MainSiteSignupPage() {
                 htmlFor="first-name"
                 className="mb-2 block text-sm font-semibold text-slate-700"
               >
-                First Name
+                {a.signupFirstName}
               </label>
               <input
                 id="first-name"
@@ -240,7 +243,7 @@ export default function MainSiteSignupPage() {
                 htmlFor="last-name"
                 className="mb-2 block text-sm font-semibold text-slate-700"
               >
-                Last Name
+                {a.signupLastName}
               </label>
               <input
                 id="last-name"
@@ -258,7 +261,7 @@ export default function MainSiteSignupPage() {
               htmlFor="email"
               className="mb-2 block text-sm font-semibold text-slate-700"
             >
-              Work Email
+              {a.signupWorkEmail}
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -280,7 +283,7 @@ export default function MainSiteSignupPage() {
               htmlFor="password"
               className="mb-2 block text-sm font-semibold text-slate-700"
             >
-              Password
+              {a.signupCreatePassword}
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -299,7 +302,7 @@ export default function MainSiteSignupPage() {
                 type="button"
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? a.hidePassword : a.showPassword}
               >
                 <EyeIcon size={16} />
               </button>
@@ -308,10 +311,10 @@ export default function MainSiteSignupPage() {
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
                 <div className="h-full w-[18%] bg-[#11c4b6]" />
               </div>
-              <span className="text-xs font-medium text-slate-500">Weak</span>
+              <span className="text-xs font-medium text-slate-500">{a.signupPasswordHint}</span>
             </div>
             <p className="mt-2 text-xs text-slate-500">
-              Must be at least 8 characters with numbers and symbols
+              {a.signupPasswordRule}
             </p>
           </div>
 
@@ -320,8 +323,8 @@ export default function MainSiteSignupPage() {
               htmlFor="company"
               className="mb-2 block text-sm font-semibold text-slate-700"
             >
-              Company Name{" "}
-              <span className="font-normal text-slate-400">(Optional)</span>
+              {a.signupCompany}{" "}
+              <span className="font-normal text-slate-400">{a.signupOptional}</span>
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -342,7 +345,7 @@ export default function MainSiteSignupPage() {
               htmlFor="role"
               className="mb-2 block text-sm font-semibold text-slate-700"
             >
-              What best describes you?
+              {a.signupRoleLabel}
             </label>
             <div className="relative">
               <select
@@ -353,14 +356,14 @@ export default function MainSiteSignupPage() {
                 className="w-full appearance-none rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-colors focus:border-[#11c4b6]"
               >
                 <option value="" disabled>
-                  Select your role
+                  {a.signupRolePlaceholder}
                 </option>
-                <option value="freelancer">Freelancer</option>
-                <option value="consultant">Consultant</option>
-                <option value="agency-owner">Agency Owner</option>
-                <option value="entrepreneur">Entrepreneur</option>
-                <option value="small-business">Small Business Owner</option>
-                <option value="other">Other</option>
+                <option value="freelancer">{a.signupRoleFreelancer}</option>
+                <option value="consultant">{a.signupRoleConsultant}</option>
+                <option value="agency-owner">{a.signupRoleAgencyOwner}</option>
+                <option value="entrepreneur">{a.signupRoleEntrepreneur}</option>
+                <option value="small-business">{a.signupRoleSmallBusiness}</option>
+                <option value="other">{a.signupRoleOther}</option>
               </select>
                 <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
                   <ChevronDownIcon size={16} />
@@ -376,19 +379,19 @@ export default function MainSiteSignupPage() {
               className="mt-0.5 h-5 w-5 rounded border-2 border-slate-300 text-[#11c4b6] focus:ring-[#11c4b6]"
             />
             <span className="text-sm leading-relaxed text-slate-600">
-              I agree to SoloHub&apos;s{" "}
+              {a.signupAgreePrefix}{" "}
               <Link
                 href="/privacy"
                 className="font-semibold text-[#0ea5b7] underline decoration-[#99f6e4] underline-offset-2"
               >
-                Terms of Service
+                {a.signupTerms}
               </Link>{" "}
-              and{" "}
+              {a.signupAnd}{" "}
               <Link
                 href="/privacy"
                 className="font-semibold text-[#0ea5b7] underline decoration-[#99f6e4] underline-offset-2"
               >
-                Privacy Policy
+                {a.signupPrivacy}
               </Link>
             </span>
           </label>
@@ -400,7 +403,7 @@ export default function MainSiteSignupPage() {
               className="mt-0.5 h-5 w-5 rounded border-2 border-slate-300 text-[#11c4b6] focus:ring-[#11c4b6]"
             />
             <span className="text-sm leading-relaxed text-slate-600">
-              Send me product updates, tips, and exclusive offers
+              {a.signupMarketingOptIn}
             </span>
           </label>
 
@@ -413,19 +416,19 @@ export default function MainSiteSignupPage() {
             disabled={loading}
             className={`group w-full gap-2 ${MARKETING_BUTTON_DARK} disabled:cursor-not-allowed disabled:opacity-60`}
           >
-            <span>{loading ? "Creating account..." : "Create Account"}</span>
+            <span>{loading ? a.signupCreating : a.signupCreateAccount}</span>
             <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </form>
 
         <div className="mt-8 text-center">
           <p className="text-slate-600">
-            Already have an account?{" "}
+            {a.signupAlreadyAccount}{" "}
             <Link
               href="/login"
               className="font-semibold text-[#0ea5b7] underline decoration-[#99f6e4] underline-offset-2"
             >
-              Sign in
+              {a.signupSignIn}
             </Link>
           </p>
         </div>
@@ -435,19 +438,19 @@ export default function MainSiteSignupPage() {
             <div className="flex items-center gap-2">
               <ShieldIcon className="h-4 w-4 text-slate-600" />
               <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
-                SSL Secure
+                {a.signupSsl}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <LockIcon size={16} />
               <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
-                GDPR Compliant
+                {a.signupGdpr}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <ShieldIcon className="h-4 w-4 text-slate-600" />
               <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
-                SOC 2 Type II
+                {a.signupSoc2}
               </span>
             </div>
           </div>

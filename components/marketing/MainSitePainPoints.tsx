@@ -1,40 +1,43 @@
-import { RefreshIcon, SearchIcon, TagIcon } from "@/components/ui/Icons";
+"use client";
 
-const PAIN_POINTS = [
-  {
-    title: 'The "Link in Bio" Limit',
-    desc: "Instagram and WhatsApp aren't a business strategy. Relying on DMs makes you look like a hobbyist instead of a professional.",
-    Icon: TagIcon,
-    iconBg: "#FEF2F2",
-    iconColor: "#EF4444",
-  },
-  {
-    title: "The Booking Ping-Pong",
-    desc: 'Spending your workday texting "Are you free at 3?" back and forth instead of focusing on your clients.',
-    Icon: RefreshIcon,
-    iconBg: "#FFF7ED",
-    iconColor: "#F97316",
-  },
-  {
-    title: "Scattered Information",
-    desc: "Wasting hours searching through emails and messages just to find a client's appointment history or service notes.",
-    Icon: SearchIcon,
-    iconBg: "#FAF5FF",
-    iconColor: "#A855F7",
-  },
-];
+import { RefreshIcon, SearchIcon, TagIcon } from "@/components/ui/Icons";
+import { useLocale } from "@/lib/i18n/context";
 
 export default function MainSitePainPoints() {
+  const { t } = useLocale();
+  const w = t.website;
+  const PAIN_POINTS = [
+    {
+      title: w.pain1Title,
+      desc: w.pain1Body,
+      Icon: TagIcon,
+      iconBg: "#FEF2F2",
+      iconColor: "#EF4444",
+    },
+    {
+      title: w.pain2Title,
+      desc: w.pain2Body,
+      Icon: RefreshIcon,
+      iconBg: "#FFF7ED",
+      iconColor: "#F97316",
+    },
+    {
+      title: w.pain3Title,
+      desc: w.pain3Body,
+      Icon: SearchIcon,
+      iconBg: "#FAF5FF",
+      iconColor: "#A855F7",
+    },
+  ];
   return (
     <section id="problem" className="bg-white px-8 py-24">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-6 text-4xl font-bold text-slate-900">
-            Running a solo business shouldn’t feel like a 24/7 admin job.
+            {w.painTitle}
           </h2>
           <p className="text-xl text-slate-600">
-            You started your business for freedom, not to become a full-time
-            secretary.
+            {w.painBody}
           </p>
         </div>
 

@@ -1,18 +1,14 @@
 "use client";
 
+import { useLocale } from "@/lib/i18n/context";
+import type { AuthFlowSection } from "@/lib/i18n/catalog/auth-flow";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 
-// ── What's included in the trial ─────────────────────────────────────────────
-const TRIAL_PERKS = [
-  { icon: "🌐", label: "Professional website", sub: "Live in minutes" },
-  { icon: "📅", label: "Smart booking calendar", sub: "24/7 self-service" },
-  { icon: "💳", label: "Automated invoicing", sub: "Get paid faster" },
-];
-
-// ── Inner component (needs useSearchParams — must be inside Suspense) ─────────
 function VerifyEmailContent() {
+  const { t } = useLocale();
+  const f = t.authFlow;
   const params = useSearchParams();
   const verified = params.get("verified") === "1";
   const errorCode = params.get("error");
@@ -20,8 +16,19 @@ function VerifyEmailContent() {
 
   const [showResend, setShowResend] = useState(false);
   const [resendEmail, setResendEmail] = useState(emailParam);
-  const [resendState, setResendState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [resendState, setResendState] = useState<
+    "idle" | "sending" | "sent" | "error"
+  >("idle");
   const [resendError, setResendError] = useState("");
+
+  const trialPerks = useMemo(
+    () => [
+      { icon: "🌐", label: f.verifyPerk1Label, sub: f.verifyPerk1Sub },
+      { icon: "📅", label: f.verifyPerk2Label, sub: f.verifyPerk2Sub },
+      { icon: "💳", label: f.verifyPerk3Label, sub: f.verifyPerk3Sub },
+    ],
+    [f]
+  );
 
   async function handleResend(e: React.FormEvent) {
     e.preventDefault();
@@ -36,90 +43,96 @@ function VerifyEmailContent() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setResendError(json.error ?? "Could not resend email.");
+        setResendError(json.error ?? f.verifyResendErrorGeneric);
         setResendState("error");
       } else {
         setResendState("sent");
       }
     } catch {
-      setResendError("Something went wrong. Please try again.");
+      setResendError(f.verifyResendErrorUnknown);
       setResendState("error");
     }
   }
 
-  // ── ✅ Email verified — account active ────────────────────────────────────
   if (verified) {
     return (
       <div className="mx-auto w-full max-w-md">
         <div className="rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm text-center">
-          {/* Animated checkmark ring */}
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full text-4xl"
-            style={{ background: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)", boxShadow: "0 0 0 8px #ecfdf5" }}
+          <div
+            className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full text-4xl"
+            style={{
+              background: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",
+              boxShadow: "0 0 0 8px #ecfdf5",
+            }}
           >
             ✅
           </div>
 
           <h1 className="mb-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            You&apos;re all set!
+            {f.verifyAllSetTitle}
           </h1>
           <p className="mb-8 text-sm leading-relaxed text-slate-500">
-            Your email is confirmed and your 14-day free trial has started.
-            Everything is ready — just sign in.
+            {f.verifyAllSetBody}
           </p>
 
           <Link
             href="/login"
             className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
-            style={{ background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)" }}
+            style={{
+              background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)",
+            }}
           >
-            Go to my workspace →
+            {f.verifyGoWorkspace}
           </Link>
         </div>
       </div>
     );
   }
 
-  // ── ⚠️ Error states ───────────────────────────────────────────────────────
   if (errorCode) {
     const errorMessages: Record<string, { title: string; body: string }> = {
       expired: {
-        title: "Link expired",
-        body: "Verification links expire after 24 hours. Enter your email below and we'll send a fresh one.",
+        title: f.verifyErrExpiredTitle,
+        body: f.verifyErrExpiredBody,
       },
       already_used: {
-        title: "Already used",
-        body: "This link has already been used. If your account isn't active yet, request a new link.",
+        title: f.verifyErrAlreadyUsedTitle,
+        body: f.verifyErrAlreadyUsedBody,
       },
       invalid_token: {
-        title: "Invalid link",
-        body: "This link doesn't look right — it may have been copied incorrectly. Request a new one below.",
+        title: f.verifyErrInvalidTokenTitle,
+        body: f.verifyErrInvalidTokenBody,
       },
       missing_token: {
-        title: "Missing token",
-        body: "The link is incomplete. Try clicking the button in your email again, or request a new one.",
+        title: f.verifyErrMissingTokenTitle,
+        body: f.verifyErrMissingTokenBody,
       },
       server_error: {
-        title: "Something went wrong",
-        body: "A server error occurred. Please try again or contact support.",
+        title: f.verifyErrServerTitle,
+        body: f.verifyErrServerBody,
       },
     };
 
     const msg = errorMessages[errorCode] ?? {
-      title: "Verification failed",
-      body: "Something went wrong with your verification link.",
+      title: f.verifyErrDefaultTitle,
+      body: f.verifyErrDefaultBody,
     };
 
     return (
       <div className="mx-auto w-full max-w-md">
         <div className="rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm">
-          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
-            style={{ background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)" }}
+          <div
+            className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
+            style={{
+              background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+            }}
           >
             ⚠️
           </div>
           <h1 className="mb-2 text-2xl font-bold text-slate-900">{msg.title}</h1>
           <p className="mb-7 text-sm leading-relaxed text-slate-500">{msg.body}</p>
           <ResendForm
+            authFlow={f}
             email={resendEmail}
             setEmail={setResendEmail}
             state={resendState}
@@ -131,66 +144,78 @@ function VerifyEmailContent() {
     );
   }
 
-  // ── 📬 Default: check your inbox ─────────────────────────────────────────
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
-
-      {/* Main card */}
       <div className="rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm">
-
-        {/* Progress steps */}
         <div className="mb-8 flex items-center justify-center gap-2 text-xs">
           <span className="flex items-center gap-1.5 font-semibold text-[#0ea5b7]">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full text-white text-[10px] font-bold"
-              style={{ background: "linear-gradient(135deg, #11C4B6, #0EA5B7)" }}>✓</span>
-            Create account
+            <span
+              className="flex h-5 w-5 items-center justify-center rounded-full text-white text-[10px] font-bold"
+              style={{
+                background: "linear-gradient(135deg, #11C4B6, #0EA5B7)",
+              }}
+            >
+              ✓
+            </span>
+            {f.verifyStepCreate}
           </span>
           <span className="h-px w-6 bg-slate-200" />
           <span className="flex items-center gap-1.5 font-semibold text-slate-900">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#11C4B6] text-[10px] font-bold text-[#0ea5b7]">2</span>
-            Verify email
+            <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#11C4B6] text-[10px] font-bold text-[#0ea5b7]">
+              2
+            </span>
+            {f.verifyStepVerify}
           </span>
           <span className="h-px w-6 bg-slate-200" />
           <span className="flex items-center gap-1.5 text-slate-400">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-slate-200 text-[10px] font-bold text-slate-400">3</span>
-            Start trial
+            <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-slate-200 text-[10px] font-bold text-slate-400">
+              3
+            </span>
+            {f.verifyStepTrial}
           </span>
         </div>
 
-        {/* Icon */}
         <div
           className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl"
-          style={{ background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)", boxShadow: "0 8px 24px -4px rgba(17,196,182,0.4)" }}
+          style={{
+            background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)",
+            boxShadow: "0 8px 24px -4px rgba(17,196,182,0.4)",
+          }}
         >
           ✉️
         </div>
 
         <h1 className="mb-2 text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-          Check your inbox
+          {f.verifyCheckInbox}
         </h1>
 
-        {/* Email address pill */}
         <div className="my-5 flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-          <svg className="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            className="h-4 w-4 shrink-0 text-slate-400"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <rect x="2" y="4" width="20" height="16" rx="2" />
             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
           </svg>
           <span className="truncate text-sm font-semibold text-slate-700">
-            {emailParam || "your email address"}
+            {emailParam || f.verifyYourEmailFallback}
           </span>
         </div>
 
         <p className="mb-6 text-center text-sm leading-relaxed text-slate-500">
-          We sent a verification link to that address. Click it to activate your account and start your free trial.
+          {f.verifyInboxBody}
         </p>
 
-        {/* Resend toggle / form */}
         {resendState === "sent" ? (
           <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-center text-sm font-semibold text-green-800">
-            ✓ New link sent — check your inbox (and spam folder).
+            {f.verifyResendSent}
           </div>
         ) : showResend ? (
           <ResendForm
+            authFlow={f}
             email={resendEmail}
             setEmail={setResendEmail}
             state={resendState}
@@ -199,37 +224,46 @@ function VerifyEmailContent() {
           />
         ) : (
           <p className="text-center text-sm text-slate-400">
-            Didn&apos;t receive it?{" "}
+            {f.verifyResendPrompt}{" "}
             <button
+              type="button"
               onClick={() => setShowResend(true)}
               className="font-semibold text-[#0ea5b7] underline decoration-[#99f6e4] underline-offset-2 hover:opacity-80"
             >
-              Resend the email
-            </button>
-            {" "}or check your spam folder.
+              {f.verifyResendLink}
+            </button>{" "}
+            {f.verifySpamHint}
           </p>
         )}
       </div>
 
-      {/* "What's waiting for you" card */}
       <div className="rounded-2xl border border-slate-100 bg-white/70 px-6 py-5 backdrop-blur-sm">
         <p className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">
-          What&apos;s waiting for you
+          {f.verifyWhatsWaiting}
         </p>
         <div className="space-y-3">
-          {TRIAL_PERKS.map((perk) => (
+          {trialPerks.map((perk) => (
             <div key={perk.label} className="flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
-                style={{ background: "linear-gradient(135deg, #f0fdfc 0%, #ccfbf1 100%)" }}
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #f0fdfc 0%, #ccfbf1 100%)",
+                }}
               >
                 {perk.icon}
               </span>
               <div>
-                <p className="text-sm font-semibold text-slate-800">{perk.label}</p>
+                <p className="text-sm font-semibold text-slate-800">
+                  {perk.label}
+                </p>
                 <p className="text-xs text-slate-400">{perk.sub}</p>
               </div>
-              <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full text-white text-[10px] font-bold"
-                style={{ background: "linear-gradient(135deg, #11C4B6, #0EA5B7)" }}
+              <span
+                className="ml-auto flex h-5 w-5 items-center justify-center rounded-full text-white text-[10px] font-bold"
+                style={{
+                  background: "linear-gradient(135deg, #11C4B6, #0EA5B7)",
+                }}
               >
                 ✓
               </span>
@@ -237,22 +271,22 @@ function VerifyEmailContent() {
           ))}
         </div>
         <p className="mt-4 text-center text-xs text-slate-400">
-          All included in your 14-day free trial · No credit card needed
+          {f.verifyTrialFooter}
         </p>
       </div>
-
     </div>
   );
 }
 
-// ── Reusable resend form ──────────────────────────────────────────────────────
 function ResendForm({
+  authFlow: af,
   email,
   setEmail,
   state,
   error,
   onSubmit,
 }: {
+  authFlow: AuthFlowSection;
   email: string;
   setEmail: (v: string) => void;
   state: "idle" | "sending" | "sent" | "error";
@@ -266,24 +300,30 @@ function ResendForm({
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="your@email.com"
+        placeholder={af.verifyResendPlaceholder}
         className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
       />
-      {error && <p className="text-sm font-medium text-rose-600">{error}</p>}
+      {error ? (
+        <p className="text-sm font-medium text-rose-600">{error}</p>
+      ) : null}
       <button
         type="submit"
         disabled={state === "sending"}
         className="w-full rounded-xl py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-        style={{ background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)" }}
+        style={{
+          background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)",
+        }}
       >
-        {state === "sending" ? "Sending…" : "Resend verification email"}
+        {state === "sending" ? af.verifyResending : af.verifyResendSend}
       </button>
     </form>
   );
 }
 
-// ── Page shell ────────────────────────────────────────────────────────────────
 export default function VerifyEmailPage() {
+  const { t } = useLocale();
+  const f = t.authFlow;
+
   return (
     <div
       className="min-h-screen px-4 py-10 sm:px-6"
@@ -293,9 +333,8 @@ export default function VerifyEmailPage() {
         backgroundColor: "#f8fcff",
       }}
     >
-      {/* Logo */}
       <div className="mb-10 flex justify-center">
-        <Link href="/" aria-label="Go to SoloHub home">
+        <Link href="/" aria-label={f.verifyHomeAria}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/SoloHub%20logo%20png.png"
@@ -310,13 +349,13 @@ export default function VerifyEmailPage() {
       </Suspense>
 
       <p className="mt-10 text-center text-xs text-slate-400">
-        Already verified?{" "}
+        {f.verifyAlreadyFooter}{" "}
         <Link href="/login" className="text-[#0ea5b7] hover:underline">
-          Sign in
+          {f.verifySignIn}
         </Link>
         {" · "}
         <Link href="/contact" className="text-[#0ea5b7] hover:underline">
-          Contact support
+          {f.verifyContactSupport}
         </Link>
       </p>
     </div>

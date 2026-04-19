@@ -1,5 +1,9 @@
 import pool from "@/lib/db";
 import { formatEUR } from "@/lib/format-currency";
+import { fillTemplate } from "@/lib/i18n/interpolate";
+import { bcp47ForLocale } from "@/lib/i18n/locale-format";
+import { getServerTranslations } from "@/lib/i18n/server";
+import type { Translations } from "@/lib/i18n/translations";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -26,23 +30,41 @@ function getStatus(
   return "Regular";
 }
 
-function getDaysAgo(date: string) {
+function getDaysAgo(
+  date: string,
+  dc: Translations["dashboard"]["customers"]
+): string {
   const days = Math.floor(
     (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24)
   );
-  if (days === 0) return "Today";
-  if (days === 1) return "1 day ago";
-  return `${days} days ago`;
+  if (days === 0) return dc.today;
+  if (days === 1) return dc.oneDayAgo;
+  return fillTemplate(dc.daysAgoTemplate, { n: days });
 }
 
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; color: string; bg: string }
-> = {
-  VIP: { label: "VIP", color: "#92400E", bg: "#FEF3C7" },
-  Regular: { label: "Regular", color: "#374151", bg: "#F3F4F6" },
-  New: { label: "New", color: "#065F46", bg: "#D1FAE5" },
-  "At Risk": { label: "At Risk", color: "#991B1B", bg: "#FEE2E2" },
+function customerStatusLabel(
+  status: string,
+  dc: Translations["dashboard"]["customers"]
+): string {
+  switch (status) {
+    case "VIP":
+      return dc.statusVip;
+    case "Regular":
+      return dc.statusRegular;
+    case "New":
+      return dc.statusNew;
+    case "At Risk":
+      return dc.statusAtRisk;
+    default:
+      return status;
+  }
+}
+
+const STATUS_STYLE: Record<string, { color: string; bg: string }> = {
+  VIP: { color: "#92400E", bg: "#FEF3C7" },
+  Regular: { color: "#374151", bg: "#F3F4F6" },
+  New: { color: "#065F46", bg: "#D1FAE5" },
+  "At Risk": { color: "#991B1B", bg: "#FEE2E2" },
 };
 
 export default async function CustomersPage({
@@ -50,6 +72,9 @@ export default async function CustomersPage({
 }: {
   searchParams: Promise<{ tab?: string; page?: string }>;
 }) {
+  const { locale, t } = await getServerTranslations();
+  const dateLocale = bcp47ForLocale(locale);
+  const dc = t.dashboard.customers;
   const tenant = await getTenant();
   if (!tenant) notFound();
 
@@ -127,10 +152,10 @@ export default async function CustomersPage({
   const customers = filtered.slice(offset, offset + PAGE_SIZE);
 
   const tabs = [
-    { label: "All Customers", value: "all" },
-    { label: "VIP", value: "vip" },
-    { label: "New", value: "new", suffix: "(this month)" },
-    { label: "At Risk", value: "at-risk", suffix: "(60+ days)" },
+    { label: dc.tabAll, value: "all" },
+    { label: dc.tabVip, value: "vip" },
+    { label: dc.tabNew, value: "new", suffix: dc.tabNewSuffix },
+    { label: dc.tabAtRisk, value: "at-risk", suffix: dc.tabAtRiskSuffix },
   ];
 
   function tabHref(t: string) {
@@ -145,7 +170,7 @@ export default async function CustomersPage({
       {/* Header */}
       <div className="mb-5 sm:mb-6">
         <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
-          Customers
+          {dc.title}
         </h1>
       </div>
 
@@ -165,7 +190,7 @@ export default async function CustomersPage({
         >
           <div>
             <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
-              Total Customers
+              {dc.totalCustomers}
             </p>
             <p
               style={{
@@ -178,7 +203,7 @@ export default async function CustomersPage({
               {totalCustomers.toLocaleString()}
             </p>
             <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
-              All time
+              {dc.allTime}
             </p>
           </div>
           <div
@@ -235,7 +260,7 @@ export default async function CustomersPage({
         >
           <div>
             <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
-              New This Month
+              {dc.newThisMonth}
             </p>
             <p
               style={{
@@ -258,8 +283,11 @@ export default async function CustomersPage({
                   borderRadius: 100,
                 }}
               >
-                {newGrowthPct >= 0 ? "↑" : "↓"} {Math.abs(newGrowthPct)}% vs
-                last month
+                {fillTemplate(dc.growthLineTemplate, {
+                  arrow: newGrowthPct >= 0 ? "↑" : "↓",
+                  n: Math.abs(newGrowthPct),
+                  vs: dc.growthVsLastMonth,
+                })}
               </span>
             )}
           </div>
@@ -333,7 +361,7 @@ export default async function CustomersPage({
               {formatEUR(avgSpend)}
             </p>
             <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
-              Per customer
+              {dc.perCustomer}
             </p>
           </div>
           <div
@@ -387,16 +415,47 @@ export default async function CustomersPage({
       {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
         {customers.length === 0 ? (
-          <div
-            style={{
-              padding: "48px 24px",
-              textAlign: "center",
-              color: "#9CA3AF",
-              fontSize: 14,
-            }}
-          >
-            No customers found.
-          </div>
+          allCustomers.length === 0 ? (
+            /* ── First-time: no clients yet ── */
+            <div style={{ padding: "72px 24px", textAlign: "center" }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
+              <p style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", margin: "0 0 8px" }}>
+                {dc.emptyNoClientsTitle}
+              </p>
+              <p style={{ fontSize: 14, color: "#64748B", margin: "0 0 24px", maxWidth: 380, display: "inline-block", lineHeight: 1.6 }}>
+                {dc.emptyNoClientsBody}
+              </p>
+              <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                <Link
+                  href="/bookings/new"
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    padding: "10px 20px", borderRadius: 10, fontSize: 14,
+                    fontWeight: 600, color: "#fff", background: brand,
+                    textDecoration: "none",
+                  }}
+                >
+                  {dc.addFirstBooking}
+                </Link>
+                <Link
+                  href="/settings/site"
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    padding: "10px 20px", borderRadius: 10, fontSize: 14,
+                    fontWeight: 600, color: "#475569",
+                    border: "1px solid #E2E8F0", textDecoration: "none",
+                  }}
+                >
+                  {dc.setupBookingSite}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            /* ── Has clients but filter matched nothing ── */
+            <div style={{ padding: "48px 24px", textAlign: "center", color: "#94A3B8", fontSize: 14 }}>
+              {dc.emptyFilter}
+            </div>
+          )
         ) : (
           <>
             <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
@@ -404,13 +463,13 @@ export default async function CustomersPage({
                 <thead>
                   <tr style={{ borderBottom: "1px solid #F3F4F6" }}>
                     {[
-                      "Client",
-                      "Contact",
-                      "Visits",
-                      "Last Visit",
-                      "Total Spent",
-                      "Status",
-                      "Action",
+                      dc.colClient,
+                      dc.colContact,
+                      dc.colVisits,
+                      dc.colLastVisit,
+                      dc.colTotalSpent,
+                      dc.colStatus,
+                      dc.colAction,
                     ].map((h) => (
                       <th
                         key={h}
@@ -432,7 +491,7 @@ export default async function CustomersPage({
                 <tbody>
                   {customers.map((customer, i) => {
                     const cfg =
-                      STATUS_CONFIG[customer.status] ?? STATUS_CONFIG.Regular;
+                      STATUS_STYLE[customer.status] ?? STATUS_STYLE.Regular;
                     return (
                       <tr
                         key={customer.client_email + i}
@@ -490,7 +549,7 @@ export default async function CustomersPage({
                                 Member since{" "}
                                 {new Date(
                                   customer.member_since
-                                ).toLocaleDateString("en-US", {
+                                ).toLocaleDateString(dateLocale, {
                                   month: "short",
                                   year: "numeric",
                                 })}
@@ -589,7 +648,7 @@ export default async function CustomersPage({
                               color: "#9CA3AF",
                             }}
                           >
-                            total visits
+                            {dc.visitsSubline}
                           </p>
                         </td>
 
@@ -604,7 +663,7 @@ export default async function CustomersPage({
                             }}
                           >
                             {new Date(customer.last_visit).toLocaleDateString(
-                              "en-US",
+                              dateLocale,
                               {
                                 month: "short",
                                 day: "numeric",
@@ -619,7 +678,7 @@ export default async function CustomersPage({
                               color: "#9CA3AF",
                             }}
                           >
-                            {getDaysAgo(customer.last_visit)}
+                            {getDaysAgo(customer.last_visit, dc)}
                           </p>
                         </td>
 
@@ -650,7 +709,7 @@ export default async function CustomersPage({
                               background: cfg.bg,
                             }}
                           >
-                            {cfg.label}
+                            {customerStatusLabel(customer.status, dc)}
                           </span>
                         </td>
 
@@ -665,7 +724,7 @@ export default async function CustomersPage({
                               textDecoration: "none",
                             }}
                           >
-                            View History
+                            {dc.viewHistory}
                           </Link>
                         </td>
                       </tr>
@@ -678,15 +737,11 @@ export default async function CustomersPage({
             {/* Pagination */}
             <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <p style={{ margin: 0, fontSize: 13, color: "#6B7280" }}>
-                Showing{" "}
-                <strong style={{ color: "#111" }}>
-                  {showingFrom}–{showingTo}
-                </strong>{" "}
-                of{" "}
-                <strong style={{ color: "#111" }}>
-                  {totalFiltered.toLocaleString()}
-                </strong>{" "}
-                customers
+                {fillTemplate(dc.showingRangeTemplate, {
+                  from: showingFrom,
+                  to: showingTo,
+                  total: totalFiltered.toLocaleString(dateLocale),
+                })}
               </p>
 
               <div className="flex flex-wrap items-center gap-1 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">

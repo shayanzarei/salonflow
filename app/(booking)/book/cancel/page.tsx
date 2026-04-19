@@ -1,5 +1,8 @@
 import { CalendarIcon, ClockIcon, MapPinIcon, ScissorsIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
+import { fillTemplate } from "@/lib/i18n/interpolate";
+import { bcp47ForLocale } from "@/lib/i18n/locale-format";
+import { getServerTranslations } from "@/lib/i18n/server";
 import { notFound } from "next/navigation";
 
 export default async function CancelPage({
@@ -8,6 +11,9 @@ export default async function CancelPage({
   searchParams: Promise<{ booking?: string; token?: string }>;
 }) {
   const { booking, token } = await searchParams;
+  const { locale, t } = await getServerTranslations();
+  const dateLocale = bcp47ForLocale(locale);
+  const c = t.booking.cancel;
 
   if (!booking || !token) notFound();
 
@@ -53,17 +59,17 @@ export default async function CancelPage({
           <span style={{ fontSize: 36 }}>✓</span>
         </div>
         <h1 className="mb-3 text-center text-2xl font-bold text-gray-900 sm:text-3xl">
-          Already cancelled
+          {c.alreadyTitle}
         </h1>
         <p className="mb-8 text-center text-sm text-gray-500 sm:text-base">
-          This appointment has already been cancelled.
+          {c.alreadyBody}
         </p>
         <a
           href="/"
           className="inline-flex min-h-12 items-center justify-center rounded-full px-8 py-3 text-sm font-semibold text-white no-underline sm:px-10 sm:text-[15px]"
           style={{ background: brand }}
         >
-          Back to home
+          {t.booking.success.backToHome}
         </a>
       </div>
     );
@@ -89,11 +95,10 @@ export default async function CancelPage({
 
       {/* Title */}
       <h1 className="mb-3 max-w-md text-balance text-center text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
-        Cancel appointment?
+        {c.cancelTitle}
       </h1>
       <p className="mb-8 max-w-md text-center text-sm leading-relaxed text-gray-500 sm:mb-9 sm:text-base">
-        Are you sure you want to cancel this booking? This action cannot be
-        undone.
+        {c.cancelBody}
       </p>
 
       <div className="mb-4 w-full max-w-md rounded-[20px] border border-gray-100 bg-white p-5 sm:p-7">
@@ -109,7 +114,7 @@ export default async function CancelPage({
             gap: 6,
           }}
         >
-          ℹ Appointment Details
+          ℹ {c.appointmentDetails}
         </p>
 
         <div className="mb-6 flex flex-col gap-4 border-b border-gray-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
@@ -140,7 +145,7 @@ export default async function CancelPage({
                 {bookingData.service_name}
               </h3>
               <p style={{ fontSize: 13, color: "#888", margin: 0 }}>
-                with {bookingData.staff_name}
+                {c.withStaffPrefix} {bookingData.staff_name}
               </p>
             </div>
           </div>
@@ -161,7 +166,7 @@ export default async function CancelPage({
                 gap: 4,
               }}
             >
-              <CalendarIcon size={12} /> Date
+              <CalendarIcon size={12} /> {c.date}
             </p>
             <p
               style={{
@@ -171,7 +176,7 @@ export default async function CancelPage({
                 margin: 0,
               }}
             >
-              {bookedAt.toLocaleDateString("en-US", {
+              {bookedAt.toLocaleDateString(dateLocale, {
                 weekday: "long",
                 month: "long",
                 day: "numeric",
@@ -189,7 +194,7 @@ export default async function CancelPage({
                 gap: 4,
               }}
             >
-              <ClockIcon size={12} /> Time
+              <ClockIcon size={12} /> {c.time}
             </p>
             <p
               style={{
@@ -199,7 +204,7 @@ export default async function CancelPage({
                 margin: 0,
               }}
             >
-              {bookedAt.toLocaleTimeString("en-US", {
+              {bookedAt.toLocaleTimeString(dateLocale, {
                 hour: "numeric",
                 minute: "2-digit",
               })}
@@ -216,7 +221,7 @@ export default async function CancelPage({
                 gap: 4,
               }}
             >
-              <ClockIcon size={12} /> Duration
+              <ClockIcon size={12} /> {c.duration}
             </p>
             <p
               style={{
@@ -226,7 +231,7 @@ export default async function CancelPage({
                 margin: 0,
               }}
             >
-              {bookingData.duration_mins} minutes
+              {fillTemplate(c.minutesUnit, { n: bookingData.duration_mins })}
             </p>
           </div>
           {bookingData.address && (
@@ -241,7 +246,7 @@ export default async function CancelPage({
                   gap: 4,
                 }}
               >
-                <MapPinIcon size={12} /> Location
+                <MapPinIcon size={12} /> {c.location}
               </p>
               <p
                 style={{
@@ -271,7 +276,7 @@ export default async function CancelPage({
             gap: 6,
           }}
         >
-          ⚠ Cancellation Policy
+          ⚠ {c.policyTitle}
         </p>
         <p
           style={{
@@ -282,8 +287,7 @@ export default async function CancelPage({
             opacity: 0.8,
           }}
         >
-          Cancellations made less than 24 hours before your appointment may be
-          subject to a cancellation fee.
+          {c.policyBody}
         </p>
       </div>
 
@@ -292,7 +296,7 @@ export default async function CancelPage({
           href="/"
           className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-center text-sm font-semibold text-gray-800 no-underline sm:text-[15px]"
         >
-          ← Keep appointment
+          {c.keepAppointment}
         </a>
         <form action="/api/bookings/cancel" method="POST" className="flex-1">
           <input type="hidden" name="booking_id" value={booking} />
@@ -301,7 +305,7 @@ export default async function CancelPage({
             type="submit"
             className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-none bg-red-500 px-4 py-3 text-sm font-semibold text-white"
           >
-            ✕ Yes, cancel
+            {c.confirmCancel}
           </button>
         </form>
       </div>
@@ -309,7 +313,7 @@ export default async function CancelPage({
       {/* Reschedule link */}
       <div style={{ textAlign: "center" }}>
         <p style={{ fontSize: 14, color: "#888", margin: "0 0 8px" }}>
-          Need to reschedule instead?
+          {c.reschedulePrompt}
         </p>
         <a
           href="/book"
@@ -323,7 +327,7 @@ export default async function CancelPage({
             gap: 6,
           }}
         >
-          <CalendarIcon size={14} /> Choose a new time
+          <CalendarIcon size={14} /> {c.rescheduleLink}
         </a>
       </div>
     </div>

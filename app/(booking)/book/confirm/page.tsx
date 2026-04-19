@@ -1,6 +1,9 @@
 import BookingProgress from "@/components/booking/BookingProgress";
 import { MapPinIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
+import { fillTemplate } from "@/lib/i18n/interpolate";
+import { bcp47ForLocale } from "@/lib/i18n/locale-format";
+import { getServerTranslations } from "@/lib/i18n/server";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
@@ -10,6 +13,8 @@ export default async function ConfirmPage({
 }: {
   searchParams: Promise<{ service?: string; staff?: string; time?: string }>;
 }) {
+  const { locale, t } = await getServerTranslations();
+  const dateLocale = bcp47ForLocale(locale);
   const tenant = await getTenant();
   if (!tenant) notFound();
 
@@ -40,17 +45,21 @@ export default async function ConfirmPage({
           href={`/book/time?service=${service}&staff=${staff}`}
           className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
         >
-          ← Back
+          {t.booking.back}
         </a>
 
-        <BookingProgress step={4} brand={brand} />
+        <BookingProgress
+          step={4}
+          brand={brand}
+          progressLabels={t.booking.progress}
+        />
 
         <div className="mb-8 text-center sm:mb-10 md:mb-12">
           <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
-            Confirm your booking
+            {t.booking.confirmTitle}
           </h1>
           <p className="mt-2 text-sm text-gray-500 sm:text-base">
-            Review your appointment details before confirming
+            {t.booking.confirmSubtitle}
           </p>
         </div>
 
@@ -85,7 +94,7 @@ export default async function ConfirmPage({
                   margin: 0,
                 }}
               >
-                Booking Summary
+                {t.booking.summaryHeading}
               </h2>
             </div>
 
@@ -141,25 +150,27 @@ export default async function ConfirmPage({
                 style={{ display: "flex", flexDirection: "column", gap: 16 }}
               >
                 {[
-                  { label: "Service", value: selectedService.name },
+                  { label: t.booking.rowService, value: selectedService.name },
                   {
-                    label: "Date",
-                    value: bookedAt.toLocaleDateString("en-US", {
+                    label: t.booking.rowDate,
+                    value: bookedAt.toLocaleDateString(dateLocale, {
                       weekday: "long",
                       month: "long",
                       day: "numeric",
                     }),
                   },
                   {
-                    label: "Time",
-                    value: bookedAt.toLocaleTimeString("en-US", {
+                    label: t.booking.rowTime,
+                    value: bookedAt.toLocaleTimeString(dateLocale, {
                       hour: "numeric",
                       minute: "2-digit",
                     }),
                   },
                   {
-                    label: "Duration",
-                    value: `${selectedService.duration_mins} mins`,
+                    label: t.booking.rowDuration,
+                    value: fillTemplate(t.booking.durationMinsShort, {
+                      n: selectedService.duration_mins,
+                    }),
                   },
                 ].map((item) => (
                   <div
@@ -188,7 +199,7 @@ export default async function ConfirmPage({
                   <span
                     style={{ fontSize: 15, fontWeight: 600, color: "#111" }}
                   >
-                    Total
+                    {t.booking.rowTotal}
                   </span>
                   <span style={{ fontSize: 24, fontWeight: 700, color: brand }}>
                     €{selectedService.price}
@@ -214,7 +225,7 @@ export default async function ConfirmPage({
                       margin: "0 0 8px",
                     }}
                   >
-                    Location
+                    {t.booking.rowLocation}
                   </p>
                   <p style={{ fontSize: 14, color: "#555", margin: 0, display: "flex", alignItems: "center", gap: 4 }}>
                     <MapPinIcon size={13} /> {tenant.address}
@@ -234,10 +245,10 @@ export default async function ConfirmPage({
                 margin: "0 0 6px",
               }}
             >
-              Your details
+              {t.booking.yourDetails}
             </h2>
             <p style={{ fontSize: 14, color: "#888", margin: "0 0 28px" }}>
-              Enter your information to complete the booking
+              {t.booking.yourDetailsHint}
             </p>
 
             <form
@@ -260,13 +271,13 @@ export default async function ConfirmPage({
                     marginBottom: 8,
                   }}
                 >
-                  Full name
+                  {t.booking.fullName}
                 </label>
                 <input
                   type="text"
                   name="client_name"
                   required
-                  placeholder="Sarah Johnson"
+                  placeholder={t.booking.placeholderName}
                   className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
                 />
               </div>
@@ -281,13 +292,13 @@ export default async function ConfirmPage({
                     marginBottom: 8,
                   }}
                 >
-                  Email address
+                  {t.booking.emailAddress}
                 </label>
                 <input
                   type="email"
                   name="client_email"
                   required
-                  placeholder="sarah@example.com"
+                  placeholder={t.booking.placeholderEmail}
                   className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
                 />
               </div>
@@ -302,15 +313,15 @@ export default async function ConfirmPage({
                     marginBottom: 8,
                   }}
                 >
-                  Phone number{" "}
+                  {t.booking.phoneNumber}{" "}
                   <span style={{ color: "#bbb", fontWeight: 400 }}>
-                    (optional)
+                    {t.booking.phoneOptional}
                   </span>
                 </label>
                 <input
                   type="tel"
                   name="client_phone"
-                  placeholder="+31 6 12345678"
+                  placeholder={t.booking.placeholderPhone}
                   className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
                 />
               </div>
@@ -331,8 +342,7 @@ export default async function ConfirmPage({
                     lineHeight: 1.6,
                   }}
                 >
-                  By confirming, you agree to our cancellation policy. Free
-                  cancellation up to 24 hours before your appointment.
+                  {t.booking.confirmPolicyNotice}
                 </p>
               </div>
 
@@ -341,7 +351,7 @@ export default async function ConfirmPage({
                 className="mt-1 w-full min-h-12 rounded-full border-none py-4 text-base font-semibold text-white"
                 style={{ background: brand, cursor: "pointer" }}
               >
-                Confirm booking →
+                {t.booking.confirmBookingCta}
               </button>
             </form>
           </div>

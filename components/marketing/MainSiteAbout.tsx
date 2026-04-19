@@ -1,8 +1,13 @@
+"use client";
+
 import { ArrowRightIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { MARKETING_BUTTON_DARK } from "@/components/marketing/buttonStyles";
+import { useLocale } from "@/lib/i18n/context";
 
 export default function MainSiteAbout() {
+  const { t } = useLocale();
+  const w = t.website;
   return (
     <section
       id="about-story"
@@ -34,29 +39,23 @@ export default function MainSiteAbout() {
           <div className="lg:w-1/2">
             <div className="mb-6 inline-block rounded-full bg-[#ccfbf1] px-4 py-2 text-sm font-semibold text-[#0ea5b7]">
               <span className="mr-2">🇳🇱</span>
-              Built in the Netherlands
+              {w.aboutBadge}
             </div>
             <h2 className="mb-6 text-4xl font-bold tracking-tight text-slate-900 lg:text-5xl">
-              We’ve walked in your shoes.
+              {w.aboutTitle}
             </h2>
             <p className="mb-6 text-xl leading-relaxed text-slate-600">
-              SoloHub was born from a real-world challenge at our kitchen table.
-              Watching my partner manage her Physiotherapy practice, I saw the
-              frustration of juggling messy calendars and unprofessional
-              &apos;Link-in-bio&apos; tools.
+              {w.aboutBody1}
             </p>
             <p className="mb-8 text-lg leading-relaxed text-slate-600">
-              We combined her industry insights with my technical craft to build
-              the digital partner we both wished existed. Our mission is simple:
-              to give you a professional presence in minutes, so you can focus
-              on your clients, not your admin.
+              {w.aboutBody2}
             </p>
             <div className="flex flex-col gap-8 sm:flex-row">
               <Link
                 href="/about"
                 className={`${MARKETING_BUTTON_DARK} space-x-2`}
               >
-                <span>Read Our Story</span>
+                <span>{w.aboutCta}</span>
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
               <div className="flex items-center -space-x-2 px-6">
@@ -78,7 +77,7 @@ export default function MainSiteAbout() {
                     Shayan & Aryana
                   </p>
                   <p className="text-xs text-slate-500">
-                    Founder & Co-Founder
+                    {w.aboutFounderRole}
                   </p>
                 </div>
               </div>
@@ -87,21 +86,21 @@ export default function MainSiteAbout() {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
                 <div className="text-center sm:text-left">
                   <div className="mb-1 text-xl font-bold text-[#0ea5b7]">
-                    Founding Member
+                    {w.stat1Title}
                   </div>
-                  <div className="text-sm text-slate-600">Personal Support</div>
+                  <div className="text-sm text-slate-600">{w.stat1Body}</div>
                 </div>
                 <div className="text-center sm:text-left">
                   <div className="mb-1 text-xl font-bold text-[#0ea5b7]">
-                    100% Focused
+                    {w.stat2Title}
                   </div>
-                  <div className="text-sm text-slate-600">On Solo Pros</div>
+                  <div className="text-sm text-slate-600">{w.stat2Body}</div>
                 </div>
                 <div className="text-center sm:text-left">
                   <div className="mb-1 text-xl font-bold text-[#0ea5b7]">
                     2026
                   </div>
-                  <div className="text-sm text-slate-600">Founded</div>
+                  <div className="text-sm text-slate-600">{w.stat3Body}</div>
                 </div>
               </div>
             </div>

@@ -1,16 +1,27 @@
+import { fillTemplate } from "@/lib/i18n/interpolate";
+import type { BookingSection } from "@/lib/i18n/catalog/booking";
+
+type ProgressLabels = BookingSection["progress"];
+
 export default function BookingProgress({
   step,
   brand,
+  variant = "default",
+  progressLabels,
 }: {
   step: number;
   brand: string;
+  variant?: "default" | "complete";
+  progressLabels: ProgressLabels;
 }) {
   const steps = [
-    { num: 1, label: "Service" },
-    { num: 2, label: "Staff" },
-    { num: 3, label: "Time" },
-    { num: 4, label: "Confirm" },
+    { num: 1, label: progressLabels.service },
+    { num: 2, label: progressLabels.staff },
+    { num: 3, label: progressLabels.time },
+    { num: 4, label: progressLabels.confirm },
   ];
+
+  const effectiveStep = variant === "complete" ? steps.length + 1 : step;
 
   return (
     <div className="-mx-1 mb-8 overflow-x-auto px-1 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] sm:mx-0 sm:mb-10 sm:overflow-visible sm:px-0 sm:pb-0 md:mb-12">
@@ -21,15 +32,19 @@ export default function BookingProgress({
               <div
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold sm:h-9 sm:w-9 sm:text-[13px]"
                 style={{
-                  background: s.num <= step ? brand : "#f0f0f0",
-                  color: s.num <= step ? "white" : "#999",
+                  background: s.num < effectiveStep ? brand : "#f0f0f0",
+                  color: s.num < effectiveStep ? "white" : "#999",
                 }}
               >
-                {s.num < step ? "✓" : s.num}
+                {s.num < effectiveStep ? "✓" : s.num}
               </div>
               <span
                 className={`hidden text-sm sm:inline ${
-                  s.num === step ? "font-semibold text-gray-900" : "font-normal text-gray-500"
+                  variant === "complete"
+                    ? "font-medium text-gray-800"
+                    : s.num === step
+                      ? "font-semibold text-gray-900"
+                      : "font-normal text-gray-500"
                 }`}
               >
                 {s.label}
@@ -37,16 +52,24 @@ export default function BookingProgress({
             </div>
             {i < steps.length - 1 && (
               <div
-                className="mx-2 h-px w-6 shrink-0 bg-gray-200 sm:mx-3 sm:w-10 md:w-[52px]"
+                className="mx-2 h-px w-6 shrink-0 sm:mx-3 sm:w-10 md:w-[52px]"
+                style={{
+                  background: s.num < effectiveStep ? `${brand}40` : "#e5e7eb",
+                }}
                 aria-hidden
               />
             )}
           </div>
         ))}
       </div>
-      {/* Mobile-only current step label */}
       <p className="mt-2 text-center text-xs font-medium text-gray-600 sm:hidden">
-        Step {step} of {steps.length}: {steps.find((x) => x.num === step)?.label}
+        {variant === "complete"
+          ? progressLabels.allCompleteMobile
+          : fillTemplate(progressLabels.stepMobile, {
+              step,
+              total: steps.length,
+              label: steps.find((x) => x.num === step)?.label ?? "",
+            })}
       </p>
     </div>
   );

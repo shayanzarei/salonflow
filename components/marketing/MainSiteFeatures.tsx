@@ -1,30 +1,25 @@
-const FEATURE_ITEMS = [
-  {
-    title: "Launch Your Website",
-    desc: 'Turn your "Link in Bio" into a stunning .nl website that showcases your brand and services in minutes.',
-  },
-  {
-    title: "Automate Your Calendar",
-    desc: "Give your clients a 24/7 self-service booking experience. You stay busy; your calendar stays organized.",
-  },
-  {
-    title: "Manage Your Business",
-    desc: "Track your services, client notes, and upcoming schedule from one unified, beautiful dashboard.",
-  },
-];
+"use client";
+
+import { useLocale } from "@/lib/i18n/context";
 
 export default function MainSiteFeatures() {
+  const { t } = useLocale();
+  const w = t.website;
+  const FEATURE_ITEMS = [
+    { title: w.feat1Title, desc: w.feat1Body },
+    { title: w.feat2Title, desc: w.feat2Body },
+    { title: w.feat3Title, desc: w.feat3Body },
+  ];
   return (
     <section id="solution" className="px-8 py-24">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col items-center gap-16 lg:flex-row">
           <div className="lg:w-1/2">
             <h2 className="mb-6 text-4xl font-bold text-slate-900">
-              Your professional home, all in one place.
+              {w.featuresTitle}
             </h2>
             <p className="mb-10 text-xl text-slate-600">
-              SoloHub replaces your scattered messages with a single, elegant
-              workflow built for independent specialists.
+              {w.featuresBody}
             </p>
 
             <div className="space-y-8">
@@ -57,8 +52,8 @@ export default function MainSiteFeatures() {
                 🌐
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-900">Website published</p>
-                <p className="text-[10px] text-gray-400">deltashop8.solohub.nl is live</p>
+                <p className="text-xs font-bold text-gray-900">{w.featureBadgeTitle}</p>
+                <p className="text-[10px] text-gray-400">{w.featureBadgeMeta}</p>
               </div>
             </div>
 
@@ -71,8 +66,8 @@ export default function MainSiteFeatures() {
                 ✨
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-900">6 premium templates</p>
-                <p className="text-[10px] text-gray-400">Pick yours in seconds</p>
+                <p className="text-xs font-bold text-gray-900">{w.templatesBadgeTitle}</p>
+                <p className="text-[10px] text-gray-400">{w.templatesBadgeMeta}</p>
               </div>
             </div>
 

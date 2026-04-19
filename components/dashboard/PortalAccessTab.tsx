@@ -26,57 +26,34 @@ export default function PortalAccessTab({
   brand: string;
   activity: Activity[];
 }) {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [sendLoading, setSendLoading] = useState(false);
+  const [sendError, setSendError] = useState("");
+  const [sendSuccess, setSendSuccess] = useState("");
 
-  // password strength
-  function getStrength(pwd: string) {
-    if (pwd.length === 0) return 0;
-    let score = 0;
-    if (pwd.length >= 8) score++;
-    if (/[A-Z]/.test(pwd)) score++;
-    if (/[0-9]/.test(pwd)) score++;
-    if (/[^A-Za-z0-9]/.test(pwd)) score++;
-    return score;
-  }
-
-  const strength = getStrength(password);
-  const strengthLabels = ["", "Weak", "Medium", "Strong", "Very Strong"];
-  const strengthColors = ["", "#EF4444", "#F59E0B", "#7C3AED", "#10B981"];
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
+  async function handleSendSetupEmail() {
+    setSendError("");
+    setSendSuccess("");
+    setSendLoading(true);
+    try {
+      const res = await fetch("/api/staff/send-setup-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ staffId, tenantId }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? "Could not send email.");
+      }
+      setSendSuccess(
+        hasPortal
+          ? "We sent them a link to set a new password."
+          : "We sent them a link to set their password and enable portal access."
+      );
+    } catch (e) {
+      setSendError(e instanceof Error ? e.message : "Something went wrong.");
+    } finally {
+      setSendLoading(false);
     }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
-
-    setLoading(true);
-    const fd = new FormData();
-    fd.append("staff_id", staffId);
-    fd.append("tenant_id", tenantId);
-    fd.append("password", password);
-
-    await fetch("/api/staff/set-password", { method: "POST", body: fd });
-    setSuccess(
-      hasPortal ? "Password updated successfully" : "Portal access enabled"
-    );
-    setPassword("");
-    setConfirmPassword("");
-    setLoading(false);
-    setTimeout(() => window.location.reload(), 1000);
   }
 
   async function handleRevoke() {
@@ -93,18 +70,6 @@ export default function PortalAccessTab({
     window.location.reload();
   }
 
-  const inputStyle = {
-    width: "100%",
-    border: "1px solid #e5e7eb",
-    borderRadius: 10,
-    padding: "10px 14px",
-    fontSize: 14,
-    color: "#111",
-    background: "white",
-    outline: "none",
-    boxSizing: "border-box" as const,
-  };
-
   if (!hasPortal) {
     return (
       <div
@@ -115,8 +80,7 @@ export default function PortalAccessTab({
           padding: 32,
         }}
       >
-        {/* No access state */}
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div
             style={{
               width: 72,
@@ -142,17 +106,13 @@ export default function PortalAccessTab({
           >
             No Portal Access
           </h3>
-          <p style={{ fontSize: 14, color: "#888", margin: 0 }}>
-            This staff member cannot log in yet. Set a password to enable
-            access.
+          <p style={{ fontSize: 14, color: "#888", margin: 0, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
+            This team member cannot log in until they choose their own password.
+            We will email them a secure link — you cannot set their password here.
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          style={{ maxWidth: 480, margin: "0 auto" }}
-        >
-          {/* Section label */}
+        <div style={{ maxWidth: 480, margin: "0 auto" }}>
           <p
             style={{
               fontSize: 11,
@@ -163,10 +123,9 @@ export default function PortalAccessTab({
               margin: "0 0 16px",
             }}
           >
-            Enable Portal Access
+            Enable portal by email
           </p>
 
-          {/* Info box */}
           <div
             style={{
               background: "#EEF2FF",
@@ -180,160 +139,38 @@ export default function PortalAccessTab({
           >
             <span style={{ fontSize: 16, color: brand, flexShrink: 0 }}>ℹ</span>
             <p style={{ fontSize: 13, color: "#555", margin: 0 }}>
-              Staff will log in using their email:{" "}
+              They will log in with:{" "}
               <strong style={{ color: brand }}>{staffEmail}</strong>
             </p>
           </div>
 
-          {/* Password inputs */}
-          <div style={{ marginBottom: 16 }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: 14,
-                fontWeight: 500,
-                color: "#111",
-                marginBottom: 8,
-              }}
-            >
-              Create Password
-            </label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter new password"
-                required
-                style={{ ...inputStyle, paddingRight: 44 }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: 12,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 16,
-                  color: "#aaa",
-                }}
-              >
-                {showPassword ? "🙈" : "👁"}
-              </button>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: 16 }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: 14,
-                fontWeight: 500,
-                color: "#111",
-                marginBottom: 8,
-              }}
-            >
-              Confirm Password
-            </label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showConfirm ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
-                required
-                style={{ ...inputStyle, paddingRight: 44 }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                style={{
-                  position: "absolute",
-                  right: 12,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 16,
-                  color: "#aaa",
-                }}
-              >
-                {showConfirm ? "🙈" : "👁"}
-              </button>
-            </div>
-          </div>
-
-          {/* Strength indicator */}
-          {password.length > 0 && (
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", gap: 4, marginBottom: 4 }}>
-                {[1, 2, 3, 4].map((level) => (
-                  <div
-                    key={level}
-                    style={{
-                      flex: 1,
-                      height: 4,
-                      borderRadius: 100,
-                      background:
-                        strength >= level
-                          ? strengthColors[strength]
-                          : "#e5e7eb",
-                      transition: "background 0.2s",
-                    }}
-                  />
-                ))}
-              </div>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: strengthColors[strength],
-                  textAlign: "right",
-                  margin: 0,
-                }}
-              >
-                {strengthLabels[strength]}
-              </p>
-            </div>
-          )}
-
-          {error && (
+          {sendError ? (
             <p
               style={{
                 fontSize: 13,
                 color: "#EF4444",
                 margin: "0 0 12px",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
               }}
             >
-              ⚠ {error}
+              ⚠ {sendError}
             </p>
-          )}
-
-          {success && (
+          ) : null}
+          {sendSuccess ? (
             <p
               style={{
                 fontSize: 13,
                 color: "#10B981",
                 margin: "0 0 12px",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
               }}
             >
-              ✓ {success}
+              ✓ {sendSuccess}
             </p>
-          )}
+          ) : null}
 
           <button
-            type="submit"
-            disabled={loading}
+            type="button"
+            disabled={sendLoading}
+            onClick={() => void handleSendSetupEmail()}
             style={{
               width: "100%",
               padding: "14px",
@@ -343,12 +180,11 @@ export default function PortalAccessTab({
               borderRadius: 10,
               fontSize: 14,
               fontWeight: 600,
-              cursor: "pointer",
-              marginBottom: 12,
-              opacity: loading ? 0.7 : 1,
+              cursor: sendLoading ? "wait" : "pointer",
+              opacity: sendLoading ? 0.75 : 1,
             }}
           >
-            {loading ? "Enabling..." : "Enable Portal Access"}
+            {sendLoading ? "Sending…" : "Email password setup link"}
           </button>
 
           <p
@@ -356,17 +192,16 @@ export default function PortalAccessTab({
               fontSize: 12,
               color: "#aaa",
               textAlign: "center",
-              margin: 0,
+              margin: "14px 0 0",
             }}
           >
-            Note: Staff member will receive login instructions via email
+            Link expires after 7 days. You can resend a new link anytime.
           </p>
-        </form>
+        </div>
       </div>
     );
   }
 
-  // Portal active state
   return (
     <div
       style={{
@@ -376,7 +211,6 @@ export default function PortalAccessTab({
         overflow: "hidden",
       }}
     >
-      {/* Header */}
       <div style={{ padding: "20px 28px", borderBottom: "1px solid #f5f5f5" }}>
         <h2
           style={{
@@ -389,11 +223,10 @@ export default function PortalAccessTab({
           Staff Portal Access
         </h2>
         <p style={{ fontSize: 13, color: "#888", margin: 0 }}>
-          Manage login access for this staff member
+          Password changes are always done by the staff member via email link.
         </p>
       </div>
 
-      {/* Active banner */}
       <div
         style={{
           background: "#ECFDF5",
@@ -423,9 +256,6 @@ export default function PortalAccessTab({
             Portal Access Active
           </span>
         </div>
-        <span style={{ fontSize: 13, color: "#888" }}>
-          Last login: recently
-        </span>
       </div>
 
       <div
@@ -436,7 +266,6 @@ export default function PortalAccessTab({
           gap: 32,
         }}
       >
-        {/* Left: credentials + danger */}
         <div>
           <h3
             style={{
@@ -446,7 +275,7 @@ export default function PortalAccessTab({
               margin: "0 0 16px",
             }}
           >
-            Login Credentials
+            Login
           </h3>
 
           <div
@@ -479,7 +308,7 @@ export default function PortalAccessTab({
                     fontWeight: 500,
                   }}
                 >
-                  Email (Username)
+                  Email (username)
                 </p>
                 <p
                   style={{
@@ -532,21 +361,23 @@ export default function PortalAccessTab({
               </div>
               <button
                 type="button"
+                onClick={() => void handleSendSetupEmail()}
+                disabled={sendLoading}
                 style={{
                   fontSize: 13,
                   color: brand,
                   background: "none",
                   border: "none",
-                  cursor: "pointer",
+                  cursor: sendLoading ? "wait" : "pointer",
                   fontWeight: 500,
+                  opacity: sendLoading ? 0.6 : 1,
                 }}
               >
-                Change
+                {sendLoading ? "Sending…" : "Email reset link"}
               </button>
             </div>
           </div>
 
-          {/* Danger zone */}
           <div>
             <h3
               style={{
@@ -573,8 +404,7 @@ export default function PortalAccessTab({
                   lineHeight: 1.6,
                 }}
               >
-                This will prevent the staff member from logging in to the
-                portal.
+                This will prevent the staff member from logging in to the portal.
               </p>
               <button
                 type="button"
@@ -596,120 +426,52 @@ export default function PortalAccessTab({
           </div>
         </div>
 
-        {/* Right: update password + activity */}
         <div>
-          <form onSubmit={handleSubmit}>
-            <h3
-              style={{
-                fontSize: 15,
-                fontWeight: 600,
-                color: "#111",
-                margin: "0 0 16px",
-              }}
-            >
-              Update Password
-            </h3>
+          <h3
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              color: "#111",
+              margin: "0 0 12px",
+            }}
+          >
+            Password & access
+          </h3>
+          <p style={{ fontSize: 13, color: "#666", margin: "0 0 16px", lineHeight: 1.6 }}>
+            To set a new password, send them a secure link. They complete the
+            change themselves — you never see or type their password.
+          </p>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 14,
-                marginBottom: 20,
-              }}
-            >
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: "#555",
-                    marginBottom: 8,
-                  }}
-                >
-                  New Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  style={inputStyle}
-                />
-                {password.length > 0 && (
-                  <div style={{ display: "flex", gap: 4, marginTop: 8 }}>
-                    {[1, 2, 3, 4].map((level) => (
-                      <div
-                        key={level}
-                        style={{
-                          flex: 1,
-                          height: 4,
-                          borderRadius: 100,
-                          background:
-                            strength >= level
-                              ? strengthColors[strength]
-                              : "#e5e7eb",
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+          {sendError ? (
+            <p style={{ fontSize: 13, color: "#EF4444", margin: "0 0 12px" }}>
+              ⚠ {sendError}
+            </p>
+          ) : null}
+          {sendSuccess ? (
+            <p style={{ fontSize: 13, color: "#10B981", margin: "0 0 12px" }}>
+              ✓ {sendSuccess}
+            </p>
+          ) : null}
 
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: "#555",
-                    marginBottom: 8,
-                  }}
-                >
-                  Confirm New Password
-                </label>
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  style={inputStyle}
-                />
-              </div>
-            </div>
+          <button
+            type="button"
+            disabled={sendLoading}
+            onClick={() => void handleSendSetupEmail()}
+            style={{
+              padding: "11px 24px",
+              background: brand,
+              color: "white",
+              border: "none",
+              borderRadius: 10,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: sendLoading ? "wait" : "pointer",
+              opacity: sendLoading ? 0.75 : 1,
+            }}
+          >
+            {sendLoading ? "Sending…" : "Email password setup link"}
+          </button>
 
-            {error && (
-              <p style={{ fontSize: 13, color: "#EF4444", margin: "0 0 12px" }}>
-                ⚠ {error}
-              </p>
-            )}
-            {success && (
-              <p style={{ fontSize: 13, color: "#10B981", margin: "0 0 12px" }}>
-                ✓ {success}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                padding: "11px 24px",
-                background: brand,
-                color: "white",
-                border: "none",
-                borderRadius: 10,
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: "pointer",
-                opacity: loading ? 0.7 : 1,
-              }}
-            >
-              {loading ? "Updating..." : "Update Password"}
-            </button>
-          </form>
-
-          {/* Recent activity */}
           {activity.length > 0 && (
             <div style={{ marginTop: 32 }}>
               <h3

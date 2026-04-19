@@ -1,10 +1,13 @@
 import BookingProgress from "@/components/booking/BookingProgress";
 import pool from "@/lib/db";
+import { fillTemplate } from "@/lib/i18n/interpolate";
+import { getServerTranslations } from "@/lib/i18n/server";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
 
 export default async function ChooseServicePage() {
+  const { t } = await getServerTranslations();
   const tenant = await getTenant();
   if (!tenant) notFound();
 
@@ -23,19 +26,23 @@ export default async function ChooseServicePage() {
           href="/"
           className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
         >
-          ← Back
+          {t.booking.backToWebsite}
         </a>
 
         {/* Progress */}
-        <BookingProgress step={1} brand={brand} />
+        <BookingProgress
+          step={1}
+          brand={brand}
+          progressLabels={t.booking.progress}
+        />
 
         {/* Title */}
         <div className="mb-8 text-center sm:mb-10 md:mb-12">
           <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
-            Choose a service
+            {t.booking.chooseServiceTitle}
           </h1>
           <p className="mt-2 text-sm text-gray-500 sm:text-base">
-            Select the treatment that&apos;s perfect for you
+            {t.booking.chooseServiceSubtitle}
           </p>
         </div>
 
@@ -71,7 +78,9 @@ export default async function ChooseServicePage() {
               )}
               <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs text-gray-400 sm:text-[13px]">
-                  {service.duration_mins} min
+                  {fillTemplate(t.booking.minutesShort, {
+                    n: service.duration_mins,
+                  })}
                 </span>
                 <span
                   className="text-lg font-bold sm:text-xl md:text-[22px]"

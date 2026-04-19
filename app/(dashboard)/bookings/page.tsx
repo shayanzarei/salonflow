@@ -1,8 +1,25 @@
 import { EyeIcon, PlusIcon, SearchIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
+import { fillTemplate } from "@/lib/i18n/interpolate";
+import { bcp47ForLocale } from "@/lib/i18n/locale-format";
+import { getServerTranslations } from "@/lib/i18n/server";
+import type { Translations } from "@/lib/i18n/translations";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+function bookingStatusLabel(status: string, t: Translations): string {
+  switch (status) {
+    case "confirmed":
+      return t.dashboard.bookings.statusConfirmed;
+    case "pending":
+      return t.dashboard.bookings.statusPending;
+    case "cancelled":
+      return t.dashboard.bookings.statusCancelled;
+    default:
+      return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+}
 
 const PAGE_SIZE = 12;
 
@@ -11,6 +28,9 @@ export default async function BookingsPage({
 }: {
   searchParams: Promise<{ status?: string; page?: string; search?: string }>;
 }) {
+  const { locale, t } = await getServerTranslations();
+  const dateLocale = bcp47ForLocale(locale);
+  const db = t.dashboard.bookings;
   const tenant = await getTenant();
   if (!tenant) notFound();
 
@@ -20,7 +40,7 @@ export default async function BookingsPage({
   const brand = tenant.primary_color ?? "#7C3AED";
 
   const conditions = [`b.tenant_id = $1`];
-  const params: any[] = [tenant.id];
+  const params: string[] = [tenant.id];
   let paramCount = 1;
 
   if (status) {
@@ -66,10 +86,10 @@ export default async function BookingsPage({
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const filters = [
-    { label: "All", value: "" },
-    { label: "Confirmed", value: "confirmed" },
-    { label: "Pending", value: "pending" },
-    { label: "Cancelled", value: "cancelled" },
+    { label: db.filterAll, value: "" },
+    { label: db.filterConfirmed, value: "confirmed" },
+    { label: db.filterPending, value: "pending" },
+    { label: db.filterCancelled, value: "cancelled" },
   ];
 
   const statusConfig: Record<
@@ -87,7 +107,7 @@ export default async function BookingsPage({
       <div className="mb-6 flex flex-col gap-4 sm:mb-7 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
           <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
-            Bookings
+            {db.title}
           </h1>
           <span
             className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium sm:text-[13px]"
@@ -96,7 +116,7 @@ export default async function BookingsPage({
               background: `${brand}15`,
             }}
           >
-            {totalCount} Total
+            {fillTemplate(db.totalTemplate, { n: totalCount })}
           </span>
         </div>
         <Link
@@ -106,7 +126,7 @@ export default async function BookingsPage({
 
         >
           <PlusIcon size={14} style={{ display: "inline", verticalAlign: "middle" }} />
-          Add Booking
+          {db.addBooking}
         </Link>
       </div>
 
@@ -147,7 +167,7 @@ export default async function BookingsPage({
               type="text"
               name="search"
               defaultValue={search ?? ""}
-              placeholder="Search client, service..."
+              placeholder={db.searchPlaceholder}
               className="w-full min-w-0 rounded-[10px] border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 outline-none sm:w-[220px] md:w-[260px]"
             />
           </form>
@@ -177,13 +197,13 @@ export default async function BookingsPage({
           <thead>
             <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
               {[
-                "Client",
-                "Service",
-                "Staff",
-                "Date & Time",
-                "Status",
-                "Price",
-                "Action",
+                db.colClient,
+                db.colService,
+                db.colStaff,
+                db.colDateTime,
+                db.colStatus,
+                db.colPrice,
+                db.colAction,
               ].map((h) => (
                 <th
                   key={h}
@@ -214,7 +234,7 @@ export default async function BookingsPage({
                     fontSize: 14,
                   }}
                 >
-                  No bookings found.
+                  {db.noBookings}
                 </td>
               </tr>
             ) : (
@@ -285,7 +305,9 @@ export default async function BookingsPage({
                         {booking.service_name}
                       </p>
                       <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
-                        {booking.duration_mins} min
+                        {fillTemplate(db.minShort, {
+                          n: booking.duration_mins,
+                        })}
                       </p>
                     </td>
 
@@ -305,13 +327,13 @@ export default async function BookingsPage({
                     <td style={{ padding: "16px 20px" }}>
                       <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
                         {new Date(booking.booked_at).toLocaleDateString(
-                          "en-US",
+                          dateLocale,
                           { month: "short", day: "numeric", year: "numeric" }
                         )}
                       </p>
                       <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
                         {new Date(booking.booked_at).toLocaleTimeString(
-                          "en-US",
+                          dateLocale,
                           { hour: "numeric", minute: "2-digit" }
                         )}
                       </p>
@@ -341,8 +363,7 @@ export default async function BookingsPage({
                             display: "inline-block",
                           }}
                         />
-                        {booking.status.charAt(0).toUpperCase() +
-                          booking.status.slice(1)}
+                        {bookingStatusLabel(booking.status, t)}
                       </span>
                     </td>
 
@@ -375,7 +396,8 @@ export default async function BookingsPage({
                           background: `${brand}08`,
                         }}
                       >
-                        <EyeIcon size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} /> View
+                        <EyeIcon size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />{" "}
+                        {db.view}
                       </Link>
                     </td>
                   </tr>
@@ -390,7 +412,7 @@ export default async function BookingsPage({
         {totalPages > 1 && (
           <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-              <span style={{ fontSize: 13, color: "#666" }}>Show</span>
+              <span style={{ fontSize: 13, color: "#666" }}>{db.show}</span>
               <select
                 style={{
                   border: "1px solid #e5e7eb",
@@ -405,7 +427,7 @@ export default async function BookingsPage({
                 <option>48</option>
               </select>
               <span style={{ fontSize: 13, color: "#666" }}>
-                of {totalCount} results
+                {fillTemplate(db.ofResultsTemplate, { n: totalCount })}
               </span>
             </div>
 

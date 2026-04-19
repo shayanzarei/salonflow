@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-    const tokenResult = await pool.query(
+    const tenantTokenResult = await pool.query(
       `SELECT id, tenant_id
        FROM password_reset_tokens
        WHERE token_hash = $1
@@ -45,35 +45,72 @@ export async function POST(request: NextRequest) {
       [tokenHash]
     );
 
-    if (!tokenResult.rows[0]) {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    if (tenantTokenResult.rows[0]) {
+      const tokenId: string = tenantTokenResult.rows[0].id;
+      const tenantId: string = tenantTokenResult.rows[0].tenant_id;
+
+      await pool.query("BEGIN");
+      await pool.query(`UPDATE tenants SET password_hash = $1 WHERE id = $2`, [
+        passwordHash,
+        tenantId,
+      ]);
+      await pool.query(
+        `UPDATE password_reset_tokens
+         SET used_at = NOW()
+         WHERE id = $1`,
+        [tokenId]
+      );
+      await pool.query(
+        `UPDATE password_reset_tokens
+         SET used_at = NOW()
+         WHERE tenant_id = $1
+           AND id <> $2
+           AND used_at IS NULL`,
+        [tenantId, tokenId]
+      );
+      await pool.query("COMMIT");
+      return NextResponse.json({ ok: true });
+    }
+
+    const staffInviteResult = await pool.query(
+      `SELECT sit.id, sit.staff_id, sit.tenant_id
+       FROM staff_invite_tokens sit
+       WHERE sit.token_hash = $1
+         AND sit.used_at IS NULL
+         AND sit.expires_at > NOW()
+       LIMIT 1`,
+      [tokenHash]
+    );
+
+    if (!staffInviteResult.rows[0]) {
       return NextResponse.json(
         { error: "This reset link is invalid or expired." },
         { status: 400 }
       );
     }
 
-    const tokenId: string = tokenResult.rows[0].id;
-    const tenantId: string = tokenResult.rows[0].tenant_id;
-    const passwordHash = await bcrypt.hash(password, 10);
+    const inviteId: string = staffInviteResult.rows[0].id;
+    const staffId: string = staffInviteResult.rows[0].staff_id;
+    const tenantId: string = staffInviteResult.rows[0].tenant_id;
 
     await pool.query("BEGIN");
-    await pool.query(`UPDATE tenants SET password_hash = $1 WHERE id = $2`, [
-      passwordHash,
-      tenantId,
-    ]);
     await pool.query(
-      `UPDATE password_reset_tokens
-       SET used_at = NOW()
-       WHERE id = $1`,
-      [tokenId]
+      `UPDATE staff SET password_hash = $1 WHERE id = $2 AND tenant_id = $3`,
+      [passwordHash, staffId, tenantId]
     );
     await pool.query(
-      `UPDATE password_reset_tokens
+      `UPDATE staff_invite_tokens SET used_at = NOW() WHERE id = $1`,
+      [inviteId]
+    );
+    await pool.query(
+      `UPDATE staff_invite_tokens
        SET used_at = NOW()
-       WHERE tenant_id = $1
+       WHERE staff_id = $1
          AND id <> $2
          AND used_at IS NULL`,
-      [tenantId, tokenId]
+      [staffId, inviteId]
     );
     await pool.query("COMMIT");
 

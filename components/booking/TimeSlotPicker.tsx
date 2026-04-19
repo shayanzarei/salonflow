@@ -1,5 +1,6 @@
 "use client";
 
+import type { BookingSection } from "@/lib/i18n/catalog/booking";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -15,10 +16,14 @@ export default function TimeSlotPicker({
   service,
   staff,
   brand,
+  picker,
+  localeTag,
 }: {
   service: string;
   staff: string;
   brand: string;
+  picker: BookingSection["timePicker"];
+  localeTag: string;
 }) {
   const router = useRouter();
   const today = new Date();
@@ -103,7 +108,7 @@ export default function TimeSlotPicker({
     date.toDateString() === selectedDate.toDateString();
   const isPast = (date: Date) => date < today;
 
-  const selectedDateLabel = selectedDate.toLocaleDateString("en-US", {
+  const selectedDateLabel = selectedDate.toLocaleDateString(localeTag, {
     weekday: "long",
     month: "short",
     day: "numeric",
@@ -134,7 +139,7 @@ export default function TimeSlotPicker({
               margin: "0 0 20px",
             }}
           >
-            Select a date
+            {picker.selectDate}
           </h3>
 
           {/* Month nav */}
@@ -165,7 +170,7 @@ export default function TimeSlotPicker({
               ‹
             </button>
             <span style={{ fontSize: 15, fontWeight: 600, color: "#111" }}>
-              {currentMonth.toLocaleDateString("en-US", {
+              {currentMonth.toLocaleDateString(localeTag, {
                 month: "long",
                 year: "numeric",
               })}
@@ -198,7 +203,7 @@ export default function TimeSlotPicker({
               marginBottom: 8,
             }}
           >
-            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+            {picker.weekdayShort.map((d) => (
               <div
                 key={d}
                 style={{
@@ -266,7 +271,7 @@ export default function TimeSlotPicker({
               <div
                 style={{ width: 12, height: 12, borderRadius: "50%", background: brand }}
               />
-              <span style={{ fontSize: 12, color: "#888" }}>Selected</span>
+              <span style={{ fontSize: 12, color: "#888" }}>{picker.legendSelected}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div
@@ -278,7 +283,7 @@ export default function TimeSlotPicker({
                   border: `1px solid ${brand}`,
                 }}
               />
-              <span style={{ fontSize: 12, color: "#888" }}>Today</span>
+              <span style={{ fontSize: 12, color: "#888" }}>{picker.legendToday}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div
@@ -290,7 +295,9 @@ export default function TimeSlotPicker({
                   border: "1px solid #F3F4F6",
                 }}
               />
-              <span style={{ fontSize: 12, color: "#888" }}>Unavailable</span>
+              <span style={{ fontSize: 12, color: "#888" }}>
+                {picker.legendUnavailable}
+              </span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div
@@ -302,7 +309,7 @@ export default function TimeSlotPicker({
                   border: "1px solid #FDE68A",
                 }}
               />
-              <span style={{ fontSize: 12, color: "#888" }}>Already booked</span>
+              <span style={{ fontSize: 12, color: "#888" }}>{picker.legendBooked}</span>
             </div>
           </div>
         </div>
@@ -318,7 +325,7 @@ export default function TimeSlotPicker({
                 margin: 0,
               }}
             >
-              Available times
+              {picker.availableTimes}
             </h3>
             <span
               className="text-sm font-medium sm:text-[13px]"
@@ -362,7 +369,7 @@ export default function TimeSlotPicker({
                 />
               </svg>
               <p style={{ fontSize: 13, color: "#aaa", margin: 0 }}>
-                Checking availability…
+                {picker.loadingAvailability}
               </p>
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
@@ -378,7 +385,7 @@ export default function TimeSlotPicker({
                 fontSize: 14,
               }}
             >
-              Could not load availability. Please try again.
+              {picker.loadError}
             </div>
           )}
 
@@ -392,7 +399,7 @@ export default function TimeSlotPicker({
                 fontSize: 14,
               }}
             >
-              No available slots for this date
+              {picker.noSlots}
             </div>
           )}
 
@@ -400,9 +407,9 @@ export default function TimeSlotPicker({
           {!loadingSlots && !slotsError && slots.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               {[
-                { label: "Morning", slots: morning },
-                { label: "Afternoon", slots: afternoon },
-                { label: "Evening", slots: evening },
+                { label: picker.morning, slots: morning },
+                { label: picker.afternoon, slots: afternoon },
+                { label: picker.evening, slots: evening },
               ]
                 .filter((g) => g.slots.length > 0)
                 .map((group) => (
@@ -436,9 +443,9 @@ export default function TimeSlotPicker({
                             }
                             title={
                               isBooked
-                                ? "Already booked"
+                                ? picker.titleBooked
                                 : isPastSlot
-                                  ? "Time has passed"
+                                  ? picker.titlePast
                                   : undefined
                             }
                             className="relative min-h-11 rounded-[10px] px-1 py-2.5 text-xs sm:text-[13px]"
@@ -482,7 +489,7 @@ export default function TimeSlotPicker({
                                   marginTop: 2,
                                 }}
                               >
-                                Booked
+                                {picker.bookedBadge}
                               </span>
                             )}
                           </button>
@@ -510,7 +517,7 @@ export default function TimeSlotPicker({
             cursor: selectedTime ? "pointer" : "not-allowed",
           }}
         >
-          Continue to confirmation →
+          {picker.continueCta}
         </button>
       </div>
     </div>

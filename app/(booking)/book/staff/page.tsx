@@ -1,5 +1,6 @@
 import BookingProgress from "@/components/booking/BookingProgress";
 import pool from "@/lib/db";
+import { getServerTranslations } from "@/lib/i18n/server";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
@@ -9,6 +10,7 @@ export default async function ChooseStaffPage({
 }: {
   searchParams: Promise<{ service?: string }>;
 }) {
+  const { t } = await getServerTranslations();
   const tenant = await getTenant();
   if (!tenant) notFound();
 
@@ -55,18 +57,22 @@ export default async function ChooseStaffPage({
           href="/book"
           className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
         >
-          ← Back
+          {t.booking.back}
         </a>
 
-        <BookingProgress step={2} brand={brand} />
+        <BookingProgress
+          step={2}
+          brand={brand}
+          progressLabels={t.booking.progress}
+        />
 
         <div className="mb-8 text-center sm:mb-10 md:mb-12">
           <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
-            Choose a staff member
+            {t.booking.chooseStaffTitle}
           </h1>
           {selectedService && (
             <p className="mt-2 text-sm text-gray-500 sm:text-[15px]">
-              Selected:{" "}
+              {t.booking.selectedLabel}{" "}
               <strong className="text-gray-700">{selectedService.name}</strong>
             </p>
           )}

@@ -13,12 +13,14 @@ import {
   MARKETING_BUTTON_DARK,
   MARKETING_BUTTON_OUTLINE_DARK,
 } from "@/components/marketing/buttonStyles";
+import { useLocale } from "@/lib/i18n/context";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginPage() {
+  const { t } = useLocale();
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,7 +40,7 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("Invalid email or password");
+      setError(t.auth.invalidCredentials);
       setLoading(false);
     } else {
       // fetch session to check isAdmin
@@ -76,10 +78,10 @@ export default function LoginPage() {
 
         <div className="mb-8 text-center sm:text-left">
           <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-            Sign in to your account
+            {t.auth.signInTitle}
           </h1>
           <p className="mt-2 text-base text-slate-600 sm:text-lg">
-            Welcome back! Please enter your details.
+            {t.auth.signInSubtitle}
           </p>
         </div>
 
@@ -97,7 +99,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
-              Email
+              {t.auth.email}
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -116,13 +118,13 @@ export default function LoginPage() {
           <div>
             <div className="mb-2 flex items-center justify-between">
               <label className="block text-sm font-semibold text-slate-700">
-                Password
+                {t.auth.password}
               </label>
               <Link
                 href="/forgot-password"
                 className="text-sm font-semibold text-[#0ea5b7] transition-colors hover:text-[#0891b2]"
               >
-                Forgot password?
+                {t.auth.forgotPassword}
               </Link>
             </div>
             <div className="relative">
@@ -140,7 +142,9 @@ export default function LoginPage() {
                 type="button"
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={
+                  showPassword ? t.auth.hidePassword : t.auth.showPassword
+                }
               >
                 <EyeIcon size={16} />
               </button>
@@ -156,7 +160,7 @@ export default function LoginPage() {
             disabled={loading}
             className={`group w-full gap-2 ${MARKETING_BUTTON_DARK} disabled:cursor-not-allowed disabled:opacity-60`}
           >
-            <span>{loading ? "Signing in..." : "Sign In"}</span>
+            <span>{loading ? t.auth.signingIn : t.auth.signIn}</span>
             <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </form>
@@ -168,7 +172,7 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="bg-white px-3 text-slate-500">
-                New to SoloHub?
+                {t.auth.newTo}
               </span>
             </div>
           </div>
@@ -177,7 +181,7 @@ export default function LoginPage() {
             href="/signup"
             className={`group w-full gap-2 ${MARKETING_BUTTON_OUTLINE_DARK}`}
           >
-            <span>Create an account</span>
+            <span>{t.auth.createAccount}</span>
             <SparkleIcon className="h-4 w-4 transition-transform group-hover:scale-110" />
           </Link>
         </div>
@@ -189,16 +193,16 @@ export default function LoginPage() {
             </div>
             <div>
               <h4 className="mb-1 text-sm font-semibold text-slate-900">
-                Need help signing in?
+                {t.auth.needHelpTitle}
               </h4>
               <p className="mb-3 text-sm text-slate-600">
-                Our support team is available 24/7 to assist you.
+                {t.auth.needHelpBody}
               </p>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700"
               >
-                <span>Contact Support</span>
+                <span>{t.auth.contactSupportLink}</span>
                 <ArrowRightIcon className="h-3 w-3" />
               </Link>
             </div>
@@ -210,19 +214,19 @@ export default function LoginPage() {
             <div className="flex items-center gap-2">
               <ShieldIcon className="h-4 w-4 text-slate-600" />
               <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
-                256-bit SSL
+                {t.auth.sslBadge}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <LockIcon size={16} />
               <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
-                Encrypted
+                {t.auth.encryptedBadge}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <ShieldIcon className="h-4 w-4 text-slate-600" />
               <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
-                2FA Ready
+                {t.auth.twoFactorBadge}
               </span>
             </div>
           </div>

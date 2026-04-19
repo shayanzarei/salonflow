@@ -10,9 +10,12 @@ import {
   PaperPlaneIcon,
   ShieldIcon,
 } from "@/components/ui/Icons";
+import { useLocale } from "@/lib/i18n/context";
 import { FormEvent, useState } from "react";
 
 export default function MainSiteContactPage() {
+  const { t } = useLocale();
+  const m = t.marketing;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [workEmail, setWorkEmail] = useState("");
@@ -44,10 +47,10 @@ export default function MainSiteContactPage() {
       });
       const json = (await res.json()) as { error?: string };
       if (!res.ok) {
-        throw new Error(json.error ?? "Failed to send message");
+        throw new Error(json.error ?? m.contactFailedSend);
       }
 
-      setSubmitMessage("Thanks! Your message has been sent.");
+      setSubmitMessage(m.contactThanksSent);
       setSubmitStatus("success");
       setFirstName("");
       setLastName("");
@@ -56,7 +59,7 @@ export default function MainSiteContactPage() {
       setMessage("");
     } catch (error) {
       const errMessage =
-        error instanceof Error ? error.message : "Failed to send message";
+        error instanceof Error ? error.message : m.contactFailedSend;
       setSubmitMessage(errMessage);
       setSubmitStatus("error");
     } finally {
@@ -81,13 +84,9 @@ export default function MainSiteContactPage() {
         <div className="mx-auto w-full max-w-6xl">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
-              Contact the Founders
+              {m.contactHeroTitle}
             </h1>
-            <p className="text-lg text-slate-600">
-              Whether you have a question about the multi-template website
-              builder, staff portals, or the automated reminders, you have a
-              direct line to the people who built the platform.
-            </p>
+            <p className="text-lg text-slate-600">{m.contactHeroSubtitle}</p>
           </div>
 
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8">
@@ -95,24 +94,21 @@ export default function MainSiteContactPage() {
               <section className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-sm">
                 <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-[#14b8a6] to-[#9ceee5]" />
                 <h3 className="mb-4 text-xl font-bold text-white">
-                  Our Promise
+                  {m.contactPromiseTitle}
                 </h3>
                 <p className="mb-6 text-sm text-slate-300">
-                  We are a small, dedicated team based in the Netherlands. We
-                  aim to respond to all inquiries within 1 business day . Your
-                  success is our priority because your feedback directly drives
-                  our product roadmap.
+                  {m.contactPromiseBody}
                 </p>
                 <div className="flex items-center gap-2 text-sm font-medium text-[#9ceee5]">
                   <ClockIcon className="h-4 w-4 text-[#14b8a6]" />
-                  <span>Average response time:</span>
-                  <span className="text-white">Under 4 hours</span>
+                  <span>{m.contactAvgResponseLabel}</span>
+                  <span className="text-white">{m.contactAvgResponseValue}</span>
                 </div>
               </section>
 
               <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
                 <h3 className="mb-6 text-lg font-bold text-slate-900">
-                  Direct Contact
+                  {m.contactDirectTitle}
                 </h3>
                 <div className="space-y-6">
                   {/* TODO: Add email contact */}
@@ -142,10 +138,10 @@ export default function MainSiteContactPage() {
                     </div>
                     <div>
                       <h4 className="text-sm font-semibold text-slate-900">
-                        WhatsApp Chat
+                        {m.contactWhatsAppTitle}
                       </h4>
                       <p className="mb-2 text-sm text-slate-500">
-                        Chat with our support team in real-time via WhatsApp.
+                        {m.contactWhatsAppBody}
                       </p>
                       <a
                         href="https://wa.me/31683103485"
@@ -153,7 +149,7 @@ export default function MainSiteContactPage() {
                         rel="noreferrer"
                         className="inline-flex items-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200 mt-2"
                       >
-                        Start Chat{" "}
+                        {m.contactStartChat}{" "}
                         <ArrowRightIcon className="ml-1 h-3.5 w-3.5" />
                       </a>
                     </div>
@@ -166,14 +162,14 @@ export default function MainSiteContactPage() {
                   href="/faq"
                   className="flex items-center gap-2 transition-colors hover:text-[#0ea5b7]"
                 >
-                  <BookIcon className="h-4 w-4" /> Read FAQs
+                  <BookIcon className="h-4 w-4" /> {m.contactReadFaqs}
                 </a>
                 <span className="text-slate-300">•</span>
                 <a
                   href="/privacy"
                   className="flex items-center gap-2 transition-colors hover:text-[#0ea5b7]"
                 >
-                  <ShieldIcon className="h-4 w-4" /> Privacy Policy
+                  <ShieldIcon className="h-4 w-4" /> {m.contactPrivacyLink}
                 </a>
               </div>
             </div>
@@ -181,7 +177,7 @@ export default function MainSiteContactPage() {
             <div className="lg:col-span-7">
               <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
                 <h2 className="mb-6 text-2xl font-bold text-slate-900">
-                  Send us a message
+                  {m.contactFormTitle}
                 </h2>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -190,7 +186,7 @@ export default function MainSiteContactPage() {
                         className="mb-2 block text-sm font-medium text-slate-700"
                         htmlFor="firstName"
                       >
-                        First Name
+                        {m.contactFirstName}
                       </label>
                       <input
                         id="firstName"
@@ -198,7 +194,7 @@ export default function MainSiteContactPage() {
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
-                        placeholder="Jane"
+                        placeholder={m.phFirstName}
                         className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
                       />
                     </div>
@@ -207,7 +203,7 @@ export default function MainSiteContactPage() {
                         className="mb-2 block text-sm font-medium text-slate-700"
                         htmlFor="lastName"
                       >
-                        Last Name
+                        {m.contactLastName}
                       </label>
                       <input
                         id="lastName"
@@ -215,7 +211,7 @@ export default function MainSiteContactPage() {
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
-                        placeholder="Doe"
+                        placeholder={m.phLastName}
                         className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
                       />
                     </div>
@@ -226,7 +222,7 @@ export default function MainSiteContactPage() {
                       className="mb-2 block text-sm font-medium text-slate-700"
                       htmlFor="workEmail"
                     >
-                      Work Email
+                      {m.contactWorkEmail}
                     </label>
                     <input
                       id="workEmail"
@@ -234,7 +230,7 @@ export default function MainSiteContactPage() {
                       value={workEmail}
                       onChange={(e) => setWorkEmail(e.target.value)}
                       required
-                      placeholder="jane@company.com"
+                      placeholder={m.phWorkEmail}
                       className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
                     />
                   </div>
@@ -244,7 +240,7 @@ export default function MainSiteContactPage() {
                       className="mb-2 block text-sm font-medium text-slate-700"
                       htmlFor="topic"
                     >
-                      How can we help?
+                      {m.contactTopicLabel}
                     </label>
                     <select
                       id="topic"
@@ -254,12 +250,12 @@ export default function MainSiteContactPage() {
                       className="w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
                     >
                       <option value="" disabled>
-                        Select a topic...
+                        {m.contactTopicPlaceholder}
                       </option>
-                      <option value="sales">Sales Inquiry</option>
-                      <option value="support">Technical Support</option>
-                      <option value="billing">Billing Question</option>
-                      <option value="other">Other</option>
+                      <option value="sales">{m.contactTopicSales}</option>
+                      <option value="support">{m.contactTopicSupport}</option>
+                      <option value="billing">{m.contactTopicBilling}</option>
+                      <option value="other">{m.contactTopicOther}</option>
                     </select>
                   </div>
 
@@ -268,7 +264,7 @@ export default function MainSiteContactPage() {
                       className="mb-2 block text-sm font-medium text-slate-700"
                       htmlFor="message"
                     >
-                      Message
+                      {m.contactMessageLabel}
                     </label>
                     <textarea
                       id="message"
@@ -276,7 +272,7 @@ export default function MainSiteContactPage() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       required
-                      placeholder="Tell us more about your inquiry..."
+                      placeholder={m.contactMessagePlaceholder}
                       className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
                     />
                   </div>
@@ -286,7 +282,7 @@ export default function MainSiteContactPage() {
                     disabled={isSubmitting}
                     className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#14b8a6] py-3.5 text-base font-bold text-white shadow-lg shadow-[#14b8a6]/20 transition-colors hover:bg-[#0ea5b7] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {isSubmitting ? "Sending..." : "Send Message"}
+                    {isSubmitting ? m.contactSending : m.contactSend}
                     <PaperPlaneIcon className="h-4 w-4" />
                   </button>
                   {submitMessage ? (
@@ -301,20 +297,20 @@ export default function MainSiteContactPage() {
                     >
                       <p className="font-semibold">
                         {submitStatus === "success"
-                          ? "Message sent successfully"
-                          : "Could not send message"}
+                          ? m.contactSuccessTitle
+                          : m.contactErrorTitle}
                       </p>
                       <p className="mt-1 text-xs opacity-90">{submitMessage}</p>
                     </div>
                   ) : null}
 
                   <p className="mt-4 text-center text-xs text-slate-500">
-                    By submitting this form, you agree to our{" "}
+                    {m.contactFormDisclaimerPrefix}{" "}
                     <a
                       href="/privacy"
                       className="text-[#0ea5b7] hover:underline"
                     >
-                      Privacy Policy
+                      {m.contactPrivacyLink}
                     </a>
                     .
                   </p>

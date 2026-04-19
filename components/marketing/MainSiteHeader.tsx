@@ -1,20 +1,13 @@
 "use client";
 
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { MARKETING_BUTTON_PRIMARY } from "@/components/marketing/buttonStyles";
 import { MenuIcon, XIcon } from "@/components/ui/Icons";
+import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { useState } from "react";
 
 type NavKey = "home" | "pricing" | "demo" | "faq" | "contact" | "privacy";
-
-const NAV_ITEMS = [
-  { key: "home" as NavKey, label: "Home", href: "/" },
-  { key: "pricing" as NavKey, label: "Pricing", href: "/pricing" },
-  { key: "demo" as NavKey, label: "Book a Demo", href: "/book-demo" },
-  { key: "contact" as NavKey, label: "Contact", href: "/contact" },
-  { key: "faq" as NavKey, label: "FAQ", href: "/faq" },
-  { key: "privacy" as NavKey, label: "Privacy & Terms", href: "/privacy" },
-] as const;
 
 export default function MainSiteHeader({
   active = "home",
@@ -22,6 +15,16 @@ export default function MainSiteHeader({
   active?: NavKey;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useLocale();
+
+  const NAV_ITEMS: { key: NavKey; label: string; href: string }[] = [
+    { key: "home", label: t.nav.home, href: "/" },
+    { key: "pricing", label: t.nav.pricing, href: "/pricing" },
+    { key: "demo", label: t.nav.demo, href: "/book-demo" },
+    { key: "contact", label: t.nav.contact, href: "/contact" },
+    { key: "faq", label: t.nav.faq, href: "/faq" },
+    { key: "privacy", label: t.nav.privacy, href: "/privacy" },
+  ];
 
   return (
     <>
@@ -30,7 +33,7 @@ export default function MainSiteHeader({
           <Link
             href="/"
             className="flex items-center"
-            aria-label="Go to SoloHub home"
+            aria-label={t.website.homeAria}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -56,16 +59,17 @@ export default function MainSiteHeader({
             ))}
           </nav>
 
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-4">
+            <LanguageSwitcher variant="light" />
             <Link href="/signup" className={MARKETING_BUTTON_PRIMARY}>
-              Get Started
+              {t.nav.getStarted}
             </Link>
           </div>
 
           <button
             type="button"
             className="text-2xl text-slate-900 md:hidden mr-4"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-label={mobileOpen ? t.website.closeMenu : t.website.openMenu}
             onClick={() => setMobileOpen((v) => !v)}
           >
             {mobileOpen ? (
@@ -98,13 +102,16 @@ export default function MainSiteHeader({
                 </Link>
               ))}
             </nav>
-            <Link
-              href="/signup"
-              className={`${MARKETING_BUTTON_PRIMARY} mt-3 w-full px-6`}
-              onClick={() => setMobileOpen(false)}
-            >
-              Get Started
-            </Link>
+            <div className="mt-3 flex items-center justify-between">
+              <LanguageSwitcher variant="light" />
+              <Link
+                href="/signup"
+                className={`${MARKETING_BUTTON_PRIMARY} px-6`}
+                onClick={() => setMobileOpen(false)}
+              >
+                {t.nav.getStarted}
+              </Link>
+            </div>
           </div>
         </div>
       ) : null}

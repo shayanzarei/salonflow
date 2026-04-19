@@ -1,3 +1,4 @@
+import { getServerTranslations } from "@/lib/i18n/server";
 import { getTenant } from "@/lib/tenant";
 import { isMainSiteHost } from "@/lib/main-site";
 import { headers } from "next/headers";
@@ -15,12 +16,12 @@ export default async function BookingLayout({
   if (!tenant) return <>{children}</>;
 
   if (tenant.website_status !== "published") {
+    const { t } = await getServerTranslations();
     return (
       <main className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-4 text-center">
-        <h1 className="text-3xl font-bold text-gray-900">Website coming soon</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t.website.comingSoonTitle}</h1>
         <p className="mt-3 max-w-xl text-sm text-gray-600 sm:text-base">
-          This salon is currently preparing their public booking website.
-          Please check back later.
+          {t.website.comingSoonBody}
         </p>
       </main>
     );

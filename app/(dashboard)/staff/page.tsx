@@ -22,7 +22,12 @@ const STAFF_COLORS = [
   "#06B6D4",
 ];
 
-export default async function StaffPage() {
+export default async function StaffPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ invited?: string }>;
+}) {
+  const { invited } = await searchParams;
   const tenant = await getTenant();
   if (!tenant) notFound();
 
@@ -58,6 +63,15 @@ export default async function StaffPage() {
 
   return (
     <div>
+      {invited === "1" ? (
+        <div
+          className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 sm:mb-6"
+          role="status"
+        >
+          Invite sent. Your team member will receive an email to set their password
+          and access the staff portal.
+        </div>
+      ) : null}
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">

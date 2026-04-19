@@ -1,11 +1,17 @@
+"use client";
+
 import {
   FacebookIcon,
   InstagramIcon,
   YoutubeIcon,
 } from "@/components/ui/Icons";
+import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 
 export default function MainSiteFooter() {
+  const { t } = useLocale();
+  const f = t.footer;
+
   return (
     <footer
       id="footer"
@@ -25,9 +31,7 @@ export default function MainSiteFooter() {
               className="h-14 w-auto"
             />
           </Link>
-          <p className="mb-6 text-sm text-slate-500">
-            The operating system for independent professionals.
-          </p>
+          <p className="mb-6 text-sm text-slate-500">{f.tagline}</p>
           <div className="flex space-x-4 text-slate-400">
             <a href="#" className="transition-colors hover:text-[#11c4b6]">
               <InstagramIcon className="h-5 w-5" />
@@ -42,86 +46,86 @@ export default function MainSiteFooter() {
         </div>
 
         <div>
-          <h4 className="mb-4 font-bold text-slate-900">Product</h4>
+          <h4 className="mb-4 font-bold text-slate-900">{f.product}</h4>
           <ul className="space-y-3 text-sm text-slate-500">
             <li>
-              <a
+              <Link
                 href="/pricing"
                 className="transition-colors hover:text-[#0ea5b7]"
               >
-                Pricing
-              </a>
+                {f.pricing}
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/book-demo"
                 className="transition-colors hover:text-[#0ea5b7]"
               >
-                Book a Demo
-              </a>
+                {f.demo}
+              </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="mb-4 font-bold text-slate-900">Resources</h4>
+          <h4 className="mb-4 font-bold text-slate-900">{f.resources}</h4>
           <ul className="space-y-3 text-sm text-slate-500">
             <li>
-              <a
+              <Link
                 href="/blog"
                 className="transition-colors hover:text-[#0ea5b7]"
               >
-                Blog
-              </a>
+                {f.blog}
+              </Link>
             </li>
             <li>
-              <a href="/faq" className="transition-colors hover:text-[#0ea5b7]">
-                FAQs
-              </a>
+              <Link href="/faq" className="transition-colors hover:text-[#0ea5b7]">
+                {f.faqs}
+              </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="mb-4 font-bold text-slate-900">Company</h4>
+          <h4 className="mb-4 font-bold text-slate-900">{f.company}</h4>
           <ul className="space-y-3 text-sm text-slate-500">
             <li>
-              <a
+              <Link
                 href="/about"
                 className="transition-colors hover:text-[#0ea5b7]"
               >
-                About Us
-              </a>
+                {f.about}
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/contact"
                 className="transition-colors hover:text-[#0ea5b7]"
               >
-                Contact
-              </a>
+                {f.contact}
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/privacy"
                 className="transition-colors hover:text-[#0ea5b7]"
               >
-                Privacy &amp; Terms
-              </a>
+                {f.privacyTerms}
+              </Link>
             </li>
           </ul>
         </div>
       </div>
 
       <div className="mx-auto mt-16 flex max-w-7xl flex-col items-center justify-between border-t border-slate-100 pt-8 text-sm text-slate-400 md:flex-row">
-        <p>© 2024 SoloHub Inc. All rights reserved.</p>
+        <p>{f.copyright}</p>
         <div className="mt-4 flex space-x-6 md:mt-0">
-          <a href="/privacy" className="hover:text-slate-600">
-            Privacy Policy
-          </a>
-          <a href="/terms" className="hover:text-slate-600">
-            Terms of Service
-          </a>
+          <Link href="/privacy" className="hover:text-slate-600">
+            {f.privacyPolicy}
+          </Link>
+          <Link href="/terms" className="hover:text-slate-600">
+            {f.termsOfService}
+          </Link>
         </div>
       </div>
     </footer>

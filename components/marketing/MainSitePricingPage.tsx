@@ -15,48 +15,10 @@ import {
   MARKETING_BUTTON_SECONDARY,
 } from "@/components/marketing/buttonStyles";
 import { CheckCircleIcon, ChevronDownIcon, XIcon } from "@/components/ui/Icons";
+import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, useMemo, useState } from "react";
-
-const FAQS = [
-  {
-    q: "Is this price inclusive of VAT?",
-    a: "As is standard for B2B SaaS in the Netherlands, all prices are displayed excluding 21% BTW.",
-  },
-  {
-    q: "Can each staff member have their own login?",
-    a: "Yes. Starting from our Hub plan, each team member gets a dedicated staff portal to manage their own schedules.",
-  },
-  {
-    q: 'What is the "Locked for Life" promise?',
-    a: "Early adopters are protected from future price increases. If you sign up during our launch phase, your monthly rate will stay the same even as we add more features.",
-  },
-  {
-    q: "Do you charge commission on my bookings?",
-    a: "No. Unlike competitors who take a percentage of your new clients, SoloHub charges a flat monthly fee so you keep 100% of your earnings.",
-  },
-  {
-    q: "Do I need a credit card to start my 14-day trial?",
-    a: "No. You can set up your website and start taking bookings immediately without entering any payment details.",
-  },
-  {
-    q: "How easy is it to move my data from another tool?",
-    a: "If you are currently using WhatsApp, paper, or another platform like Fresha, we provide migration assistance to help you move your core data quickly.",
-  },
-  {
-    q: "Can my staff see my business revenue?",
-    a: "No. Staff access is limited to their own schedule and notes. Sensitive financial data stays restricted to the owner dashboard.",
-  },
-  {
-    q: "Do I need to buy a separate domain for my website?",
-    a: "Every plan includes a free solohub.io subdomain. If your package includes custom domain support, you can connect your own brand domain too.",
-  },
-  {
-    q: "Is there really no fee for new clients?",
-    a: "Correct. SoloHub is a management tool, not a commission marketplace. You pay a flat monthly fee and keep every cent you earn.",
-  },
-] as const;
+import { Fragment, useEffect, useMemo, useState } from "react";
 
 type ComparisonSection = {
   category: string;
@@ -80,11 +42,24 @@ export default function MainSitePricingPage({
   packages,
   comparisonSections,
 }: MainSitePricingPageProps) {
+  const { t } = useLocale();
+  const m = t.marketing;
+  const pricingFaqs = m.pricingFaqs;
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isAnnual, setIsAnnual] = useState(false);
-  const [openFaq, setOpenFaq] = useState<string | null>(FAQS[0]?.q ?? null);
+  const [openFaq, setOpenFaq] = useState<string | null>(
+    () => pricingFaqs[0]?.q ?? null
+  );
   const [checkoutPlan, setCheckoutPlan] = useState<string | null>(null);
+
+  useEffect(() => {
+    const first = pricingFaqs[0]?.q ?? null;
+    setOpenFaq((prev) => {
+      const exists = pricingFaqs.some((item) => item.q === prev);
+      return exists ? prev : first;
+    });
+  }, [pricingFaqs]);
   const checkoutResult = searchParams.get("checkout");
   const showCheckoutSuccess =
     checkoutResult === "success" || checkoutResult === "succeeded";
@@ -113,12 +88,12 @@ export default function MainSitePricingPage({
         error?: string;
       };
       if (!response.ok || !payload.url) {
-        throw new Error(payload.error ?? "Unable to start checkout.");
+        throw new Error(payload.error ?? m.pricingUnableCheckout);
       }
       router.push(payload.url);
     } catch (error) {
       console.error(error);
-      alert("Unable to start checkout. Please try again.");
+      alert(m.pricingUnableCheckout);
     } finally {
       setCheckoutPlan(null);
     }
@@ -139,11 +114,10 @@ export default function MainSitePricingPage({
           <section className="mx-auto w-full max-w-7xl px-8 pt-6">
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-emerald-900">
               <p className="text-sm font-semibold sm:text-base">
-                Payment received. Thank you for subscribing to SoloHub.
+                {m.pricingPaymentReceivedTitle}
               </p>
               <p className="mt-1 text-xs text-emerald-800 sm:text-sm">
-                If you paid with iDEAL or another bank redirect, activation may finish shortly
-                after Stripe webhook confirmation.
+                {m.pricingPaymentReceivedBody}
               </p>
             </div>
           </section>
@@ -151,9 +125,11 @@ export default function MainSitePricingPage({
         {showCheckoutCancelled ? (
           <section className="mx-auto w-full max-w-7xl px-8 pt-6">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-6 py-4 text-slate-900">
-              <p className="text-sm font-semibold sm:text-base">Checkout was cancelled.</p>
+              <p className="text-sm font-semibold sm:text-base">
+                {m.pricingCheckoutCancelledTitle}
+              </p>
               <p className="mt-1 text-xs text-slate-700 sm:text-sm">
-                No charge was made. You can choose a plan and try again anytime.
+                {m.pricingCheckoutCancelledBody}
               </p>
             </div>
           </section>
@@ -162,10 +138,10 @@ export default function MainSitePricingPage({
           <section className="mx-auto w-full max-w-7xl px-8 pt-6">
             <div className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-4 text-rose-900">
               <p className="text-sm font-semibold sm:text-base">
-                Payment did not complete successfully.
+                {m.pricingCheckoutFailedTitle}
               </p>
               <p className="mt-1 text-xs text-rose-800 sm:text-sm">
-                You were not charged. Please retry checkout or contact us for help.
+                {m.pricingCheckoutFailedBody}
               </p>
             </div>
           </section>
@@ -177,10 +153,10 @@ export default function MainSitePricingPage({
           <div className="mx-auto max-w-6xl">
             <div className="text-center">
               <h1 className="text-5xl font-bold leading-[1.1] tracking-tight text-slate-900 lg:text-6xl">
-                Simple, Professional Pricing
+                {m.pricingHeroTitle}
               </h1>
               <p className="mx-auto mb-12 mt-6 max-w-2xl text-xl leading-relaxed text-slate-600">
-                No commission, no hidden fees. All prices exclude 21% BTW.
+                {m.pricingHeroSubtitle}
               </p>
             </div>
 
@@ -190,13 +166,13 @@ export default function MainSitePricingPage({
                   !isAnnual ? "text-slate-900" : "text-slate-500"
                 }`}
               >
-                Monthly
+                {m.pricingMonthly}
               </span>
               <button
                 type="button"
                 role="switch"
                 aria-checked={isAnnual}
-                aria-label="Toggle annual pricing"
+                aria-label={m.pricingToggleAria}
                 onClick={() => setIsAnnual((prev) => !prev)}
                 className={`relative inline-flex h-8 w-16 items-center rounded-full border transition-colors duration-300 ${
                   isAnnual
@@ -215,9 +191,9 @@ export default function MainSitePricingPage({
                   isAnnual ? "text-slate-900" : "text-slate-600"
                 }`}
               >
-                Annually
+                {m.pricingAnnually}
                 <span className="mt-1 block rounded-full border border-[#c6faf5] bg-[#ecfdfb] px-2 py-1 text-center text-sm font-bold text-[#0ea5b7] sm:ml-2 sm:mt-0 sm:inline-block">
-                  Save 20%
+                  {m.pricingSave20}
                 </span>
               </span>
             </div>
@@ -227,7 +203,9 @@ export default function MainSitePricingPage({
                 const shownPrice = isAnnual
                   ? formatPrice(plan.annualPrice)
                   : formatPrice(plan.monthlyPrice);
-                const priceSuffix = isAnnual ? "/yr" : "/mo";
+                const priceSuffix = isAnnual
+                  ? m.pricingSuffixYr
+                  : m.pricingSuffixMo;
                 const cardFeatures = getPackageCardBullets(plan);
 
                 return (
@@ -246,7 +224,7 @@ export default function MainSitePricingPage({
                   >
                     {plan.featured ? (
                       <div className="absolute -top-4 rounded-full bg-[#11c4b6] px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
-                        Most Popular
+                        {m.pricingMostPopular}
                       </div>
                     ) : null}
                     <div className="text-center">
@@ -275,7 +253,9 @@ export default function MainSitePricingPage({
                             : "border border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
                       } disabled:cursor-not-allowed disabled:opacity-60`}
                     >
-                      {checkoutPlan === plan.id ? "Redirecting..." : "Get Started"}
+                      {checkoutPlan === plan.id
+                        ? m.pricingRedirecting
+                        : m.pricingGetStarted}
                     </button>
                     <ul className="w-full space-y-4 text-left">
                       {cardFeatures.map((feature) => (
@@ -307,27 +287,23 @@ export default function MainSitePricingPage({
               <div className="pointer-events-none absolute -bottom-20 -left-12 h-52 w-52 rounded-full bg-[#67e8f9]/30 blur-3xl" />
 
               <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#0f766e]">
-                Why a 14-day trial?
+                {m.pricingTrialEyebrow}
               </p>
               <h3 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-                See the value first, then decide with confidence
+                {m.pricingTrialTitle}
               </h3>
               <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-slate-600 md:text-lg">
-                We want you to experience exactly how much time SoloHub saves
-                before you pay a cent. During your trial, you get full access to
-                your professional website, automated reminders, and staff
-                portals. If it&apos;s not the perfect fit, you can walk away
-                anytime, no questions asked.
+                {m.pricingTrialBody}
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link href="/book-demo" className={MARKETING_BUTTON_PRIMARY}>
-                  Book a Demo
+                  {m.pricingBookDemo}
                 </Link>
                 <Link
                   href="/signup"
                   className={`${MARKETING_BUTTON_SECONDARY} border-[#9ceee5] text-[#0ea5b7] hover:bg-[#ecfdfb]`}
                 >
-                  Start Free Trial
+                  {m.pricingStartTrial}
                 </Link>
               </div>
             </div>
@@ -340,11 +316,9 @@ export default function MainSitePricingPage({
         >
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold text-slate-900 lg:text-4xl">
-              Compare plans in detail
+              {m.pricingCompareTitle}
             </h2>
-            <p className="text-lg text-slate-600">
-              Find the perfect plan for your business needs.
-            </p>
+            <p className="text-lg text-slate-600">{m.pricingCompareSubtitle}</p>
           </div>
 
           <div
@@ -359,7 +333,7 @@ export default function MainSitePricingPage({
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/50">
                   <th className="min-w-[260px] p-6 font-semibold text-slate-900">
-                    Feature
+                    {m.pricingTableFeature}
                   </th>
                   {activePackages.map((pkg) => (
                     <th
@@ -439,15 +413,13 @@ export default function MainSitePricingPage({
           <div className="mx-auto max-w-4xl">
             <div className="mb-16 text-center">
               <h2 className="mb-4 text-3xl font-bold text-slate-900 lg:text-4xl">
-                Frequently Asked Questions
+                {m.pricingFaqTitle}
               </h2>
-              <p className="text-lg text-slate-600">
-                Everything you need to know about billing and plans.
-              </p>
+              <p className="text-lg text-slate-600">{m.pricingFaqSubtitle}</p>
             </div>
 
             <div className="space-y-6">
-              {FAQS.map((faq) => (
+              {pricingFaqs.map((faq) => (
                 <div
                   key={faq.q}
                   className="cursor-pointer rounded-xl border border-slate-200 p-6 transition-colors hover:border-[#9ceee5]"

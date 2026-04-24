@@ -1,9 +1,9 @@
 "use client";
 
 import { ArrowRightIcon } from "@/components/ui/Icons";
-import Link from "next/link";
-import { MARKETING_BUTTON_DARK } from "@/components/marketing/buttonStyles";
 import { useLocale } from "@/lib/i18n/context";
+import Link from "next/link";
+import { Button } from "../ds/Button";
 
 export default function MainSiteAbout() {
   const { t } = useLocale();
@@ -11,7 +11,7 @@ export default function MainSiteAbout() {
   return (
     <section
       id="about-story"
-      className="bg-gradient-to-br from-[#ecfdfb] to-white px-8 py-24"
+      className="bg-gradient-to-br from-brand-50 to-white px-8 py-24"
     >
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col items-center gap-16 lg:flex-row">
@@ -37,7 +37,7 @@ export default function MainSiteAbout() {
           </div>
 
           <div className="lg:w-1/2">
-            <div className="mb-6 inline-block rounded-full bg-[#ccfbf1] px-4 py-2 text-sm font-semibold text-[#0ea5b7]">
+            <div className="mb-6 inline-block rounded-full bg-brand-100 px-4 py-2 text-sm font-semibold text-brand-700">
               <span className="mr-2">🇳🇱</span>
               {w.aboutBadge}
             </div>
@@ -51,13 +51,12 @@ export default function MainSiteAbout() {
               {w.aboutBody2}
             </p>
             <div className="flex flex-col gap-8 sm:flex-row">
-              <Link
-                href="/about"
-                className={`${MARKETING_BUTTON_DARK} space-x-2`}
-              >
-                <span>{w.aboutCta}</span>
-                <ArrowRightIcon className="h-4 w-4" />
-              </Link>
+              <Button variant="dark" asChild size="xl" className="space-x-2">
+                <Link href="/about">
+                  <span>{w.aboutCta}</span>
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </Button>
               <div className="flex items-center -space-x-2 px-6">
                 {/* Your Profile Image */}
                 <img
@@ -76,28 +75,26 @@ export default function MainSiteAbout() {
                   <p className="text-sm font-semibold text-slate-900">
                     Shayan & Aryana
                   </p>
-                  <p className="text-xs text-slate-500">
-                    {w.aboutFounderRole}
-                  </p>
+                  <p className="text-xs text-slate-500">{w.aboutFounderRole}</p>
                 </div>
               </div>
             </div>
             <div className="mt-10 border-t border-slate-200 pt-10">
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
                 <div className="text-center sm:text-left">
-                  <div className="mb-1 text-xl font-bold text-[#0ea5b7]">
+                  <div className="mb-1 text-xl font-bold text-brand-700">
                     {w.stat1Title}
                   </div>
                   <div className="text-sm text-slate-600">{w.stat1Body}</div>
                 </div>
                 <div className="text-center sm:text-left">
-                  <div className="mb-1 text-xl font-bold text-[#0ea5b7]">
+                  <div className="mb-1 text-xl font-bold text-brand-700">
                     {w.stat2Title}
                   </div>
                   <div className="text-sm text-slate-600">{w.stat2Body}</div>
                 </div>
                 <div className="text-center sm:text-left">
-                  <div className="mb-1 text-xl font-bold text-[#0ea5b7]">
+                  <div className="mb-1 text-xl font-bold text-brand-700">
                     2026
                   </div>
                   <div className="text-sm text-slate-600">{w.stat3Body}</div>

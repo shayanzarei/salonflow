@@ -3,22 +3,18 @@
 import MainSiteCta from "@/components/marketing/MainSiteCta";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
+import { CheckCircleIcon, ChevronDownIcon, XIcon } from "@/components/ui/Icons";
 import {
   getPackageCardBullets,
   type PackageEntitlementKey,
   type PackageId,
   type ResolvedPackage,
 } from "@/config/packages";
-import {
-  MARKETING_BUTTON_BASE,
-  MARKETING_BUTTON_PRIMARY,
-  MARKETING_BUTTON_SECONDARY,
-} from "@/components/marketing/buttonStyles";
-import { CheckCircleIcon, ChevronDownIcon, XIcon } from "@/components/ui/Icons";
 import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
+import { Button } from "../ds/Button";
 
 type ComparisonSection = {
   category: string;
@@ -68,7 +64,10 @@ export default function MainSitePricingPage({
   const showCheckoutFailed = checkoutResult === "failed";
 
   const activePackages = useMemo(
-    () => packages.filter((pkg) => pkg.isActive).sort((a, b) => a.sortOrder - b.sortOrder),
+    () =>
+      packages
+        .filter((pkg) => pkg.isActive)
+        .sort((a, b) => a.sortOrder - b.sortOrder),
     [packages]
   );
 
@@ -104,7 +103,7 @@ export default function MainSitePricingPage({
       className="min-h-screen bg-[#f8fafc] text-slate-900"
       style={{
         backgroundImage:
-          "radial-gradient(at 40% 20%, hsla(173, 100%, 76%, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.1) 0px, transparent 50%)",
+          "radial-gradient(at 40% 20%, hsla(262, 90%, 76%, 0.18) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(280, 90%, 65%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(38, 100%, 90%, 0.12) 0px, transparent 50%)",
       }}
     >
       <MainSiteHeader active="pricing" />
@@ -176,7 +175,7 @@ export default function MainSitePricingPage({
                 onClick={() => setIsAnnual((prev) => !prev)}
                 className={`relative inline-flex h-8 w-16 items-center rounded-full border transition-colors duration-300 ${
                   isAnnual
-                    ? "border-[#5eead4] bg-[#99f6e4]"
+                    ? "border-brand-200 bg-brand-200"
                     : "border-slate-300 bg-slate-200"
                 }`}
               >
@@ -192,7 +191,7 @@ export default function MainSitePricingPage({
                 }`}
               >
                 {m.pricingAnnually}
-                <span className="mt-1 block rounded-full border border-[#c6faf5] bg-[#ecfdfb] px-2 py-1 text-center text-sm font-bold text-[#0ea5b7] sm:ml-2 sm:mt-0 sm:inline-block">
+                <span className="mt-1 block rounded-full border border-[#c6faf5] bg-brand-50 px-2 py-1 text-center text-sm font-bold text-brand-700 sm:ml-2 sm:mt-0 sm:inline-block">
                   {m.pricingSave20}
                 </span>
               </span>
@@ -213,7 +212,7 @@ export default function MainSitePricingPage({
                     key={plan.id}
                     className={`relative flex flex-col items-center rounded-2xl p-8 ${
                       plan.featured
-                        ? "border-2 border-[#11c4b6] shadow-lg md:-translate-y-4"
+                        ? "border-2 border-brand-600 shadow-lg md:-translate-y-4"
                         : "border border-slate-200 shadow-sm transition-shadow hover:shadow-md"
                     }`}
                     style={{
@@ -223,7 +222,7 @@ export default function MainSitePricingPage({
                     }}
                   >
                     {plan.featured ? (
-                      <div className="absolute -top-4 rounded-full bg-[#11c4b6] px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                      <div className="absolute -top-4 rounded-full bg-brand-600 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
                         {m.pricingMostPopular}
                       </div>
                     ) : null}
@@ -238,32 +237,33 @@ export default function MainSitePricingPage({
                         <span className="text-5xl font-bold text-slate-900">
                           {shownPrice}
                         </span>
-                        <span className="ml-2 text-slate-500">{priceSuffix}</span>
+                        <span className="ml-2 text-slate-500">
+                          {priceSuffix}
+                        </span>
                       </div>
                     </div>
-                    <button
-                      type="button"
+
+                    <Button
                       onClick={() => startCheckout(plan.id)}
                       disabled={checkoutPlan === plan.id}
-                      className={`mb-8 w-full rounded-full px-6 text-center ${MARKETING_BUTTON_BASE} ${
-                        plan.featured
-                          ? "bg-[#11c4b6] text-white shadow-md hover:bg-[#0ea5b7]"
-                          : index === 0
-                            ? "border border-[#9ceee5] bg-white text-[#0ea5b7] hover:bg-[#ecfdfb]"
-                            : "border border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
-                      } disabled:cursor-not-allowed disabled:opacity-60`}
+                      size="xl"
+                      
+                      variant={plan.featured ? "primary" : "secondary"}
+                      className="mb-8 w-full"
                     >
                       {checkoutPlan === plan.id
                         ? m.pricingRedirecting
                         : m.pricingGetStarted}
-                    </button>
+                    </Button>
                     <ul className="w-full space-y-4 text-left">
                       {cardFeatures.map((feature) => (
                         <li key={feature} className="flex items-start">
-                          <span className="mr-3 mt-0.5 text-[#11c4b6]">
+                          <span className="mr-3 mt-0.5 text-brand-600">
                             <CheckCircleIcon className="h-4 w-4" />
                           </span>
-                          <span className="text-sm text-slate-600">{feature}</span>
+                          <span className="text-sm text-slate-600">
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -277,16 +277,16 @@ export default function MainSitePricingPage({
         <section className="px-8 py-16">
           <div className="mx-auto max-w-7xl">
             <div
-              className="relative overflow-hidden rounded-3xl border border-[#baf4ec] p-8 text-center shadow-[0_20px_60px_-30px_rgba(17,196,182,0.45)] md:p-12"
+              className="relative overflow-hidden rounded-3xl border border-brand-200 p-8 text-center shadow-[0_20px_60px_-30px_rgba(124, 58, 237, 0.35)] md:p-12"
               style={{
                 background:
-                  "linear-gradient(130deg, rgba(236,253,251,0.95) 0%, rgba(255,255,255,0.96) 45%, rgba(240,249,255,0.92) 100%)",
+                  "linear-gradient(130deg, rgba(245,243,255,0.95) 0%, rgba(255,255,255,0.96) 45%, rgba(237,233,254,0.92) 100%)",
               }}
             >
-              <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#5eead4]/40 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-20 -left-12 h-52 w-52 rounded-full bg-[#67e8f9]/30 blur-3xl" />
+              <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-brand-200/40 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-20 -left-12 h-52 w-52 rounded-full bg-[#A78BFA]/30 blur-3xl" />
 
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#0f766e]">
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-brand-900">
                 {m.pricingTrialEyebrow}
               </p>
               <h3 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
@@ -296,15 +296,22 @@ export default function MainSitePricingPage({
                 {m.pricingTrialBody}
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Link href="/book-demo" className={MARKETING_BUTTON_PRIMARY}>
-                  {m.pricingBookDemo}
-                </Link>
-                <Link
-                  href="/signup"
-                  className={`${MARKETING_BUTTON_SECONDARY} border-[#9ceee5] text-[#0ea5b7] hover:bg-[#ecfdfb]`}
+                <Button
+                  variant="primary"
+                  asChild
+                  size="xl"
+                  className="space-x-2"
                 >
-                  {m.pricingStartTrial}
-                </Link>
+                  <Link href="/book-demo">{m.pricingBookDemo}</Link>
+                </Button>
+                <Button
+                  variant="secondary"
+                  asChild
+                  size="xl"
+                  className="space-x-2"
+                >
+                  <Link href="/signup">{m.pricingStartTrial}</Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -339,7 +346,7 @@ export default function MainSitePricingPage({
                     <th
                       key={pkg.id}
                       className={`min-w-[120px] p-6 text-center font-semibold ${
-                        pkg.featured ? "text-[#0ea5b7]" : "text-slate-900"
+                        pkg.featured ? "text-brand-700" : "text-slate-900"
                       }`}
                     >
                       {pkg.name}
@@ -357,7 +364,7 @@ export default function MainSitePricingPage({
                           style={{
                             backgroundImage:
                               sectionIndex === 0
-                                ? "linear-gradient(90deg, rgba(226, 253, 248, 0.8) 0%, rgba(240, 249, 255, 0.85) 50%, rgba(255, 241, 242, 0.75) 100%)"
+                                ? "linear-gradient(90deg, rgba(245, 243, 255, 0.8) 0%, rgba(237, 233, 254, 0.85) 50%, rgba(255, 241, 242, 0.75) 100%)"
                                 : undefined,
                           }}
                           className="border-b border-t border-slate-200 p-4 font-bold uppercase text-slate-900"
@@ -372,7 +379,9 @@ export default function MainSitePricingPage({
                             rowIndex % 2 === 1 ? "bg-slate-50/20" : ""
                           }`}
                         >
-                          <td className="p-4 pl-6 text-slate-600">{row.label}</td>
+                          <td className="p-4 pl-6 text-slate-600">
+                            {row.label}
+                          </td>
                           {activePackages.map((pkg) => {
                             const value = row.values[pkg.id];
                             return (
@@ -382,7 +391,7 @@ export default function MainSitePricingPage({
                               >
                                 {typeof value === "boolean" ? (
                                   value ? (
-                                    <span className="inline-flex text-[#11c4b6]">
+                                    <span className="inline-flex text-brand-600">
                                       <CheckCircleIcon className="h-4 w-4" />
                                     </span>
                                   ) : (
@@ -422,7 +431,7 @@ export default function MainSitePricingPage({
               {pricingFaqs.map((faq) => (
                 <div
                   key={faq.q}
-                  className="cursor-pointer rounded-xl border border-slate-200 p-6 transition-colors hover:border-[#9ceee5]"
+                  className="cursor-pointer rounded-xl border border-slate-200 p-6 transition-colors hover:border-brand-200"
                   style={{
                     background: "rgba(255, 255, 255, 0.8)",
                     backdropFilter: "blur(12px)",
@@ -439,7 +448,7 @@ export default function MainSitePricingPage({
                   >
                     <h4
                       className={`text-lg font-bold ${
-                        openFaq === faq.q ? "text-[#0ea5b7]" : "text-slate-900"
+                        openFaq === faq.q ? "text-brand-700" : "text-slate-900"
                       }`}
                     >
                       {faq.q}
@@ -447,7 +456,7 @@ export default function MainSitePricingPage({
                     <ChevronDownIcon
                       className={`h-5 w-5 transition-transform duration-200 ${
                         openFaq === faq.q
-                          ? "rotate-180 text-[#11c4b6]"
+                          ? "rotate-180 text-brand-600"
                           : "text-slate-400"
                       }`}
                     />

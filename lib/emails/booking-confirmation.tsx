@@ -29,8 +29,8 @@ export function bookingConfirmationEmail({
 }) {
   const color = /^#[0-9A-Fa-f]{6}$/.test(brandColor ?? "")
     ? (brandColor as string)
-    : "#11C4B6";
-  const colorDark = "#0EA5B7";
+    : "#7C3AED";
+  const colorDark = "#6D28D9";
   const colorTint = `${color}22`;
 
   const date = bookedAt.toLocaleDateString("nl-NL", {

@@ -30,7 +30,7 @@ export default async function ServiceDetailPage({
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const [detail, categoriesResult] = await Promise.all([
     loadServiceDetail(pool, tenant.id, id),
@@ -458,8 +458,8 @@ export default async function ServiceDetailPage({
               >
                 {detail.assignedStaff.map((member, i) => {
                   const colors = [
-                    "#7C3AED",
-                    "#F59E0B",
+                    'var(--color-brand-600)',
+                    'var(--color-accent-500)',
                     "#10B981",
                     "#EC4899",
                     "#3B82F6",

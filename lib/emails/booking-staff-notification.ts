@@ -98,11 +98,11 @@ export function bookingStaffNotificationEmail({
 
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#11C4B6 0%,#0EA5B7 100%);border-radius:16px 16px 0 0;padding:32px;text-align:center;" align="center">
+          <td style="background:linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%);border-radius:16px 16px 0 0;padding:32px;text-align:center;" align="center">
             <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin:0 auto 14px;">
               <tr>
                 <td width="48" height="48" style="width:48px;height:48px;background:#ffffff;border-radius:12px;text-align:center;vertical-align:middle;">
-                  <span style="font-size:22px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,Helvetica,sans-serif;line-height:48px;display:block;">S</span>
+                  <span style="font-size:22px;font-weight:800;color:#7C3AED;font-family:Inter,Arial,Helvetica,sans-serif;line-height:48px;display:block;">S</span>
                 </td>
               </tr>
             </table>
@@ -185,7 +185,7 @@ export function bookingStaffNotificationEmail({
                         <span style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;">Price</span>
                       </td>
                       <td style="border-top:2px solid #E2E8F0;padding-top:12px;vertical-align:top;">
-                        <span style="font-size:16px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,Helvetica,sans-serif;">${formatEUR(price)}</span>
+                        <span style="font-size:16px;font-weight:800;color:#7C3AED;font-family:Inter,Arial,Helvetica,sans-serif;">${formatEUR(price)}</span>
                       </td>
                     </tr>
                   </table>
@@ -206,7 +206,7 @@ export function bookingStaffNotificationEmail({
                     </tr>
                     <tr>
                       <td style="padding-bottom:${clientPhone ? "4px" : "0"};">
-                        <a href="mailto:${esc(clientEmail)}" style="font-size:13px;color:#0EA5B7;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;">&#9993;&nbsp; ${esc(clientEmail)}</a>
+                        <a href="mailto:${esc(clientEmail)}" style="font-size:13px;color:#6D28D9;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;">&#9993;&nbsp; ${esc(clientEmail)}</a>
                       </td>
                     </tr>
                     ${
@@ -229,7 +229,7 @@ export function bookingStaffNotificationEmail({
                 <td align="center">
                   <table cellpadding="0" cellspacing="0" border="0" role="presentation">
                     <tr>
-                      <td style="border-radius:12px;background:linear-gradient(135deg,#11C4B6 0%,#0EA5B7 100%);">
+                      <td style="border-radius:12px;background:linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%);">
                         <a href="${safeDashboardUrl}" style="display:block;padding:14px 32px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;white-space:nowrap;border-radius:12px;">
                           View booking in dashboard &rarr;
                         </a>
@@ -246,7 +246,7 @@ export function bookingStaffNotificationEmail({
         <!-- Footer -->
         <tr>
           <td style="background:#F8FAFC;border:1px solid #E2E8F0;border-top:none;border-radius:0 0 16px 16px;padding:22px 32px;" align="center">
-            <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,Helvetica,sans-serif;letter-spacing:-0.01em;">SoloHub</p>
+            <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#7C3AED;font-family:Inter,Arial,Helvetica,sans-serif;letter-spacing:-0.01em;">SoloHub</p>
             <p style="margin:0 0 6px;font-size:12px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">
               <a href="https://solohub.nl" style="color:#64748B;text-decoration:none;margin:0 6px;">solohub.nl</a>&nbsp;·&nbsp;
               <a href="https://solohub.nl/privacy" style="color:#64748B;text-decoration:none;margin:0 6px;">Privacy Policy</a>

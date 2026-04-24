@@ -10,7 +10,7 @@ export default async function NotFound() {
       <Link href="/" className="mb-12" aria-label={e.notFoundHomeAria}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/SoloHub%20logo%20png.png"
+          src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/solohub%20logo2%20%281%29.png"
           alt="SoloHub"
           className="h-12 w-auto"
         />
@@ -22,7 +22,7 @@ export default async function NotFound() {
           style={{
             fontSize: "clamp(100px, 20vw, 180px)",
             color: "transparent",
-            WebkitTextStroke: "2px #11c4b6",
+            WebkitTextStroke: "2px #7C3AED",
             opacity: 0.18,
           }}
         >
@@ -42,7 +42,7 @@ export default async function NotFound() {
           href="/"
           className="inline-flex min-h-11 items-center justify-center rounded-xl px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           style={{
-            background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)",
+            background: "linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)",
           }}
         >
           {e.notFoundBack}

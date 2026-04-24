@@ -21,7 +21,7 @@ export default async function ConfirmPage({
   if (!tenant) notFound();
 
   const { service, staff, time } = await searchParams;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const [serviceResult, staffResult] = await Promise.all([
     pool.query(

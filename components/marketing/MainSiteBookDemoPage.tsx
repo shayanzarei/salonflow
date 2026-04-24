@@ -215,7 +215,7 @@ export default function MainSiteBookDemoPage() {
       className="min-h-screen bg-[#f8fafc] text-slate-900"
       style={{
         backgroundImage:
-          "radial-gradient(at 40% 20%, hsla(173, 100%, 76%, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.1) 0px, transparent 50%)",
+          "radial-gradient(at 40% 20%, hsla(262, 90%, 76%, 0.18) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(280, 90%, 65%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(38, 100%, 90%, 0.12) 0px, transparent 50%)",
       }}
     >
       <MainSiteHeader active="demo" />
@@ -230,7 +230,7 @@ export default function MainSiteBookDemoPage() {
             className="flex w-full flex-col pt-8 lg:w-5/12"
           >
             <div className="mb-8 inline-flex w-fit items-center space-x-2 rounded-full border border-slate-200 bg-white/60 px-4 py-2 shadow-sm backdrop-blur-sm">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-[#14b8a6]" />
+              <span className="h-2 w-2 animate-pulse rounded-full bg-brand-600" />
               <span className="text-sm font-medium text-slate-700">
                 15-30 min demo
               </span>
@@ -250,8 +250,8 @@ export default function MainSiteBookDemoPage() {
 
             <div className="mb-12 space-y-6">
               <div className="flex items-start">
-                <div className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#ecfdfb]">
-                  <SparkleIcon className="h-6 w-6 text-[#0ea5b7]" />
+                <div className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-50">
+                  <SparkleIcon className="h-6 w-6 text-brand-700" />
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-semibold text-slate-900">
@@ -265,8 +265,8 @@ export default function MainSiteBookDemoPage() {
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#ecfdfb]">
-                  <UsersIcon className="h-6 w-6 text-[#0ea5b7]" />
+                <div className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-50">
+                  <UsersIcon className="h-6 w-6 text-brand-700" />
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-semibold text-slate-900">
@@ -336,7 +336,7 @@ export default function MainSiteBookDemoPage() {
                     <label
                       className={`flex cursor-pointer items-center rounded-xl border p-4 ${
                         focusArea === "general_overview"
-                          ? "border-[#14b8a6] bg-[#f0fdfa]"
+                          ? "border-brand-600 bg-brand-50"
                           : "border-slate-200"
                       }`}
                     >
@@ -351,12 +351,12 @@ export default function MainSiteBookDemoPage() {
                       <span
                         className={`relative mr-3 h-5 w-5 shrink-0 rounded-full border-2 ${
                           focusArea === "general_overview"
-                            ? "border-[#14b8a6]"
+                            ? "border-brand-600"
                             : "border-slate-300"
                         }`}
                       >
                         {focusArea === "general_overview" ? (
-                          <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#14b8a6]" />
+                          <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-600" />
                         ) : null}
                       </span>
                       <span>
@@ -371,7 +371,7 @@ export default function MainSiteBookDemoPage() {
                     <label
                       className={`flex cursor-pointer items-center rounded-xl border p-4 ${
                         focusArea === "billing_invoicing"
-                          ? "border-[#14b8a6] bg-[#f0fdfa]"
+                          ? "border-brand-600 bg-brand-50"
                           : "border-slate-200"
                       }`}
                     >
@@ -386,12 +386,12 @@ export default function MainSiteBookDemoPage() {
                       <span
                         className={`relative mr-3 h-5 w-5 shrink-0 rounded-full border-2 ${
                           focusArea === "billing_invoicing"
-                            ? "border-[#14b8a6]"
+                            ? "border-brand-600"
                             : "border-slate-300"
                         }`}
                       >
                         {focusArea === "billing_invoicing" ? (
-                          <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#14b8a6]" />
+                          <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-600" />
                         ) : null}
                       </span>
                       <span>
@@ -473,7 +473,7 @@ export default function MainSiteBookDemoPage() {
                               }}
                               className={`py-2 ${
                                 day.isSelected
-                                  ? "rounded-full bg-[#14b8a6] font-semibold text-white"
+                                  ? "rounded-full bg-brand-600 font-semibold text-white"
                                   : disabled
                                     ? "cursor-not-allowed text-slate-300"
                                     : "cursor-pointer rounded-full hover:bg-slate-100"
@@ -511,7 +511,7 @@ export default function MainSiteBookDemoPage() {
                                 onClick={() => setSelectedTime(slot.value)}
                                 className={`w-full rounded-xl border px-4 py-3 text-center font-medium transition-colors ${
                                   selected
-                                    ? "flex items-center justify-between border-[#14b8a6] bg-[#f0fdfa] px-6 font-semibold text-[#0d9488]"
+                                    ? "flex items-center justify-between border-brand-600 bg-brand-50 px-6 font-semibold text-brand-700"
                                     : slot.isAvailable
                                       ? "border-slate-200 text-slate-700 hover:bg-slate-50"
                                       : "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
@@ -547,7 +547,7 @@ export default function MainSiteBookDemoPage() {
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
                           type="text"
-                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
                           placeholder="Jane"
                         />
                       </div>
@@ -560,7 +560,7 @@ export default function MainSiteBookDemoPage() {
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
                           type="text"
-                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
                           placeholder="Doe"
                         />
                       </div>
@@ -574,7 +574,7 @@ export default function MainSiteBookDemoPage() {
                         value={workEmail}
                         onChange={(e) => setWorkEmail(e.target.value)}
                         type="email"
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
                         placeholder="jane@company.com"
                       />
                     </div>
@@ -586,7 +586,7 @@ export default function MainSiteBookDemoPage() {
                         value={companyRole}
                         onChange={(e) => setCompanyRole(e.target.value)}
                         type="text"
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
                         placeholder="Independent Consultant"
                       />
                     </div>
@@ -598,7 +598,7 @@ export default function MainSiteBookDemoPage() {
                         value={goals}
                         onChange={(e) => setGoals(e.target.value)}
                         rows={3}
-                        className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                        className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
                         placeholder="e.g., I want to automate my invoicing and client onboarding..."
                       />
                     </div>
@@ -613,7 +613,7 @@ export default function MainSiteBookDemoPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !selectedTime}
-                    className="flex w-full items-center justify-center space-x-2 rounded-xl bg-[#14b8a6] px-8 py-3.5 font-bold text-white shadow-lg shadow-[#14b8a6]/20 transition-colors hover:bg-[#0ea5b7] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                    className="flex w-full items-center justify-center space-x-2 rounded-xl bg-brand-600 px-8 py-3.5 font-bold text-white shadow-lg shadow-brand-600/20 transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                   >
                     <span>Schedule Demo</span>
                     <ArrowRightIcon className="h-4 w-4" />

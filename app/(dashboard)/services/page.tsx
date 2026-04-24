@@ -27,7 +27,7 @@ export default async function ServicesPage({
   const activeTab = tab === "categories" ? "categories" : "services";
   const currentPage = parseInt(page ?? "1");
   const offset = (currentPage - 1) * PAGE_SIZE;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
   const redirectTo =
     redirect_to && redirect_to.startsWith("/") && !redirect_to.startsWith("//")
       ? redirect_to
@@ -184,14 +184,14 @@ export default async function ServicesPage({
                   width: 44,
                   height: 44,
                   borderRadius: 12,
-                  background: "#F5F3FF",
+                  background: 'var(--color-brand-50)',
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
                 }}
               >
-                <ScissorsIcon size={20} color="#7C3AED" />
+                <ScissorsIcon size={20} color='var(--color-brand-600)' />
               </div>
               <div>
                 <p style={{ fontSize: 13, color: "#888", margin: "0 0 4px" }}>
@@ -233,7 +233,7 @@ export default async function ServicesPage({
                   flexShrink: 0,
                 }}
               >
-                <TrophyIcon size={20} color="#D97706" />
+                <TrophyIcon size={20} color='var(--color-accent-600)' />
               </div>
               <div>
                 <p style={{ fontSize: 13, color: "#888", margin: "0 0 4px" }}>

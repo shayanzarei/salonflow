@@ -180,7 +180,7 @@ export default function ReportsPage() {
         <div className="flex flex-col items-center gap-3 text-gray-400">
           <svg className="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="#E2E8F0" strokeWidth="3" />
-            <path d="M12 2a10 10 0 0 1 10 10" stroke="#11C4B6" strokeWidth="3" strokeLinecap="round" />
+            <path d="M12 2a10 10 0 0 1 10 10" stroke='var(--color-brand-600)' strokeWidth="3" strokeLinecap="round" />
           </svg>
           <span className="text-sm">{dr.loading}</span>
         </div>
@@ -233,7 +233,7 @@ export default function ReportsPage() {
             onClick={finalizeAll}
             disabled={bulkLoading}
             className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg,#11C4B6,#0EA5B7)" }}
+            style={{ background: "linear-gradient(135deg,var(--color-brand-600),var(--color-brand-700))" }}
           >
             {bulkLoading
               ? dr.finalizing
@@ -248,7 +248,7 @@ export default function ReportsPage() {
           label={dr.statToday}
           revenue={data.today_revenue}
           count={data.today_completed}
-          accent="#11C4B6"
+          accent='var(--color-brand-600)'
           icon="📅"
           localeTag={localeTag}
           completedOne={dr.completedAppointmentsOne}
@@ -268,7 +268,7 @@ export default function ReportsPage() {
           label={dr.statMonth}
           revenue={data.month_revenue}
           count={data.month_completed}
-          accent="#F59E0B"
+          accent='var(--color-accent-500)'
           icon="🗓️"
           localeTag={localeTag}
           completedOne={dr.completedAppointmentsOne}
@@ -326,7 +326,7 @@ export default function ReportsPage() {
                   {/* Avatar */}
                   <div
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                    style={{ background: "linear-gradient(135deg,#11C4B6,#0EA5B7)" }}
+                    style={{ background: "linear-gradient(135deg,var(--color-brand-600),var(--color-brand-700))" }}
                   >
                     {mkInitials(booking.client_name)}
                   </div>

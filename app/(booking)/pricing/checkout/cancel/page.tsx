@@ -1,8 +1,5 @@
 import { CheckoutResultLayout } from "@/components/marketing/CheckoutResultLayout";
-import {
-  MARKETING_BUTTON_PRIMARY,
-  MARKETING_BUTTON_SECONDARY,
-} from "@/components/marketing/buttonStyles";
+import { Button } from "@/components/ds/Button";
 import { isMainSiteHost } from "@/lib/main-site";
 import { XIcon } from "@/components/ui/Icons";
 import { headers } from "next/headers";
@@ -30,18 +27,12 @@ export default async function CheckoutCancelPage() {
           or reach out if you need a different package or billing cycle.
         </p>
         <div className="mt-10 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link
-            href="/pricing"
-            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${MARKETING_BUTTON_PRIMARY}`}
-          >
-            View plans again
-          </Link>
-          <Link
-            href="/contact"
-            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${MARKETING_BUTTON_SECONDARY}`}
-          >
-            Contact sales
-          </Link>
+          <Button asChild variant="primary" size="lg">
+            <Link href="/pricing">View plans again</Link>
+          </Button>
+          <Button asChild variant="secondary" size="lg">
+            <Link href="/contact">Contact sales</Link>
+          </Button>
         </div>
       </div>
     </CheckoutResultLayout>

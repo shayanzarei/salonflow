@@ -26,7 +26,7 @@ SoloHub uses a four-layer color model:
 ```
 neutral  → surfaces, borders, text
 brand    → per-tenant primary (overrideable at runtime)
-accent   → SoloHub marketing identity (teal)
+accent   → SoloHub marketing identity (amber)
 semantic → success, warning, danger, info
 ```
 
@@ -64,8 +64,8 @@ semantic → success, warning, danger, info
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `--color-accent-500` | `#11C4B6` | Marketing CTA fill |
-| `--color-accent-600` | `#0EA5B7` | Marketing CTA hover |
+| `--color-accent-500` | `#F59E0B` | Marketing accent (badges, highlights) |
+| `--color-accent-600` | `#D97706` | Marketing accent hover |
 
 #### Semantic
 

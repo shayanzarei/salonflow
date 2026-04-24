@@ -37,7 +37,7 @@ export default async function ReviewPage({
   );
 
   const alreadyReviewed = existingReview.rows.length > 0;
-  const brand = tenant?.primary_color ?? "#7C3AED";
+  const brand = tenant?.primary_color ?? 'var(--color-brand-600)';
   const preselectedRating = rating ? parseInt(rating) : null;
 
   if (alreadyReviewed) {
@@ -75,7 +75,7 @@ export default async function ReviewPage({
               width: 24,
               height: 24,
               borderRadius: "50%",
-              background: "#F59E0B",
+              background: 'var(--color-accent-500)',
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

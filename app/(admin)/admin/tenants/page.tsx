@@ -143,7 +143,7 @@ export default async function AdminTenantsPage({
                         <div
                           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white"
                           style={{
-                            backgroundColor: tenant.primary_color ?? "#7C3AED",
+                            backgroundColor: tenant.primary_color ?? 'var(--color-brand-600)',
                           }}
                         >
                           {tenant.name.charAt(0)}

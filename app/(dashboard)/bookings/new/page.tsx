@@ -33,7 +33,7 @@ export default async function NewBookingPage() {
       <AddBookingForm
         services={servicesResult.rows}
         staffList={staffResult.rows}
-        brand={tenant.primary_color ?? '#7C3AED'}
+        brand={tenant.primary_color ?? 'var(--color-brand-600)'}
         tenantId={tenant.id}
       />
     </div>

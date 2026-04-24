@@ -72,7 +72,7 @@ export default function MainSiteContactPage() {
       className="min-h-screen bg-[#f8fafc] text-slate-900"
       style={{
         backgroundImage:
-          "radial-gradient(at 40% 20%, hsla(173, 100%, 76%, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.1) 0px, transparent 50%)",
+          "radial-gradient(at 40% 20%, hsla(262, 90%, 76%, 0.18) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(280, 90%, 65%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(38, 100%, 90%, 0.12) 0px, transparent 50%)",
       }}
     >
       <MainSiteHeader active="contact" />
@@ -92,15 +92,15 @@ export default function MainSiteContactPage() {
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8">
             <div className="space-y-8 lg:col-span-5">
               <section className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-sm">
-                <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-[#14b8a6] to-[#9ceee5]" />
+                <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-brand-600 to-brand-200" />
                 <h3 className="mb-4 text-xl font-bold text-white">
                   {m.contactPromiseTitle}
                 </h3>
                 <p className="mb-6 text-sm text-slate-300">
                   {m.contactPromiseBody}
                 </p>
-                <div className="flex items-center gap-2 text-sm font-medium text-[#9ceee5]">
-                  <ClockIcon className="h-4 w-4 text-[#14b8a6]" />
+                <div className="flex items-center gap-2 text-sm font-medium text-brand-200">
+                  <ClockIcon className="h-4 w-4 text-brand-600" />
                   <span>{m.contactAvgResponseLabel}</span>
                   <span className="text-white">{m.contactAvgResponseValue}</span>
                 </div>
@@ -113,7 +113,7 @@ export default function MainSiteContactPage() {
                 <div className="space-y-6">
                   {/* TODO: Add email contact */}
                   {/* <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ecfdfb] text-[#0ea5b7]">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
                       <IconEnvelope className="h-5 w-5" />
                     </div>
                     <div>
@@ -125,7 +125,7 @@ export default function MainSiteContactPage() {
                       </p>
                       <a
                         href="mailto:hello@solohub.com"
-                        className="text-sm font-medium text-[#0ea5b7] hover:underline"
+                        className="text-sm font-medium text-brand-700 hover:underline"
                       >
                         hello@solohub.com
                       </a>
@@ -160,14 +160,14 @@ export default function MainSiteContactPage() {
               <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
                 <a
                   href="/faq"
-                  className="flex items-center gap-2 transition-colors hover:text-[#0ea5b7]"
+                  className="flex items-center gap-2 transition-colors hover:text-brand-700"
                 >
                   <BookIcon className="h-4 w-4" /> {m.contactReadFaqs}
                 </a>
                 <span className="text-slate-300">•</span>
                 <a
                   href="/privacy"
-                  className="flex items-center gap-2 transition-colors hover:text-[#0ea5b7]"
+                  className="flex items-center gap-2 transition-colors hover:text-brand-700"
                 >
                   <ShieldIcon className="h-4 w-4" /> {m.contactPrivacyLink}
                 </a>
@@ -195,7 +195,7 @@ export default function MainSiteContactPage() {
                         onChange={(e) => setFirstName(e.target.value)}
                         required
                         placeholder={m.phFirstName}
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                       />
                     </div>
                     <div>
@@ -212,7 +212,7 @@ export default function MainSiteContactPage() {
                         onChange={(e) => setLastName(e.target.value)}
                         required
                         placeholder={m.phLastName}
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                       />
                     </div>
                   </div>
@@ -231,7 +231,7 @@ export default function MainSiteContactPage() {
                       onChange={(e) => setWorkEmail(e.target.value)}
                       required
                       placeholder={m.phWorkEmail}
-                      className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                     />
                   </div>
 
@@ -247,7 +247,7 @@ export default function MainSiteContactPage() {
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
                       required
-                      className="w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
+                      className="w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                     >
                       <option value="" disabled>
                         {m.contactTopicPlaceholder}
@@ -273,14 +273,14 @@ export default function MainSiteContactPage() {
                       onChange={(e) => setMessage(e.target.value)}
                       required
                       placeholder={m.contactMessagePlaceholder}
-                      className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
+                      className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#14b8a6] py-3.5 text-base font-bold text-white shadow-lg shadow-[#14b8a6]/20 transition-colors hover:bg-[#0ea5b7] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 py-3.5 text-base font-bold text-white shadow-lg shadow-brand-600/20 transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSubmitting ? m.contactSending : m.contactSend}
                     <PaperPlaneIcon className="h-4 w-4" />
@@ -308,7 +308,7 @@ export default function MainSiteContactPage() {
                     {m.contactFormDisclaimerPrefix}{" "}
                     <a
                       href="/privacy"
-                      className="text-[#0ea5b7] hover:underline"
+                      className="text-brand-700 hover:underline"
                     >
                       {m.contactPrivacyLink}
                     </a>

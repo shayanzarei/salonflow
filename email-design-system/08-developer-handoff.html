@@ -25,11 +25,11 @@
     table.spec tr:nth-child(even) td { background: #F8FAFC; }
     code { font-family: 'SF Mono', 'Fira Code', Consolas, monospace; font-size: 12px; background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 4px; padding: 1px 6px; color: #0F172A; }
     .code-block { background: #0F172A; color: #E2E8F0; border-radius: 10px; padding: 16px 20px; font-family: 'SF Mono', 'Fira Code', Consolas, monospace; font-size: 12px; line-height: 1.7; margin: 12px 0 20px; overflow-x: auto; }
-    .code-block .token-key { color: #11C4B6; }
+    .code-block .token-key { color: #7C3AED; }
     .code-block .token-str { color: #A7F3D0; }
     .code-block .token-comment { color: #475569; }
     .template-card { background: #ffffff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
-    .template-card .num { display: inline-block; background: #11C4B6; color: #0F172A; font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; margin-right: 8px; }
+    .template-card .num { display: inline-block; background: #7C3AED; color: #0F172A; font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; margin-right: 8px; }
     .template-card .title { font-size: 15px; font-weight: 700; color: #0F172A; }
     .template-card .filename { font-size: 12px; color: #64748B; margin: 4px 0 12px; }
     .token-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -37,7 +37,7 @@
     .warn { font-size: 12px; font-weight: 600; background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; border-radius: 6px; padding: 3px 10px; }
     .section-intro { font-size: 14px; color: #64748B; margin-bottom: 16px; }
     .checklist li { font-size: 13px; color: #334155; line-height: 1.7; list-style: none; padding-left: 20px; position: relative; }
-    .checklist li::before { content: "✓"; position: absolute; left: 0; color: #11C4B6; font-weight: 700; }
+    .checklist li::before { content: "✓"; position: absolute; left: 0; color: #7C3AED; font-weight: 700; }
     .checklist { margin: 8px 0 20px; }
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     hr { border: none; border-top: 1px solid #E2E8F0; margin: 32px 0; }
@@ -85,7 +85,7 @@
       </tr>
       <tr>
         <th>Header style</th>
-        <td>Teal gradient (#11C4B6 → #0EA5B7)</td>
+        <td>Teal gradient (#7C3AED → #6D28D9)</td>
       </tr>
     </table>
     <div class="token-list">
@@ -334,7 +334,7 @@
     <tr>
       <td><strong>Teal gradient header</strong></td>
       <td>01, 03, 04, 05, 07</td>
-      <td><code>linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)</code> · White "S" logo mark</td>
+      <td><code>linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)</code> · White "S" logo mark</td>
     </tr>
     <tr>
       <td><strong>Dark navy header</strong></td>
@@ -344,7 +344,7 @@
     <tr>
       <td><strong>Urgency banner</strong></td>
       <td>02, 05</td>
-      <td>02: teal <code>#11C4B6</code> · 05: orange <code>#F97316</code> · Full-width strip below header</td>
+      <td>02: teal <code>#7C3AED</code> · 05: orange <code>#F97316</code> · Full-width strip below header</td>
     </tr>
     <tr>
       <td><strong>Status badge</strong></td>
@@ -359,7 +359,7 @@
     <tr>
       <td><strong>Quoted message block</strong></td>
       <td>01, 02</td>
-      <td>White bg, <code>border-left:3px solid #11C4B6</code>, <code>border-radius: 0 8px 8px 0</code></td>
+      <td>White bg, <code>border-left:3px solid #7C3AED</code>, <code>border-radius: 0 8px 8px 0</code></td>
     </tr>
     <tr>
       <td><strong>Icon row</strong></td>
@@ -374,7 +374,7 @@
     <tr>
       <td><strong>Primary CTA button</strong></td>
       <td>All except 02</td>
-      <td>Teal <code>#11C4B6</code> bg, white text, <code>border-radius:999px</code> on <code>&lt;td&gt;</code> not <code>&lt;a&gt;</code></td>
+      <td>Teal <code>#7C3AED</code> bg, white text, <code>border-radius:999px</code> on <code>&lt;td&gt;</code> not <code>&lt;a&gt;</code></td>
     </tr>
     <tr>
       <td><strong>Navy CTA button</strong></td>
@@ -661,7 +661,7 @@
     </tr>
     <tr>
       <td>Gradients degrade gracefully in Outlook</td>
-      <td>Add a fallback <code>background-color</code> (use <code>#11C4B6</code>). MSO conditional comments provided in all headers</td>
+      <td>Add a fallback <code>background-color</code> (use <code>#7C3AED</code>). MSO conditional comments provided in all headers</td>
     </tr>
     <tr>
       <td>Keep width at <code>max-width:600px</code></td>
@@ -698,12 +698,12 @@
     </tr>
     <tr>
       <td><strong>Brand primary</strong></td>
-      <td><code>#11C4B6</code></td>
+      <td><code>#7C3AED</code></td>
       <td>CTA buttons, teal header, accents, star highlight, logo S bg</td>
     </tr>
     <tr>
       <td><strong>Brand secondary</strong></td>
-      <td><code>#0EA5B7</code></td>
+      <td><code>#6D28D9</code></td>
       <td>Gradient end, border accents</td>
     </tr>
     <tr>

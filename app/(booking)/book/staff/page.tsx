@@ -15,7 +15,7 @@ export default async function ChooseStaffPage({
   if (!tenant) notFound();
 
   const { service } = await searchParams;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const [staffResult, serviceResult] = await Promise.all([
     service

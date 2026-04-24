@@ -23,7 +23,7 @@ export default async function SuccessPage({
   const { locale, t } = await getServerTranslations();
   const dateLocale = bcp47ForLocale(locale);
   const tenant = await getTenant();
-  const brand = tenant?.primary_color ?? "#11c4b6";
+  const brand = tenant?.primary_color ?? 'var(--color-brand-600)';
 
   let bookingData: {
     booked_at: string;

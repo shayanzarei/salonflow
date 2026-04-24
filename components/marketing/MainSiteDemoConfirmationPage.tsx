@@ -84,7 +84,7 @@ export default function MainSiteDemoConfirmationPage() {
       className="min-h-screen bg-[#f8fafc] text-slate-900"
       style={{
         backgroundImage:
-          "radial-gradient(at 40% 20%, hsla(173, 100%, 76%, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.1) 0px, transparent 50%)",
+          "radial-gradient(at 40% 20%, hsla(262, 90%, 76%, 0.18) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(280, 90%, 65%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(38, 100%, 90%, 0.12) 0px, transparent 50%)",
       }}
     >
       <MainSiteHeader active="demo" />
@@ -95,8 +95,8 @@ export default function MainSiteDemoConfirmationPage() {
       >
         <div className="flex w-full max-w-4xl flex-col items-center">
           <div className="mb-12 text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-[#ccfbf1] bg-[#ecfdfb] shadow-sm">
-              <CheckCircleIcon className="h-10 w-10 text-[#14b8a6]" />
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-brand-100 bg-brand-50 shadow-sm">
+              <CheckCircleIcon className="h-10 w-10 text-brand-600" />
             </div>
             <h1 className="mb-4 text-4xl font-bold leading-[1.1] tracking-tight text-slate-900 lg:text-5xl">
               Meeting Confirmed!
@@ -168,12 +168,12 @@ export default function MainSiteDemoConfirmationPage() {
               <div>
                 <div className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
                   <h3 className="mb-4 flex items-center font-bold text-slate-900">
-                    <ListCheckIcon className="mr-2 h-4 w-4 text-[#14b8a6]" />
+                    <ListCheckIcon className="mr-2 h-4 w-4 text-brand-600" />
                     Next Steps
                   </h3>
                   <ul className="space-y-3">
                     <li className="flex items-start text-sm text-slate-600">
-                      <CircleIcon filled className="mr-3 mt-1 h-3.5 w-3.5 text-[#14b8a6]" />
+                      <CircleIcon filled className="mr-3 mt-1 h-3.5 w-3.5 text-brand-600" />
                       Check your email for calendar invite
                     </li>
                     <li className="flex items-start text-sm text-slate-600">
@@ -201,7 +201,7 @@ export default function MainSiteDemoConfirmationPage() {
                           type="text"
                           value={currentTools}
                           onChange={(e) => setCurrentTools(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
                           placeholder="e.g. QuickBooks, Calendly"
                         />
                       </div>
@@ -213,7 +213,7 @@ export default function MainSiteDemoConfirmationPage() {
                           rows={2}
                           value={biggestChallenge}
                           onChange={(e) => setBiggestChallenge(e.target.value)}
-                          className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/20"
+                          className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
                           placeholder="e.g. Too much manual admin work"
                         />
                       </div>
@@ -235,7 +235,7 @@ export default function MainSiteDemoConfirmationPage() {
           </section>
 
           <div className="flex space-x-6 text-sm font-medium">
-            <Link href="/" className="flex items-center text-[#0ea5b7] hover:text-[#0d9488]">
+            <Link href="/" className="flex items-center text-brand-700 hover:text-brand-700">
               <ArrowLeftIcon className="mr-2 h-4 w-4" /> Return to Home
             </Link>
             <span className="text-slate-300">|</span>

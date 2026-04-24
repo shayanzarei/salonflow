@@ -43,7 +43,10 @@ export default function LoginPageClient() {
     }
 
     const res = await fetch("/api/auth/session");
-    const session = (await res.json()) as { isAdmin?: boolean; isStaff?: boolean };
+    const session = (await res.json()) as {
+      isAdmin?: boolean;
+      isStaff?: boolean;
+    };
 
     if (session?.isAdmin) {
       router.push("/admin");
@@ -59,7 +62,7 @@ export default function LoginPageClient() {
       className="min-h-screen bg-[#f8fcff] px-4 py-10 sm:px-6 lg:px-8"
       style={{
         backgroundImage:
-          "radial-gradient(at 25% 10%, hsla(186, 100%, 93%, 0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(173, 100%, 90%, 0.4) 0px, transparent 50%)",
+          "radial-gradient(at 25% 10%, hsla(262, 90%, 95%, 0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(280, 90%, 92%, 0.4) 0px, transparent 50%)",
       }}
     >
       <div className="mx-auto w-full max-w-xl rounded-3xl border border-slate-100 bg-white/85 p-6 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:p-8">
@@ -67,7 +70,7 @@ export default function LoginPageClient() {
           <Link href="/" className="mx-auto flex w-fit items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/SoloHub%20logo%20png.png"
+              src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/solohub%20logo2%20%281%29.png"
               alt="SoloHub"
               className="h-12 w-auto"
             />
@@ -97,7 +100,7 @@ export default function LoginPageClient() {
                 name="email"
                 required
                 placeholder="you@company.com"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
+                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
               />
             </div>
           </div>
@@ -109,7 +112,7 @@ export default function LoginPageClient() {
               </label>
               <Link
                 href="/forgot-password"
-                className="text-sm font-semibold text-[#0ea5b7] transition-colors hover:text-[#0891b2]"
+                className="text-sm font-semibold text-brand-700 transition-colors hover:text-[#0891b2]"
               >
                 {t.auth.forgotPassword}
               </Link>
@@ -123,29 +126,44 @@ export default function LoginPageClient() {
                 name="password"
                 required
                 placeholder="Enter your password"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-12 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
+                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-12 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
               />
               <button
                 type="button"
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? t.auth.hidePassword : t.auth.showPassword}
+                aria-label={
+                  showPassword ? t.auth.hidePassword : t.auth.showPassword
+                }
               >
                 <EyeIcon size={16} />
               </button>
             </div>
           </div>
 
-          {error ? <p className="text-sm font-medium text-rose-600">{error}</p> : null}
+          {error ? (
+            <p className="text-sm font-medium text-rose-600">{error}</p>
+          ) : null}
 
-          <Button type="submit" variant="dark" size="xl" disabled={loading} className="group w-full gap-2">
+          <Button
+            type="submit"
+            variant="dark"
+            size="xl"
+            disabled={loading}
+            className="group w-full gap-2"
+          >
             <span>{loading ? t.auth.signingIn : t.auth.signIn}</span>
             <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Button>
         </form>
 
         <div className="mt-8 space-y-4">
-          <Button asChild variant="outlineDark" size="xl" className="group w-full gap-2">
+          <Button
+            asChild
+            variant="outlineDark"
+            size="xl"
+            className="group w-full gap-2"
+          >
             <Link href="/signup">
               <span>{t.auth.createAccount}</span>
               <SparkleIcon className="h-4 w-4 transition-transform group-hover:scale-110" />
@@ -162,7 +180,9 @@ export default function LoginPageClient() {
               <h4 className="mb-1 text-sm font-semibold text-slate-900">
                 {t.auth.needHelpTitle}
               </h4>
-              <p className="mb-3 text-sm text-slate-600">{t.auth.needHelpBody}</p>
+              <p className="mb-3 text-sm text-slate-600">
+                {t.auth.needHelpBody}
+              </p>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700"

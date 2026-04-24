@@ -52,7 +52,7 @@ export function passwordResetEmail({
           <td style="background:#0F172A;border-radius:16px 16px 0 0;padding:36px 32px;text-align:center;" align="center">
             <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin:0 auto 14px;">
               <tr>
-                <td width="48" height="48" style="width:48px;height:48px;background:#11C4B6;border-radius:12px;text-align:center;vertical-align:middle;">
+                <td width="48" height="48" style="width:48px;height:48px;background:#7C3AED;border-radius:12px;text-align:center;vertical-align:middle;">
                   <span style="font-size:22px;font-weight:800;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;line-height:48px;display:block;">S</span>
                 </td>
               </tr>
@@ -100,7 +100,7 @@ export function passwordResetEmail({
               <tr>
                 <td style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px;">
                   <span style="display:block;font-size:12px;font-weight:600;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;margin-bottom:6px;">Button not working? Copy and paste this link:</span>
-                  <span style="font-size:12px;color:#11C4B6;font-family:Inter,Arial,Helvetica,sans-serif;word-break:break-all;">${safeResetUrl}</span>
+                  <span style="font-size:12px;color:#7C3AED;font-family:Inter,Arial,Helvetica,sans-serif;word-break:break-all;">${safeResetUrl}</span>
                 </td>
               </tr>
             </table>
@@ -111,7 +111,7 @@ export function passwordResetEmail({
                 <td style="border-top:1px solid #F1F5F9;padding-top:20px;">
                   <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;">&#128274; ${securityTitle}</p>
                   <p style="margin:0 0 6px;font-size:13px;color:#64748B;line-height:1.6;font-family:Inter,Arial,Helvetica,sans-serif;">${securityText}</p>
-                  <p style="margin:0;font-size:13px;color:#64748B;line-height:1.6;font-family:Inter,Arial,Helvetica,sans-serif;">If you're concerned about unauthorised access, please <a href="mailto:support@solohub.nl" style="color:#11C4B6;text-decoration:none;font-weight:600;">contact our support team</a>.</p>
+                  <p style="margin:0;font-size:13px;color:#64748B;line-height:1.6;font-family:Inter,Arial,Helvetica,sans-serif;">If you're concerned about unauthorised access, please <a href="mailto:support@solohub.nl" style="color:#7C3AED;text-decoration:none;font-weight:600;">contact our support team</a>.</p>
                 </td>
               </tr>
             </table>
@@ -122,7 +122,7 @@ export function passwordResetEmail({
         <!-- Footer -->
         <tr>
           <td style="background:#F8FAFC;border:1px solid #E2E8F0;border-top:none;border-radius:0 0 16px 16px;padding:22px 32px;" align="center">
-            <p style="margin:0 0 8px;font-size:16px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,Helvetica,sans-serif;letter-spacing:-0.01em;">SoloHub</p>
+            <p style="margin:0 0 8px;font-size:16px;font-weight:800;color:#7C3AED;font-family:Inter,Arial,Helvetica,sans-serif;letter-spacing:-0.01em;">SoloHub</p>
             <p style="margin:0 0 6px;font-size:12px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">
               <a href="https://solohub.nl" style="color:#64748B;text-decoration:none;margin:0 6px;">solohub.nl</a>&nbsp;·&nbsp;
               <a href="https://solohub.nl/privacy" style="color:#64748B;text-decoration:none;margin:0 6px;">Privacy Policy</a>&nbsp;·&nbsp;

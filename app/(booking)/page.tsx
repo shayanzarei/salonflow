@@ -175,7 +175,7 @@ export default async function BookingHomePage({
   const totalReviews = parseInt(reviewStats.total);
   const avgRating = parseFloat(reviewStats.avg_rating);
   const totalClients = clientStats?.total_clients ?? 0;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
   const websiteTemplate = normalizeWebsiteTemplate(tenant.website_template);
   const yearsExperience = Math.max(
     1,
@@ -249,7 +249,7 @@ export default async function BookingHomePage({
             <div className="min-w-0">
               <div
                 className="mb-5 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 sm:mb-6"
-                style={{ background: "#F5F3FF" }}
+                style={{ background: 'var(--color-brand-50)' }}
               >
                 <span className="text-xs" style={{ color: brand }}>
                   ✦
@@ -321,7 +321,7 @@ export default async function BookingHomePage({
                         <span
                           key={s}
                           className="text-sm"
-                          style={{ color: s <= Math.round(avgRating) ? "#F59E0B" : "#D1D5DB" }}
+                          style={{ color: s <= Math.round(avgRating) ? 'var(--color-accent-500)' : "#D1D5DB" }}
                         >
                           ★
                         </span>

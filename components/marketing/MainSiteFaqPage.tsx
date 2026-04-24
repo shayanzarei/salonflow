@@ -45,14 +45,14 @@ export default function MainSiteFaqPage() {
             <div className="space-y-10">
               {faqSections.map((section) => (
                 <div key={section.title}>
-                  <h3 className="mb-4 text-lg font-bold uppercase tracking-[0.16em] text-[#0ea5b7]">
+                  <h3 className="mb-4 text-lg font-bold uppercase tracking-[0.16em] text-brand-700">
                     {section.title}
                   </h3>
                   <div className="space-y-4">
                     {section.items.map((faq) => (
                       <div
                         key={faq.q}
-                        className="cursor-pointer rounded-xl border border-slate-200 p-6 transition-colors hover:border-[#9ceee5]"
+                        className="cursor-pointer rounded-xl border border-slate-200 p-6 transition-colors hover:border-brand-200"
                         style={{
                           background: "rgba(255, 255, 255, 0.8)",
                           backdropFilter: "blur(12px)",
@@ -72,7 +72,7 @@ export default function MainSiteFaqPage() {
                           <h4
                             className={`text-sm font-bold ${
                               openFaq === faq.q
-                                ? "text-[#0ea5b7]"
+                                ? "text-brand-700"
                                 : "text-slate-900"
                             }`}
                           >
@@ -81,7 +81,7 @@ export default function MainSiteFaqPage() {
                           <ChevronDownIcon
                             className={`h-5 w-5 transition-transform duration-200 ${
                               openFaq === faq.q
-                                ? "rotate-180 text-[#11c4b6]"
+                                ? "rotate-180 text-brand-600"
                                 : "text-slate-400"
                             }`}
                           />

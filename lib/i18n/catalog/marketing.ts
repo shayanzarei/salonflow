@@ -5,6 +5,17 @@ export type MarketingFaqSection = {
   items: MarketingFaqItem[];
 };
 
+export type MarketingAboutValueItem = {
+  title: string;
+  desc: string;
+};
+
+export type MarketingAboutTeamMember = {
+  name: string;
+  role: string;
+  bio: string;
+};
+
 export type MarketingSection = {
   contactHeroTitle: string;
   contactHeroSubtitle: string;
@@ -72,6 +83,29 @@ export type MarketingSection = {
   pricingFaqTitle: string;
   pricingFaqSubtitle: string;
   pricingFaqs: MarketingFaqItem[];
+  aboutHeroBadge: string;
+  aboutHeroTitle: string;
+  aboutHeroLead: string;
+  aboutHeroSecondaryCta: string;
+  aboutStoryTitle: string;
+  aboutStoryParagraph1: string;
+  aboutStoryParagraph2: string;
+  aboutStoryParagraph3: string;
+  aboutStoryClosing: string;
+  aboutStoryImageAlt: string;
+  aboutStatHeadline: string;
+  aboutStatSub: string;
+  aboutStatBlurb: string;
+  aboutMissionTitle: string;
+  aboutMissionBody: string;
+  aboutVisionTitle: string;
+  aboutVisionBody: string;
+  aboutValuesTitle: string;
+  aboutValuesSubtitle: string;
+  aboutValuesItems: MarketingAboutValueItem[];
+  aboutTeamTitle: string;
+  aboutTeamSubtitle: string;
+  aboutTeamMembers: MarketingAboutTeamMember[];
 };
 
 const faqSectionsEn: MarketingFaqSection[] = [
@@ -320,6 +354,70 @@ const pricingFaqsNl: MarketingFaqItem[] = [
   },
 ];
 
+const aboutValuesItemsEn: MarketingAboutValueItem[] = [
+  {
+    title: "Empathy First",
+    desc: "We built this for our own family practice. We understand the stress of a busy schedule because we live it every day.",
+  },
+  {
+    title: "Simplicity Over Everything",
+    desc: "If it's not easy enough to use between clients, it's not in SoloHub.",
+  },
+  {
+    title: "Local Support",
+    desc: "No call centers. You have a direct line to the founders who actually built the code.",
+  },
+  {
+    title: "Professionalism for All",
+    desc: "We believe a solo entrepreneur deserves a website that looks as high-end as a major clinic.",
+  },
+];
+
+const aboutValuesItemsNl: MarketingAboutValueItem[] = [
+  {
+    title: "Empathie eerst",
+    desc: "We bouwden dit voor onze eigen praktijk. We snappen de druk van een volle agenda — we leven het elke dag.",
+  },
+  {
+    title: "Eenvoud boven alles",
+    desc: "Is het niet makkelijk genoeg tussen twee cliënten door, dan hoort het niet in SoloHub.",
+  },
+  {
+    title: "Lokale ondersteuning",
+    desc: "Geen callcenters. Je hebt een directe lijn met de founders die de code echt bouwen.",
+  },
+  {
+    title: "Professionaliteit voor iedereen",
+    desc: "Een zzp'er verdient een website die er net zo strak uitziet als die van een grote kliniek.",
+  },
+];
+
+const aboutTeamMembersEn: MarketingAboutTeamMember[] = [
+  {
+    name: "Shayan Zarei",
+    role: "Founder & CTO",
+    bio: "The technical heart of SoloHub. Dedicated to building clean, fast, and reliable tools for the Dutch market.",
+  },
+  {
+    name: "Aryana nayeri",
+    role: "Co-Founder & Industry Lead",
+    bio: 'The "real world" voice. A physiotherapist who makes sure every feature solves a real problem for service-based businesses.',
+  },
+];
+
+const aboutTeamMembersNl: MarketingAboutTeamMember[] = [
+  {
+    name: "Shayan Zarei",
+    role: "Oprichter & CTO",
+    bio: "Het technische hart van SoloHub. Gericht op snelle, betrouwbare tools voor de Nederlandse markt.",
+  },
+  {
+    name: "Aryana nayeri",
+    role: "Medeoprichter & branche-expert",
+    bio: "De stem uit de praktijk. Als fysiotherapeut zorgt ze dat elke functie een echt probleem oplost.",
+  },
+];
+
 export const marketingEn: MarketingSection = {
   contactHeroTitle: "Contact the Founders",
   contactHeroSubtitle:
@@ -397,6 +495,39 @@ export const marketingEn: MarketingSection = {
   pricingFaqTitle: "Frequently Asked Questions",
   pricingFaqSubtitle: "Everything you need to know about billing and plans.",
   pricingFaqs: pricingFaqsEn,
+  aboutHeroBadge: "About SoloHub",
+  aboutHeroTitle: "Built by specialists, for specialists.",
+  aboutHeroLead:
+    "We're on a mission to give independent professionals their time back—so you can focus on your craft, not your admin.",
+  aboutHeroSecondaryCta: "Contact us",
+  aboutStoryTitle: "It started with a kitchen table conversation.",
+  aboutStoryParagraph1:
+    "In 2025, my partner was running her own physiotherapy practice. She was a master of her craft, but success brought a hidden cost: administrative chaos.",
+  aboutStoryParagraph2:
+    "Every evening was spent chasing appointments via WhatsApp, manually updating a messy calendar, and trying to make a basic social media profile look like a professional business. One Sunday night, after hours of trying to fix a scheduling conflict instead of relaxing, we realized there had to be a better way.",
+  aboutStoryParagraph3:
+    "We combined her on-the-ground industry experience with my technical background as a developer. We didn't want a complex corporate tool; we wanted a digital partner that makes you look professional in minutes.",
+  aboutStoryClosing: "That frustration became SoloHub.",
+  aboutStoryImageAlt:
+    "Frustrated freelancer at a messy desk with multiple screens and papers, late-night work, realistic photography style.",
+  aboutStatHeadline: "10+ hrs",
+  aboutStatSub: "Our weekly goal for you",
+  aboutStatBlurb:
+    "We designed SoloHub to automate up to 10 hours of manual admin work every week.",
+  aboutMissionTitle: "Our mission",
+  aboutMissionBody:
+    "To eliminate the digital hurdles that stop specialists from doing their best work. You shouldn't have to be a tech expert to run a beautiful, professional business.",
+  aboutVisionTitle: "Our vision",
+  aboutVisionBody:
+    "A world where every solo professional in the Netherlands has a digital home that works as hard as they do. Simple, powerful, and built for humans.",
+  aboutValuesTitle: "Our core values",
+  aboutValuesSubtitle:
+    "These principles guide every decision we make, from product features to customer support.",
+  aboutValuesItems: aboutValuesItemsEn,
+  aboutTeamTitle: "Meet the team",
+  aboutTeamSubtitle:
+    "A small, passionate team of builders who care deeply about making your work life better.",
+  aboutTeamMembers: aboutTeamMembersEn,
 };
 
 export const marketingNl: MarketingSection = {
@@ -477,4 +608,37 @@ export const marketingNl: MarketingSection = {
   pricingFaqTitle: "Veelgestelde vragen",
   pricingFaqSubtitle: "Alles over facturatie en pakketten.",
   pricingFaqs: pricingFaqsNl,
+  aboutHeroBadge: "Over SoloHub",
+  aboutHeroTitle: "Gebouwd door specialisten, voor specialisten.",
+  aboutHeroLead:
+    "We willen zelfstandige professionals hun tijd teruggeven — zodat jij je op je vak kunt richten, niet op administratie.",
+  aboutHeroSecondaryCta: "Neem contact op",
+  aboutStoryTitle: "Het begon aan de keukentafel.",
+  aboutStoryParagraph1:
+    "In 2025 had mijn partner haar eigen fysiopraktijk. Ze was een koningin in haar vak, maar succes bracht een verborgen last: administratieve chaos.",
+  aboutStoryParagraph2:
+    "Elke avond ging op aan afspraken via WhatsApp, handmatig een rommelige agenda bijwerken en een basis socialmediaprofiel professioneel laten lijken. Op een zondagavond, na uren een planningsconflict oplossen in plaats van uit te rusten, wisten we: er moet een betere manier zijn.",
+  aboutStoryParagraph3:
+    "We combineerden haar praktijkervaring met mijn achtergrond als developer. We wilden geen ingewikkeld corporatietool; we zochten een digitale partner die je binnen minuten professioneel laat ogen.",
+  aboutStoryClosing: "Die frustratie werd SoloHub.",
+  aboutStoryImageAlt:
+    "Gefrustreerde ondernemer aan een rommelig bureau met meerdere schermen en papieren, laat op de avond, realistische fotostijl.",
+  aboutStatHeadline: "10+ uur",
+  aboutStatSub: "Ons wekelijkse doel voor jou",
+  aboutStatBlurb:
+    "SoloHub is ontworpen om tot wel 10 uur handmatige administratie per week te automatiseren.",
+  aboutMissionTitle: "Onze missie",
+  aboutMissionBody:
+    "De digitale drempels wegnemen die specialisten tegenhouden om hun beste werk te doen. Je hoeft geen techneut te zijn om een professioneel, mooi bedrijf te runnen.",
+  aboutVisionTitle: "Onze visie",
+  aboutVisionBody:
+    "Een wereld waarin elke zelfstandige professional in Nederland een digitale thuisbasis heeft die net zo hard werkt als zijzelf. Eenvoudig, krachtig en gemaakt voor mensen.",
+  aboutValuesTitle: "Onze kernwaarden",
+  aboutValuesSubtitle:
+    "Deze principes sturen elke keuze die we maken — van product tot klantenservice.",
+  aboutValuesItems: aboutValuesItemsNl,
+  aboutTeamTitle: "Ontmoet het team",
+  aboutTeamSubtitle:
+    "Een klein, gepassioneerd team dat bouwt en diep geeft om jouw werkdag beter te maken.",
+  aboutTeamMembers: aboutTeamMembersNl,
 };

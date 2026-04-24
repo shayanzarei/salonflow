@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         owner_last_name,
         owner_role,
         plan_tier,
-        primary_color || "#11c4b6",
+        primary_color || "#7C3AED",
         temporaryPasswordHash,
         website_template,
         business_started_at,

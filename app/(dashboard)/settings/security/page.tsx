@@ -11,7 +11,7 @@ export default async function SecurityPage({
 }) {
   const tenant = await getTenant();
   if (!tenant) notFound();
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const qp = await searchParams;
   const session = await getServerSession(authOptions);

@@ -61,7 +61,7 @@ export default async function DashboardPage() {
   };
 
   const upcoming = upcomingBookings.rows;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
   const websiteStatus = tenant.website_status ?? "draft";
   const [servicesCountRes, salonHoursRes, categoriesCountRes] =
     await Promise.all([
@@ -371,8 +371,8 @@ export default async function DashboardPage() {
     {
       label: "Upcoming",
       value: stats.upcomingCount,
-      icon: <ClockIcon size={18} color="#7C3AED" />,
-      iconBg: "#F5F3FF",
+      icon: <ClockIcon size={18} color='var(--color-brand-600)' />,
+      iconBg: 'var(--color-brand-50)',
       change: "+8%",
       changeBg: "#ECFDF5",
       changeColor: "#10B981",
@@ -380,7 +380,7 @@ export default async function DashboardPage() {
     {
       label: "Total Customers",
       value: stats.customerCount.toLocaleString(),
-      icon: <UsersIcon size={18} color="#F59E0B" />,
+      icon: <UsersIcon size={18} color='var(--color-accent-500)' />,
       iconBg: "#FFF7ED",
       change: "+23%",
       changeBg: "#ECFDF5",

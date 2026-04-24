@@ -9,7 +9,7 @@ export default async function GalleryPage() {
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
   const galleryEnabled = await hasPackageFeature(tenant, "gallery");
 
   if (!galleryEnabled) {

@@ -9,12 +9,12 @@ import {
   MailIcon,
   ShieldIcon,
 } from "@/components/ui/Icons";
-import { MARKETING_BUTTON_DARK } from "@/components/marketing/buttonStyles";
 import { useLocale } from "@/lib/i18n/context";
-import Link from "next/link";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "../ds/Button";
 
 export default function MainSiteSignupPage() {
   const { t } = useLocale();
@@ -117,12 +117,11 @@ export default function MainSiteSignupPage() {
         className="flex min-h-screen flex-col items-center justify-center px-4 py-10"
         style={{
           backgroundImage:
-            "radial-gradient(at 25% 10%, hsla(186,100%,93%,0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(173,100%,90%,0.4) 0px, transparent 50%)",
+            "radial-gradient(at 25% 10%, hsla(262, 90%, 95%, 0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(280, 90%, 92%, 0.4) 0px, transparent 50%)",
           backgroundColor: "#f8fcff",
         }}
       >
         <div className="mx-auto w-full max-w-sm rounded-3xl border border-slate-100 bg-white/90 p-10 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm text-center">
-
           {/* Spinner */}
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center">
             <svg
@@ -130,11 +129,7 @@ export default function MainSiteSignupPage() {
               viewBox="0 0 64 64"
               fill="none"
             >
-              <circle
-                cx="32" cy="32" r="28"
-                stroke="#e2e8f0"
-                strokeWidth="5"
-              />
+              <circle cx="32" cy="32" r="28" stroke="#e2e8f0" strokeWidth="5" />
               <path
                 d="M32 4a28 28 0 0 1 28 28"
                 stroke="url(#spin-grad)"
@@ -142,9 +137,16 @@ export default function MainSiteSignupPage() {
                 strokeLinecap="round"
               />
               <defs>
-                <linearGradient id="spin-grad" x1="32" y1="4" x2="60" y2="32" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#11C4B6" />
-                  <stop offset="1" stopColor="#0EA5B7" />
+                <linearGradient
+                  id="spin-grad"
+                  x1="32"
+                  y1="4"
+                  x2="60"
+                  y2="32"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stopColor="var(--color-brand-600)" />
+                  <stop offset="1" stopColor="var(--color-brand-700)" />
                 </linearGradient>
               </defs>
             </svg>
@@ -159,16 +161,13 @@ export default function MainSiteSignupPage() {
 
           {/* Animated steps */}
           <div className="space-y-3 text-left">
-            {[
-              a.signupStep1,
-              a.signupStep2,
-              a.signupStep3,
-            ].map((step, i) => (
+            {[a.signupStep1, a.signupStep2, a.signupStep3].map((step, i) => (
               <div key={step} className="flex items-center gap-3">
                 <span
                   className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                   style={{
-                    background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)",
+                    background:
+                      "linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-700) 100%)",
                     animationDelay: `${i * 0.4}s`,
                   }}
                 >
@@ -188,14 +187,14 @@ export default function MainSiteSignupPage() {
       className="min-h-screen bg-[#f8fcff] px-4 py-10 sm:px-6 lg:px-8"
       style={{
         backgroundImage:
-          "radial-gradient(at 25% 10%, hsla(186, 100%, 93%, 0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(173, 100%, 90%, 0.4) 0px, transparent 50%)",
+          "radial-gradient(at 25% 10%, hsla(262, 90%, 95%, 0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(280, 90%, 92%, 0.4) 0px, transparent 50%)",
       }}
     >
       <div className="mx-auto w-full max-w-2xl rounded-3xl border border-slate-100 bg-white/85 p-6 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:p-8">
         <div className="mb-8 ">
           <Link href="/" className="mx-auto flex w-fit items-center gap-3">
             <img
-              src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/SoloHub%20logo%20png.png"
+              src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/solohub%20logo2%20%281%29.png"
               alt="SoloHub"
               className="h-12 w-auto"
             />
@@ -235,7 +234,7 @@ export default function MainSiteSignupPage() {
                 type="text"
                 required
                 placeholder="John"
-                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
+                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
               />
             </div>
             <div>
@@ -251,7 +250,7 @@ export default function MainSiteSignupPage() {
                 type="text"
                 required
                 placeholder="Doe"
-                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
+                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
               />
             </div>
           </div>
@@ -273,7 +272,7 @@ export default function MainSiteSignupPage() {
                 type="email"
                 required
                 placeholder="you@company.com"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
+                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
               />
             </div>
           </div>
@@ -296,7 +295,7 @@ export default function MainSiteSignupPage() {
                 required
                 minLength={8}
                 placeholder="Create a strong password"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-12 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
+                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-12 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
               />
               <button
                 type="button"
@@ -309,9 +308,11 @@ export default function MainSiteSignupPage() {
             </div>
             <div className="mt-2 flex items-center gap-2">
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
-                <div className="h-full w-[18%] bg-[#11c4b6]" />
+                <div className="h-full w-[18%] bg-brand-600" />
               </div>
-              <span className="text-xs font-medium text-slate-500">{a.signupPasswordHint}</span>
+              <span className="text-xs font-medium text-slate-500">
+                {a.signupPasswordHint}
+              </span>
             </div>
             <p className="mt-2 text-xs text-slate-500">
               {a.signupPasswordRule}
@@ -324,7 +325,9 @@ export default function MainSiteSignupPage() {
               className="mb-2 block text-sm font-semibold text-slate-700"
             >
               {a.signupCompany}{" "}
-              <span className="font-normal text-slate-400">{a.signupOptional}</span>
+              <span className="font-normal text-slate-400">
+                {a.signupOptional}
+              </span>
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -335,7 +338,7 @@ export default function MainSiteSignupPage() {
                 name="company"
                 type="text"
                 placeholder="Your company"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[#11c4b6]"
+                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
               />
             </div>
           </div>
@@ -353,7 +356,7 @@ export default function MainSiteSignupPage() {
                 name="role"
                 defaultValue=""
                 required
-                className="w-full appearance-none rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-colors focus:border-[#11c4b6]"
+                className="w-full appearance-none rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-colors focus:border-brand-600"
               >
                 <option value="" disabled>
                   {a.signupRolePlaceholder}
@@ -362,12 +365,14 @@ export default function MainSiteSignupPage() {
                 <option value="consultant">{a.signupRoleConsultant}</option>
                 <option value="agency-owner">{a.signupRoleAgencyOwner}</option>
                 <option value="entrepreneur">{a.signupRoleEntrepreneur}</option>
-                <option value="small-business">{a.signupRoleSmallBusiness}</option>
+                <option value="small-business">
+                  {a.signupRoleSmallBusiness}
+                </option>
                 <option value="other">{a.signupRoleOther}</option>
               </select>
-                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
-                  <ChevronDownIcon size={16} />
-                </span>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+                <ChevronDownIcon size={16} />
+              </span>
             </div>
           </div>
 
@@ -376,20 +381,20 @@ export default function MainSiteSignupPage() {
               type="checkbox"
               name="terms"
               required
-              className="mt-0.5 h-5 w-5 rounded border-2 border-slate-300 text-[#11c4b6] focus:ring-[#11c4b6]"
+              className="mt-0.5 h-5 w-5 rounded border-2 border-slate-300 text-brand-600 focus:ring-brand-600"
             />
             <span className="text-sm leading-relaxed text-slate-600">
               {a.signupAgreePrefix}{" "}
               <Link
                 href="/privacy"
-                className="font-semibold text-[#0ea5b7] underline decoration-[#99f6e4] underline-offset-2"
+                className="font-semibold text-brand-700 underline decoration-brand-200 underline-offset-2"
               >
                 {a.signupTerms}
               </Link>{" "}
               {a.signupAnd}{" "}
               <Link
                 href="/privacy"
-                className="font-semibold text-[#0ea5b7] underline decoration-[#99f6e4] underline-offset-2"
+                className="font-semibold text-brand-700 underline decoration-brand-200 underline-offset-2"
               >
                 {a.signupPrivacy}
               </Link>
@@ -400,7 +405,7 @@ export default function MainSiteSignupPage() {
             <input
               type="checkbox"
               name="marketing"
-              className="mt-0.5 h-5 w-5 rounded border-2 border-slate-300 text-[#11c4b6] focus:ring-[#11c4b6]"
+              className="mt-0.5 h-5 w-5 rounded border-2 border-slate-300 text-brand-600 focus:ring-brand-600"
             />
             <span className="text-sm leading-relaxed text-slate-600">
               {a.signupMarketingOptIn}
@@ -411,14 +416,16 @@ export default function MainSiteSignupPage() {
             <p className="text-sm font-medium text-rose-600">{error}</p>
           ) : null}
 
-          <button
+          <Button
             type="submit"
+            variant="dark"
+            size="xl"
+            className="group w-full gap-2"
             disabled={loading}
-            className={`group w-full gap-2 ${MARKETING_BUTTON_DARK} disabled:cursor-not-allowed disabled:opacity-60`}
           >
             <span>{loading ? a.signupCreating : a.signupCreateAccount}</span>
             <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8 text-center">
@@ -426,7 +433,7 @@ export default function MainSiteSignupPage() {
             {a.signupAlreadyAccount}{" "}
             <Link
               href="/login"
-              className="font-semibold text-[#0ea5b7] underline decoration-[#99f6e4] underline-offset-2"
+              className="font-semibold text-brand-700 underline decoration-brand-200 underline-offset-2"
             >
               {a.signupSignIn}
             </Link>

@@ -32,6 +32,7 @@ export type Messages = {
     home: string;
     pricing: string;
     demo: string;
+    about: string;
     contact: string;
     faq: string;
     privacy: string;
@@ -119,6 +120,7 @@ const en: Messages = {
     home: "Home",
     pricing: "Pricing",
     demo: "Book a Demo",
+    about: "About Us",
     contact: "Contact",
     faq: "FAQ",
     privacy: "Privacy & Terms",
@@ -204,6 +206,7 @@ const nl: Messages = {
     home: "Home",
     pricing: "Prijzen",
     demo: "Demo boeken",
+    about: "Over ons",
     contact: "Contact",
     faq: "Veelgestelde vragen",
     privacy: "Privacy & Voorwaarden",

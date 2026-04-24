@@ -107,7 +107,7 @@ export async function runProvisioningJob(input: ProvisioningInput) {
        )
        VALUES (
          $1, $2, $3, $4, $5, 'owner',
-         $6, '#11c4b6', $7,
+         $6, '#7C3AED', $7,
          'signuture', 'active', 'draft', NOW(), NOW() + INTERVAL '14 days',
          $8, $9, false
        )

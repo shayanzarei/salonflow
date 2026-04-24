@@ -13,7 +13,7 @@ export default async function BookingDetailPage({
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const [bookingResult, servicesResult, staffResult] = await Promise.all([
     pool.query(
@@ -67,7 +67,7 @@ export default async function BookingDetailPage({
     { color: string; bg: string; dot: string }
   > = {
     confirmed: { color: "#059669", bg: "#ECFDF5", dot: "#10B981" },
-    pending: { color: "#D97706", bg: "#FFFBEB", dot: "#F59E0B" },
+    pending: { color: 'var(--color-accent-600)', bg: "#FFFBEB", dot: 'var(--color-accent-500)' },
     cancelled: { color: "#DC2626", bg: "#FEF2F2", dot: "#EF4444" },
   };
 

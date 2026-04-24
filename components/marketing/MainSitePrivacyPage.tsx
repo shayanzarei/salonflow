@@ -82,7 +82,7 @@ export default function MainSitePrivacyPage() {
       className="min-h-screen bg-[#f8fafc] text-slate-900"
       style={{
         backgroundImage:
-          "radial-gradient(at 40% 20%, hsla(173, 100%, 76%, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.1) 0px, transparent 50%)",
+          "radial-gradient(at 40% 20%, hsla(262, 90%, 76%, 0.18) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(280, 90%, 65%, 0.15) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(38, 100%, 90%, 0.12) 0px, transparent 50%)",
       }}
     >
       <MainSiteHeader active="privacy" />
@@ -95,7 +95,7 @@ export default function MainSitePrivacyPage() {
           id="legal-header"
           className="mx-auto mb-16 w-full max-w-4xl px-4 text-center"
         >
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ccfbf1] bg-[#ecfdfb] px-4 py-2 text-sm font-medium text-[#0ea5b7] shadow-sm">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm font-medium text-brand-700 shadow-sm">
             <ShieldIcon className="h-4 w-4" />
             Last Updated: April 15, 2026
           </div>
@@ -138,7 +138,7 @@ export default function MainSitePrivacyPage() {
                 placeholder="Search policies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 transition-all focus:border-[#14b8a6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/20"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
               />
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function MainSitePrivacyPage() {
               <nav className="space-y-3">
                 <a
                   href="#privacy"
-                  className="block border-l-2 border-[#14b8a6] pl-3 text-sm font-medium text-[#0ea5b7]"
+                  className="block border-l-2 border-brand-600 pl-3 text-sm font-medium text-brand-700"
                 >
                   1. Privacy Policy
                 </a>

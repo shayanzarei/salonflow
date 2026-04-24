@@ -56,8 +56,11 @@ export function Button({
   ...props
 }: ButtonProps) {
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 border font-medium transition-[background-color,border-color,color,box-shadow,transform] duration-base ease-standard",
-    "focus-visible:shadow-focus focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60",
+    "inline-flex items-center justify-center gap-2 border font-medium",
+    "transition-[background-color,border-color,color,box-shadow,transform]",
+    "[transition-duration:var(--duration-base)] [transition-timing-function:var(--ease-standard)]",
+    "focus-visible:shadow-focus focus-visible:outline-none",
+    "active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100",
     variantClasses[variant],
     variant === "link" ? "" : sizeClasses[size],
     className

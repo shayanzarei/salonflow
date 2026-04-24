@@ -56,7 +56,7 @@ export default async function StaffEditPage({
       <StaffEditForm
         staffId={id}
         tenantId={tenant.id}
-        brand={tenant.primary_color ?? "#7C3AED"}
+        brand={tenant.primary_color ?? 'var(--color-brand-600)'}
         hasPortal={!!member.password_hash}
         initial={{
           name: member.name ?? "",
@@ -65,7 +65,7 @@ export default async function StaffEditPage({
           phone: member.phone ?? "",
           avatar_url: member.avatar_url ?? "",
           avatar_color:
-            member.avatar_color ?? tenant.primary_color ?? "#7C3AED",
+            member.avatar_color ?? tenant.primary_color ?? 'var(--color-brand-600)',
           bio: member.bio ?? "",
         }}
       />

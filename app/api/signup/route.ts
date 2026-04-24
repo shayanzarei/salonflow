@@ -100,7 +100,7 @@ export async function POST(request: Request) {
        VALUES (
          $1, $2, $3, $4, $5, $6,
          'hub',
-         '#11c4b6',
+         '#7C3AED',
          $7,
          'signature',
          'pending_verification',

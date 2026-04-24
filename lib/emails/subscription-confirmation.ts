@@ -56,7 +56,7 @@ export function subscriptionConfirmationEmail({
       <td align="center">
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
           <tr>
-            <td style="background:linear-gradient(135deg,#11C4B6 0%,#0EA5B7 100%);padding:28px 24px;text-align:center;">
+            <td style="background:linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%);padding:28px 24px;text-align:center;">
               <p style="margin:0;font-size:12px;letter-spacing:.12em;color:#ccfbf1;font-weight:700;">SOLOHUB</p>
             </td>
           </tr>
@@ -90,7 +90,7 @@ export function subscriptionConfirmationEmail({
               </table>
               <p style="margin:18px 0 0;font-size:13px;line-height:1.7;color:#64748b;">
                 If you have any questions, reply to this email or contact us at
-                <a href="mailto:hello@solohub.nl" style="color:#0ea5b7;text-decoration:none;">hello@solohub.nl</a>.
+                <a href="mailto:hello@solohub.nl" style="color:#6D28D9;text-decoration:none;">hello@solohub.nl</a>.
               </p>
             </td>
           </tr>

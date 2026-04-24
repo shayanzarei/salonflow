@@ -82,7 +82,7 @@ export default async function CustomersPage({
   const activeTab = tab ?? "all";
   const currentPage = parseInt(page ?? "1");
   const offset = (currentPage - 1) * PAGE_SIZE;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   // Fetch all customers with aggregated stats
   const result = await pool.query(

@@ -170,7 +170,7 @@ export default function NewTenantPage() {
               </p>
             </div>
 
-            <input type="hidden" name="primary_color" value="#11c4b6" />
+            <input type="hidden" name="primary_color" value='var(--color-brand-600)' />
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">

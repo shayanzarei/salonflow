@@ -71,7 +71,7 @@ export default async function TenantDetailPage({
               <div className="flex items-center gap-3">
                 <div
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-semibold text-white"
-                  style={{ backgroundColor: tenant.primary_color ?? "#7C3AED" }}
+                  style={{ backgroundColor: tenant.primary_color ?? 'var(--color-brand-600)' }}
                 >
                   {tenant.name.charAt(0)}
                 </div>
@@ -371,7 +371,7 @@ export default async function TenantDetailPage({
                             type="submit"
                             className="relative h-6 w-11 cursor-pointer rounded-full border-none transition-colors"
                             style={{
-                              background: isEnabled ? "#7C3AED" : "#D1D5DB",
+                              background: isEnabled ? 'var(--color-brand-600)' : "#D1D5DB",
                             }}
                             aria-label={
                               isEnabled
@@ -459,7 +459,7 @@ export default async function TenantDetailPage({
                             type="submit"
                             className="relative h-6 w-11 cursor-pointer rounded-full border-none transition-colors"
                             style={{
-                              background: effectiveValue ? "#7C3AED" : "#D1D5DB",
+                              background: effectiveValue ? 'var(--color-brand-600)' : "#D1D5DB",
                             }}
                             aria-label={
                               effectiveValue

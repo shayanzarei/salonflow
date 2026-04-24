@@ -16,7 +16,7 @@ export default async function ChooseServicePage() {
     [tenant.id]
   );
   const services = result.rows;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   return (
     <div className="min-h-screen bg-gray-50">

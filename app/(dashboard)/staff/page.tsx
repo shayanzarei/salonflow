@@ -12,13 +12,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const STAFF_COLORS = [
-  "#7C3AED",
-  "#F59E0B",
+  'var(--color-brand-600)',
+  'var(--color-accent-500)',
   "#10B981",
   "#EC4899",
   "#3B82F6",
   "#EF4444",
-  "#8B5CF6",
+  'var(--color-brand-500)',
   "#06B6D4",
 ];
 
@@ -31,7 +31,7 @@ export default async function StaffPage({
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const staffResult = await pool.query(
     `SELECT
@@ -123,8 +123,8 @@ export default async function StaffPage({
           {
             label: "Total Revenue Generated",
             value: `€${totalRevenue.toLocaleString("en", { minimumFractionDigits: 0 })}`,
-            icon: <TrendingUpIcon size={20} color="#7C3AED" />,
-            iconBg: "#F5F3FF",
+            icon: <TrendingUpIcon size={20} color='var(--color-brand-600)' />,
+            iconBg: 'var(--color-brand-50)',
           },
         ].map((stat) => (
           <div

@@ -13,7 +13,7 @@ export default async function NewStaffPage({
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const countResult = await pool.query(
     `SELECT COUNT(*)::int AS c FROM staff WHERE tenant_id = $1`,

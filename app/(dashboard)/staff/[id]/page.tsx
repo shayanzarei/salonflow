@@ -6,13 +6,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const STAFF_COLORS = [
-  "#7C3AED",
-  "#F59E0B",
+  'var(--color-brand-600)',
+  'var(--color-accent-500)',
   "#10B981",
   "#EC4899",
   "#3B82F6",
   "#EF4444",
-  "#8B5CF6",
+  'var(--color-brand-500)',
   "#06B6D4",
 ];
 
@@ -25,7 +25,7 @@ export default async function StaffDetailPage({
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const [staffResult, allStaffResult] = await Promise.all([
     pool.query(`SELECT * FROM staff WHERE id = $1 AND tenant_id = $2`, [
@@ -237,7 +237,7 @@ export default async function StaffDetailPage({
           {
             label: "THIS WEEK",
             value: stats.this_week,
-            icon: <TrendingUpIcon size={16} color="#F59E0B" />,
+            icon: <TrendingUpIcon size={16} color='var(--color-accent-500)' />,
             iconBg: "#FFF7ED",
           },
           {

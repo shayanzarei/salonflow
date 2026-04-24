@@ -1,8 +1,5 @@
 import { CheckoutResultLayout } from "@/components/marketing/CheckoutResultLayout";
-import {
-  MARKETING_BUTTON_PRIMARY,
-  MARKETING_BUTTON_SECONDARY,
-} from "@/components/marketing/buttonStyles";
+import { Button } from "@/components/ds/Button";
 import { isMainSiteHost } from "@/lib/main-site";
 import { ShieldIcon } from "@/components/ui/Icons";
 import { headers } from "next/headers";
@@ -39,18 +36,12 @@ export default async function CheckoutFailedPage() {
           </ul>
         </div>
         <div className="mt-10 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link
-            href="/pricing"
-            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${MARKETING_BUTTON_PRIMARY}`}
-          >
-            Try again
-          </Link>
-          <Link
-            href="/contact"
-            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${MARKETING_BUTTON_SECONDARY}`}
-          >
-            Get help
-          </Link>
+          <Button asChild variant="primary" size="lg">
+            <Link href="/pricing">Try again</Link>
+          </Button>
+          <Button asChild variant="secondary" size="lg">
+            <Link href="/contact">Get help</Link>
+          </Button>
         </div>
       </div>
     </CheckoutResultLayout>

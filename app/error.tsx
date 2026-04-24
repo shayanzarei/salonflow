@@ -1,8 +1,8 @@
 "use client";
 
 import { useLocale } from "@/lib/i18n/context";
-import { useEffect } from "react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function GlobalError({
   error,
@@ -24,7 +24,7 @@ export default function GlobalError({
       <Link href="/" className="mb-12" aria-label={t.errors.goHomeAria}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/SoloHub%20logo%20png.png"
+          src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/solohub%20logo2%20%281%29.png"
           alt="SoloHub"
           className="h-12 w-auto"
         />
@@ -34,7 +34,9 @@ export default function GlobalError({
       <div className="mb-6">
         <div
           className="flex h-20 w-20 items-center justify-center rounded-2xl text-4xl shadow-lg"
-          style={{ background: "linear-gradient(135deg, #f97316 0%, #ef4444 100%)" }}
+          style={{
+            background: "linear-gradient(135deg, #f97316 0%, #ef4444 100%)",
+          }}
         >
           ⚡
         </div>
@@ -60,7 +62,9 @@ export default function GlobalError({
         <button
           onClick={reset}
           className="inline-flex min-h-11 items-center justify-center rounded-xl px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)" }}
+          style={{
+            background: "linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)",
+          }}
         >
           {t.errors.tryAgain}
         </button>
@@ -79,9 +83,7 @@ export default function GlobalError({
       </div>
 
       {/* Footer hint */}
-      <p className="mt-16 text-xs text-slate-400">
-        {t.errors.footerNote}
-      </p>
+      <p className="mt-16 text-xs text-slate-400">{t.errors.footerNote}</p>
     </div>
   );
 }

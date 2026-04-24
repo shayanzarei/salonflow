@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  MARKETING_BUTTON_PRIMARY,
-  MARKETING_BUTTON_SECONDARY,
-} from "@/components/marketing/buttonStyles";
+import { Button } from "@/components/ds/Button";
 import { CheckoutResultLayout } from "@/components/marketing/CheckoutResultLayout";
 import { CheckCircleIcon } from "@/components/ui/Icons";
 import Link from "next/link";
@@ -144,21 +141,17 @@ export function CheckoutSuccessContent({ sessionId }: { sessionId: string }) {
 
         <div className="mt-10 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           {!loading && !error && data?.provisioned && (
-            <Link
-              href="/login"
-              className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${MARKETING_BUTTON_PRIMARY}`}
-            >
-              Sign in to your account →
-            </Link>
+            <Button asChild variant="primary" size="lg">
+              <Link href="/login">Sign in to your account →</Link>
+            </Button>
           )}
-          <Link
-            href="/contact"
-            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold ${
-              data?.provisioned ? MARKETING_BUTTON_SECONDARY : MARKETING_BUTTON_PRIMARY
-            }`}
+          <Button
+            asChild
+            variant={data?.provisioned ? "secondary" : "primary"}
+            size="lg"
           >
-            Talk to us
-          </Link>
+            <Link href="/contact">Talk to us</Link>
+          </Button>
         </div>
       </div>
     </CheckoutResultLayout>

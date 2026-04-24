@@ -26,20 +26,20 @@ export default function MainSiteFooter() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/SoloHub%20logo%20png.png"
+              src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/solohub%20logo2%20%281%29.png"
               alt="SoloHub"
               className="h-14 w-auto"
             />
           </Link>
           <p className="mb-6 text-sm text-slate-500">{f.tagline}</p>
           <div className="flex space-x-4 text-slate-400">
-            <a href="#" className="transition-colors hover:text-[#11c4b6]">
+            <a href="#" className="transition-colors hover:text-brand-600">
               <InstagramIcon className="h-5 w-5" />
             </a>
-            <a href="#" className="transition-colors hover:text-[#11c4b6]">
+            <a href="#" className="transition-colors hover:text-brand-600">
               <FacebookIcon className="h-5 w-5" />
             </a>
-            <a href="#" className="transition-colors hover:text-[#11c4b6]">
+            <a href="#" className="transition-colors hover:text-brand-600">
               <YoutubeIcon className="h-5 w-5" />
             </a>
           </div>
@@ -51,7 +51,7 @@ export default function MainSiteFooter() {
             <li>
               <Link
                 href="/pricing"
-                className="transition-colors hover:text-[#0ea5b7]"
+                className="transition-colors hover:text-brand-700"
               >
                 {f.pricing}
               </Link>
@@ -59,7 +59,7 @@ export default function MainSiteFooter() {
             <li>
               <Link
                 href="/book-demo"
-                className="transition-colors hover:text-[#0ea5b7]"
+                className="transition-colors hover:text-brand-700"
               >
                 {f.demo}
               </Link>
@@ -73,13 +73,16 @@ export default function MainSiteFooter() {
             <li>
               <Link
                 href="/blog"
-                className="transition-colors hover:text-[#0ea5b7]"
+                className="transition-colors hover:text-brand-700"
               >
                 {f.blog}
               </Link>
             </li>
             <li>
-              <Link href="/faq" className="transition-colors hover:text-[#0ea5b7]">
+              <Link
+                href="/faq"
+                className="transition-colors hover:text-brand-700"
+              >
                 {f.faqs}
               </Link>
             </li>
@@ -92,7 +95,7 @@ export default function MainSiteFooter() {
             <li>
               <Link
                 href="/about"
-                className="transition-colors hover:text-[#0ea5b7]"
+                className="transition-colors hover:text-brand-700"
               >
                 {f.about}
               </Link>
@@ -100,7 +103,7 @@ export default function MainSiteFooter() {
             <li>
               <Link
                 href="/contact"
-                className="transition-colors hover:text-[#0ea5b7]"
+                className="transition-colors hover:text-brand-700"
               >
                 {f.contact}
               </Link>
@@ -108,7 +111,7 @@ export default function MainSiteFooter() {
             <li>
               <Link
                 href="/privacy"
-                className="transition-colors hover:text-[#0ea5b7]"
+                className="transition-colors hover:text-brand-700"
               >
                 {f.privacyTerms}
               </Link>

@@ -15,7 +15,7 @@ export default async function OpeningHoursPage({
     redirect_to && redirect_to.startsWith("/") && !redirect_to.startsWith("//")
       ? redirect_to
       : "";
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
   const result = await pool.query(
     `SELECT day_of_week, start_time, end_time, is_working
      FROM salon_working_hours

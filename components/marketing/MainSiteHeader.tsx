@@ -1,13 +1,20 @@
 "use client";
 
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { MARKETING_BUTTON_PRIMARY } from "@/components/marketing/buttonStyles";
 import { MenuIcon, XIcon } from "@/components/ui/Icons";
 import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { useState } from "react";
+import { Button } from "../ds/Button";
 
-type NavKey = "home" | "pricing" | "demo" | "faq" | "contact" | "privacy";
+type NavKey =
+  | "home"
+  | "pricing"
+  | "demo"
+  | "faq"
+  | "contact"
+  | "privacy"
+  | "about";
 
 export default function MainSiteHeader({
   active = "home",
@@ -21,9 +28,8 @@ export default function MainSiteHeader({
     { key: "home", label: t.nav.home, href: "/" },
     { key: "pricing", label: t.nav.pricing, href: "/pricing" },
     { key: "demo", label: t.nav.demo, href: "/book-demo" },
+    { key: "about", label: t.nav.about, href: "/about" },
     { key: "contact", label: t.nav.contact, href: "/contact" },
-    { key: "faq", label: t.nav.faq, href: "/faq" },
-    { key: "privacy", label: t.nav.privacy, href: "/privacy" },
   ];
 
   return (
@@ -37,7 +43,7 @@ export default function MainSiteHeader({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/SoloHub%20logo%20png.png"
+              src="https://6vgmy5o5gznqt4ax.public.blob.vercel-storage.com/uploads/solohub%20logo2%20%281%29.png"
               alt="SoloHub"
               className="h-14 w-auto"
             />
@@ -50,8 +56,8 @@ export default function MainSiteHeader({
                 href={item.href}
                 className={
                   item.key === active
-                    ? "border-b-2 border-[#11c4b6] pb-1 text-sm font-semibold text-[#0ea5b7]"
-                    : "text-sm text-slate-600 transition-colors hover:text-[#0ea5b7]"
+                    ? "border-b-2 border-brand-600 pb-1 text-sm font-semibold text-brand-700"
+                    : "text-sm text-slate-600 transition-colors hover:text-brand-700"
                 }
               >
                 {item.label}
@@ -61,9 +67,10 @@ export default function MainSiteHeader({
 
           <div className="hidden md:flex items-center gap-4">
             <LanguageSwitcher variant="light" />
-            <Link href="/signup" className={MARKETING_BUTTON_PRIMARY}>
-              {t.nav.getStarted}
-            </Link>
+
+            <Button variant="primary" asChild size="md">
+              <Link href="/signup">{t.nav.getStarted}</Link>
+            </Button>
           </div>
 
           <button
@@ -104,13 +111,12 @@ export default function MainSiteHeader({
             </nav>
             <div className="mt-3 flex items-center justify-between">
               <LanguageSwitcher variant="light" />
-              <Link
-                href="/signup"
-                className={`${MARKETING_BUTTON_PRIMARY} px-6`}
-                onClick={() => setMobileOpen(false)}
-              >
-                {t.nav.getStarted}
-              </Link>
+
+              <Button variant="primary" asChild size="md">
+                <Link href="/signup" onClick={() => setMobileOpen(false)}>
+                  {t.nav.getStarted}
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

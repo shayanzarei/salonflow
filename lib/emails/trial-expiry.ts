@@ -23,11 +23,11 @@ function baseLayout(preheader: string, body: string): string {
 
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#11C4B6 0%,#0EA5B7 100%);border-radius:16px 16px 0 0;padding:32px;text-align:center;">
+          <td style="background:linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%);border-radius:16px 16px 0 0;padding:32px;text-align:center;">
             <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin:0 auto 10px;">
               <tr>
                 <td width="48" height="48" style="width:48px;height:48px;background:#ffffff;border-radius:12px;text-align:center;vertical-align:middle;">
-                  <span style="font-size:22px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,Helvetica,sans-serif;line-height:48px;display:block;">S</span>
+                  <span style="font-size:22px;font-weight:800;color:#7C3AED;font-family:Inter,Arial,Helvetica,sans-serif;line-height:48px;display:block;">S</span>
                 </td>
               </tr>
             </table>
@@ -116,7 +116,7 @@ export function trialWarningEmail({
             .map(
               (item) =>
                 `<p style="margin:0 0 8px;font-size:13px;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;">
-                  <span style="color:#11C4B6;font-weight:700;margin-right:8px;">&#10003;</span>${item}
+                  <span style="color:#7C3AED;font-weight:700;margin-right:8px;">&#10003;</span>${item}
                 </p>`
             )
             .join("")}
@@ -130,7 +130,7 @@ export function trialWarningEmail({
         <td align="center">
           <table cellpadding="0" cellspacing="0" border="0" role="presentation">
             <tr>
-              <td style="border-radius:12px;background:linear-gradient(135deg,#11C4B6 0%,#0EA5B7 100%);">
+              <td style="border-radius:12px;background:linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%);">
                 <a href="${safeBillingUrl}" style="display:block;padding:14px 36px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;white-space:nowrap;border-radius:12px;">
                   Choose a plan &rarr;
                 </a>
@@ -196,7 +196,7 @@ export function trialExpiredEmail({
         <td align="center">
           <table cellpadding="0" cellspacing="0" border="0" role="presentation">
             <tr>
-              <td style="border-radius:12px;background:linear-gradient(135deg,#11C4B6 0%,#0EA5B7 100%);">
+              <td style="border-radius:12px;background:linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%);">
                 <a href="${safeBillingUrl}" style="display:block;padding:14px 36px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;white-space:nowrap;border-radius:12px;">
                   Reactivate my account &rarr;
                 </a>

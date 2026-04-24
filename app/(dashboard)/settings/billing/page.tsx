@@ -208,7 +208,7 @@ export default function BillingPage() {
 
   if (!tenant) return null;
 
-  const brand = tenant.primary_color ?? "#11C4B6";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
   const plan = tenant.plan_tier;
   const meta = PLAN_META[plan];
   const trialDays = daysLeft(tenant.trial_ends_at);
@@ -406,7 +406,7 @@ export default function BillingPage() {
                   disabled={showAsCurrent}
                   className={`relative rounded-xl border-2 p-4 text-left transition-all ${
                     isSelected
-                      ? "border-[#11C4B6] bg-[#F0FDFC]"
+                      ? "border-brand-600 bg-[#F0FDFC]"
                       : showAsCurrent
                         ? "border-gray-200 bg-gray-50 opacity-60 cursor-default"
                         : "border-gray-200 bg-white hover:border-gray-300"

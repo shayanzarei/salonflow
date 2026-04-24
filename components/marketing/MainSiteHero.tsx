@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  MARKETING_BUTTON_PRIMARY,
-  MARKETING_BUTTON_SECONDARY,
-} from "@/components/marketing/buttonStyles";
-import { ArrowRightIcon, PlayIcon } from "@/components/ui/Icons";
+import { ArrowRightIcon } from "@/components/ui/Icons";
 import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
+import { Button } from "../ds/Button";
 
 export default function MainSiteHero() {
   const { t } = useLocale();
@@ -26,27 +23,23 @@ export default function MainSiteHero() {
         </p>
 
         <div className="flex flex-col space-y-4 pt-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-          <Link
-            href="/signup"
-            className={`${MARKETING_BUTTON_PRIMARY} space-x-2`}
-          >
-            <span>{w.heroStartFree}</span>
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
-          <a
-            href="#features"
-            className={`${MARKETING_BUTTON_SECONDARY} space-x-2`}
-          >
-            <PlayIcon className="h-3.5 w-3.5 text-[#11c4b6]" />
-            <span>{w.heroSeeHow}</span>
-          </a>
+          <Button variant="primary" asChild size="xl" className="space-x-2">
+            <Link href="/signup">
+              <span>{w.heroStartFree}</span>
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          </Button>
+          <Button variant="secondary" asChild size="xl" className="space-x-2">
+            <a href="#features">
+              <span>{w.heroSeeHow}</span>
+              <ArrowRightIcon className="h-4 w-4" />
+            </a>
+          </Button>
         </div>
 
         <div className="flex items-center space-x-4 pt-4">
           <div className="text-sm text-slate-600">
-            <div className="text-sm font-bold">
-              🇳🇱 {w.heroSupport}
-            </div>
+            <div className="text-sm font-bold">🇳🇱 {w.heroSupport}</div>
             <div className="text-sm">{w.heroBuiltInNl}</div>
           </div>
         </div>
@@ -55,7 +48,7 @@ export default function MainSiteHero() {
       {/* ── Right: laptop mockup ──────────────────────────────────────────── */}
       <div className="relative mt-16 flex w-full items-center justify-center lg:mt-0 lg:w-1/2">
         {/* Ambient glow */}
-        <div className="absolute -inset-8 rounded-3xl bg-[#bff4ef] opacity-55 blur-3xl" />
+        <div className="absolute -inset-8 rounded-3xl bg-brand-100 opacity-55 blur-3xl" />
 
         {/* Floating badge — top right */}
         <div
@@ -66,7 +59,9 @@ export default function MainSiteHero() {
             ✅
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-900">{w.heroBadgeTitle}</p>
+            <p className="text-xs font-bold text-gray-900">
+              {w.heroBadgeTitle}
+            </p>
             <p className="text-[10px] text-gray-400">{w.heroBadgeMeta}</p>
           </div>
         </div>

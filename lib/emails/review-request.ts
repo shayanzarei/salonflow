@@ -53,11 +53,11 @@ export function reviewRequestEmail({
 
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#11C4B6 0%,#0EA5B7 100%);border-radius:16px 16px 0 0;padding:36px 32px;text-align:center;" align="center">
+          <td style="background:linear-gradient(135deg,#7C3AED 0%,#6D28D9 100%);border-radius:16px 16px 0 0;padding:36px 32px;text-align:center;" align="center">
             <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin:0 auto 14px;">
               <tr>
                 <td width="48" height="48" style="width:48px;height:48px;background:#ffffff;border-radius:12px;text-align:center;vertical-align:middle;">
-                  <span style="font-size:22px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,Helvetica,sans-serif;line-height:48px;display:block;">S</span>
+                  <span style="font-size:22px;font-weight:800;color:#7C3AED;font-family:Inter,Arial,Helvetica,sans-serif;line-height:48px;display:block;">S</span>
                 </td>
               </tr>
             </table>
@@ -118,7 +118,7 @@ export function reviewRequestEmail({
                       <td style="padding:0 4px;">
                         <table cellpadding="0" cellspacing="0" border="0" role="presentation">
                           <tr>
-                            <td style="background:#11C4B6;border:1px solid #0EA5B7;border-radius:10px;width:48px;height:48px;text-align:center;vertical-align:middle;">
+                            <td style="background:#7C3AED;border:1px solid #6D28D9;border-radius:10px;width:48px;height:48px;text-align:center;vertical-align:middle;">
                               <a href="${safeReviewUrl}&amp;rating=5" style="display:block;width:48px;height:48px;line-height:48px;font-size:22px;text-decoration:none;">&#11088;</a>
                             </td>
                           </tr>
@@ -144,13 +144,13 @@ export function reviewRequestEmail({
             <!-- Fallback CTA -->
             <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom:20px;">
               <tr>
-                <td style="background:#11C4B6;border-radius:999px;">
+                <td style="background:#7C3AED;border-radius:999px;">
                   <a href="${safeReviewUrl}" style="display:block;padding:13px 28px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;white-space:nowrap;">Leave a review &#8599;</a>
                 </td>
               </tr>
             </table>
 
-            <p style="margin:0 0 24px;font-size:13px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">Can't see the stars? <a href="${safeReviewUrl}" style="color:#11C4B6;text-decoration:none;font-weight:600;">Click here to open the review page</a>.</p>
+            <p style="margin:0 0 24px;font-size:13px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">Can't see the stars? <a href="${safeReviewUrl}" style="color:#7C3AED;text-decoration:none;font-weight:600;">Click here to open the review page</a>.</p>
 
             <!-- Polite note -->
             <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
@@ -167,7 +167,7 @@ export function reviewRequestEmail({
         <!-- Footer -->
         <tr>
           <td style="background:#F8FAFC;border:1px solid #E2E8F0;border-top:none;border-radius:0 0 16px 16px;padding:22px 32px;" align="center">
-            <p style="margin:0 0 8px;font-size:16px;font-weight:800;color:#11C4B6;font-family:Inter,Arial,Helvetica,sans-serif;letter-spacing:-0.01em;">SoloHub</p>
+            <p style="margin:0 0 8px;font-size:16px;font-weight:800;color:#7C3AED;font-family:Inter,Arial,Helvetica,sans-serif;letter-spacing:-0.01em;">SoloHub</p>
             <p style="margin:0 0 6px;font-size:12px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">
               <a href="https://solohub.nl" style="color:#64748B;text-decoration:none;margin:0 6px;">solohub.nl</a>&nbsp;·&nbsp;
               <a href="https://solohub.nl/privacy" style="color:#64748B;text-decoration:none;margin:0 6px;">Privacy Policy</a>&nbsp;·&nbsp;

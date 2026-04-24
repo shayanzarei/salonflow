@@ -17,7 +17,7 @@ export default async function NewServicePage({
       ? redirect_to
       : "";
 
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const [staffResult, categoriesResult] = await Promise.all([
     pool.query(

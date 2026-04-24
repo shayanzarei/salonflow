@@ -10,7 +10,7 @@ import { notFound } from "next/navigation";
 export default async function SocialMediaPage() {
   const tenant = await getTenant();
   if (!tenant) notFound();
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   return (
     <div className="mx-auto max-w-3xl pb-12">

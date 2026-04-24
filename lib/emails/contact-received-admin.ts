@@ -64,7 +64,7 @@ export function contactReceivedAdminEmail({
                 <td>
                   <table cellpadding="0" cellspacing="0" border="0" role="presentation">
                     <tr>
-                      <td width="32" height="32" style="width:32px;height:32px;background:#11C4B6;border-radius:8px;text-align:center;vertical-align:middle;">
+                      <td width="32" height="32" style="width:32px;height:32px;background:#7C3AED;border-radius:8px;text-align:center;vertical-align:middle;">
                         <span style="font-size:16px;font-weight:800;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;line-height:32px;display:block;">S</span>
                       </td>
                       <td style="padding-left:10px;vertical-align:middle;">
@@ -90,7 +90,7 @@ export function contactReceivedAdminEmail({
 
         <!-- Alert banner -->
         <tr>
-          <td style="background:#11C4B6;padding:10px 32px;">
+          <td style="background:#7C3AED;padding:10px 32px;">
             <p style="margin:0;font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;">&#128338;&nbsp; New contact form submission — reply within 4 hours</p>
           </td>
         </tr>
@@ -122,7 +122,7 @@ export function contactReceivedAdminEmail({
                         <span style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.07em;font-family:Inter,Arial,Helvetica,sans-serif;">Email</span>
                       </td>
                       <td style="border-top:1px solid #F1F5F9;padding-top:8px;padding-bottom:8px;vertical-align:top;">
-                        <a href="mailto:${safeEmail}" style="font-size:14px;font-weight:600;color:#11C4B6;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;">${safeEmail}</a>
+                        <a href="mailto:${safeEmail}" style="font-size:14px;font-weight:600;color:#7C3AED;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;">${safeEmail}</a>
                       </td>
                     </tr>
                     <tr>
@@ -149,7 +149,7 @@ export function contactReceivedAdminEmail({
               <tr>
                 <td>
                   <span style="display:block;font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.07em;font-family:Inter,Arial,Helvetica,sans-serif;margin-bottom:10px;">Message</span>
-                  <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-left:3px solid #11C4B6;border-radius:0 8px 8px 0;padding:16px 18px;">
+                  <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-left:3px solid #7C3AED;border-radius:0 8px 8px 0;padding:16px 18px;">
                     <span style="font-size:15px;color:#334155;line-height:1.7;font-family:Inter,Arial,Helvetica,sans-serif;white-space:pre-wrap;">${safeMessage}</span>
                   </div>
                 </td>

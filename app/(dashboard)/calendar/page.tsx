@@ -40,7 +40,7 @@ export default async function CalendarPage() {
     <CalendarView
       bookings={result.rows}
       staff={staffResult.rows}
-      brandColor={tenant.primary_color ?? "#7C3AED"}
+      brandColor={tenant.primary_color ?? 'var(--color-brand-600)'}
     />
   );
 }

@@ -37,7 +37,7 @@ export default async function BookingsPage({
   const { status, page, search } = await searchParams;
   const currentPage = parseInt(page ?? "1");
   const offset = (currentPage - 1) * PAGE_SIZE;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const conditions = [`b.tenant_id = $1`];
   const params: string[] = [tenant.id];
@@ -97,7 +97,7 @@ export default async function BookingsPage({
     { color: string; bg: string; dot: string }
   > = {
     confirmed: { color: "#059669", bg: "#ECFDF5", dot: "#10B981" },
-    pending: { color: "#D97706", bg: "#FFFBEB", dot: "#F59E0B" },
+    pending: { color: 'var(--color-accent-600)', bg: "#FFFBEB", dot: 'var(--color-accent-500)' },
     cancelled: { color: "#DC2626", bg: "#FEF2F2", dot: "#EF4444" },
   };
 

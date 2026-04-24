@@ -46,7 +46,7 @@ export default function DashboardError({
         <button
           onClick={reset}
           className="inline-flex min-h-10 items-center justify-center rounded-xl px-5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ background: "linear-gradient(135deg, #11C4B6 0%, #0EA5B7 100%)" }}
+          style={{ background: "linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-700) 100%)" }}
         >
           {t.errors.tryAgain}
         </button>

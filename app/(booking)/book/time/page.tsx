@@ -17,7 +17,7 @@ export default async function ChooseTimePage({
   if (!tenant) notFound();
 
   const { service, staff } = await searchParams;
-  const brand = tenant.primary_color ?? "#7C3AED";
+  const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   const [serviceResult, staffResult] = await Promise.all([
     pool.query(

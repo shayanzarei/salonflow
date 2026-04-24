@@ -39,7 +39,7 @@ export default async function CancelPage({
   if (!bookingData) notFound();
 
   const alreadyCancelled = bookingData.status === "cancelled";
-  const brand = bookingData.primary_color ?? "#7C3AED";
+  const brand = bookingData.primary_color ?? 'var(--color-brand-600)';
   const bookedAt = new Date(bookingData.booked_at);
 
   if (alreadyCancelled) {

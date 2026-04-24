@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SoloHub — Pre-Launch Test Scenarios</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6fa; color: #1a1a2e; }
+
+  .topbar { background: linear-gradient(135deg, #11C4B6, #0EA5B7); color: white; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar h1 { font-size: 20px; font-weight: 700; }
+  .topbar p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+  .progress-wrap { display: flex; align-items: center; gap: 12px; }
+  .progress-bar-bg { width: 200px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 99px; }
+  .progress-bar { height: 8px; background: white; border-radius: 99px; transition: width 0.3s; }
+  .progress-label { font-size: 13px; font-weight: 600; white-space: nowrap; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  .section { background: white; border-radius: 16px; border: 1px solid #e8eaf0; margin-bottom: 20px; overflow: hidden; }
+  .section-header { padding: 18px 22px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #f0f0f5; user-select: none; }
+  .section-header:hover { background: #fafafa; }
+  .section-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .section-title { flex: 1; }
+  .section-title h2 { font-size: 15px; font-weight: 700; color: #111; }
+  .section-title p { font-size: 12px; color: #888; margin-top: 2px; }
+  .section-chevron { color: #aaa; font-size: 13px; transition: transform 0.2s; }
+  .section-chevron.open { transform: rotate(90deg); }
+  .section-count { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 99px; white-space: nowrap; }
+
+  .section-body { padding: 8px 0; }
+
+  .scenario { padding: 12px 22px; display: flex; align-items: flex-start; gap: 14px; border-bottom: 1px solid #f5f5f8; }
+  .scenario:last-child { border-bottom: none; }
+  .scenario:hover { background: #fafbff; }
+  .scenario.done { background: #f0fdf4; }
+  .scenario.failed { background: #fff5f5; }
+
+  .check-wrap { flex-shrink: 0; padding-top: 2px; }
+  input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; accent-color: #11C4B6; }
+
+  .scenario-body { flex: 1; min-width: 0; }
+  .scenario-title { font-size: 14px; font-weight: 600; color: #1a1a2e; line-height: 1.4; }
+  .scenario.done .scenario-title { color: #16a34a; text-decoration: line-through; text-decoration-color: #86efac; }
+  .scenario-steps { margin-top: 7px; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .scenario-steps li { font-size: 13px; color: #555; line-height: 1.5; padding-left: 14px; position: relative; }
+  .scenario-steps li::before { content: "→"; position: absolute; left: 0; color: #11C4B6; font-size: 11px; top: 2px; }
+  .expect { margin-top: 8px; display: inline-flex; align-items: flex-start; gap: 6px; font-size: 12px; color: #0369a1; background: #e0f2fe; border-radius: 8px; padding: 6px 10px; line-height: 1.4; }
+  .warn { margin-top: 8px; display: inline-flex; align-items: flex-start; gap: 6px; font-size: 12px; color: #92400e; background: #fef3c7; border-radius: 8px; padding: 6px 10px; line-height: 1.4; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.04em; }
+  .badge-critical { background: #fee2e2; color: #b91c1c; }
+  .badge-bug { background: #fef3c7; color: #92400e; }
+  .badge-flow { background: #e0e7ff; color: #4338ca; }
+
+  .fail-btn { margin-left: auto; flex-shrink: 0; font-size: 11px; font-weight: 600; color: #ef4444; border: 1px solid #fca5a5; border-radius: 6px; padding: 3px 8px; cursor: pointer; background: white; }
+  .fail-btn:hover { background: #fff5f5; }
+  .fail-btn.active { background: #fee2e2; }
+
+  .notes-area { margin-top: 8px; width: 100%; font-size: 12px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 7px 10px; resize: vertical; min-height: 44px; color: #374151; font-family: inherit; display: none; }
+  .notes-area.visible { display: block; }
+
+  .summary-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e8eaf0; padding: 12px 32px; display: flex; align-items: center; gap: 20px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
+  .summary-bar span { font-size: 13px; color: #555; }
+  .summary-bar strong { color: #111; }
+  .reset-btn { margin-left: auto; font-size: 12px; color: #888; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 14px; cursor: pointer; background: white; }
+  .reset-btn:hover { background: #f5f5f5; }
+
+  .pill { display: inline-flex; gap: 4px; }
+  .pill-item { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 99px; }
+  .pill-pass { background: #dcfce7; color: #16a34a; }
+  .pill-fail { background: #fee2e2; color: #b91c1c; }
+  .pill-left { background: #f0f0f5; color: #666; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>🧪 SoloHub Pre-Launch Test Scenarios</h1>
+    <p>Work through each scenario top-to-bottom. Tick pass, flag failures with notes.</p>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar" id="prog-bar" style="width:0%"></div></div>
+    <span class="progress-label" id="prog-label">0 / 0</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ── 1. SIGN UP ─────────────────────────────────────────────────────────── -->
+<div class="section" id="sec-signup">
+  <div class="section-header" onclick="toggleSection('signup')">
+    <div class="section-icon" style="background:#e0f2fe">📝</div>
+    <div class="section-title"><h2>1. Sign Up &amp; Onboarding</h2><p>New account creation, email verification, first login</p></div>
+    <span class="section-count" id="cnt-signup" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-signup">▶</span>
+  </div>
+  <div class="section-body" id="body-signup">
+
+    <div class="scenario" id="sc-1">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-1',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">1.1 — Complete sign-up with valid details</div>
+        <ul class="scenario-steps">
+          <li>Go to <code>/signup</code></li>
+          <li>Fill in salon name, your name, email, and a strong password</li>
+          <li>Submit the form</li>
+        </ul>
+        <div class="expect">✅ Expected: Redirected to dashboard or "check your email" confirmation page. No 500 error.</div>
+        <textarea class="notes-area" id="notes-sc-1" placeholder="Notes / what went wrong…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-1',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-2">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-2',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">1.2 — Sign-up with a duplicate email</div>
+        <ul class="scenario-steps">
+          <li>Submit the sign-up form with an email already in the system</li>
+        </ul>
+        <div class="expect">✅ Expected: Clear error "email already in use", not a 500.</div>
+        <textarea class="notes-area" id="notes-sc-2" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-2',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-3">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-3',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">1.3 — Email verification link works <span class="badge badge-critical">Critical</span></div>
+        <ul class="scenario-steps">
+          <li>After sign-up, open the verification email</li>
+          <li>Click the verification link</li>
+        </ul>
+        <div class="expect">✅ Expected: Account marked as verified, redirected to dashboard. Login works immediately after.</div>
+        <textarea class="notes-area" id="notes-sc-3" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-3',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-4">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-4',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">1.4 — Login before verifying email</div>
+        <ul class="scenario-steps">
+          <li>Sign up with a fresh email</li>
+          <li>Without clicking the verification link, try to log in at <code>/login</code></li>
+        </ul>
+        <div class="expect">✅ Expected: Clear "please verify your email" message, not a cryptic error.</div>
+        <textarea class="notes-area" id="notes-sc-4" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-4',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-5">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-5',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">1.5 — Trial banner and countdown visible after login</div>
+        <ul class="scenario-steps">
+          <li>Log in as a fresh trial account</li>
+          <li>Check if a trial expiry notice or banner is visible on the dashboard</li>
+        </ul>
+        <div class="expect">✅ Expected: Trial days remaining is shown correctly and counts down.</div>
+        <textarea class="notes-area" id="notes-sc-5" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-5',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 2. AUTH ─────────────────────────────────────────────────────────────── -->
+<div class="section" id="sec-auth">
+  <div class="section-header" onclick="toggleSection('auth')">
+    <div class="section-icon" style="background:#ede9fe">🔐</div>
+    <div class="section-title"><h2>2. Login, Logout &amp; Password</h2><p>Authentication flows and session handling</p></div>
+    <span class="section-count" id="cnt-auth" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-auth">▶</span>
+  </div>
+  <div class="section-body" id="body-auth">
+
+    <div class="scenario" id="sc-6">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-6',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">2.1 — Login with correct credentials</div>
+        <ul class="scenario-steps">
+          <li>Go to <code>/login</code>, enter valid email + password</li>
+        </ul>
+        <div class="expect">✅ Expected: Lands on dashboard, session persists on page refresh.</div>
+        <textarea class="notes-area" id="notes-sc-6" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-6',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-7">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-7',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">2.2 — Login with wrong password</div>
+        <ul class="scenario-steps">
+          <li>Submit login with correct email but wrong password</li>
+        </ul>
+        <div class="expect">✅ Expected: "Invalid credentials" error, stays on login page.</div>
+        <textarea class="notes-area" id="notes-sc-7" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-7',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-8">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-8',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">2.3 — Forgot password → reset email → set new password</div>
+        <ul class="scenario-steps">
+          <li>Click "Forgot password" on the login page</li>
+          <li>Enter your email, submit</li>
+          <li>Open the reset email and click the link</li>
+          <li>Set a new password and confirm</li>
+          <li>Log in with the new password</li>
+        </ul>
+        <div class="expect">✅ Expected: Full flow completes, old password no longer works.</div>
+        <textarea class="notes-area" id="notes-sc-8" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-8',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-9">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-9',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">2.4 — Change password from Settings</div>
+        <ul class="scenario-steps">
+          <li>Log in, go to Settings → Account &amp; Security</li>
+          <li>Fill in current password, new password, confirm</li>
+          <li>Save, then log out and log back in with the new password</li>
+        </ul>
+        <div class="expect">✅ Expected: Password updated, new credentials work.</div>
+        <textarea class="notes-area" id="notes-sc-9" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-9',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-10">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-10',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">2.5 — Logout clears session</div>
+        <ul class="scenario-steps">
+          <li>Log in, then click logout</li>
+          <li>Try navigating to <code>/dashboard</code> directly</li>
+        </ul>
+        <div class="expect">✅ Expected: Redirected back to login page.</div>
+        <textarea class="notes-area" id="notes-sc-10" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-10',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 3. SERVICES ────────────────────────────────────────────────────────── -->
+<div class="section" id="sec-services">
+  <div class="section-header" onclick="toggleSection('services')">
+    <div class="section-icon" style="background:#fef9c3">✂️</div>
+    <div class="section-title"><h2>3. Services</h2><p>Creating and managing services offered by the salon</p></div>
+    <span class="section-count" id="cnt-services" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-services">▶</span>
+  </div>
+  <div class="section-body" id="body-services">
+
+    <div class="scenario" id="sc-11">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-11',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">3.1 — Add a new service</div>
+        <ul class="scenario-steps">
+          <li>Go to Services → Add new</li>
+          <li>Fill in name (e.g. "Haircut"), price (e.g. €35), duration (30 min)</li>
+          <li>Save</li>
+        </ul>
+        <div class="expect">✅ Expected: Service appears in the list, correct price and duration shown.</div>
+        <textarea class="notes-area" id="notes-sc-11" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-11',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-12">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-12',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">3.2 — Edit a service</div>
+        <ul class="scenario-steps">
+          <li>Click into a service and change its price</li>
+          <li>Save</li>
+        </ul>
+        <div class="expect">✅ Expected: Updated price reflects immediately in the list.</div>
+        <textarea class="notes-area" id="notes-sc-12" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-12',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-13">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-13',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">3.3 — Delete a service</div>
+        <ul class="scenario-steps">
+          <li>Delete a service that has no upcoming bookings</li>
+        </ul>
+        <div class="expect">✅ Expected: Service removed from list. No orphaned booking records crash the app.</div>
+        <textarea class="notes-area" id="notes-sc-13" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-13',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-14">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-14',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">3.4 — New service appears on public booking page</div>
+        <ul class="scenario-steps">
+          <li>Add a new service in the dashboard</li>
+          <li>Open the public booking page in a different browser tab (or incognito)</li>
+        </ul>
+        <div class="expect">✅ Expected: The new service is selectable by clients.</div>
+        <textarea class="notes-area" id="notes-sc-14" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-14',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 4. STAFF ────────────────────────────────────────────────────────────── -->
+<div class="section" id="sec-staff">
+  <div class="section-header" onclick="toggleSection('staff')">
+    <div class="section-icon" style="background:#fce7f3">👥</div>
+    <div class="section-title"><h2>4. Staff Management</h2><p>Inviting, authenticating, and managing team members</p></div>
+    <span class="section-count" id="cnt-staff" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-staff">▶</span>
+  </div>
+  <div class="section-body" id="body-staff">
+
+    <div class="scenario" id="sc-15">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-15',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">4.1 — Invite a new staff member</div>
+        <ul class="scenario-steps">
+          <li>Go to Staff → Add team member</li>
+          <li>Enter a real name, role, and an email you can access</li>
+          <li>Click Send invite</li>
+        </ul>
+        <div class="expect">✅ Expected: Staff member appears in the list with "Invite pending" status. Invite email arrives.</div>
+        <textarea class="notes-area" id="notes-sc-15" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-15',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-16">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-16',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">4.2 — Staff member sets password via invite link <span class="badge badge-critical">Critical</span></div>
+        <ul class="scenario-steps">
+          <li>Open the invite email received above</li>
+          <li>Click the link to set a password</li>
+          <li>Set a password and submit</li>
+          <li>Log in at <code>/login</code> with the staff email + new password</li>
+        </ul>
+        <div class="expect">✅ Expected: Staff can log in and see the staff portal (limited view — not owner settings).</div>
+        <textarea class="notes-area" id="notes-sc-16" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-16',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-17">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-17',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">4.3 — Staff invite link expires after 7 days <span class="badge badge-bug">Bug check</span></div>
+        <ul class="scenario-steps">
+          <li>Use an expired invite link (or manually set token expiry to the past in the DB)</li>
+        </ul>
+        <div class="expect">✅ Expected: Friendly "link has expired, contact your salon owner" message.</div>
+        <textarea class="notes-area" id="notes-sc-17" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-17',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-18">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-18',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">4.4 — Invite duplicate email</div>
+        <ul class="scenario-steps">
+          <li>Try to invite a staff member using an email already in the system</li>
+        </ul>
+        <div class="expect">✅ Expected: Error message, not a silent failure or 500.</div>
+        <textarea class="notes-area" id="notes-sc-18" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-18',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-19">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-19',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">4.5 — Staff member appears as assignable in new booking</div>
+        <ul class="scenario-steps">
+          <li>After adding a staff member, go to Bookings → New booking</li>
+          <li>Check the staff dropdown</li>
+        </ul>
+        <div class="expect">✅ Expected: The new staff member is listed and selectable.</div>
+        <textarea class="notes-area" id="notes-sc-19" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-19',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 5. BOOKINGS ─────────────────────────────────────────────────────────── -->
+<div class="section" id="sec-bookings">
+  <div class="section-header" onclick="toggleSection('bookings')">
+    <div class="section-icon" style="background:#dcfce7">📅</div>
+    <div class="section-title"><h2>5. Bookings — Dashboard Side</h2><p>Creating and managing bookings from the owner's view</p></div>
+    <span class="section-count" id="cnt-bookings" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-bookings">▶</span>
+  </div>
+  <div class="section-body" id="body-bookings">
+
+    <div class="scenario" id="sc-20">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-20',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">5.1 — Create a booking manually from the dashboard</div>
+        <ul class="scenario-steps">
+          <li>Go to Bookings → New booking</li>
+          <li>Select a service, staff member, date, and time</li>
+          <li>Fill in client name, email, phone</li>
+          <li>Submit</li>
+        </ul>
+        <div class="expect">✅ Expected: Booking created, appears in the list, confirmation email sent to client.</div>
+        <textarea class="notes-area" id="notes-sc-20" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-20',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-21">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-21',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">5.2 — Search and filter bookings</div>
+        <ul class="scenario-steps">
+          <li>Use the search box to look up a client by name</li>
+          <li>Filter by status (Pending, Confirmed, Completed)</li>
+          <li>Filter by a specific date range</li>
+        </ul>
+        <div class="expect">✅ Expected: Results narrow correctly, no results show the empty state, not a blank page.</div>
+        <textarea class="notes-area" id="notes-sc-21" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-21',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-22">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-22',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">5.3 — Try booking an already-taken slot</div>
+        <ul class="scenario-steps">
+          <li>Create booking A for staff X at 10:00 for 60 min</li>
+          <li>Immediately try to create booking B for the same staff X at 10:30</li>
+        </ul>
+        <div class="expect">✅ Expected: Second booking is rejected with "time slot unavailable".</div>
+        <div class="warn">⚠️ Known risk: Race condition may allow both — note whether this happens.</div>
+        <textarea class="notes-area" id="notes-sc-22" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-22',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-23">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-23',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">5.4 — Owner and assigned staff both receive booking notification email</div>
+        <ul class="scenario-steps">
+          <li>Create a booking assigning it to a staff member with a different email from the owner</li>
+          <li>Check both inboxes</li>
+        </ul>
+        <div class="expect">✅ Expected: Owner gets "New booking at your salon", staff gets "You have a new appointment".</div>
+        <textarea class="notes-area" id="notes-sc-23" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-23',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-24">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-24',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">5.5 — In-platform notification appears for new booking</div>
+        <ul class="scenario-steps">
+          <li>Create a new booking</li>
+          <li>Check the notification bell in the dashboard header</li>
+        </ul>
+        <div class="expect">✅ Expected: Notification count increases and the booking notification is listed.</div>
+        <textarea class="notes-area" id="notes-sc-24" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-24',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 6. CLIENT BOOKING FLOW ─────────────────────────────────────────────── -->
+<div class="section" id="sec-client">
+  <div class="section-header" onclick="toggleSection('client')">
+    <div class="section-icon" style="background:#f0f9ff">🌐</div>
+    <div class="section-title"><h2>6. Public Booking Flow (Client Side)</h2><p>What your clients experience when they book</p></div>
+    <span class="section-count" id="cnt-client" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-client">▶</span>
+  </div>
+  <div class="section-body" id="body-client">
+
+    <div class="scenario" id="sc-25">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-25',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">6.1 — Client books an appointment end-to-end <span class="badge badge-flow">Core flow</span></div>
+        <ul class="scenario-steps">
+          <li>Open the public booking page in incognito (no dashboard session)</li>
+          <li>Select a service, pick a staff member, choose an available time slot</li>
+          <li>Fill in name, email, phone and submit</li>
+        </ul>
+        <div class="expect">✅ Expected: Booking confirmed page shown. Confirmation email arrives in client inbox.</div>
+        <textarea class="notes-area" id="notes-sc-25" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-25',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-26">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-26',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">6.2 — Confirmation email contains cancellation link <span class="badge badge-critical">Critical</span></div>
+        <ul class="scenario-steps">
+          <li>After a client books (scenario 6.1), open the confirmation email</li>
+          <li>Find and click the cancellation link</li>
+        </ul>
+        <div class="expect">✅ Expected: Cancellation page loads showing the correct appointment details.</div>
+        <div class="warn">⚠️ Known bug: cancellation_token may not be generated — if the link is missing or broken, note it here.</div>
+        <textarea class="notes-area" id="notes-sc-26" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-26',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-27">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-27',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">6.3 — Client cancels their appointment</div>
+        <ul class="scenario-steps">
+          <li>On the cancellation page from 6.2, click "Cancel appointment"</li>
+          <li>Confirm the cancellation</li>
+        </ul>
+        <div class="expect">✅ Expected: Booking status changes to "cancelled" in the dashboard. Slot becomes available again.</div>
+        <textarea class="notes-area" id="notes-sc-27" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-27',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-28">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-28',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">6.4 — Client tries to book an already-taken slot</div>
+        <ul class="scenario-steps">
+          <li>Create a booking via the dashboard for 14:00</li>
+          <li>Try to book the same staff member at 14:00 via the public page</li>
+        </ul>
+        <div class="expect">✅ Expected: That slot is not shown as available, or submission returns an error.</div>
+        <textarea class="notes-area" id="notes-sc-28" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-28',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-29">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-29',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">6.5 — Client tries to book outside opening hours</div>
+        <ul class="scenario-steps">
+          <li>Set opening hours to 09:00–17:00 Monday–Friday</li>
+          <li>Try to select a slot on a weekend or after 17:00</li>
+        </ul>
+        <div class="expect">✅ Expected: Out-of-hours slots are not available for selection.</div>
+        <textarea class="notes-area" id="notes-sc-29" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-29',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-30">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-30',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">6.6 — Booking reminder email sent 24 hrs before</div>
+        <ul class="scenario-steps">
+          <li>Create a booking for tomorrow's date</li>
+          <li>Trigger the reminder job manually (or wait) and check whether reminder email arrives</li>
+        </ul>
+        <div class="expect">✅ Expected: Client receives a "don't forget your appointment tomorrow" email.</div>
+        <textarea class="notes-area" id="notes-sc-30" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-30',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 7. REPORTS / REVENUE ───────────────────────────────────────────────── -->
+<div class="section" id="sec-reports">
+  <div class="section-header" onclick="toggleSection('reports')">
+    <div class="section-icon" style="background:#fef3c7">💰</div>
+    <div class="section-title"><h2>7. Reports &amp; Revenue Finalization</h2><p>End-of-day revenue tracking and appointment finalization</p></div>
+    <span class="section-count" id="cnt-reports" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-reports">▶</span>
+  </div>
+  <div class="section-body" id="body-reports">
+
+    <div class="scenario" id="sc-31">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-31',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">7.1 — Today's appointments appear in Reports</div>
+        <ul class="scenario-steps">
+          <li>Create a booking for today's date</li>
+          <li>Go to Reports</li>
+        </ul>
+        <div class="expect">✅ Expected: The appointment is listed in "Today's appointments" panel.</div>
+        <textarea class="notes-area" id="notes-sc-31" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-31',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-32">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-32',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">7.2 — Mark one appointment as Done</div>
+        <ul class="scenario-steps">
+          <li>On the Reports page, click "✓ Done" on one appointment</li>
+        </ul>
+        <div class="expect">✅ Expected: Row turns green immediately. "Today" revenue total increases by that service's price.</div>
+        <textarea class="notes-area" id="notes-sc-32" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-32',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-33">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-33',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">7.3 — Mark one appointment as No-show</div>
+        <ul class="scenario-steps">
+          <li>Click "No-show" on an appointment</li>
+        </ul>
+        <div class="expect">✅ Expected: Row shows "No-show" badge. Revenue total does NOT increase (no-shows don't count).</div>
+        <textarea class="notes-area" id="notes-sc-33" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-33',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-34">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-34',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">7.4 — Bulk "Complete all remaining" button</div>
+        <ul class="scenario-steps">
+          <li>With multiple pending appointments, click "Complete all N remaining"</li>
+        </ul>
+        <div class="expect">✅ Expected: All pending rows turn green, revenue stats update, button disappears.</div>
+        <textarea class="notes-area" id="notes-sc-34" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-34',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-35">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-35',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">7.5 — Week and month revenue totals are correct</div>
+        <ul class="scenario-steps">
+          <li>Finalize several appointments across multiple days this week</li>
+          <li>Check that "This week" and "This month" cards reflect the cumulative total</li>
+        </ul>
+        <div class="expect">✅ Expected: Numbers match the sum of completed services' prices.</div>
+        <textarea class="notes-area" id="notes-sc-35" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-35',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 8. SETTINGS ────────────────────────────────────────────────────────── -->
+<div class="section" id="sec-settings">
+  <div class="section-header" onclick="toggleSection('settings')">
+    <div class="section-icon" style="background:#f0fdf4">⚙️</div>
+    <div class="section-title"><h2>8. Settings</h2><p>Profile, opening hours, social media, billing</p></div>
+    <span class="section-count" id="cnt-settings" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-settings">▶</span>
+  </div>
+  <div class="section-body" id="body-settings">
+
+    <div class="scenario" id="sc-36">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-36',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">8.1 — Update salon profile (name, phone, address)</div>
+        <ul class="scenario-steps">
+          <li>Go to Settings → Profile, change the salon name and phone</li>
+          <li>Save, reload the page</li>
+        </ul>
+        <div class="expect">✅ Expected: Updated values persist after reload. Sidebar also reflects new name.</div>
+        <textarea class="notes-area" id="notes-sc-36" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-36',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-37">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-37',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">8.2 — Set opening hours and verify closed days are blocked</div>
+        <ul class="scenario-steps">
+          <li>Go to Settings → Opening hours</li>
+          <li>Mark Sunday as closed</li>
+          <li>Save, then go to the public booking page and try to pick a Sunday slot</li>
+        </ul>
+        <div class="expect">✅ Expected: Sunday is not available for selection on the booking page.</div>
+        <textarea class="notes-area" id="notes-sc-37" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-37',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-38">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-38',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">8.3 — Social media links saved and appear on booking site</div>
+        <ul class="scenario-steps">
+          <li>Go to Settings → Social media, add an Instagram handle</li>
+          <li>Save, then visit the public booking/salon page</li>
+        </ul>
+        <div class="expect">✅ Expected: Instagram link is visible on the public page.</div>
+        <textarea class="notes-area" id="notes-sc-38" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-38',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-39">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-39',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">8.4 — Plan &amp; Billing page loads correctly</div>
+        <ul class="scenario-steps">
+          <li>Go to Settings → Plan &amp; billing</li>
+        </ul>
+        <div class="expect">✅ Expected: Current plan is displayed. No 500 error or blank page.</div>
+        <textarea class="notes-area" id="notes-sc-39" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-39',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 9. LANGUAGE SWITCHER ───────────────────────────────────────────────── -->
+<div class="section" id="sec-lang">
+  <div class="section-header" onclick="toggleSection('lang')">
+    <div class="section-icon" style="background:#eff6ff">🌍</div>
+    <div class="section-title"><h2>9. Language Switcher (EN / NL)</h2><p>Dutch/English toggle on marketing site and dashboard</p></div>
+    <span class="section-count" id="cnt-lang" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-lang">▶</span>
+  </div>
+  <div class="section-body" id="body-lang">
+
+    <div class="scenario" id="sc-40">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-40',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">9.1 — Switch to Dutch on the marketing homepage</div>
+        <ul class="scenario-steps">
+          <li>Go to the marketing homepage (not logged in)</li>
+          <li>Find the EN | NL toggle in the header and click NL</li>
+        </ul>
+        <div class="expect">✅ Expected: Nav items change to Dutch (e.g. "Prijzen", "Aan de slag"). Page does not reload to a blank screen.</div>
+        <textarea class="notes-area" id="notes-sc-40" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-40',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-41">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-41',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">9.2 — Language preference persists across pages</div>
+        <ul class="scenario-steps">
+          <li>Switch to NL on the homepage</li>
+          <li>Navigate to Pricing, FAQ, and Contact pages</li>
+        </ul>
+        <div class="expect">✅ Expected: Still Dutch on every page (cookie persists).</div>
+        <textarea class="notes-area" id="notes-sc-41" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-41',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-42">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-42',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">9.3 — Switch to Dutch in the dashboard sidebar</div>
+        <ul class="scenario-steps">
+          <li>Log in to the dashboard</li>
+          <li>Find the language toggle and switch to NL</li>
+        </ul>
+        <div class="expect">✅ Expected: Sidebar labels change ("Afspraken", "Klanten", "Diensten", etc.). No broken layout.</div>
+        <textarea class="notes-area" id="notes-sc-42" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-42',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-43">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-43',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">9.4 — Language persists after logout and login</div>
+        <ul class="scenario-steps">
+          <li>Switch to NL in the dashboard</li>
+          <li>Log out, log back in</li>
+        </ul>
+        <div class="expect">✅ Expected: Dashboard is still in Dutch (cookie survived the session).</div>
+        <textarea class="notes-area" id="notes-sc-43" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-43',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 10. TRIAL & BILLING ────────────────────────────────────────────────── -->
+<div class="section" id="sec-billing">
+  <div class="section-header" onclick="toggleSection('billing')">
+    <div class="section-icon" style="background:#fdf4ff">💳</div>
+    <div class="section-title"><h2>10. Trial Expiry &amp; Billing</h2><p>Trial emails, plan upgrade, Stripe integration</p></div>
+    <span class="section-count" id="cnt-billing" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-billing">▶</span>
+  </div>
+  <div class="section-body" id="body-billing">
+
+    <div class="scenario" id="sc-44">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-44',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">10.1 — 3-day trial warning email is sent</div>
+        <ul class="scenario-steps">
+          <li>Set a tenant's <code>trial_ends_at</code> to 3 days from now in the DB</li>
+          <li>Trigger the trial reminder job manually</li>
+          <li>Check the owner's email</li>
+        </ul>
+        <div class="expect">✅ Expected: Warning email arrives with correct days remaining and billing link.</div>
+        <textarea class="notes-area" id="notes-sc-44" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-44',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-45">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-45',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">10.2 — Trial expired email is sent</div>
+        <ul class="scenario-steps">
+          <li>Set <code>trial_ends_at</code> to yesterday, <code>tenant_status</code> to 'trial'</li>
+          <li>Trigger the trial job</li>
+        </ul>
+        <div class="expect">✅ Expected: Expiry email sent. Job does NOT send it again on the next run (idempotent).</div>
+        <textarea class="notes-area" id="notes-sc-45" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-45',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-46">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-46',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">10.3 — Upgrade to paid plan via Stripe Checkout</div>
+        <ul class="scenario-steps">
+          <li>Go to Settings → Plan &amp; billing → Upgrade</li>
+          <li>Complete Stripe Checkout using card number <code>4242 4242 4242 4242</code></li>
+        </ul>
+        <div class="expect">✅ Expected: Redirected back to billing page. Account status updates to "active". No 500 from webhook.</div>
+        <textarea class="notes-area" id="notes-sc-46" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-46',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-47">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-47',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">10.4 — Failed payment card is declined gracefully</div>
+        <ul class="scenario-steps">
+          <li>Use Stripe test card <code>4000 0000 0000 0002</code> (always declined)</li>
+        </ul>
+        <div class="expect">✅ Expected: Stripe shows decline message, user stays in checkout, account stays on trial.</div>
+        <textarea class="notes-area" id="notes-sc-47" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-47',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 11. SECURITY ───────────────────────────────────────────────────────── -->
+<div class="section" id="sec-security">
+  <div class="section-header" onclick="toggleSection('security')">
+    <div class="section-icon" style="background:#fff1f2">🛡️</div>
+    <div class="section-title"><h2>11. Security &amp; Tenant Isolation</h2><p>Make sure salon A can never see salon B's data</p></div>
+    <span class="section-count" id="cnt-security" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-security">▶</span>
+  </div>
+  <div class="section-body" id="body-security">
+
+    <div class="scenario" id="sc-48">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-48',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">11.1 — Owner cannot access another tenant's data via API <span class="badge badge-critical">Critical</span></div>
+        <ul class="scenario-steps">
+          <li>Log in as Salon A</li>
+          <li>In browser devtools, send a GET to <code>/api/bookings</code> with header <code>x-tenant-slug: salon-b-slug</code></li>
+        </ul>
+        <div class="expect">✅ Expected: Returns 401 or 404, not Salon B's bookings.</div>
+        <textarea class="notes-area" id="notes-sc-48" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-48',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-49">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-49',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">11.2 — Unauthenticated user cannot access dashboard</div>
+        <ul class="scenario-steps">
+          <li>In a fresh incognito window, navigate directly to <code>/dashboard</code>, <code>/bookings</code>, <code>/staff</code></li>
+        </ul>
+        <div class="expect">✅ Expected: All redirect to <code>/login</code>.</div>
+        <textarea class="notes-area" id="notes-sc-49" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-49',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-50">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-50',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">11.3 — Staff member cannot access owner-only settings</div>
+        <ul class="scenario-steps">
+          <li>Log in as a staff member</li>
+          <li>Try navigating to <code>/settings/billing</code> and <code>/settings/security</code></li>
+        </ul>
+        <div class="expect">✅ Expected: Redirected or shown an "access denied" message.</div>
+        <textarea class="notes-area" id="notes-sc-50" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-50',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 12. EDGE CASES ─────────────────────────────────────────────────────── -->
+<div class="section" id="sec-edge">
+  <div class="section-header" onclick="toggleSection('edge')">
+    <div class="section-icon" style="background:#f0fdf4">🔬</div>
+    <div class="section-title"><h2>12. Edge Cases &amp; Empty States</h2><p>What happens when nothing is set up yet</p></div>
+    <span class="section-count" id="cnt-edge" style="background:#f0f0f5;color:#666">0/0</span>
+    <span class="section-chevron open" id="chev-edge">▶</span>
+  </div>
+  <div class="section-body" id="body-edge">
+
+    <div class="scenario" id="sc-51">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-51',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">12.1 — Brand new account with no data</div>
+        <ul class="scenario-steps">
+          <li>Sign up and immediately visit Bookings, Customers, Services, Staff, Reports</li>
+        </ul>
+        <div class="expect">✅ Expected: Each page shows a helpful empty state with a call-to-action, not a blank page or error.</div>
+        <textarea class="notes-area" id="notes-sc-51" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-51',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-52">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-52',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">12.2 — Calendar page with no bookings</div>
+        <ul class="scenario-steps">
+          <li>Go to Calendar on a fresh account</li>
+        </ul>
+        <div class="expect">✅ Expected: Calendar renders with empty slots, no crash.</div>
+        <textarea class="notes-area" id="notes-sc-52" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-52',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-53">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-53',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">12.3 — Public booking page with no services or staff</div>
+        <ul class="scenario-steps">
+          <li>Open the public booking URL for a fresh account that has no services</li>
+        </ul>
+        <div class="expect">✅ Expected: Sensible message like "No services available yet", not a crash or blank page.</div>
+        <textarea class="notes-area" id="notes-sc-53" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-53',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-54">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-54',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">12.4 — Booking with invalid / past date</div>
+        <ul class="scenario-steps">
+          <li>Manipulate the booking form to submit a past date (e.g. yesterday)</li>
+        </ul>
+        <div class="expect">✅ Expected: Server rejects it with a clear validation error, not a silent success.</div>
+        <textarea class="notes-area" id="notes-sc-54" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-54',this)">Fail</button>
+    </div>
+
+    <div class="scenario" id="sc-55">
+      <div class="check-wrap"><input type="checkbox" onchange="tick('sc-55',this)"></div>
+      <div class="scenario-body">
+        <div class="scenario-title">12.5 — Mobile responsiveness check</div>
+        <ul class="scenario-steps">
+          <li>Open the dashboard on a phone or use devtools mobile emulator (375px wide)</li>
+          <li>Check sidebar, bookings list, reports page, and the public booking flow</li>
+        </ul>
+        <div class="expect">✅ Expected: No horizontal overflow. Sidebar collapses to hamburger. All buttons are tappable.</div>
+        <textarea class="notes-area" id="notes-sc-55" placeholder="Notes…"></textarea>
+      </div>
+      <button class="fail-btn" onclick="flagFail('sc-55',this)">Fail</button>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<div class="summary-bar">
+  <span>Passed: <strong id="pass-count">0</strong></span>
+  <span>Failed: <strong id="fail-count" style="color:#ef4444">0</strong></span>
+  <span>Remaining: <strong id="rem-count">55</strong></span>
+  <div class="pill">
+    <span class="pill-item pill-pass" id="pill-pass">0 pass</span>
+    <span class="pill-item pill-fail" id="pill-fail">0 fail</span>
+    <span class="pill-item pill-left" id="pill-left">55 left</span>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset all</button>
+</div>
+
+<script>
+const TOTAL = 55;
+const state = {}; // sc-N -> 'pass' | 'fail' | null
+
+function tick(id, cb) {
+  if (cb.checked) {
+    state[id] = 'pass';
+    document.getElementById(id).classList.add('done');
+    document.getElementById(id).classList.remove('failed');
+    // hide notes
+    const n = document.getElementById('notes-' + id);
+    if (n) n.classList.remove('visible');
+  } else {
+    state[id] = null;
+    document.getElementById(id).classList.remove('done');
+  }
+  updateCounts();
+}
+
+function flagFail(id, btn) {
+  if (state[id] === 'fail') {
+    state[id] = null;
+    btn.classList.remove('active');
+    document.getElementById(id).classList.remove('failed');
+    const n = document.getElementById('notes-' + id);
+    if (n) n.classList.remove('visible');
+  } else {
+    state[id] = 'fail';
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('failed');
+    document.getElementById(id).classList.remove('done');
+    // uncheck checkbox
+    document.querySelector('#' + id + ' input[type=checkbox]').checked = false;
+    // show notes
+    const n = document.getElementById('notes-' + id);
+    if (n) n.classList.add('visible');
+  }
+  updateCounts();
+}
+
+const SECTIONS = ['signup','auth','services','staff','bookings','client','reports','settings','lang','billing','security','edge'];
+const SECTION_RANGES = {
+  signup: [1,5], auth: [6,10], services: [11,14], staff: [15,19],
+  bookings: [20,24], client: [25,30], reports: [31,35], settings: [36,39],
+  lang: [40,43], billing: [44,47], security: [48,50], edge: [51,55]
+};
+
+function updateCounts() {
+  let pass = 0, fail = 0;
+  for (const v of Object.values(state)) {
+    if (v === 'pass') pass++;
+    if (v === 'fail') fail++;
+  }
+  const rem = TOTAL - pass - fail;
+  document.getElementById('pass-count').textContent = pass;
+  document.getElementById('fail-count').textContent = fail;
+  document.getElementById('rem-count').textContent = rem;
+  document.getElementById('pill-pass').textContent = pass + ' pass';
+  document.getElementById('pill-fail').textContent = fail + ' fail';
+  document.getElementById('pill-left').textContent = rem + ' left';
+  const pct = Math.round((pass + fail) / TOTAL * 100);
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = (pass + fail) + ' / ' + TOTAL;
+
+  // Per-section counts
+  for (const sec of SECTIONS) {
+    const [from, to] = SECTION_RANGES[sec];
+    let sp = 0, sf = 0, total = to - from + 1;
+    for (let i = from; i <= to; i++) {
+      const v = state['sc-' + i];
+      if (v === 'pass') sp++;
+      if (v === 'fail') sf++;
+    }
+    const el = document.getElementById('cnt-' + sec);
+    const done = sp + sf;
+    if (sf > 0) {
+      el.style.background = '#fee2e2'; el.style.color = '#b91c1c';
+      el.textContent = sf + ' fail';
+    } else if (done === total) {
+      el.style.background = '#dcfce7'; el.style.color = '#16a34a';
+      el.textContent = '✓ done';
+    } else {
+      el.style.background = '#f0f0f5'; el.style.color = '#666';
+      el.textContent = done + '/' + total;
+    }
+  }
+}
+
+function toggleSection(sec) {
+  const body = document.getElementById('body-' + sec);
+  const chev = document.getElementById('chev-' + sec);
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? '' : 'none';
+  chev.classList.toggle('open', hidden);
+}
+
+function resetAll() {
+  if (!confirm('Reset all test results?')) return;
+  for (const k of Object.keys(state)) delete state[k];
+  document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.scenario').forEach(el => { el.classList.remove('done','failed'); });
+  document.querySelectorAll('.fail-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.notes-area').forEach(el => el.classList.remove('visible'));
+  updateCounts();
+}
+
+updateCounts();
+</script>
+</body>
+</html>

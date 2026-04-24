@@ -211,11 +211,12 @@ export default function BillingPage() {
   const brand = tenant.primary_color ?? "#11C4B6";
   const plan = tenant.plan_tier;
   const meta = PLAN_META[plan];
-  const isTrialing = tenant.tenant_status === "trial";
+  const trialDays = daysLeft(tenant.trial_ends_at);
+  const hasActiveTrialWindow = trialDays > 0 && Boolean(tenant.trial_ends_at);
+  const isTrialing = tenant.tenant_status === "trial" || hasActiveTrialWindow;
   const isActive =
     tenant.tenant_status === "active" && !!tenant.stripe_subscription_id;
   const isSuspendedStatus = tenant.tenant_status === "suspended";
-  const trialDays = daysLeft(tenant.trial_ends_at);
   const trialUrgent = trialDays <= 3;
 
   const availableUpgrades = UPGRADE_ORDER.filter(

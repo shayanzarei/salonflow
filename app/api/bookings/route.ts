@@ -3,7 +3,9 @@ import { bookingConfirmationEmail } from '@/lib/emails/booking-confirmation';
 import { bookingStaffNotificationEmail } from '@/lib/emails/booking-staff-notification';
 import { sendEmail } from '@/lib/emails/send';
 import { createNotification } from '@/lib/notifications';
+import { isValidPhone, normalizePhoneInput } from '@/lib/phone';
 import { bookableServiceSql } from '@/lib/services/bookable';
+import { canAccessPublicWebsite } from '@/lib/tenant';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -17,9 +19,20 @@ export async function POST(req: NextRequest) {
     const client_name = formData.get('client_name') as string;
     const client_email = formData.get('client_email') as string;
     const client_phone = formData.get('client_phone') as string | null;
+    const normalizedPhone = normalizePhoneInput(client_phone);
 
     if (!tenant_id || !service_id || !staff_id || !booked_at || !client_name || !client_email) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+    if (!isValidPhone(normalizedPhone)) {
+      return NextResponse.json({ error: "Invalid phone number format" }, { status: 400 });
+    }
+    const bookingDate = new Date(booked_at);
+    if (Number.isNaN(bookingDate.getTime()) || bookingDate.getTime() <= Date.now()) {
+      return NextResponse.json(
+        { error: "Booking time must be in the future." },
+        { status: 400 }
+      );
     }
 
     const [tenantResult, serviceResult, staffResult] = await Promise.all([
@@ -44,9 +57,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    if (tenant.website_status !== "published") {
+    if (!canAccessPublicWebsite(tenant)) {
       return NextResponse.json(
-        { error: "Booking website is not published yet" },
+        { error: "Booking website is not available" },
         { status: 403 }
       );
     }
@@ -79,7 +92,7 @@ export async function POST(req: NextRequest) {
          AND b.booked_at < ($2::timestamptz + ($3::int || ' minutes')::interval)
          AND (b.booked_at + (s.duration_mins || ' minutes')::interval) > $2::timestamptz
        LIMIT 1`,
-      [staff_id, booked_at, service.duration_mins]
+      [staff_id, bookingDate.toISOString(), service.duration_mins]
     );
 
     if (conflictResult.rows.length > 0) {
@@ -94,7 +107,7 @@ export async function POST(req: NextRequest) {
         (tenant_id, service_id, staff_id, booked_at, client_name, client_email, client_phone, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'confirmed')
        RETURNING *`,
-      [tenant_id, service_id, staff_id, booked_at, client_name, client_email, client_phone]
+      [tenant_id, service_id, staff_id, booked_at, client_name, client_email, normalizedPhone]
     );
 
     const booking = result.rows[0];
@@ -127,12 +140,14 @@ export async function POST(req: NextRequest) {
       salonName: tenant.name,
       serviceName: service.name,
       staffName: staff.name,
-      bookedAt: new Date(booked_at),
+      bookedAt: bookingDate,
       price: parseFloat(service.price),
       salonAddress: tenant.address,
       cancellationToken: booking.cancellation_token,
       bookingId: booking.id,
       salonSlug: tenant.slug,
+      cancelBaseUrl: req.nextUrl.origin,
+      brandColor: tenant.primary_color,
     });
 
     void sendEmail({
@@ -150,10 +165,10 @@ export async function POST(req: NextRequest) {
         salonName: tenant.name,
         clientName: client_name,
         clientEmail: client_email,
-        clientPhone: client_phone,
+        clientPhone: normalizedPhone,
         serviceName: service.name,
         staffName: staff.name,
-        bookedAt: new Date(booked_at),
+        bookedAt: bookingDate,
         durationMins: service.duration_mins,
         price: parseFloat(service.price),
         dashboardUrl: bookingDashboardUrl,
@@ -177,10 +192,10 @@ export async function POST(req: NextRequest) {
         salonName: tenant.name,
         clientName: client_name,
         clientEmail: client_email,
-        clientPhone: client_phone,
+        clientPhone: normalizedPhone,
         serviceName: service.name,
         staffName: staff.name,
-        bookedAt: new Date(booked_at),
+        bookedAt: bookingDate,
         durationMins: service.duration_mins,
         price: parseFloat(service.price),
         dashboardUrl: bookingDashboardUrl,

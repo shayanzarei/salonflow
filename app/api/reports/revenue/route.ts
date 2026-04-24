@@ -84,7 +84,12 @@ export async function GET() {
          WHERE b.tenant_id = $1
            AND b.booked_at::date = (NOW() AT TIME ZONE 'Europe/Amsterdam')::date
            AND b.status NOT IN ('cancelled')
-         ORDER BY b.booked_at ASC`,
+        ORDER BY
+          CASE
+            WHEN b.status IN ('completed', 'no_show', 'cancelled') THEN 1
+            ELSE 0
+          END ASC,
+          b.booked_at ASC`,
         [tenant.id]
       ),
     ]);

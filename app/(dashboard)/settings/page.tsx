@@ -5,11 +5,11 @@ import { notFound } from "next/navigation";
 export default async function SettingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ redirect_to?: string }>;
+  searchParams: Promise<{ redirect_to?: string; error?: string }>;
 }) {
   const tenant = await getTenant();
   if (!tenant) notFound();
-  const { redirect_to } = await searchParams;
+  const { redirect_to, error } = await searchParams;
   const redirectTo =
     redirect_to && redirect_to.startsWith("/") && !redirect_to.startsWith("//")
       ? redirect_to
@@ -37,6 +37,7 @@ export default async function SettingsPage({
           primary_color: tenant.primary_color ?? null,
         }}
         redirectTo={redirectTo}
+        errorCode={error}
       />
     </div>
   );

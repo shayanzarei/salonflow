@@ -1,12 +1,21 @@
 import { computeSlots } from "@/lib/availability";
-import { canAccessPublicWebsite, getTenant } from "@/lib/tenant";
+import { requireOwner } from "@/lib/require-owner";
+import { getTenant } from "@/lib/tenant";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+  const guard = await requireOwner();
+  if (guard.error) return guard.error;
+
+  const tenant = await getTenant();
+  if (!tenant) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(req.url);
   const serviceId = searchParams.get("serviceId");
   const staffId = searchParams.get("staffId");
-  const date = searchParams.get("date"); // YYYY-MM-DD
+  const date = searchParams.get("date");
 
   if (!serviceId || !staffId || !date) {
     return NextResponse.json(
@@ -15,20 +24,8 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Validate date format
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return NextResponse.json({ error: "Invalid date format" }, { status: 400 });
-  }
-
-  const tenant = await getTenant();
-  if (!tenant) {
-    return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
-  }
-  if (!canAccessPublicWebsite(tenant)) {
-    return NextResponse.json(
-      { error: "Booking website is not available" },
-      { status: 403 }
-    );
   }
 
   const slots = await computeSlots({

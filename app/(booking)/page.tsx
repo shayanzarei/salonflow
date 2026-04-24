@@ -9,13 +9,14 @@ import { ClockIcon, FacebookIcon, InstagramIcon, MapPinIcon, TikTokIcon, Youtube
 import { computeSlots } from "@/lib/availability";
 import pool from "@/lib/db";
 import { bookableServiceSql } from "@/lib/services/bookable";
+import { getGoogleMapsSearchUrl } from "@/lib/maps";
 import { getTenant } from "@/lib/tenant";
 import { normalizeWebsiteTemplate } from "@/lib/website-templates";
 import { isMainSiteHost } from "@/lib/main-site";
 import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 async function getSectionFlags(tenantId: string) {
   const result = await pool.query(
@@ -124,7 +125,7 @@ export default async function BookingHomePage({
 
   const qp = await searchParams;
   const tenant = await getTenant();
-  if (!tenant) redirect("/login");
+  if (!tenant) notFound();
 
   const [servicesResult, staffResult, reviewsResult, galleryResult, reviewStatsResult, clientStatsResult, sections] =
     await Promise.all([
@@ -751,7 +752,10 @@ export default async function BookingHomePage({
               <div className="mt-8 flex flex-col items-center gap-4 text-center sm:mt-10 md:flex-row md:justify-center md:gap-10">
                 {tenant.address && (
                   <p className="flex items-center gap-1.5 max-w-md text-sm text-gray-500 md:text-left">
-                    <MapPinIcon size={14} /> {tenant.address}
+                    <MapPinIcon size={14} />{" "}
+                    <a href={getGoogleMapsSearchUrl(tenant.address)} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                      {tenant.address}
+                    </a>
                   </p>
                 )}
                 {tenant.hours && (
@@ -854,7 +858,10 @@ export default async function BookingHomePage({
               <h4 className="mb-4 text-sm font-semibold text-white">Contact</h4>
               {tenant.address && (
                 <p className="mb-2.5 flex items-center gap-1.5 text-sm text-gray-500">
-                  <MapPinIcon size={13} /> {tenant.address}
+                  <MapPinIcon size={13} />{" "}
+                  <a href={getGoogleMapsSearchUrl(tenant.address)} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    {tenant.address}
+                  </a>
                 </p>
               )}
               {tenant.hours && (

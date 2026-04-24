@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import { createNotification } from "@/lib/notifications";
+import { bookableServiceSql } from "@/lib/services/bookable";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -14,6 +15,44 @@ export async function POST(req: NextRequest) {
     const status = formData.get("status") as string;
 
     const booked_at = new Date(`${date}T${time}`);
+    if (Number.isNaN(booked_at.getTime()) || booked_at.getTime() <= Date.now()) {
+      return NextResponse.json(
+        { error: "Booking time must be in the future." },
+        { status: 400 }
+      );
+    }
+
+    const [serviceResult, staffResult] = await Promise.all([
+      pool.query(
+        `SELECT * FROM services WHERE id = $1 AND tenant_id = $2 AND ${bookableServiceSql()}`,
+        [service_id, tenant_id]
+      ),
+      pool.query(`SELECT * FROM staff WHERE id = $1 AND tenant_id = $2`, [staff_id, tenant_id]),
+    ]);
+    const service = serviceResult.rows[0];
+    const staff = staffResult.rows[0];
+    if (!service || !staff) {
+      return NextResponse.json({ error: "Invalid booking selection" }, { status: 400 });
+    }
+
+    const conflictResult = await pool.query(
+      `SELECT b.id
+       FROM bookings b
+       JOIN services s ON b.service_id = s.id
+       WHERE b.staff_id = $1
+         AND b.id <> $2
+         AND b.status IN ('confirmed', 'pending')
+         AND b.booked_at < ($3::timestamptz + ($4::int || ' minutes')::interval)
+         AND (b.booked_at + (s.duration_mins || ' minutes')::interval) > $3::timestamptz
+       LIMIT 1`,
+      [staff_id, booking_id, booked_at.toISOString(), service.duration_mins]
+    );
+    if (conflictResult.rows.length > 0) {
+      return NextResponse.json(
+        { error: "This staff member is already booked at that time." },
+        { status: 409 }
+      );
+    }
 
     await pool.query(
       `UPDATE bookings
@@ -51,7 +90,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.redirect(new URL(`/bookings/${booking_id}`, req.url));
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error("Unknown error");
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

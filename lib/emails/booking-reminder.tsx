@@ -60,6 +60,10 @@ export function bookingReminderEmail({
     const safeServiceName = serviceName.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     const safeStaffName = staffName.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     const safeSalonAddress = salonAddress ? salonAddress.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;") : null;
+    const mapsUrl = salonAddress
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(salonAddress)}`
+        : null;
+    const safeMapsUrl = mapsUrl ? mapsUrl.replaceAll("&", "&amp;").replaceAll('"', "&quot;") : null;
     const safeCancelUrl = cancelUrl.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
     const safeReminderText = reminderText.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 
@@ -184,6 +188,11 @@ export function bookingReminderEmail({
                 <td style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px;">
                   <span style="display:block;font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.07em;font-family:Inter,Arial,Helvetica,sans-serif;margin-bottom:4px;">&#128205;&nbsp; Location</span>
                   <span style="font-size:14px;color:#0F172A;font-family:Inter,Arial,Helvetica,sans-serif;">${safeSalonAddress}</span>
+                  ${
+                    safeMapsUrl
+                      ? `<br /><a href="${safeMapsUrl}" style="font-size:13px;color:#0EA5B7;text-decoration:none;font-family:Inter,Arial,Helvetica,sans-serif;">Get directions</a>`
+                      : ""
+                  }
                 </td>
               </tr>
             </table>

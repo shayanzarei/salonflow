@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SoloHub Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --ink-0:#FFFFFF; --ink-50:#FAFAF9; --ink-100:#F5F5F4; --ink-200:#E7E5E4;
+  --ink-300:#D6D3D1; --ink-400:#A8A29E; --ink-500:#78716C; --ink-700:#44403C;
+  --ink-900:#1C1917; --ink-950:#0C0A09;
+  --brand-50:#F5F3FF; --brand-100:#EDE9FE; --brand-200:#DDD6FE;
+  --brand-500:#8B5CF6; --brand-600:#7C3AED; --brand-700:#6D28D9; --brand-900:#4C1D95;
+  --brand-contrast:#FFFFFF;
+  --accent-500:#11C4B6; --accent-600:#0EA5B7;
+  --success-50:#ECFDF5; --success-600:#059669; --success-700:#047857;
+  --warning-50:#FFFBEB; --warning-600:#D97706; --warning-700:#B45309;
+  --danger-50:#FEF2F2;  --danger-600:#DC2626;  --danger-700:#B91C1C;
+  --info-50:#EFF6FF;    --info-600:#2563EB;
+
+  --radius-sm:6px; --radius-md:10px; --radius-lg:14px; --radius-xl:20px; --radius-full:9999px;
+  --shadow-xs:0 1px 2px rgba(28,25,23,.04);
+  --shadow-sm:0 1px 3px rgba(28,25,23,.06),0 1px 2px rgba(28,25,23,.04);
+  --shadow-md:0 4px 12px rgba(28,25,23,.08);
+  --shadow-lg:0 12px 32px rgba(28,25,23,.10);
+  --shadow-xl:0 24px 48px rgba(28,25,23,.14);
+  --shadow-focus:0 0 0 3px var(--brand-100);
+
+  --dur-fast:150ms; --dur-base:200ms; --dur-slow:300ms;
+  --ease:cubic-bezier(.2,0,0,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  background:var(--ink-50); color:var(--ink-900);
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'Geist Mono',ui-monospace,Menlo,monospace}
+a{color:var(--brand-600)}
+code{font-family:'Geist Mono',monospace;font-size:.85em;background:var(--ink-100);padding:2px 6px;border-radius:4px;color:var(--ink-700)}
+
+/* Layout */
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media (max-width:900px){.shell{grid-template-columns:1fr}.sidebar{display:none}}
+
+.sidebar{
+  position:sticky;top:0;align-self:start;height:100vh;overflow:auto;
+  background:var(--ink-0);border-right:1px solid var(--ink-200);
+  padding:24px 16px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 20px;border-bottom:1px solid var(--ink-100);margin-bottom:16px}
+.brand-mark{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--brand-600),var(--brand-500));
+  display:grid;place-items:center;color:white;font-weight:700;font-size:14px;
+}
+.brand-name{font-weight:600;letter-spacing:-0.01em}
+.nav-group{margin-bottom:18px}
+.nav-eyebrow{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-500);font-weight:600;padding:0 8px 8px}
+.nav a{
+  display:block;padding:8px 12px;border-radius:var(--radius-sm);
+  color:var(--ink-700);text-decoration:none;font-size:14px;
+  transition:background var(--dur-fast) var(--ease);
+}
+.nav a:hover{background:var(--ink-100)}
+.nav a.active{background:var(--brand-50);color:var(--brand-700);font-weight:500}
+
+.main{padding:48px 48px 96px;max-width:1100px;width:100%}
+@media (max-width:700px){.main{padding:32px 20px 64px}}
+
+/* Hero */
+.hero{
+  background:linear-gradient(135deg,var(--brand-600) 0%,var(--brand-900) 100%);
+  color:white;padding:48px 40px;border-radius:var(--radius-xl);
+  margin-bottom:48px;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;top:-40%;right:-10%;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 70%);
+}
+.hero .eyebrow{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;opacity:.8;font-weight:600;margin-bottom:12px}
+.hero h1{font-size:48px;line-height:1.05;letter-spacing:-0.02em;font-weight:600;margin:0 0 12px;max-width:700px}
+.hero p{opacity:.85;max-width:600px;margin:0;font-size:17px;line-height:1.5}
+.hero .meta{margin-top:24px;display:flex;gap:16px;flex-wrap:wrap;font-size:13px;opacity:.8}
+.hero .meta span{padding:4px 10px;border:1px solid rgba(255,255,255,.25);border-radius:var(--radius-full)}
+
+/* Sections */
+section{margin-bottom:72px;scroll-margin-top:24px}
+.section-eyebrow{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--brand-600);font-weight:600;margin-bottom:8px}
+h2.section-title{font-size:32px;line-height:1.15;letter-spacing:-0.015em;font-weight:600;margin:0 0 8px}
+.section-lede{color:var(--ink-500);max-width:640px;margin:0 0 32px;font-size:16px;line-height:1.55}
+
+h3.sub{font-size:20px;line-height:1.3;font-weight:600;margin:40px 0 16px;letter-spacing:-0.005em}
+h4.minor{font-size:14px;font-weight:600;margin:24px 0 12px;color:var(--ink-700);text-transform:uppercase;letter-spacing:0.06em}
+
+.card{
+  background:var(--ink-0);border:1px solid var(--ink-200);
+  border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);
+}
+
+/* Color grid */
+.swatch-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.swatch{background:var(--ink-0);border:1px solid var(--ink-200);border-radius:var(--radius-md);overflow:hidden}
+.swatch-color{height:68px;border-bottom:1px solid var(--ink-100)}
+.swatch-meta{padding:10px 12px}
+.swatch-name{font-size:13px;font-weight:500;color:var(--ink-900)}
+.swatch-hex{font-family:'Geist Mono',monospace;font-size:11px;color:var(--ink-500);margin-top:2px}
+
+/* Type specimens */
+.type-row{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:16px 0;border-bottom:1px solid var(--ink-100);align-items:baseline}
+.type-row:last-child{border-bottom:none}
+.type-meta{font-size:12px;color:var(--ink-500)}
+.type-meta strong{color:var(--ink-900);font-weight:500;display:block;margin-bottom:2px}
+
+/* Spacing */
+.space-row{display:flex;align-items:center;gap:16px;padding:8px 0}
+.space-row .label{width:80px;font-size:13px;color:var(--ink-500)}
+.space-row .value{width:60px;font-family:'Geist Mono',monospace;font-size:12px;color:var(--ink-700)}
+.space-row .bar{height:12px;background:var(--brand-200);border-radius:2px}
+
+/* Radius */
+.radius-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:16px}
+.radius-sample{
+  aspect-ratio:1;background:linear-gradient(135deg,var(--brand-100),var(--brand-50));
+  border:1px solid var(--brand-200);display:grid;place-items:end;padding:10px;
+}
+.radius-sample .tag{font-size:11px;color:var(--brand-700);font-weight:500}
+.radius-caption{text-align:center;font-size:11px;color:var(--ink-500);margin-top:6px;font-family:'Geist Mono',monospace}
+
+/* Shadow */
+.shadow-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:20px}
+.shadow-sample{
+  height:100px;background:var(--ink-0);border-radius:var(--radius-lg);
+  display:grid;place-items:center;font-size:13px;color:var(--ink-700);font-weight:500;
+}
+.shadow-caption{font-size:11px;color:var(--ink-500);margin-top:8px;font-family:'Geist Mono',monospace}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:inherit;font-weight:500;cursor:pointer;
+  transition:all var(--dur-base) var(--ease);
+  border:1px solid transparent;user-select:none;
+}
+.btn-sm{height:32px;padding:0 12px;font-size:13px;border-radius:var(--radius-sm)}
+.btn-md{height:40px;padding:0 16px;font-size:14px;border-radius:var(--radius-md)}
+.btn-lg{height:48px;padding:0 20px;font-size:15px;border-radius:var(--radius-md)}
+.btn-xl{height:56px;padding:0 28px;font-size:16px;font-weight:600;border-radius:var(--radius-full)}
+
+.btn-primary{background:var(--brand-600);color:white}
+.btn-primary:hover{background:var(--brand-700)}
+.btn-primary:active{background:var(--brand-900);transform:scale(.98)}
+.btn-primary:focus-visible{outline:none;box-shadow:var(--shadow-focus)}
+
+.btn-secondary{background:var(--ink-0);color:var(--ink-900);border-color:var(--ink-200)}
+.btn-secondary:hover{background:var(--ink-100)}
+.btn-secondary:active{background:var(--ink-200)}
+.btn-secondary:focus-visible{outline:none;box-shadow:var(--shadow-focus)}
+
+.btn-ghost{background:transparent;color:var(--ink-700)}
+.btn-ghost:hover{background:var(--ink-100)}
+
+.btn-danger{background:var(--danger-600);color:white}
+.btn-danger:hover{background:var(--danger-700)}
+
+.btn-link{background:transparent;color:var(--brand-600);padding:0;height:auto}
+.btn-link:hover{text-decoration:underline}
+
+.btn[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none}
+.btn-primary[disabled]{background:var(--brand-200)}
+
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:12px 0}
+
+/* Inputs */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;max-width:360px}
+.field label{font-size:13px;font-weight:500;color:var(--ink-700)}
+.field .helper{font-size:12px;color:var(--ink-500)}
+.field .error{font-size:12px;color:var(--danger-600)}
+.input{
+  height:40px;padding:0 12px;font:inherit;font-size:14px;color:var(--ink-900);
+  background:var(--ink-0);border:1px solid var(--ink-200);border-radius:var(--radius-sm);
+  transition:border-color var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease);
+  width:100%;
+}
+.input::placeholder{color:var(--ink-400)}
+.input:hover{border-color:var(--ink-300)}
+.input:focus{outline:none;border-color:var(--brand-600);box-shadow:var(--shadow-focus)}
+.input.error{border-color:var(--danger-600)}
+.input.error:focus{box-shadow:0 0 0 3px var(--danger-50)}
+.input[disabled]{background:var(--ink-100);color:var(--ink-400);cursor:not-allowed}
+textarea.input{height:auto;min-height:96px;padding:10px 12px;line-height:1.5;resize:vertical}
+
+/* Badges */
+.badge{
+  display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;
+  border-radius:var(--radius-full);font-size:12px;font-weight:600;
+}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge-neutral{background:var(--ink-100);color:var(--ink-700)}
+.badge-info{background:var(--info-50);color:var(--info-600)}
+.badge-success{background:var(--success-50);color:var(--success-700)}
+.badge-warning{background:var(--warning-50);color:var(--warning-700)}
+.badge-danger{background:var(--danger-50);color:var(--danger-700)}
+.badge-brand{background:var(--brand-50);color:var(--brand-700)}
+
+/* Avatar */
+.avatar{display:inline-grid;place-items:center;border-radius:50%;background:var(--brand-50);color:var(--brand-700);font-weight:600;overflow:hidden}
+.avatar-xs{width:24px;height:24px;font-size:10px}
+.avatar-sm{width:32px;height:32px;font-size:12px}
+.avatar-md{width:40px;height:40px;font-size:14px}
+.avatar-lg{width:56px;height:56px;font-size:18px}
+.avatar-xl{width:96px;height:96px;font-size:32px}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;background:var(--ink-0);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--ink-200)}
+.tbl thead th{
+  text-align:left;padding:12px 16px;font-size:11px;font-weight:600;
+  color:var(--ink-500);letter-spacing:.08em;text-transform:uppercase;
+  border-bottom:1px solid var(--ink-200);background:var(--ink-50);
+}
+.tbl tbody td{padding:14px 16px;font-size:14px;color:var(--ink-900);border-bottom:1px solid var(--ink-100)}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover{background:var(--ink-50)}
+.tbl tbody tr.selected{background:var(--brand-50)}
+
+/* Booking stepper */
+.stepper{display:flex;align-items:center;gap:0;max-width:560px;margin:24px 0}
+.step{display:flex;align-items:center;flex:1;gap:10px;font-size:13px;color:var(--ink-500)}
+.step:last-child{flex:0}
+.step-dot{
+  width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  font-size:12px;font-weight:600;border:2px solid var(--ink-200);background:var(--ink-0);color:var(--ink-500);
+  flex:none;
+}
+.step.current .step-dot{border-color:var(--brand-600);color:var(--brand-600)}
+.step.done .step-dot{background:var(--brand-600);border-color:var(--brand-600);color:white}
+.step.current{color:var(--ink-900);font-weight:500}
+.step.done{color:var(--ink-700)}
+.step-line{flex:1;height:2px;background:var(--ink-200);margin:0 4px}
+.step.done + .step .step-line,
+.step.done .step-line{background:var(--brand-600)}
+
+/* Time slots */
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;max-width:520px}
+.slot{
+  height:44px;display:grid;place-items:center;border-radius:var(--radius-md);
+  background:var(--ink-0);border:1px solid var(--ink-200);font-size:14px;
+  cursor:pointer;transition:all var(--dur-fast) var(--ease);
+}
+.slot:hover{border-color:var(--brand-300,var(--brand-500))}
+.slot.selected{background:var(--brand-600);color:white;border-color:var(--brand-600)}
+.slot[disabled]{color:var(--ink-400);background:var(--ink-50);cursor:not-allowed}
+
+/* Preview tiles */
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.preview{
+  background:var(--ink-0);border:1px solid var(--ink-200);border-radius:var(--radius-lg);
+  padding:20px;transition:all var(--dur-base) var(--ease);
+}
+.preview:hover{box-shadow:var(--shadow-md)}
+.preview-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-500);font-weight:600;margin-bottom:10px}
+.preview-title{font-size:18px;font-weight:600;margin:0 0 6px;letter-spacing:-0.005em}
+.preview-body{color:var(--ink-500);font-size:14px;margin:0 0 16px;line-height:1.5}
+
+/* Sidebar sim */
+.sim{background:var(--ink-50);border:1px solid var(--ink-200);border-radius:var(--radius-lg);padding:16px;display:flex;gap:12px;font-size:13px}
+.sim-side{width:140px;background:var(--ink-0);border-radius:var(--radius-md);padding:12px;border:1px solid var(--ink-100)}
+.sim-side .item{padding:8px 10px;border-radius:var(--radius-sm);color:var(--ink-700);margin-bottom:2px}
+.sim-side .item.active{background:var(--brand-50);color:var(--brand-700);font-weight:500;position:relative}
+.sim-side .item.active::before{content:"";position:absolute;left:-16px;top:8px;bottom:8px;width:3px;background:var(--brand-600);border-radius:0 2px 2px 0}
+.sim-main{flex:1;background:var(--ink-0);border-radius:var(--radius-md);padding:16px;border:1px solid var(--ink-100)}
+
+/* Principle cards */
+.principles{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.principle{padding:20px;background:var(--ink-0);border:1px solid var(--ink-200);border-radius:var(--radius-lg)}
+.principle-num{font-family:'Geist Mono',monospace;font-size:11px;color:var(--brand-600);font-weight:600;margin-bottom:8px}
+.principle h4{margin:0 0 6px;font-size:16px;font-weight:600;letter-spacing:-0.005em}
+.principle p{margin:0;font-size:13px;color:var(--ink-500);line-height:1.5}
+
+/* Do/Don't */
+.dodont{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+@media (max-width:700px){.dodont{grid-template-columns:1fr}}
+.do,.dont{padding:16px;border-radius:var(--radius-md);border:1px solid}
+.do{background:var(--success-50);border-color:#BBF7D0}
+.dont{background:var(--danger-50);border-color:#FECACA}
+.do h5,.dont h5{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.do h5{color:var(--success-700)}
+.dont h5{color:var(--danger-700)}
+.do ul,.dont ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink-700)}
+
+/* Callouts */
+.callout{
+  padding:14px 16px;border-radius:var(--radius-md);background:var(--brand-50);
+  border-left:3px solid var(--brand-600);font-size:14px;color:var(--ink-700);margin:16px 0;
+}
+.callout strong{color:var(--ink-900)}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="brand-name">SoloHub</div>
+        <div style="font-size:11px;color:var(--ink-500)">Design System v1.0</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group">
+        <div class="nav-eyebrow">Foundations</div>
+        <a href="#principles">Principles</a>
+        <a href="#color">Color</a>
+        <a href="#typography">Typography</a>
+        <a href="#spacing">Spacing</a>
+        <a href="#radius">Radius</a>
+        <a href="#elevation">Elevation</a>
+        <a href="#motion">Motion</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-eyebrow">Components</div>
+        <a href="#buttons">Buttons</a>
+        <a href="#inputs">Inputs</a>
+        <a href="#badges">Badges & Status</a>
+        <a href="#avatars">Avatars</a>
+        <a href="#cards">Cards</a>
+        <a href="#tables">Tables</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-eyebrow">Product Patterns</div>
+        <a href="#booking">Booking flow</a>
+        <a href="#sidebar-nav">Dashboard nav</a>
+        <a href="#branding">Tenant branding</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-eyebrow">Meta</div>
+        <a href="#audit">Current audit</a>
+        <a href="#implementation">Implementation</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <div class="hero">
+      <div class="eyebrow">Design system · v1.0</div>
+      <h1>A calm, composable system for SoloHub.</h1>
+      <p>Modern, minimal, and built for multi-tenant salons. One set of tokens, four surfaces, every tenant's brand on top.</p>
+      <div class="meta">
+        <span>Next.js 16 · Tailwind v4</span>
+        <span>Geist Sans</span>
+        <span>WCAG AA</span>
+      </div>
+    </div>
+
+    <!-- PRINCIPLES -->
+    <section id="principles">
+      <div class="section-eyebrow">Foundations</div>
+      <h2 class="section-title">Principles</h2>
+      <p class="section-lede">Six rules that shape every decision in the system. When tokens and components conflict, principles win.</p>
+      <div class="principles">
+        <div class="principle"><div class="principle-num">01</div><h4>Calm by default</h4><p>Salons are sensory businesses. The product UI should feel quiet so the owner's brand can be loud.</p></div>
+        <div class="principle"><div class="principle-num">02</div><h4>Content over chrome</h4><p>Minimal borders, generous whitespace, soft surfaces. No decorative noise.</p></div>
+        <div class="principle"><div class="principle-num">03</div><h4>One brand, many tenants</h4><p>Each tenant overrides a single primary color. Everything else stays neutral so branding reads intentional.</p></div>
+        <div class="principle"><div class="principle-num">04</div><h4>Accessible at rest</h4><p>WCAG AA contrast, full keyboard paths, 44px touch targets — designed first, not retrofitted.</p></div>
+        <div class="principle"><div class="principle-num">05</div><h4>Composable, not rigid</h4><p>Tokens into primitives, primitives into patterns. No one-off components.</p></div>
+        <div class="principle"><div class="principle-num">06</div><h4>Minimum viable motion</h4><p>Motion confirms, never decorates. 150–250ms, soft easing, always respects reduced-motion.</p></div>
+      </div>
+    </section>
+
+    <!-- COLOR -->
+    <section id="color">
+      <div class="section-eyebrow">Foundations</div>
+      <h2 class="section-title">Color</h2>
+      <p class="section-lede">Four layers: neutrals for surfaces, brand for tenant identity, accent for SoloHub marketing, semantic for meaning.</p>
+
+      <h3 class="sub">Neutrals — Stone</h3>
+      <p style="color:var(--ink-500);margin-top:-8px">Warmer than slate. Pairs better with salon imagery.</p>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-color" style="background:#FFFFFF;border-bottom:1px solid var(--ink-200)"></div><div class="swatch-meta"><div class="swatch-name">ink-0</div><div class="swatch-hex">#FFFFFF</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#FAFAF9"></div><div class="swatch-meta"><div class="swatch-name">ink-50</div><div class="swatch-hex">#FAFAF9</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F5F5F4"></div><div class="swatch-meta"><div class="swatch-name">ink-100</div><div class="swatch-hex">#F5F5F4</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#E7E5E4"></div><div class="swatch-meta"><div class="swatch-name">ink-200</div><div class="swatch-hex">#E7E5E4</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#D6D3D1"></div><div class="swatch-meta"><div class="swatch-name">ink-300</div><div class="swatch-hex">#D6D3D1</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#A8A29E"></div><div class="swatch-meta"><div class="swatch-name">ink-400</div><div class="swatch-hex">#A8A29E</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#78716C"></div><div class="swatch-meta"><div class="swatch-name">ink-500</div><div class="swatch-hex">#78716C</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#44403C"></div><div class="swatch-meta"><div class="swatch-name">ink-700</div><div class="swatch-hex">#44403C</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#1C1917"></div><div class="swatch-meta"><div class="swatch-name">ink-900</div><div class="swatch-hex">#1C1917</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#0C0A09"></div><div class="swatch-meta"><div class="swatch-name">ink-950</div><div class="swatch-hex">#0C0A09</div></div></div>
+      </div>
+
+      <h3 class="sub">Brand — Violet (tenant default)</h3>
+      <p style="color:var(--ink-500);margin-top:-8px">Overridden per tenant at runtime via <code>primary_color</code>. Stops 50/100/200/700/900 are derived from the 600 automatically.</p>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-color" style="background:#F5F3FF"></div><div class="swatch-meta"><div class="swatch-name">brand-50</div><div class="swatch-hex">#F5F3FF</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#EDE9FE"></div><div class="swatch-meta"><div class="swatch-name">brand-100</div><div class="swatch-hex">#EDE9FE</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#DDD6FE"></div><div class="swatch-meta"><div class="swatch-name">brand-200</div><div class="swatch-hex">#DDD6FE</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#8B5CF6"></div><div class="swatch-meta"><div class="swatch-name">brand-500</div><div class="swatch-hex">#8B5CF6</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#7C3AED"></div><div class="swatch-meta"><div class="swatch-name" style="color:white;background:var(--brand-600);padding:2px 6px;border-radius:4px;display:inline-block">brand-600 · default</div><div class="swatch-hex">#7C3AED</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#6D28D9"></div><div class="swatch-meta"><div class="swatch-name">brand-700</div><div class="swatch-hex">#6D28D9</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#4C1D95"></div><div class="swatch-meta"><div class="swatch-name">brand-900</div><div class="swatch-hex">#4C1D95</div></div></div>
+      </div>
+
+      <h3 class="sub">Accent — Teal (SoloHub marketing only)</h3>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-color" style="background:#11C4B6"></div><div class="swatch-meta"><div class="swatch-name">accent-500</div><div class="swatch-hex">#11C4B6</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#0EA5B7"></div><div class="swatch-meta"><div class="swatch-name">accent-600</div><div class="swatch-hex">#0EA5B7</div></div></div>
+      </div>
+      <div class="callout"><strong>Rule:</strong> never apply the teal accent inside a tenant's own surfaces (their booking page, their dashboard). It belongs to SoloHub's marketing identity.</div>
+
+      <h3 class="sub">Semantic</h3>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-color" style="background:#ECFDF5"></div><div class="swatch-meta"><div class="swatch-name">success-50</div><div class="swatch-hex">#ECFDF5</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#059669"></div><div class="swatch-meta"><div class="swatch-name">success-600</div><div class="swatch-hex">#059669</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#FFFBEB"></div><div class="swatch-meta"><div class="swatch-name">warning-50</div><div class="swatch-hex">#FFFBEB</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#D97706"></div><div class="swatch-meta"><div class="swatch-name">warning-600</div><div class="swatch-hex">#D97706</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#FEF2F2"></div><div class="swatch-meta"><div class="swatch-name">danger-50</div><div class="swatch-hex">#FEF2F2</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#DC2626"></div><div class="swatch-meta"><div class="swatch-name">danger-600</div><div class="swatch-hex">#DC2626</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#EFF6FF"></div><div class="swatch-meta"><div class="swatch-name">info-50</div><div class="swatch-hex">#EFF6FF</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#2563EB"></div><div class="swatch-meta"><div class="swatch-name">info-600</div><div class="swatch-hex">#2563EB</div></div></div>
+      </div>
+    </section>
+
+    <!-- TYPOGRAPHY -->
+    <section id="typography">
+      <div class="section-eyebrow">Foundations</div>
+      <h2 class="section-title">Typography</h2>
+      <p class="section-lede">Geist Sans for UI, Geist Mono for times, prices, and tabular data. A 10-step scale based on a 1.125 ratio, tuned for dense product UI.</p>
+
+      <div class="type-row"><div class="type-meta"><strong>text-display</strong>48 / 1.05 / -0.02em · 600</div><div style="font-size:48px;line-height:1.05;letter-spacing:-0.02em;font-weight:600">Book your visit</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-h1</strong>32 / 1.15 / -0.015em · 600</div><div style="font-size:32px;line-height:1.15;letter-spacing:-0.015em;font-weight:600">Today's schedule</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-h2</strong>24 / 1.2 / -0.01em · 600</div><div style="font-size:24px;line-height:1.2;letter-spacing:-0.01em;font-weight:600">Upcoming appointments</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-h3</strong>20 / 1.3 · 600</div><div style="font-size:20px;line-height:1.3;font-weight:600">Staff availability</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-h4</strong>18 / 1.35 · 600</div><div style="font-size:18px;line-height:1.35;font-weight:600">Service options</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-body</strong>15 / 1.55 · 400 · default</div><div style="font-size:15px;line-height:1.55">Your client Ana just booked a 45-minute balayage with Sofia on Friday at 2pm.</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-body-sm</strong>14 / 1.5 · 400</div><div style="font-size:14px;line-height:1.5">Secondary body copy, table cells, captions under cards.</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-label</strong>13 / 1.4 · 500</div><div style="font-size:13px;line-height:1.4;font-weight:500">Service name</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-caption</strong>12 / 1.4 · 400</div><div style="font-size:12px;line-height:1.4;color:var(--ink-500)">Last edited 2 hours ago</div></div>
+      <div class="type-row"><div class="type-meta"><strong>text-overline</strong>11 / 1.3 / .08em · 600 · UPPER</div><div style="font-size:11px;line-height:1.3;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;color:var(--ink-500)">This week</div></div>
+    </section>
+
+    <!-- SPACING -->
+    <section id="spacing">
+      <div class="section-eyebrow">Foundations</div>
+      <h2 class="section-title">Spacing</h2>
+      <p class="section-lede">A strict 4pt grid. Never use arbitrary values.</p>
+      <div class="card">
+        <div class="space-row"><div class="label">space-1</div><div class="value">4px</div><div class="bar" style="width:4px"></div></div>
+        <div class="space-row"><div class="label">space-2</div><div class="value">8px</div><div class="bar" style="width:8px"></div></div>
+        <div class="space-row"><div class="label">space-3</div><div class="value">12px</div><div class="bar" style="width:12px"></div></div>
+        <div class="space-row"><div class="label">space-4</div><div class="value">16px</div><div class="bar" style="width:16px"></div></div>
+        <div class="space-row"><div class="label">space-5</div><div class="value">20px</div><div class="bar" style="width:20px"></div></div>
+        <div class="space-row"><div class="label">space-6</div><div class="value">24px</div><div class="bar" style="width:24px"></div></div>
+        <div class="space-row"><div class="label">space-8</div><div class="value">32px</div><div class="bar" style="width:32px"></div></div>
+        <div class="space-row"><div class="label">space-10</div><div class="value">40px</div><div class="bar" style="width:40px"></div></div>
+        <div class="space-row"><div class="label">space-12</div><div class="value">48px</div><div class="bar" style="width:48px"></div></div>
+        <div class="space-row"><div class="label">space-16</div><div class="value">64px</div><div class="bar" style="width:64px"></div></div>
+        <div class="space-row"><div class="label">space-20</div><div class="value">80px</div><div class="bar" style="width:80px"></div></div>
+        <div class="space-row"><div class="label">space-24</div><div class="value">96px</div><div class="bar" style="width:96px"></div></div>
+      </div>
+    </section>
+
+    <!-- RADIUS -->
+    <section id="radius">
+      <div class="section-eyebrow">Foundations</div>
+      <h2 class="section-title">Radius</h2>
+      <p class="section-lede">Two-tier: round things fully or softly. Avoid mid-range values.</p>
+      <div class="radius-grid">
+        <div><div class="radius-sample" style="border-radius:0"><span class="tag">0</span></div><div class="radius-caption">none</div></div>
+        <div><div class="radius-sample" style="border-radius:6px"><span class="tag">6</span></div><div class="radius-caption">sm · inputs</div></div>
+        <div><div class="radius-sample" style="border-radius:10px"><span class="tag">10</span></div><div class="radius-caption">md · buttons</div></div>
+        <div><div class="radius-sample" style="border-radius:14px"><span class="tag">14</span></div><div class="radius-caption">lg · cards</div></div>
+        <div><div class="radius-sample" style="border-radius:20px"><span class="tag">20</span></div><div class="radius-caption">xl · hero</div></div>
+        <div><div class="radius-sample" style="border-radius:9999px"><span class="tag">full</span></div><div class="radius-caption">pills, avatars</div></div>
+      </div>
+    </section>
+
+    <!-- ELEVATION -->
+    <section id="elevation">
+      <div class="section-eyebrow">Foundations</div>
+      <h2 class="section-title">Elevation</h2>
+      <p class="section-lede">Soft, warm-neutral shadows. Never sharp, never tinted.</p>
+      <div class="shadow-grid">
+        <div><div class="shadow-sample" style="box-shadow:var(--shadow-xs);border:1px solid var(--ink-100)">xs</div><div class="shadow-caption">shadow-xs</div></div>
+        <div><div class="shadow-sample" style="box-shadow:var(--shadow-sm)">sm</div><div class="shadow-caption">shadow-sm · cards</div></div>
+        <div><div class="shadow-sample" style="box-shadow:var(--shadow-md)">md</div><div class="shadow-caption">shadow-md · popovers</div></div>
+        <div><div class="shadow-sample" style="box-shadow:var(--shadow-lg)">lg</div><div class="shadow-caption">shadow-lg · dropdowns</div></div>
+        <div><div class="shadow-sample" style="box-shadow:var(--shadow-xl)">xl</div><div class="shadow-caption">shadow-xl · modals</div></div>
+      </div>
+    </section>
+
+    <!-- MOTION -->
+    <section id="motion">
+      <div class="section-eyebrow">Foundations</div>
+      <h2 class="section-title">Motion</h2>
+      <p class="section-lede">Motion confirms an action, never decorates. Short durations with a standard ease. Always respects <code>prefers-reduced-motion</code>.</p>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px">
+          <div><h4 class="minor" style="margin-top:0">instant · 80ms</h4><p style="margin:0;color:var(--ink-500);font-size:13px">Pressed states</p></div>
+          <div><h4 class="minor" style="margin-top:0">fast · 150ms</h4><p style="margin:0;color:var(--ink-500);font-size:13px">Hover, tooltips</p></div>
+          <div><h4 class="minor" style="margin-top:0">base · 200ms</h4><p style="margin:0;color:var(--ink-500);font-size:13px">Default — most UI</p></div>
+          <div><h4 class="minor" style="margin-top:0">slow · 300ms</h4><p style="margin:0;color:var(--ink-500);font-size:13px">Modal / drawer enter</p></div>
+          <div><h4 class="minor" style="margin-top:0">slower · 500ms</h4><p style="margin:0;color:var(--ink-500);font-size:13px">Success confirmations</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUTTONS -->
+    <section id="buttons">
+      <div class="section-eyebrow">Components</div>
+      <h2 class="section-title">Buttons</h2>
+      <p class="section-lede">One primary per screen. Secondary for supporting actions. Ghost for tertiary. Use the XL pill only on marketing surfaces.</p>
+
+      <h4 class="minor">Variants</h4>
+      <div class="row">
+        <button class="btn btn-md btn-primary">Save changes</button>
+        <button class="btn btn-md btn-secondary">Cancel</button>
+        <button class="btn btn-md btn-ghost">More options</button>
+        <button class="btn btn-md btn-danger">Delete booking</button>
+        <a class="btn btn-link" href="#">View details →</a>
+      </div>
+
+      <h4 class="minor">Sizes</h4>
+      <div class="row">
+        <button class="btn btn-sm btn-primary">Small</button>
+        <button class="btn btn-md btn-primary">Medium</button>
+        <button class="btn btn-lg btn-primary">Large</button>
+        <button class="btn btn-xl btn-primary">Extra large (marketing)</button>
+      </div>
+
+      <h4 class="minor">States</h4>
+      <div class="row">
+        <button class="btn btn-md btn-primary">Default</button>
+        <button class="btn btn-md btn-primary" style="background:var(--brand-700)">Hover</button>
+        <button class="btn btn-md btn-primary" style="background:var(--brand-900);transform:scale(.98)">Active</button>
+        <button class="btn btn-md btn-primary" style="box-shadow:var(--shadow-focus)">Focus</button>
+        <button class="btn btn-md btn-primary" disabled>Disabled</button>
+      </div>
+
+      <div class="dodont">
+        <div class="do"><h5>✓ Do</h5><ul><li>Use one primary per screen</li><li>Sentence case: "Save changes"</li><li>Keep labels ≤ 3 words</li><li>Use XL pill only on marketing</li></ul></div>
+        <div class="dont"><h5>✗ Don't</h5><ul><li>Chain two primaries side by side</li><li>UPPERCASE button labels</li><li>"Submit" or "Click here"</li><li>XL pill inside the dashboard</li></ul></div>
+      </div>
+    </section>
+
+    <!-- INPUTS -->
+    <section id="inputs">
+      <div class="section-eyebrow">Components</div>
+      <h2 class="section-title">Inputs</h2>
+      <p class="section-lede">Labels above fields. Helper text below. Errors on blur or submit, never as alert dialogs.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px">
+        <div class="field">
+          <label>Service name</label>
+          <input class="input" placeholder="e.g. Classic manicure" />
+          <span class="helper">Shown to clients during booking.</span>
+        </div>
+        <div class="field">
+          <label>Email address</label>
+          <input class="input" type="email" value="anna@studio.com" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input class="input error" type="password" value="short" />
+          <span class="error">Must be at least 8 characters.</span>
+        </div>
+        <div class="field">
+          <label>Phone <span style="color:var(--ink-400);font-weight:400">(optional)</span></label>
+          <input class="input" placeholder="+31 6 1234 5678" disabled />
+        </div>
+        <div class="field" style="grid-column:1/-1;max-width:none">
+          <label>Appointment notes</label>
+          <textarea class="input" placeholder="Anything the stylist should know?"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- BADGES -->
+    <section id="badges">
+      <div class="section-eyebrow">Components</div>
+      <h2 class="section-title">Badges & status</h2>
+      <p class="section-lede">Pills for booking status, payment state, and metadata tags. Paired with a dot or icon — never color alone.</p>
+
+      <div class="row">
+        <span class="badge badge-neutral"><span class="badge-dot"></span>Draft</span>
+        <span class="badge badge-info"><span class="badge-dot"></span>Scheduled</span>
+        <span class="badge badge-success"><span class="badge-dot"></span>Confirmed</span>
+        <span class="badge badge-warning"><span class="badge-dot"></span>Pending</span>
+        <span class="badge badge-danger"><span class="badge-dot"></span>No-show</span>
+        <span class="badge badge-brand"><span class="badge-dot"></span>Completed</span>
+      </div>
+
+      <h4 class="minor">Booking status map</h4>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl" style="border:none;border-radius:0">
+          <thead><tr><th>Status</th><th>When</th><th>Visual</th></tr></thead>
+          <tbody>
+            <tr><td>Pending</td><td>Booked but not confirmed</td><td><span class="badge badge-warning"><span class="badge-dot"></span>Pending</span></td></tr>
+            <tr><td>Confirmed</td><td>Client confirmed the time</td><td><span class="badge badge-success"><span class="badge-dot"></span>Confirmed</span></td></tr>
+            <tr><td>Completed</td><td>Visit happened</td><td><span class="badge badge-brand"><span class="badge-dot"></span>Completed</span></td></tr>
+            <tr><td>Cancelled</td><td>Cancelled by client or owner</td><td><span class="badge badge-neutral"><span class="badge-dot"></span>Cancelled</span></td></tr>
+            <tr><td>No-show</td><td>Client didn't arrive</td><td><span class="badge badge-danger"><span class="badge-dot"></span>No-show</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- AVATARS -->
+    <section id="avatars">
+      <div class="section-eyebrow">Components</div>
+      <h2 class="section-title">Avatars</h2>
+      <p class="section-lede">Always circular. Fallback = initials on tinted brand background.</p>
+      <div class="row" style="align-items:end">
+        <div><div class="avatar avatar-xs">AM</div><div class="shadow-caption" style="text-align:center">xs · 24</div></div>
+        <div><div class="avatar avatar-sm">AM</div><div class="shadow-caption" style="text-align:center">sm · 32</div></div>
+        <div><div class="avatar avatar-md">AM</div><div class="shadow-caption" style="text-align:center">md · 40</div></div>
+        <div><div class="avatar avatar-lg">AM</div><div class="shadow-caption" style="text-align:center">lg · 56</div></div>
+        <div><div class="avatar avatar-xl">AM</div><div class="shadow-caption" style="text-align:center">xl · 96</div></div>
+      </div>
+    </section>
+
+    <!-- CARDS -->
+    <section id="cards">
+      <div class="section-eyebrow">Components</div>
+      <h2 class="section-title">Cards</h2>
+      <p class="section-lede">The foundational container. Use shadow or border, not both.</p>
+      <div class="preview-grid">
+        <div class="preview">
+          <div class="preview-label">Today</div>
+          <h3 class="preview-title">Sofia's schedule</h3>
+          <p class="preview-body">4 bookings · 3 confirmed, 1 pending. Next client at 14:00.</p>
+          <div class="row" style="margin:0"><span class="badge badge-success"><span class="badge-dot"></span>On track</span></div>
+        </div>
+        <div class="preview">
+          <div class="preview-label">Customer</div>
+          <h3 class="preview-title">Ana de Souza</h3>
+          <p class="preview-body">12 visits · Last visit 3 weeks ago · Prefers Sofia</p>
+          <button class="btn btn-sm btn-secondary">View profile</button>
+        </div>
+        <div class="preview">
+          <div class="preview-label">Service</div>
+          <h3 class="preview-title">Balayage · 90 min</h3>
+          <p class="preview-body">€120 · 2 staff qualified · Booked 14 times this month</p>
+          <button class="btn btn-sm btn-primary">Edit service</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLES -->
+    <section id="tables">
+      <div class="section-eyebrow">Components</div>
+      <h2 class="section-title">Tables</h2>
+      <p class="section-lede">Dense, data-first. Row hover instead of zebra stripes. Times and prices in Geist Mono with tabular numerals.</p>
+      <div style="overflow-x:auto">
+        <table class="tbl" style="min-width:640px">
+          <thead>
+            <tr><th>Client</th><th>Service</th><th>Staff</th><th>Time</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr class="selected">
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm">AS</div>Ana de Souza</div></td>
+              <td>Balayage · 90 min</td><td>Sofia</td>
+              <td class="mono" style="font-variant-numeric:tabular-nums">Today · 14:00</td>
+              <td><span class="badge badge-success"><span class="badge-dot"></span>Confirmed</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm">MV</div>Marco Visser</div></td>
+              <td>Haircut · 45 min</td><td>Noah</td>
+              <td class="mono" style="font-variant-numeric:tabular-nums">Today · 15:30</td>
+              <td><span class="badge badge-warning"><span class="badge-dot"></span>Pending</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm">LK</div>Lena Kowalski</div></td>
+              <td>Manicure · 30 min</td><td>Sofia</td>
+              <td class="mono" style="font-variant-numeric:tabular-nums">Today · 16:15</td>
+              <td><span class="badge badge-success"><span class="badge-dot"></span>Confirmed</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm">RB</div>Rui Batista</div></td>
+              <td>Beard trim · 20 min</td><td>Noah</td>
+              <td class="mono" style="font-variant-numeric:tabular-nums">Tomorrow · 09:00</td>
+              <td><span class="badge badge-neutral"><span class="badge-dot"></span>Cancelled</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--ink-500);font-size:13px;margin-top:12px">Selected row: 3px left accent in brand-600, subtle brand-50 background.</p>
+    </section>
+
+    <!-- BOOKING -->
+    <section id="booking">
+      <div class="section-eyebrow">Product pattern</div>
+      <h2 class="section-title">Booking flow</h2>
+      <p class="section-lede">The most critical customer-facing surface. Four steps, one primary CTA per step, progress always visible.</p>
+
+      <h4 class="minor">Stepper</h4>
+      <div class="stepper">
+        <div class="step done"><div class="step-dot">✓</div>Service</div>
+        <div class="step-line" style="background:var(--brand-600)"></div>
+        <div class="step done"><div class="step-dot">✓</div>Staff</div>
+        <div class="step-line" style="background:var(--brand-600)"></div>
+        <div class="step current"><div class="step-dot">3</div>Time</div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-dot">4</div>Confirm</div>
+      </div>
+
+      <h4 class="minor">Time slots</h4>
+      <div class="slot-grid">
+        <button class="slot" disabled>09:00</button>
+        <button class="slot" disabled>09:30</button>
+        <button class="slot">10:00</button>
+        <button class="slot">10:30</button>
+        <button class="slot selected">11:00</button>
+        <button class="slot">11:30</button>
+        <button class="slot" disabled>12:00</button>
+        <button class="slot">13:00</button>
+        <button class="slot">13:30</button>
+        <button class="slot">14:00</button>
+        <button class="slot">14:30</button>
+        <button class="slot">15:00</button>
+      </div>
+
+      <h4 class="minor">Confirm screen</h4>
+      <div class="preview" style="max-width:520px">
+        <div class="preview-label">Review your booking</div>
+        <h3 class="preview-title">Balayage with Sofia</h3>
+        <div style="display:grid;grid-template-columns:120px 1fr;gap:8px 16px;font-size:14px;margin:16px 0">
+          <div style="color:var(--ink-500)">Date</div><div class="mono">Friday, 25 April 2026</div>
+          <div style="color:var(--ink-500)">Time</div><div class="mono">11:00 – 12:30</div>
+          <div style="color:var(--ink-500)">Price</div><div class="mono">€120.00</div>
+          <div style="color:var(--ink-500)">Reminder</div><div>Email, 24h before</div>
+        </div>
+        <div class="row" style="justify-content:space-between;margin:0">
+          <button class="btn btn-md btn-ghost">← Back</button>
+          <button class="btn btn-md btn-primary">Confirm booking</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIDEBAR NAV -->
+    <section id="sidebar-nav">
+      <div class="section-eyebrow">Product pattern</div>
+      <h2 class="section-title">Dashboard navigation</h2>
+      <p class="section-lede">Fixed sidebar on desktop, drawer on mobile. Grouped by frequency of use.</p>
+
+      <div class="sim">
+        <div class="sim-side">
+          <div style="display:flex;gap:8px;align-items:center;padding:6px 10px;margin-bottom:12px">
+            <div class="brand-mark" style="width:24px;height:24px;font-size:11px;border-radius:6px">S</div>
+            <div style="font-weight:600;font-size:13px">Studio Sofia</div>
+          </div>
+          <div class="item">Home</div>
+          <div class="item active">Bookings</div>
+          <div class="item">Calendar</div>
+          <div class="item">Services</div>
+          <div class="item">Staff</div>
+          <div class="item">Customers</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin:12px 10px 6px;font-weight:600">Business</div>
+          <div class="item">Website</div>
+          <div class="item">Reports</div>
+          <div class="item">Settings</div>
+        </div>
+        <div class="sim-main">
+          <div style="color:var(--ink-500);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:600">This week</div>
+          <div style="font-size:22px;font-weight:600;margin:4px 0 12px">42 bookings</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div style="background:var(--ink-50);padding:12px;border-radius:8px"><div style="font-size:11px;color:var(--ink-500);text-transform:uppercase">Confirmed</div><div style="font-size:18px;font-weight:600">36</div></div>
+            <div style="background:var(--ink-50);padding:12px;border-radius:8px"><div style="font-size:11px;color:var(--ink-500);text-transform:uppercase">Pending</div><div style="font-size:18px;font-weight:600">4</div></div>
+            <div style="background:var(--ink-50);padding:12px;border-radius:8px"><div style="font-size:11px;color:var(--ink-500);text-transform:uppercase">No-show</div><div style="font-size:18px;font-weight:600">2</div></div>
+          </div>
+        </div>
+      </div>
+      <p style="color:var(--ink-500);font-size:13px;margin-top:12px">Active item: subtle brand-50 fill, brand-700 text, 3px brand-600 accent on the left.</p>
+    </section>
+
+    <!-- BRANDING -->
+    <section id="branding">
+      <div class="section-eyebrow">Product pattern</div>
+      <h2 class="section-title">Tenant branding</h2>
+      <p class="section-lede">Each salon sets one primary color. The system derives the rest. Preview here with three presets.</p>
+
+      <div class="preview-grid">
+        <div class="preview" style="--preview-brand:#7C3AED">
+          <div class="preview-label" style="color:#7C3AED">Violet · default</div>
+          <h3 class="preview-title">Studio Sofia</h3>
+          <p class="preview-body">Modern hair studio · Lisbon</p>
+          <button class="btn btn-md" style="background:#7C3AED;color:white">Book now</button>
+        </div>
+        <div class="preview">
+          <div class="preview-label" style="color:#E0337B">Rose · fashion</div>
+          <h3 class="preview-title">Maison Rouge</h3>
+          <p class="preview-body">Luxury salon · Paris</p>
+          <button class="btn btn-md" style="background:#E0337B;color:white">Book now</button>
+        </div>
+        <div class="preview">
+          <div class="preview-label" style="color:#0B7285">Teal · wellness</div>
+          <h3 class="preview-title">Aqua Wellness</h3>
+          <p class="preview-body">Spa & nails · Amsterdam</p>
+          <button class="btn btn-md" style="background:#0B7285;color:white">Book now</button>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>How it works:</strong> the tenant sets <code>primary_color</code>; a helper in <code>lib/brand.ts</code> derives <code>brand-50/100/200/700/900</code> via HSL lightness shifts and picks <code>brand-contrast</code> (white or ink-950) for WCAG contrast. The CSS variables are injected on the tenant's root element at request time so SSR stays consistent.
+      </div>
+    </section>
+
+    <!-- AUDIT -->
+    <section id="audit">
+      <div class="section-eyebrow">Meta</div>
+      <h2 class="section-title">Current codebase audit</h2>
+      <p class="section-lede">Where SoloHub's UI stands today and what needs to change.</p>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl" style="border:none;border-radius:0">
+          <thead><tr><th>Area</th><th>Score</th><th>Top fix</th></tr></thead>
+          <tbody>
+            <tr><td>Token coverage</td><td class="mono">3 / 10</td><td>Define the full token set — currently only bg/fg</td></tr>
+            <tr><td>Color consistency</td><td class="mono">4 / 10</td><td>Consolidate 20+ ad-hoc hex values</td></tr>
+            <tr><td>Typography</td><td class="mono">5 / 10</td><td>Adopt the 10-step type scale</td></tr>
+            <tr><td>Component reuse</td><td class="mono">4 / 10</td><td>Build shared <code>&lt;Button&gt;</code>, <code>&lt;Input&gt;</code>, <code>&lt;Card&gt;</code></td></tr>
+            <tr><td>Accessibility</td><td class="mono">6 / 10</td><td>Add ARIA on icon-only buttons, fix focus rings</td></tr>
+            <tr><td>Motion</td><td class="mono">5 / 10</td><td>Centralize durations + easings</td></tr>
+            <tr><td>Responsive</td><td class="mono">7 / 10</td><td>Polish dashboard sidebar at tablet widths</td></tr>
+            <tr><td>Dark mode</td><td class="mono">2 / 10</td><td>Commit or remove — half-state is a footgun</td></tr>
+            <tr><td>Iconography</td><td class="mono">8 / 10</td><td>Expand the custom SVG set as needed</td></tr>
+            <tr><td>Tenant branding</td><td class="mono">6 / 10</td><td>Implement 5-stop derivation from <code>primary_color</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="minor">Priority actions</h4>
+      <ol style="margin:0;padding-left:20px;color:var(--ink-700)">
+        <li>Ship <code>tokens.css</code> — single source of truth for everything downstream.</li>
+        <li>Build <code>components/ds/</code> primitives: Button, Input, Card, Badge, Avatar.</li>
+        <li>Migrate the booking flow first (customer-visible), then auth, then dashboard.</li>
+        <li>Remove inline hex values from <code>buttonStyles.ts</code>, <code>AddServiceForm</code>, <code>DashboardChrome</code>.</li>
+        <li>Implement HSL derivation in <code>lib/brand.ts</code>.</li>
+        <li>Decide on dark mode — commit or remove the current <code>prefers-color-scheme</code> block.</li>
+      </ol>
+    </section>
+
+    <!-- IMPLEMENTATION -->
+    <section id="implementation">
+      <div class="section-eyebrow">Meta</div>
+      <h2 class="section-title">Implementation</h2>
+      <p class="section-lede">Practical notes for adopting the system in the current Next.js 16 + Tailwind v4 codebase.</p>
+
+      <h4 class="minor">1 · Drop in the tokens</h4>
+      <p>Replace <code>app/globals.css</code> with <code>design-system/tokens.css</code> (or <code>@import</code> it). All tokens become available as Tailwind utilities (e.g. <code>bg-brand-600</code>, <code>text-h2</code>, <code>rounded-lg</code>).</p>
+
+      <h4 class="minor">2 · Build the primitives</h4>
+      <p>Create <code>components/ds/</code> with one file per component. Each wraps a native element, accepts <code>variant</code>, <code>size</code>, <code>asChild</code>, and forwards refs. Export a barrel <code>components/ds/index.ts</code>.</p>
+
+      <h4 class="minor">3 · Inject tenant brand at the root</h4>
+      <p>In the tenant layout, inject <code>--color-brand-*</code> overrides via inline style on the root. Keep SSR deterministic — no Math.random in derivation.</p>
+
+      <h4 class="minor">4 · Deprecate</h4>
+      <ul style="margin:0;padding-left:20px;color:var(--ink-700)">
+        <li>Inline hex values in <code>buttonStyles.ts</code> → <code>&lt;Button variant="primary" size="xl" /&gt;</code></li>
+        <li>Inline style objects in <code>AddServiceForm</code> → <code>&lt;Input /&gt;</code>, <code>&lt;Select /&gt;</code></li>
+        <li>Hardcoded <code>focus:border-purple-400</code> → <code>shadow-focus</code> token</li>
+      </ul>
+
+      <h4 class="minor">5 · Never introduce</h4>
+      <ul style="margin:0;padding-left:20px;color:var(--ink-700)">
+        <li>New fonts — stay on Geist.</li>
+        <li>Radii between 10 and 20 — pick one side.</li>
+        <li>Tinted shadows — warm-neutral rgba only.</li>
+        <li>Arbitrary Tailwind values like <code>[13px]</code> or <code>[#abc]</code> — use tokens.</li>
+      </ul>
+
+      <div class="callout" style="margin-top:24px">
+        <strong>Next step:</strong> add a <code>/design-system</code> route inside the app that renders this same page. It becomes the living reference — always in sync with the tokens it consumes.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

@@ -3,6 +3,7 @@ import pool from "@/lib/db";
 import { fillTemplate } from "@/lib/i18n/interpolate";
 import { bcp47ForLocale } from "@/lib/i18n/locale-format";
 import { getServerTranslations } from "@/lib/i18n/server";
+import { getGoogleMapsSearchUrl } from "@/lib/maps";
 import { notFound } from "next/navigation";
 
 export default async function CancelPage({
@@ -258,6 +259,14 @@ export default async function CancelPage({
               >
                 {bookingData.address.split(",")[0]}
               </p>
+              <a
+                href={getGoogleMapsSearchUrl(bookingData.address)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-flex text-xs font-semibold text-accent-600 hover:underline"
+              >
+                Get directions
+              </a>
             </div>
           )}
         </div>

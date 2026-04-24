@@ -4,6 +4,8 @@ import pool from "@/lib/db";
 import { fillTemplate } from "@/lib/i18n/interpolate";
 import { bcp47ForLocale } from "@/lib/i18n/locale-format";
 import { getServerTranslations } from "@/lib/i18n/server";
+import { getGoogleMapsSearchUrl } from "@/lib/maps";
+import { PHONE_INPUT_PATTERN } from "@/lib/phone";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
@@ -230,6 +232,14 @@ export default async function ConfirmPage({
                   <p style={{ fontSize: 14, color: "#555", margin: 0, display: "flex", alignItems: "center", gap: 4 }}>
                     <MapPinIcon size={13} /> {tenant.address}
                   </p>
+                  <a
+                    href={getGoogleMapsSearchUrl(tenant.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 inline-flex text-xs font-semibold text-accent-600 hover:underline"
+                  >
+                    Get directions
+                  </a>
                 </div>
               )}
             </div>
@@ -321,6 +331,8 @@ export default async function ConfirmPage({
                 <input
                   type="tel"
                   name="client_phone"
+                  pattern={PHONE_INPUT_PATTERN}
+                  title="Use a valid phone number format."
                   placeholder={t.booking.placeholderPhone}
                   className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
                 />

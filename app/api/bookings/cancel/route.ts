@@ -10,9 +10,18 @@ export async function POST(req: NextRequest) {
 
         // verify token
         const result = await pool.query(
-            `SELECT b.*, s.name AS service_name, t.name AS salon_name, t.slug AS salon_slug
+            `SELECT
+              b.*,
+              s.name AS service_name,
+              t.name AS salon_name,
+              t.slug AS salon_slug,
+              t.owner_email,
+              t.owner_first_name,
+              st.name AS staff_name,
+              st.email AS staff_email
        FROM bookings b
        JOIN services s ON b.service_id = s.id
+       JOIN staff st ON st.id = b.staff_id
        JOIN tenants t ON b.tenant_id = t.id
        WHERE b.id = $1 AND b.cancellation_token = $2`,
             [booking_id, token]
@@ -65,6 +74,42 @@ export async function POST(req: NextRequest) {
 </html>
       `,
         });
+
+        const appointmentAt = new Date(booking.booked_at).toLocaleString("nl-NL", {
+            timeZone: "Europe/Amsterdam",
+            dateStyle: "full",
+            timeStyle: "short",
+        });
+        const subject = `Appointment cancelled: ${booking.service_name} — ${appointmentAt}`;
+        const html = `
+<p>Hello,</p>
+<p>${booking.client_name} cancelled their appointment.</p>
+<ul>
+  <li><strong>Service:</strong> ${booking.service_name}</li>
+  <li><strong>Staff:</strong> ${booking.staff_name}</li>
+  <li><strong>When:</strong> ${appointmentAt}</li>
+  <li><strong>Client email:</strong> ${booking.client_email}</li>
+  ${booking.client_phone ? `<li><strong>Client phone:</strong> ${booking.client_phone}</li>` : ""}
+</ul>
+<p>View bookings in your SoloHub dashboard for updates.</p>
+        `;
+
+        const ownerEmail = booking.owner_email as string | null;
+        if (ownerEmail) {
+            void sendEmail({
+                to: ownerEmail,
+                subject,
+                html,
+            }).catch((emailErr) => console.error("[cancel] owner cancellation email failed", emailErr));
+        }
+        const staffEmail = booking.staff_email as string | null;
+        if (staffEmail && staffEmail.toLowerCase() !== ownerEmail?.toLowerCase()) {
+            void sendEmail({
+                to: staffEmail,
+                subject,
+                html,
+            }).catch((emailErr) => console.error("[cancel] staff cancellation email failed", emailErr));
+        }
 
         return NextResponse.redirect(
             new URL(`/book/cancel?booking=${booking_id}&token=${token}`, req.url)

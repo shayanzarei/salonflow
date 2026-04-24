@@ -1,4 +1,5 @@
 import { requireOwner } from "@/lib/require-owner";
+import { isValidPhone, normalizePhoneInput } from "@/lib/phone";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
 import { NextRequest, NextResponse } from "next/server";
@@ -48,6 +49,12 @@ export async function POST(req: NextRequest) {
       const about = formData.get("about") as string;
       const address = formData.get("address") as string;
       const phone = formData.get("phone") as string;
+      const normalizedPhone = normalizePhoneInput(phone);
+      if (!isValidPhone(normalizedPhone)) {
+        return NextResponse.redirect(
+          new URL(`${redirectTo}?error=invalid_phone`, req.url)
+        );
+      }
       const logo_url = formData.get("logo_url") as string;
 
       await pool.query(
@@ -60,7 +67,7 @@ export async function POST(req: NextRequest) {
            phone = NULLIF($6, ''),
            logo_url = NULLIF($7, '')
          WHERE id = $8`,
-        [name, slug, tagline, about, address, phone, logo_url, tenant.id]
+        [name, slug, tagline, about, address, normalizedPhone, logo_url, tenant.id]
       );
     }
 
@@ -71,6 +78,12 @@ export async function POST(req: NextRequest) {
       const about = formData.get("about") as string;
       const address = formData.get("address") as string;
       const phone = formData.get("phone") as string;
+      const normalizedPhone = normalizePhoneInput(phone);
+      if (!isValidPhone(normalizedPhone)) {
+        return NextResponse.redirect(
+          new URL(`${redirectTo}?error=invalid_phone`, req.url)
+        );
+      }
       const logo_url = formData.get("logo_url") as string;
       const primary_color = (formData.get("primary_color") as string)?.trim();
       const hero_image_url = formData.get("hero_image_url") as string;
@@ -100,7 +113,7 @@ export async function POST(req: NextRequest) {
           tagline,
           about,
           address,
-          phone,
+          normalizedPhone,
           logo_url,
           color,
           hero_image_url,
@@ -118,6 +131,12 @@ export async function POST(req: NextRequest) {
       const address = formData.get("address") as string;
       const hours = formData.get("hours") as string;
       const phone = formData.get("phone") as string;
+      const normalizedPhone = normalizePhoneInput(phone);
+      if (!isValidPhone(normalizedPhone)) {
+        return NextResponse.redirect(
+          new URL(`${redirectTo}?error=invalid_phone`, req.url)
+        );
+      }
       const logo_url = formData.get("logo_url") as string;
 
       await pool.query(
@@ -138,7 +157,7 @@ export async function POST(req: NextRequest) {
           about,
           address,
           hours,
-          phone,
+          normalizedPhone,
           logo_url,
           tenant.id,
         ]

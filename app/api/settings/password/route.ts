@@ -46,9 +46,19 @@ export async function POST(req: NextRequest) {
       tenant.id,
     ]);
 
-    return NextResponse.redirect(
-      new URL(`${redirectTo}?success=password_updated`, req.url)
+    const response = NextResponse.redirect(
+      new URL(`/login?success=password_updated`, req.url)
     );
+    // Force fresh authentication after credential change.
+    response.cookies.delete("next-auth.session-token");
+    response.cookies.delete("__Secure-next-auth.session-token");
+    response.cookies.delete("authjs.session-token");
+    response.cookies.delete("__Secure-authjs.session-token");
+    response.cookies.delete("next-auth.csrf-token");
+    response.cookies.delete("__Host-next-auth.csrf-token");
+    response.cookies.delete("authjs.csrf-token");
+    response.cookies.delete("__Host-authjs.csrf-token");
+    return response;
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error("Unknown error");
     return NextResponse.json({ error: error.message }, { status: 500 });

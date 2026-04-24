@@ -1,8 +1,9 @@
 "use client";
 
 import { CalendarIcon, SearchIcon, UserIcon } from "@/components/ui/Icons";
+import { isValidPhone, normalizePhoneInput, PHONE_INPUT_PATTERN } from "@/lib/phone";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface Service {
   id: string;
@@ -21,6 +22,12 @@ interface Client {
   client_name: string;
   client_email: string;
   client_phone: string | null;
+}
+
+interface AvailabilitySlot {
+  isoTime: string;
+  label: string;
+  available: boolean;
 }
 
 export default function AddBookingForm({
@@ -47,9 +54,15 @@ export default function AddBookingForm({
   const [searchResults, setSearchResults] = useState<Client[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState("");
+  const [availableSlots, setAvailableSlots] = useState<AvailabilitySlot[]>([]);
 
   const selectedService = services.find((s) => s.id === serviceId);
   const selectedStaff = staffList.find((s) => s.id === staffId);
+  const canLoadAvailability = Boolean(serviceId && staffId && date);
+  const todayDate = useMemo(() => new Date().toISOString().split("T")[0], []);
 
   async function handleSearch(q: string) {
     setSearchQuery(q);
@@ -75,13 +88,22 @@ export default function AddBookingForm({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const normalizedPhone = normalizePhoneInput(clientPhone);
+    if (!isValidPhone(normalizedPhone)) {
+      setPhoneError("Please enter a valid phone number.");
+      return;
+    }
+    if (!time) {
+      return;
+    }
+    setPhoneError("");
     setLoading(true);
 
     const formData = new FormData();
     formData.append("tenant_id", tenantId);
     formData.append("client_name", clientName);
     formData.append("client_email", clientEmail);
-    formData.append("client_phone", clientPhone);
+    formData.append("client_phone", normalizedPhone ?? "");
     formData.append("service_id", serviceId);
     formData.append("staff_id", staffId);
     formData.append("date", date);
@@ -96,6 +118,51 @@ export default function AddBookingForm({
 
     router.push("/bookings");
   }
+
+  useEffect(() => {
+    let active = true;
+    async function loadAvailability() {
+      if (!canLoadAvailability) {
+        setAvailableSlots([]);
+        setAvailabilityError("");
+        setTime("");
+        return;
+      }
+
+      setAvailabilityLoading(true);
+      setAvailabilityError("");
+      setTime("");
+      try {
+        const res = await fetch(
+          `/api/bookings/availability?serviceId=${serviceId}&staffId=${staffId}&date=${date}`,
+          { cache: "no-store" }
+        );
+        if (!res.ok) {
+          const payload = (await res.json().catch(() => ({}))) as { error?: string };
+          throw new Error(payload.error ?? "Failed to load staff availability.");
+        }
+        const payload = (await res.json()) as { slots: AvailabilitySlot[] };
+        if (!active) return;
+        const openSlots = payload.slots.filter((slot) => slot.available);
+        setAvailableSlots(openSlots);
+      } catch (error) {
+        if (!active) return;
+        setAvailableSlots([]);
+        setAvailabilityError(
+          error instanceof Error ? error.message : "Failed to load staff availability."
+        );
+      } finally {
+        if (active) {
+          setAvailabilityLoading(false);
+        }
+      }
+    }
+
+    void loadAvailability();
+    return () => {
+      active = false;
+    };
+  }, [canLoadAvailability, date, serviceId, staffId]);
 
   const inputStyle = {
     width: "100%",
@@ -283,10 +350,17 @@ export default function AddBookingForm({
               <input
                 type="tel"
                 value={clientPhone}
-                onChange={(e) => setClientPhone(e.target.value)}
+                pattern={PHONE_INPUT_PATTERN}
+                onChange={(e) => {
+                  setClientPhone(e.target.value);
+                  if (phoneError) setPhoneError("");
+                }}
                 placeholder="e.g. +1 (555) 000-0000"
                 style={inputStyle}
               />
+              {phoneError ? (
+                <p className="mt-1 text-xs text-red-600">{phoneError}</p>
+              ) : null}
             </div>
           </div>
 
@@ -356,19 +430,38 @@ export default function AddBookingForm({
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                     required
-                    min={new Date().toISOString().split("T")[0]}
+                    min={todayDate}
                     style={inputStyle}
                   />
                 </div>
                 <div>
                   <label style={labelStyle}>Time</label>
-                  <input
-                    type="time"
+                  <select
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
                     required
+                    disabled={!canLoadAvailability || availabilityLoading || availableSlots.length === 0}
                     style={inputStyle}
-                  />
+                  >
+                    <option value="">
+                      {availabilityLoading
+                        ? "Loading availability..."
+                        : "Select available time..."}
+                    </option>
+                    {availableSlots.map((slot) => (
+                      <option key={slot.isoTime} value={slot.isoTime.slice(11, 16)}>
+                        {slot.label}
+                      </option>
+                    ))}
+                  </select>
+                  {availabilityError ? (
+                    <p className="mt-1 text-xs text-red-600">{availabilityError}</p>
+                  ) : null}
+                  {!availabilityLoading && canLoadAvailability && !availabilityError && availableSlots.length === 0 ? (
+                    <p className="mt-1 text-xs text-amber-700">
+                      No available times for this staff on the selected date.
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
@@ -563,7 +656,7 @@ export default function AddBookingForm({
           <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !time}
               className="mb-3.5 w-full min-h-12 rounded-[10px] border-none text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
               style={{ background: brand, padding: "13px" }}
             >

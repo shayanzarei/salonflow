@@ -56,7 +56,7 @@ export default function TimeSlotPicker({
       try {
         const res = await fetch(
           `/api/availability?serviceId=${service}&staffId=${staff}&date=${dateStr}`,
-          { signal: controller.signal }
+          { signal: controller.signal, cache: "no-store" }
         );
         if (!res.ok) throw new Error("Request failed");
         const data = await res.json() as {

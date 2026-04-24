@@ -1,5 +1,5 @@
 import { getServerTranslations } from "@/lib/i18n/server";
-import { getTenant } from "@/lib/tenant";
+import { canAccessPublicWebsite, getTenant } from "@/lib/tenant";
 import { isMainSiteHost } from "@/lib/main-site";
 import { headers } from "next/headers";
 
@@ -15,7 +15,7 @@ export default async function BookingLayout({
   const tenant = await getTenant();
   if (!tenant) return <>{children}</>;
 
-  if (tenant.website_status !== "published") {
+  if (!canAccessPublicWebsite(tenant)) {
     const { t } = await getServerTranslations();
     return (
       <main className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-4 text-center">

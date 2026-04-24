@@ -70,3 +70,18 @@ export async function getTenant(): Promise<Tenant | null> {
 
   return tenant;
 }
+
+export function canAccessPublicWebsite(
+  tenant: Pick<Tenant, "website_status" | "tenant_status" | "trial_ends_at" | "stripe_subscription_id">
+): boolean {
+  if (tenant.website_status !== "published") {
+    return false;
+  }
+  if (tenant.tenant_status === "active") {
+    return true;
+  }
+  if (tenant.tenant_status === "trial" && tenant.trial_ends_at) {
+    return new Date(tenant.trial_ends_at) > new Date();
+  }
+  return false;
+}

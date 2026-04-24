@@ -10,6 +10,7 @@ import pool from "@/lib/db";
 import { fillTemplate } from "@/lib/i18n/interpolate";
 import { bcp47ForLocale } from "@/lib/i18n/locale-format";
 import { getServerTranslations } from "@/lib/i18n/server";
+import { getGoogleMapsSearchUrl } from "@/lib/maps";
 import { getTenant } from "@/lib/tenant";
 import Link from "next/link";
 
@@ -194,6 +195,14 @@ export default async function SuccessPage({
                   <p className="text-sm leading-relaxed text-gray-600 sm:text-[15px]">
                     {tenant.address}
                   </p>
+                  <a
+                    href={getGoogleMapsSearchUrl(tenant.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 inline-flex text-sm font-semibold text-accent-600 hover:underline"
+                  >
+                    Get directions
+                  </a>
                 </div>
               ) : null}
             </div>

@@ -140,6 +140,7 @@ export default function ReportsPage() {
       });
       if (res.ok) {
         setLocalStatus((p) => ({ ...p, [bookingId]: outcome }));
+        void load();
       }
     } finally {
       setFinalizing((p) => ({ ...p, [bookingId]: false }));
@@ -195,10 +196,25 @@ export default function ReportsPage() {
     );
   }
 
-  const today = data.today_appointments;
+  const isActionRequiredStatus = (status: string) =>
+    status !== "completed" && status !== "no_show" && status !== "cancelled";
+  const today = data.today_appointments
+    .slice()
+    .sort((a, b) => {
+      const aEffective = localStatus[a.id] ?? a.status;
+      const bEffective = localStatus[b.id] ?? b.status;
+      const aActionRequired = isActionRequiredStatus(aEffective);
+      const bActionRequired = isActionRequiredStatus(bEffective);
+      if (aActionRequired !== bActionRequired) {
+        return aActionRequired ? -1 : 1;
+      }
+      return (
+        new Date(a.booked_at).getTime() - new Date(b.booked_at).getTime()
+      );
+    });
   const pendingCount = today.filter((b) => {
     const effective = localStatus[b.id] ?? b.status;
-    return effective !== "completed" && effective !== "no_show" && effective !== "cancelled";
+    return isActionRequiredStatus(effective);
   }).length;
 
   return (

@@ -1,17 +1,44 @@
-/**
- * Booking slot algorithm — used by /api/availability and booking flow.
- *
- * All times are in LOCAL server time. Slot isoTime strings are returned as
- * "YYYY-MM-DDTHH:MM:00" (no Z / no timezone suffix), so JavaScript on both
- * server and client parses them as LOCAL time. This keeps the picker label,
- * the confirm page summary, the stored booked_at, and the email confirmation
- * all consistent.
- *
- * If a per-tenant timezone is ever added, convert here using a TZ-aware
- * library (e.g. Temporal / date-fns-tz).
- */
-
 import pool from "@/lib/db";
+const BUSINESS_TIMEZONE = "Europe/Amsterdam";
+
+function getTzDateParts(date: Date, timeZone: string) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    weekday: "short",
+  });
+  const parts = formatter.formatToParts(date);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return {
+    year: Number(get("year")),
+    month: Number(get("month")),
+    day: Number(get("day")),
+    hour: Number(get("hour")),
+    minute: Number(get("minute")),
+    weekdayShort: get("weekday"),
+  };
+}
+
+function getWeekdayIndex(dateYmd: string, timeZone: string) {
+  const [year, month, day] = dateYmd.split("-").map(Number);
+  const utcMidday = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  const weekdayShort = getTzDateParts(utcMidday, timeZone).weekdayShort;
+  const map: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+  return map[weekdayShort] ?? 0;
+}
 
 export interface Slot {
   /** "YYYY-MM-DDTHH:MM:00" — no Z, local time */
@@ -42,9 +69,8 @@ export async function computeSlots(input: {
   if (!serviceRes.rows[0]) return [];
   const durationMins: number = parseInt(serviceRes.rows[0].duration_mins);
 
-  // 2. Day-of-week from LOCAL date  ("2026-04-16" → local Date → .getDay())
-  const localDate = new Date(date);
-  const dayOfWeek = localDate.getDay(); // 0=Sun … 6=Sat
+  // 2. Day-of-week from salon timezone date.
+  const dayOfWeek = getWeekdayIndex(date, BUSINESS_TIMEZONE); // 0=Sun … 6=Sat
 
   // 3. Working hours for this staff + day
   const hoursRes = await pool.query(
@@ -116,34 +142,35 @@ export async function computeSlots(input: {
     }
   }
 
-  // 5. Existing bookings for this staff on this LOCAL date
+  // 5. Existing bookings for this staff on selected business date
   const bookingsRes = await pool.query(
     `SELECT b.booked_at, s.duration_mins AS svc_duration
      FROM bookings b
      JOIN services s ON b.service_id = s.id
      WHERE b.staff_id = $1
-       AND b.booked_at >= $2::timestamptz
-       AND b.booked_at <  ($2::timestamptz + INTERVAL '1 day')
+       AND b.booked_at >= (($2::date)::timestamp AT TIME ZONE '${BUSINESS_TIMEZONE}')
+       AND b.booked_at < ((($2::date + INTERVAL '1 day')::timestamp) AT TIME ZONE '${BUSINESS_TIMEZONE}')
        AND b.status IN ('confirmed', 'pending')`,
-    [staffId, `${date}T00:00:00`] // no Z → PostgreSQL uses session timezone
+    [staffId, date]
   );
 
   // Blocked ranges in minutes-from-LOCAL-midnight
   const blocked: { start: number; end: number }[] = bookingsRes.rows.map((b) => {
     const d = new Date(b.booked_at as string);
-    const startMin = d.getHours() * 60 + d.getMinutes();
+    const tz = getTzDateParts(d, BUSINESS_TIMEZONE);
+    const startMin = tz.hour * 60 + tz.minute;
     return { start: startMin, end: startMin + parseInt(b.svc_duration) };
   });
 
-  // 6. Guard against past slots for today (local comparison)
-  const now = new Date();
+  // 6. Guard against past slots for today in business timezone.
+  const nowTz = getTzDateParts(new Date(), BUSINESS_TIMEZONE);
   const todayLocal = [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0"),
+    nowTz.year,
+    String(nowTz.month).padStart(2, "0"),
+    String(nowTz.day).padStart(2, "0"),
   ].join("-");
   const isToday = date === todayLocal;
-  const nowMins = isToday ? now.getHours() * 60 + now.getMinutes() : -1;
+  const nowMins = isToday ? nowTz.hour * 60 + nowTz.minute : -1;
 
   // 7. Generate ALL slots within working hours, marking availability
   const slots: Slot[] = [];

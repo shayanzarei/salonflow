@@ -124,10 +124,42 @@ export default async function DashboardPage() {
   }));
   const completedSteps = setupSteps.filter((s) => s.done).length;
   const progressPct = Math.round((completedSteps / setupSteps.length) * 100);
+  const nowTime = new Date().getTime();
+  const trialDays =
+    tenant.trial_ends_at == null
+      ? 0
+      : Math.max(
+          0,
+          Math.ceil(
+            (new Date(tenant.trial_ends_at).getTime() - nowTime) /
+              (1000 * 60 * 60 * 24)
+          )
+        );
+  const showTrialBanner = trialDays > 0;
 
   if (websiteStatus !== "published") {
     return (
       <div>
+        {showTrialBanner ? (
+          <div className="mb-5 flex flex-col items-start justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 sm:flex-row sm:items-center">
+            <div>
+              <p className="text-sm font-semibold text-amber-900">
+                {trialDays === 1
+                  ? "1 day left in your trial"
+                  : `${trialDays} days left in your trial`}
+              </p>
+              <p className="mt-0.5 text-sm text-amber-800">
+                Upgrade any time to keep uninterrupted access.
+              </p>
+            </div>
+            <Link
+              href="/settings/billing"
+              className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+            >
+              View plans
+            </Link>
+          </div>
+        ) : null}
         <div className="mb-5 rounded-2xl border border-gray-100 bg-white p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
@@ -371,6 +403,26 @@ export default async function DashboardPage() {
 
   return (
     <div>
+      {showTrialBanner ? (
+        <div className="mb-5 flex flex-col items-start justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 sm:flex-row sm:items-center">
+          <div>
+            <p className="text-sm font-semibold text-amber-900">
+              {trialDays === 1
+                ? "1 day left in your trial"
+                : `${trialDays} days left in your trial`}
+            </p>
+            <p className="mt-0.5 text-sm text-amber-800">
+              Upgrade any time to keep uninterrupted access.
+            </p>
+          </div>
+          <Link
+            href="/settings/billing"
+            className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+          >
+            View plans
+          </Link>
+        </div>
+      ) : null}
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1

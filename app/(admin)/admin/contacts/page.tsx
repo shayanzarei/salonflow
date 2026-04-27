@@ -1,3 +1,11 @@
+import {
+  Table,
+  TableContainer,
+  TBodyRow,
+  TD,
+  TH,
+  THeadRow,
+} from "@/components/ds/Table";
 import pool from "@/lib/db";
 
 export default async function AdminContactsPage() {
@@ -29,52 +37,52 @@ export default async function AdminContactsPage() {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+      <TableContainer className="rounded-2xl border-gray-100">
         {rows.length === 0 ? (
           <div className="px-6 py-12 text-center text-sm text-gray-400">
             No contact messages yet.
           </div>
         ) : (
           <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-            <table className="w-full min-w-[1100px] border-collapse">
+            <Table className="min-w-[1100px]">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-5 py-3.5">Source</th>
-                  <th className="px-5 py-3.5">Sender</th>
-                  <th className="px-5 py-3.5">Topic / Subject</th>
-                  <th className="px-5 py-3.5">Message</th>
-                  <th className="px-5 py-3.5">Status</th>
-                  <th className="px-5 py-3.5">Received</th>
-                </tr>
+                <THeadRow>
+                  <TH>Source</TH>
+                  <TH>Sender</TH>
+                  <TH>Topic / Subject</TH>
+                  <TH>Message</TH>
+                  <TH>Status</TH>
+                  <TH>Received</TH>
+                </THeadRow>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {rows.map((row) => (
-                  <tr key={row.id} className="text-sm text-gray-800">
-                    <td className="px-5 py-3">
+                  <TBodyRow key={row.id} interactive={false}>
+                    <TD>
                       <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
                         {row.source === "contact_form" ? "Contact Form" : "Inbound Email"}
                       </span>
-                    </td>
-                    <td className="px-5 py-3">
+                    </TD>
+                    <TD>
                       <p className="font-medium text-gray-900">
                         {[row.first_name, row.last_name].filter(Boolean).join(" ") || "—"}
                       </p>
                       <p className="text-xs text-gray-500">{row.email ?? "—"}</p>
-                    </td>
-                    <td className="px-5 py-3">
+                    </TD>
+                    <TD>
                       <p className="font-medium text-gray-900">{row.topic ?? row.subject ?? "—"}</p>
-                    </td>
-                    <td className="px-5 py-3 text-gray-600">
+                    </TD>
+                    <TD className="text-gray-600">
                       <p className="max-w-[420px] whitespace-pre-wrap break-words">
                         {row.message ?? "No body captured in webhook payload metadata."}
                       </p>
-                    </td>
-                    <td className="px-5 py-3">
+                    </TD>
+                    <TD>
                       <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium capitalize text-emerald-700">
                         {row.status}
                       </span>
-                    </td>
-                    <td className="px-5 py-3 text-xs text-gray-500">
+                    </TD>
+                    <TD className="text-xs text-gray-500">
                       {new Date(row.created_at).toLocaleString("en-US", {
                         month: "short",
                         day: "2-digit",
@@ -82,14 +90,14 @@ export default async function AdminContactsPage() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
-                    </td>
-                  </tr>
+                    </TD>
+                  </TBodyRow>
                 ))}
               </tbody>
-            </table>
+            </Table>
           </div>
         )}
-      </div>
+      </TableContainer>
     </div>
   );
 }

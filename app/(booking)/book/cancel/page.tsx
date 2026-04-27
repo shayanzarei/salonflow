@@ -44,7 +44,7 @@ export default async function CancelPage({
 
   if (alreadyCancelled) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-10 sm:px-6 sm:py-12">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-ink-50 px-4 py-10 sm:px-6 sm:py-12">
         <div
           style={{
             width: 80,
@@ -59,10 +59,10 @@ export default async function CancelPage({
         >
           <span style={{ fontSize: 36 }}>✓</span>
         </div>
-        <h1 className="mb-3 text-center text-2xl font-bold text-gray-900 sm:text-3xl">
+        <h1 className="mb-3 text-center text-2xl font-bold text-ink-900 sm:text-3xl">
           {c.alreadyTitle}
         </h1>
-        <p className="mb-8 text-center text-sm text-gray-500 sm:text-base">
+        <p className="mb-8 text-center text-sm text-ink-500 sm:text-base">
           {c.alreadyBody}
         </p>
         <a
@@ -77,7 +77,7 @@ export default async function CancelPage({
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-10 sm:px-6 sm:py-12">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-ink-50 px-4 py-10 sm:px-6 sm:py-12">
       {/* Warning icon */}
       <div
         style={{
@@ -95,14 +95,14 @@ export default async function CancelPage({
       </div>
 
       {/* Title */}
-      <h1 className="mb-3 max-w-md text-balance text-center text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+      <h1 className="mb-3 max-w-md text-balance text-center text-2xl font-bold text-ink-900 sm:text-3xl md:text-4xl">
         {c.cancelTitle}
       </h1>
-      <p className="mb-8 max-w-md text-center text-sm leading-relaxed text-gray-500 sm:mb-9 sm:text-base">
+      <p className="mb-8 max-w-md text-center text-sm leading-relaxed text-ink-500 sm:mb-9 sm:text-base">
         {c.cancelBody}
       </p>
 
-      <div className="mb-4 w-full max-w-md rounded-[20px] border border-gray-100 bg-white p-5 sm:p-7">
+      <div className="mb-4 w-full max-w-md rounded-[20px] border border-ink-100 bg-white p-5 sm:p-7">
         <p
           style={{
             fontSize: 12,
@@ -118,7 +118,7 @@ export default async function CancelPage({
           ℹ {c.appointmentDetails}
         </p>
 
-        <div className="mb-6 flex flex-col gap-4 border-b border-gray-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-6 flex flex-col gap-4 border-b border-ink-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3.5">
             <div
               style={{
@@ -273,7 +273,7 @@ export default async function CancelPage({
       </div>
 
       {/* Cancellation policy */}
-      <div className="mb-7 w-full max-w-md rounded-2xl border border-red-200 bg-red-50 p-4 sm:p-5">
+      <div className="mb-7 w-full max-w-md rounded-2xl border border-danger-50 bg-danger-50 p-4 sm:p-5">
         <p
           style={{
             fontSize: 14,
@@ -303,7 +303,7 @@ export default async function CancelPage({
       <div className="mb-5 flex w-full max-w-md flex-col gap-3 sm:mb-6 sm:flex-row sm:gap-3">
         <a
           href="/"
-          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-center text-sm font-semibold text-gray-800 no-underline sm:text-[15px]"
+          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-ink-200 bg-white px-4 py-3 text-center text-sm font-semibold text-ink-700 no-underline sm:text-[15px]"
         >
           {c.keepAppointment}
         </a>
@@ -312,7 +312,7 @@ export default async function CancelPage({
           <input type="hidden" name="token" value={token} />
           <button
             type="submit"
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-none bg-red-500 px-4 py-3 text-sm font-semibold text-white"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-none bg-danger-600 px-4 py-3 text-sm font-semibold text-white"
           >
             {c.confirmCancel}
           </button>

@@ -1,5 +1,11 @@
 "use client";
 
+import { Avatar } from "@/components/ds/Avatar";
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Input } from "@/components/ds/Input";
+import { Select } from "@/components/ds/Select";
 import { CalendarIcon, SearchIcon, UserIcon } from "@/components/ui/Icons";
 import { isValidPhone, normalizePhoneInput, PHONE_INPUT_PATTERN } from "@/lib/phone";
 import { useRouter } from "next/navigation";
@@ -164,30 +170,9 @@ export default function AddBookingForm({
     };
   }, [canLoadAvailability, date, serviceId, staffId]);
 
-  const inputStyle = {
-    width: "100%",
-    minHeight: 44,
-    border: "1px solid #e5e7eb",
-    borderRadius: 10,
-    padding: "10px 14px",
-    fontSize: 16,
-    color: "#111",
-    background: "white",
-    outline: "none",
-    boxSizing: "border-box" as const,
-  } as const;
-
-  const labelStyle = {
-    display: "block",
-    fontSize: 13,
-    fontWeight: 500,
-    color: "#555",
-    marginBottom: 6,
-  } as const;
-
-  const statusConfig = [
-    { value: "confirmed", label: "Confirmed", color: "#10B981" },
-    { value: "pending", label: "Pending", color: "#F59E0B" },
+  const statusConfig: { value: string; label: string; variant: "success" | "warning" }[] = [
+    { value: "confirmed", label: "Confirmed", variant: "success" },
+    { value: "pending", label: "Pending", variant: "warning" },
   ];
 
   return (
@@ -196,42 +181,21 @@ export default function AddBookingForm({
         {/* Left column — form fields */}
         <div className="flex min-w-0 flex-col gap-5">
           {/* Client details */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              <UserIcon size={16} color="#6B7280" />
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined">
+            <div className="mb-5 flex items-center gap-2">
+              <UserIcon size={16} color="var(--color-ink-500)" />
+              <h2 className="text-body font-semibold text-ink-900">
                 Client Details
               </h2>
             </div>
 
             {/* Search */}
-            <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>Find Client</label>
-              <div style={{ position: "relative" }}>
-                <span
-                  style={{
-                    position: "absolute",
-                    left: 12,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#aaa",
-                    display: "flex",
-                  }}
-                >
+            <div className="mb-4">
+              <label className="mb-1.5 block text-label font-medium text-ink-700">
+                Find Client
+              </label>
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400">
                   <SearchIcon size={15} />
                 </span>
                 <input
@@ -239,72 +203,29 @@ export default function AddBookingForm({
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   placeholder="Search existing clients..."
-                  style={{ ...inputStyle, paddingLeft: 36 }}
                   autoComplete="off"
+                  className="min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 py-2 pl-9 pr-4 text-body-sm text-ink-900 placeholder:text-ink-400 hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus focus-visible:outline-none"
                 />
                 {showDropdown && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      right: 0,
-                      background: "white",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                      zIndex: 10,
-                      overflow: "hidden",
-                      marginTop: 4,
-                    }}
-                  >
+                  <div className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-md border border-ink-200 bg-ink-0 shadow-lg">
                     {searchResults.map((client) => (
                       <button
                         key={client.client_email}
                         type="button"
                         onClick={() => selectClient(client)}
-                        style={{
-                          width: "100%",
-                          padding: "12px 16px",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          background: "white",
-                          border: "none",
-                          cursor: "pointer",
-                          textAlign: "left",
-                          borderBottom: "1px solid #f5f5f5",
-                        }}
+                        className="flex w-full cursor-pointer items-center gap-2.5 border-0 border-b border-ink-100 bg-ink-0 px-4 py-3 text-left last:border-b-0 hover:bg-ink-50"
                       >
-                        <div
-                          style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: "50%",
-                            background: brand,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "white",
-                            fontSize: 12,
-                            fontWeight: 600,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {client.client_name.charAt(0)}
-                        </div>
+                        <Avatar
+                          name={client.client_name}
+                          size="sm"
+                          className="text-xs text-white"
+                          style={{ background: brand }}
+                        />
                         <div>
-                          <p
-                            style={{
-                              fontSize: 13,
-                              fontWeight: 500,
-                              color: "#111",
-                              margin: 0,
-                            }}
-                          >
+                          <p className="text-body-sm font-medium text-ink-900">
                             {client.client_name}
                           </p>
-                          <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                          <p className="text-caption text-ink-400">
                             {client.client_email}
                           </p>
                         </div>
@@ -316,36 +237,30 @@ export default function AddBookingForm({
             </div>
 
             <div className="mb-3.5 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-              <div>
-                <label style={labelStyle}>Full Name</label>
-                <input
-                  type="text"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  placeholder="e.g. Jane Doe"
-                  required
-                  style={inputStyle}
-                />
-              </div>
-              <div>
-                <label style={labelStyle}>Email Address</label>
-                <input
-                  type="email"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="e.g. jane@example.com"
-                  required
-                  style={inputStyle}
-                />
-              </div>
+              <Input
+                id="add-booking-name"
+                type="text"
+                label="Full Name"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="e.g. Jane Doe"
+                required
+              />
+              <Input
+                id="add-booking-email"
+                type="email"
+                label="Email Address"
+                value={clientEmail}
+                onChange={(e) => setClientEmail(e.target.value)}
+                placeholder="e.g. jane@example.com"
+                required
+              />
             </div>
 
             <div>
-              <label style={labelStyle}>
+              <label className="mb-1.5 block text-label font-medium text-ink-700">
                 Phone Number{" "}
-                <span style={{ color: "#aaa", fontWeight: 400 }}>
-                  (Optional)
-                </span>
+                <span className="font-normal text-ink-400">(Optional)</span>
               </label>
               <input
                 type="tel"
@@ -356,92 +271,72 @@ export default function AddBookingForm({
                   if (phoneError) setPhoneError("");
                 }}
                 placeholder="e.g. +1 (555) 000-0000"
-                style={inputStyle}
+                className="min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 px-4 text-body-sm text-ink-900 placeholder:text-ink-400 hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus focus-visible:outline-none"
               />
               {phoneError ? (
-                <p className="mt-1 text-xs text-red-600">{phoneError}</p>
+                <p className="mt-1 text-caption text-danger-600">{phoneError}</p>
               ) : null}
             </div>
-          </div>
+          </Card>
 
           {/* Appointment details */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              <CalendarIcon size={16} color="#6B7280" />
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined">
+            <div className="mb-5 flex items-center gap-2">
+              <CalendarIcon size={16} color="var(--color-ink-500)" />
+              <h2 className="text-body font-semibold text-ink-900">
                 Appointment Details
               </h2>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={labelStyle}>Service</label>
-                <select
-                  value={serviceId}
-                  onChange={(e) => setServiceId(e.target.value)}
-                  required
-                  style={inputStyle}
-                >
-                  <option value="">Select a service...</option>
-                  {services.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} — €{s.price} · {s.duration_mins}min
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="flex flex-col gap-4">
+              <Select
+                id="add-booking-service"
+                label="Service"
+                value={serviceId}
+                onChange={(e) => setServiceId(e.target.value)}
+                required
+              >
+                <option value="">Select a service...</option>
+                {services.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} — €{s.price} · {s.duration_mins}min
+                  </option>
+                ))}
+              </Select>
 
-              <div>
-                <label style={labelStyle}>Staff Member</label>
-                <select
-                  value={staffId}
-                  onChange={(e) => setStaffId(e.target.value)}
-                  required
-                  style={inputStyle}
-                >
-                  <option value="">Select staff member...</option>
-                  {staffList.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} — {s.role}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                id="add-booking-staff"
+                label="Staff Member"
+                value={staffId}
+                onChange={(e) => setStaffId(e.target.value)}
+                required
+              >
+                <option value="">Select staff member...</option>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} — {s.role}
+                  </option>
+                ))}
+              </Select>
 
               <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+                <Input
+                  id="add-booking-date"
+                  type="date"
+                  label="Date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  required
+                  min={todayDate}
+                />
                 <div>
-                  <label style={labelStyle}>Date</label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    required
-                    min={todayDate}
-                    style={inputStyle}
-                  />
-                </div>
-                <div>
-                  <label style={labelStyle}>Time</label>
-                  <select
+                  <Select
+                    id="add-booking-time"
+                    label="Time"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
                     required
                     disabled={!canLoadAvailability || availabilityLoading || availableSlots.length === 0}
-                    style={inputStyle}
                   >
                     <option value="">
                       {availabilityLoading
@@ -453,12 +348,12 @@ export default function AddBookingForm({
                         {slot.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                   {availabilityError ? (
-                    <p className="mt-1 text-xs text-red-600">{availabilityError}</p>
+                    <p className="mt-1 text-caption text-danger-600">{availabilityError}</p>
                   ) : null}
                   {!availabilityLoading && canLoadAvailability && !availabilityError && availableSlots.length === 0 ? (
-                    <p className="mt-1 text-xs text-amber-700">
+                    <p className="mt-1 text-caption text-warning-700">
                       No available times for this staff on the selected date.
                     </p>
                   ) : null}
@@ -466,133 +361,71 @@ export default function AddBookingForm({
               </div>
 
               <div>
-                <label style={labelStyle}>Status</label>
-                <select
+                <Select
+                  id="add-booking-status"
+                  label="Status"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  style={inputStyle}
                 >
                   {statusConfig.map((s) => (
                     <option key={s.value} value={s.value}>
                       {s.label}
                     </option>
                   ))}
-                </select>
+                </Select>
                 {/* Status pills */}
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   {statusConfig.map((s) => (
-                    <span
+                    <button
                       key={s.value}
+                      type="button"
                       onClick={() => setStatus(s.value)}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 5,
-                        padding: "4px 12px",
-                        borderRadius: 100,
-                        fontSize: 12,
-                        fontWeight: 500,
-                        cursor: "pointer",
-                        border:
-                          status === s.value ? "none" : "1px solid #e5e7eb",
-                        background:
-                          status === s.value ? `${s.color}20` : "white",
-                        color: status === s.value ? s.color : "#aaa",
-                      }}
+                      className="cursor-pointer border-none bg-transparent p-0"
                     >
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: s.color,
-                        }}
-                      />
-                      {s.label}
-                    </span>
+                      <Badge variant={status === s.value ? s.variant : "neutral"}>
+                        {s.label}
+                      </Badge>
+                    </button>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Right column — summary + actions (sticky from lg) */}
         <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
           {/* Summary card */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
+          <Card variant="outlined">
             <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 20,
-                paddingBottom: 16,
-                borderBottom: `2px solid ${brand}`,
-              }}
+              className="mb-5 flex items-center gap-2 pb-4"
+              style={{ borderBottom: `2px solid ${brand}` }}
             >
-              <span style={{ fontSize: 16 }}>📋</span>
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
-                Summary
-              </h2>
+              <span className="text-base">📋</span>
+              <h2 className="text-body font-semibold text-ink-900">Summary</h2>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 14,
-                marginBottom: 20,
-              }}
-            >
+            <div className="mb-5 flex flex-col gap-3.5">
               <div>
-                <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 3px" }}>
-                  Service
-                </p>
+                <p className="mb-1 text-caption text-ink-400">Service</p>
                 <p
-                  style={{
-                    fontSize: 14,
-                    color: selectedService ? "#111" : "#ccc",
-                    margin: 0,
-                    fontWeight: selectedService ? 500 : 400,
-                  }}
+                  className={`text-body-sm ${selectedService ? "font-medium text-ink-900" : "text-ink-300"}`}
                 >
                   {selectedService?.name ?? "No service selected"}
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 3px" }}>
-                  Staff
-                </p>
+                <p className="mb-1 text-caption text-ink-400">Staff</p>
                 <p
-                  style={{
-                    fontSize: 14,
-                    color: selectedStaff ? "#111" : "#ccc",
-                    margin: 0,
-                    fontWeight: selectedStaff ? 500 : 400,
-                  }}
+                  className={`text-body-sm ${selectedStaff ? "font-medium text-ink-900" : "text-ink-300"}`}
                 >
                   {selectedStaff?.name ?? "No staff selected"}
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 3px" }}>
-                  Date & Time
-                </p>
+                <p className="mb-1 text-caption text-ink-400">Date &amp; Time</p>
                 <p
-                  style={{
-                    fontSize: 14,
-                    color: date && time ? "#111" : "#ccc",
-                    margin: 0,
-                    fontWeight: date && time ? 500 : 400,
-                  }}
+                  className={`text-body-sm ${date && time ? "font-medium text-ink-900" : "text-ink-300"}`}
                 >
                   {date && time
                     ? `${new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at ${time}`
@@ -600,15 +433,9 @@ export default function AddBookingForm({
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 3px" }}>
-                  Duration
-                </p>
+                <p className="mb-1 text-caption text-ink-400">Duration</p>
                 <p
-                  style={{
-                    fontSize: 14,
-                    color: selectedService ? "#111" : "#ccc",
-                    margin: 0,
-                  }}
+                  className={`text-body-sm ${selectedService ? "text-ink-900" : "text-ink-300"}`}
                 >
                   {selectedService
                     ? `${selectedService.duration_mins} min`
@@ -616,32 +443,13 @@ export default function AddBookingForm({
                 </p>
               </div>
 
-              <div
-                style={{
-                  borderTop: "1px solid #f0f0f0",
-                  paddingTop: 14,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: "#111",
-                    margin: 0,
-                  }}
-                >
+              <div className="flex items-center justify-between border-t border-ink-100 pt-3.5">
+                <p className="text-body-sm font-medium text-ink-900">
                   Total Price
                 </p>
                 <p
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 700,
-                    color: brand,
-                    margin: 0,
-                  }}
+                  className="text-h2 font-bold"
+                  style={{ color: brand }}
                 >
                   €
                   {selectedService
@@ -650,30 +458,22 @@ export default function AddBookingForm({
                 </p>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Actions card */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6">
-            <button
+          <Card variant="outlined">
+            <Button
               type="submit"
               disabled={loading || !time}
-              className="mb-3.5 w-full min-h-12 rounded-[10px] border-none text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
-              style={{ background: brand, padding: "13px" }}
+              variant="primary"
+              size="lg"
+              className="mb-3.5 w-full"
+              style={{ backgroundColor: brand }}
             >
               {loading ? "Creating..." : "Create Booking"}
-            </button>
+            </Button>
 
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                fontSize: 13,
-                color: "#555",
-                cursor: "pointer",
-                marginBottom: 12,
-              }}
-            >
+            <label className="mb-3 flex cursor-pointer items-center gap-2 text-body-sm text-ink-700">
               <input
                 type="checkbox"
                 defaultChecked
@@ -682,18 +482,20 @@ export default function AddBookingForm({
               Send confirmation email
             </label>
 
-            <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 14px" }}>
+            <p className="mb-3.5 text-caption text-ink-400">
               The client will receive a confirmation email if checked.
             </p>
 
-            <button
+            <Button
               type="button"
               onClick={() => window.history.back()}
-              className="w-full min-h-11 cursor-pointer rounded-[10px] border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-600"
+              variant="secondary"
+              size="md"
+              className="w-full"
             >
               Cancel
-            </button>
-          </div>
+            </Button>
+          </Card>
         </div>
       </div>
     </form>

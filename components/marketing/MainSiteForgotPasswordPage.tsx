@@ -8,6 +8,7 @@ import {
   ShieldIcon,
 } from "@/components/ui/Icons";
 import { Button } from "@/components/ds/Button";
+import { Input } from "@/components/ds/Input";
 import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { useState } from "react";
@@ -76,33 +77,25 @@ export default function MainSiteForgotPasswordPage() {
         </p>
 
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
-              {a.email}
-            </label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <MailIcon />
-              </span>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder={f.forgotEmailPlaceholder}
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-              />
-            </div>
-            <p className="mt-2 text-sm text-slate-500">{f.forgotEmailHint}</p>
-          </div>
+          <Input
+            id="forgot-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            label={a.email}
+            placeholder={f.forgotEmailPlaceholder}
+            leading={<MailIcon />}
+            helperText={f.forgotEmailHint}
+          />
 
           {done ? (
-            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            <p className="rounded-xl border border-success-50 bg-success-50 px-4 py-3 text-sm text-success-700">
               If an account exists for this email, a reset link has been sent.
             </p>
           ) : null}
           {error ? (
-            <p className="text-sm font-medium text-rose-600">{error}</p>
+            <p className="text-sm font-medium text-danger-600">{error}</p>
           ) : null}
 
           <Button

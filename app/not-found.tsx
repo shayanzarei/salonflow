@@ -1,3 +1,4 @@
+import { Button } from "@/components/ds/Button";
 import { getServerTranslations } from "@/lib/i18n/server";
 import Link from "next/link";
 
@@ -38,21 +39,12 @@ export default async function NotFound() {
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Link
-          href="/"
-          className="inline-flex min-h-11 items-center justify-center rounded-xl px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{
-            background: "linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)",
-          }}
-        >
-          {e.notFoundBack}
-        </Link>
-        <Link
-          href="/contact"
-          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-        >
-          {e.notFoundContact}
-        </Link>
+        <Button asChild variant="primary" size="lg">
+          <Link href="/">{e.notFoundBack}</Link>
+        </Button>
+        <Button asChild variant="secondary" size="lg">
+          <Link href="/contact">{e.notFoundContact}</Link>
+        </Button>
       </div>
 
       <p className="mt-16 text-xs text-slate-400">{e.notFoundFooter}</p>

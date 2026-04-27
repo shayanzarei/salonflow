@@ -66,11 +66,11 @@ export default async function SuccessPage({
         : "";
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-ink-50">
       <div className="mx-auto max-w-[560px] px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <Link
           href="/"
-          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 sm:mb-8"
+          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-ink-500 transition-colors hover:text-ink-900 sm:mb-8"
         >
           {t.booking.backToWebsite}
         </Link>
@@ -93,10 +93,10 @@ export default async function SuccessPage({
               <CheckCircleIcon size={34} color="#ffffff" />
             </div>
           </div>
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h1 className="text-balance text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl">
             {t.booking.success.title}
           </h1>
-          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-gray-500 sm:text-base">
+          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink-500 sm:text-base">
             {t.booking.success.subtitle}
           </p>
         </div>
@@ -118,7 +118,7 @@ export default async function SuccessPage({
             </div>
 
             <div className="p-5 sm:p-6 md:p-8">
-              <div className="mb-6 flex items-start gap-4 border-b border-gray-100 pb-6">
+              <div className="mb-6 flex items-start gap-4 border-b border-ink-100 pb-6">
                 <div
                   className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl sm:h-14 sm:w-14"
                   style={{ background: `${brand}18` }}
@@ -126,10 +126,10 @@ export default async function SuccessPage({
                   <ScissorsIcon size={22} color={brand} />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-lg font-bold text-gray-900 sm:text-xl">
+                  <h2 className="text-lg font-bold text-ink-900 sm:text-xl">
                     {bookingData.service_name}
                   </h2>
-                  <p className="mt-0.5 text-sm text-gray-500">
+                  <p className="mt-0.5 text-sm text-ink-500">
                     {t.booking.success.withStaffPrefix} {bookingData.staff_name}
                   </p>
                 </div>
@@ -164,7 +164,7 @@ export default async function SuccessPage({
                   },
                   {
                     icon: (
-                      <span className="text-xs font-bold text-gray-400">€</span>
+                      <span className="text-xs font-bold text-ink-400">€</span>
                     ),
                     label: t.booking.success.totalLabel,
                     value: priceLabel,
@@ -172,12 +172,12 @@ export default async function SuccessPage({
                   },
                 ].map((item) => (
                   <div key={item.label}>
-                    <p className="mb-1 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-gray-400">
+                    <p className="mb-1 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-ink-400">
                       <span className="flex shrink-0 items-center">{item.icon}</span>
                       {item.label}
                     </p>
                     <p
-                      className="text-[15px] font-semibold text-gray-900 sm:text-base"
+                      className="text-[15px] font-semibold text-ink-900 sm:text-base"
                       style={item.accent ? { color: brand } : undefined}
                     >
                       {item.value}
@@ -187,12 +187,12 @@ export default async function SuccessPage({
               </div>
 
               {tenant?.address ? (
-                <div className="border-t border-gray-100 pt-6">
-                  <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-gray-400">
+                <div className="border-t border-ink-100 pt-6">
+                  <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-ink-400">
                     <MapPinIcon size={14} color="#9ca3af" />
                     {t.booking.success.locationLabel}
                   </p>
-                  <p className="text-sm leading-relaxed text-gray-600 sm:text-[15px]">
+                  <p className="text-sm leading-relaxed text-ink-500 sm:text-[15px]">
                     {tenant.address}
                   </p>
                   <a
@@ -232,7 +232,7 @@ export default async function SuccessPage({
             <CalendarIcon size={16} color={brand} />
             {t.booking.success.addGoogleCalendar}
           </a>
-          <span className="hidden h-4 w-px bg-gray-200 sm:block" aria-hidden />
+          <span className="hidden h-4 w-px bg-ink-200 sm:block" aria-hidden />
           <a
             href={`https://wa.me/?text=${encodeURIComponent(
               fillTemplate(t.booking.success.shareWhatsappTemplate, {

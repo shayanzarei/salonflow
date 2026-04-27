@@ -1,3 +1,11 @@
+import {
+  Table,
+  TableContainer,
+  TBodyRow,
+  TD,
+  TH,
+  THeadRow,
+} from "@/components/ds/Table";
 import pool from "@/lib/db";
 
 export default async function AdminDemoBookingsPage() {
@@ -28,28 +36,28 @@ export default async function AdminDemoBookingsPage() {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+      <TableContainer className="rounded-2xl border-gray-100">
         {bookings.length === 0 ? (
           <div className="px-6 py-12 text-center text-sm text-gray-400">
             No demo bookings yet.
           </div>
         ) : (
           <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-            <table className="w-full min-w-[980px] border-collapse">
+            <Table className="min-w-[980px]">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-5 py-3.5">Contact</th>
-                  <th className="px-5 py-3.5">Focus</th>
-                  <th className="px-5 py-3.5">Slot</th>
-                  <th className="px-5 py-3.5">Duration</th>
-                  <th className="px-5 py-3.5">Status</th>
-                  <th className="px-5 py-3.5">Requested</th>
-                </tr>
+                <THeadRow>
+                  <TH>Contact</TH>
+                  <TH>Focus</TH>
+                  <TH>Slot</TH>
+                  <TH>Duration</TH>
+                  <TH>Status</TH>
+                  <TH>Requested</TH>
+                </THeadRow>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {bookings.map((booking) => (
-                  <tr key={booking.id} className="text-sm text-gray-800">
-                    <td className="px-5 py-3">
+                  <TBodyRow key={booking.id} interactive={false}>
+                    <TD>
                       <p className="font-medium text-gray-900">
                         {booking.first_name} {booking.last_name}
                       </p>
@@ -57,13 +65,13 @@ export default async function AdminDemoBookingsPage() {
                       {booking.company_role ? (
                         <p className="text-xs text-gray-500">{booking.company_role}</p>
                       ) : null}
-                    </td>
-                    <td className="px-5 py-3">
+                    </TD>
+                    <TD>
                       <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium capitalize text-slate-700">
                         {String(booking.focus_area).replaceAll("_", " ")}
                       </span>
-                    </td>
-                    <td className="px-5 py-3 text-gray-600">
+                    </TD>
+                    <TD className="text-gray-600">
                       {new Date(booking.scheduled_for).toLocaleString("en-US", {
                         weekday: "short",
                         month: "short",
@@ -72,27 +80,27 @@ export default async function AdminDemoBookingsPage() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
-                    </td>
-                    <td className="px-5 py-3 text-gray-600">{booking.duration_mins} min</td>
-                    <td className="px-5 py-3">
+                    </TD>
+                    <TD className="text-gray-600">{booking.duration_mins} min</TD>
+                    <TD>
                       <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium capitalize text-emerald-700">
                         {booking.status}
                       </span>
-                    </td>
-                    <td className="px-5 py-3 text-xs text-gray-500">
+                    </TD>
+                    <TD className="text-xs text-gray-500">
                       {new Date(booking.created_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "2-digit",
                         year: "numeric",
                       })}
-                    </td>
-                  </tr>
+                    </TD>
+                  </TBodyRow>
                 ))}
               </tbody>
-            </table>
+            </Table>
           </div>
         )}
-      </div>
+      </TableContainer>
     </div>
   );
 }

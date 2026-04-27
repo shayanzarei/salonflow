@@ -1,5 +1,9 @@
 "use client";
 
+import { Avatar } from "@/components/ds/Avatar";
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
 import { useLocale } from "@/lib/i18n/context";
 import { fillTemplate } from "@/lib/i18n/interpolate";
 import { bcp47ForLocale } from "@/lib/i18n/locale-format";
@@ -47,15 +51,6 @@ function fmtTime(iso: string, localeTag: string) {
   });
 }
 
-function mkInitials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
 // ── Stat card ─────────────────────────────────────────────────────────────────
 
 function StatCard({
@@ -82,18 +77,18 @@ function StatCard({
       ? fillTemplate(completedOne, { n: count })
       : fillTemplate(completedMany, { n: count });
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <Card variant="outlined" className="p-5">
       <div className="mb-3 flex items-center gap-2">
         <span className="text-lg">{icon}</span>
-        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">{label}</p>
+        <p className="text-caption font-semibold uppercase tracking-widest text-ink-400">{label}</p>
       </div>
       <p className="mb-0.5 text-3xl font-extrabold tracking-tight" style={{ color: accent }}>
         {formatEUR(revenue, localeTag)}
       </p>
-      <p className="text-sm text-gray-500">
+      <p className="text-body-sm text-ink-500">
         {countLine}
       </p>
-    </div>
+    </Card>
   );
 }
 
@@ -177,12 +172,12 @@ export default function ReportsPage() {
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-400">
+        <div className="flex flex-col items-center gap-3 text-ink-400">
           <svg className="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#E2E8F0" strokeWidth="3" />
+            <circle cx="12" cy="12" r="10" stroke="var(--color-ink-200)" strokeWidth="3" />
             <path d="M12 2a10 10 0 0 1 10 10" stroke='var(--color-brand-600)' strokeWidth="3" strokeLinecap="round" />
           </svg>
-          <span className="text-sm">{dr.loading}</span>
+          <span className="text-body-sm">{dr.loading}</span>
         </div>
       </div>
     );
@@ -190,9 +185,9 @@ export default function ReportsPage() {
 
   if (error || !data) {
     return (
-      <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center text-sm text-red-600">
+      <Card variant="outlined" className="bg-danger-50 p-8 text-center text-body-sm text-danger-600">
         {error || dr.genericError}
-      </div>
+      </Card>
     );
   }
 
@@ -223,22 +218,22 @@ export default function ReportsPage() {
       {/* Page header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{dr.title}</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-h1 font-bold text-ink-900">{dr.title}</h1>
+          <p className="mt-1 text-body-sm text-ink-500">
             {dr.subtitle}
           </p>
         </div>
         {pendingCount > 0 && (
-          <button
+          <Button
             onClick={finalizeAll}
             disabled={bulkLoading}
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg,var(--color-brand-600),var(--color-brand-700))" }}
+            variant="primary"
+            size="md"
           >
             {bulkLoading
               ? dr.finalizing
               : fillTemplate(dr.completeAllTemplate, { n: pendingCount })}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -258,7 +253,7 @@ export default function ReportsPage() {
           label={dr.statWeek}
           revenue={data.week_revenue}
           count={data.week_completed}
-          accent="#6366F1"
+          accent="var(--color-info-600)"
           icon="📆"
           localeTag={localeTag}
           completedOne={dr.completedAppointmentsOne}
@@ -277,33 +272,31 @@ export default function ReportsPage() {
       </div>
 
       {/* Today's appointment list */}
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+      <Card variant="outlined" className="overflow-hidden p-0">
+        <div className="flex items-center justify-between border-b border-ink-100 px-6 py-4">
           <div>
-            <h2 className="font-semibold text-gray-900">{dr.todayAppointmentsTitle}</h2>
-            <p className="mt-0.5 text-xs text-gray-400">
+            <h2 className="font-semibold text-ink-900">{dr.todayAppointmentsTitle}</h2>
+            <p className="mt-0.5 text-caption text-ink-400">
               {dr.todayAppointmentsHint}
             </p>
           </div>
           {pendingCount === 0 && today.length > 0 && (
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-              {dr.allDone}
-            </span>
+            <Badge variant="success">{dr.allDone}</Badge>
           )}
         </div>
 
         {today.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 text-3xl">
+            <div className="flex h-16 w-16 items-center justify-center rounded-md bg-ink-50 text-3xl">
               📅
             </div>
-            <p className="font-semibold text-gray-700">{dr.emptyTodayTitle}</p>
-            <p className="max-w-xs text-sm text-gray-400">
+            <p className="font-semibold text-ink-700">{dr.emptyTodayTitle}</p>
+            <p className="max-w-xs text-body-sm text-ink-400">
               {dr.emptyTodayBody}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-ink-50">
             {today.map((booking) => {
               const effectiveStatus = localStatus[booking.id] ?? booking.status;
               const isBusy = finalizing[booking.id] ?? false;
@@ -315,28 +308,28 @@ export default function ReportsPage() {
                   key={booking.id}
                   className={`flex items-center gap-4 px-6 py-4 transition-colors ${
                     effectiveStatus === "completed"
-                      ? "bg-emerald-50/40"
+                      ? "bg-success-50/40"
                       : effectiveStatus === "no_show"
-                        ? "bg-gray-50/70"
+                        ? "bg-ink-50/70"
                         : isCancelled
                           ? "opacity-50"
-                          : "bg-white"
+                          : "bg-ink-0"
                   }`}
                 >
                   {/* Avatar */}
-                  <div
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                    style={{ background: "linear-gradient(135deg,var(--color-brand-600),var(--color-brand-700))" }}
-                  >
-                    {mkInitials(booking.client_name)}
-                  </div>
+                  <Avatar
+                    name={booking.client_name}
+                    size="md"
+                    className="h-10 w-10 shrink-0 text-body-sm font-bold text-white"
+                    style={{ background: "var(--color-brand-600)" }}
+                  />
 
                   {/* Info */}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-gray-900">
+                    <p className="truncate text-body-sm font-semibold text-ink-900">
                       {booking.client_name}
                     </p>
-                    <p className="truncate text-xs text-gray-500">
+                    <p className="truncate text-caption text-ink-500">
                       {booking.service_name} · {booking.staff_name} ·{" "}
                       {fmtTime(booking.booked_at, localeTag)}
                     </p>
@@ -344,10 +337,10 @@ export default function ReportsPage() {
 
                   {/* Price + duration */}
                   <div className="hidden shrink-0 text-right sm:block">
-                    <p className="text-sm font-bold text-gray-900">
+                    <p className="text-body-sm font-bold text-ink-900">
                       {formatEUR(booking.price, localeTag)}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-caption text-ink-400">
                       {fillTemplate(dr.minShort, { n: booking.duration_mins })}
                     </p>
                   </div>
@@ -355,37 +348,40 @@ export default function ReportsPage() {
                   {/* Actions */}
                   <div className="shrink-0">
                     {isDone || isCancelled ? (
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      <Badge
+                        variant={
                           effectiveStatus === "completed"
-                            ? "bg-emerald-100 text-emerald-700"
+                            ? "success"
                             : effectiveStatus === "no_show"
-                              ? "bg-orange-100 text-orange-600"
-                              : "bg-gray-100 text-gray-500"
-                        }`}
+                              ? "warning"
+                              : "neutral"
+                        }
                       >
                         {effectiveStatus === "completed"
                           ? dr.statusCompleted
                           : effectiveStatus === "no_show"
                             ? dr.statusNoShow
                             : dr.statusCancelled}
-                      </span>
+                      </Badge>
                     ) : (
                       <div className="flex gap-2">
-                        <button
+                        <Button
                           onClick={() => void finalize(booking.id, "completed")}
                           disabled={isBusy}
-                          className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                          variant="primary"
+                          size="sm"
+                          style={{ backgroundColor: "var(--color-success-600)" }}
                         >
                           {isBusy ? "…" : dr.done}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => void finalize(booking.id, "no_show")}
                           disabled={isBusy}
-                          className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-500 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                          variant="secondary"
+                          size="sm"
                         >
                           {dr.noShow}
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -394,14 +390,14 @@ export default function ReportsPage() {
             })}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Explainer */}
-      <div className="rounded-xl border border-blue-100 bg-blue-50/60 px-5 py-4">
-        <p className="text-sm leading-relaxed text-blue-700">
+      <Card variant="outlined" className="bg-info-50 px-5 py-4">
+        <p className="text-body-sm leading-relaxed text-info-600">
           {dr.explainer}
         </p>
-      </div>
+      </Card>
 
     </div>
   );

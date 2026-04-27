@@ -1,3 +1,6 @@
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Input } from "@/components/ds/Input";
 import { authOptions } from "@/lib/auth-options";
 import { getTenant } from "@/lib/tenant";
 import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
@@ -19,38 +22,38 @@ export default async function SecurityPage({
   return (
     <div className="mx-auto max-w-3xl space-y-6 pb-12">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Account & security</h1>
-        <p className="mt-1 text-gray-500">
+        <h1 className="text-h2 font-bold text-ink-900">Account & security</h1>
+        <p className="mt-1 text-ink-500">
           Update credentials and security preferences.
         </p>
       </div>
 
       {qp.success === "password_updated" ? (
-        <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        <div className="rounded-md border border-success-600/30 bg-success-50 px-4 py-3 text-body-sm text-success-700">
           Password updated successfully.
         </div>
       ) : null}
       {qp.error === "wrong_password" ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-md border border-danger-600/30 bg-danger-50 px-4 py-3 text-body-sm text-danger-700">
           Current password is incorrect.
         </div>
       ) : null}
       {qp.error === "password_mismatch" ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-md border border-danger-600/30 bg-danger-50 px-4 py-3 text-body-sm text-danger-700">
           New password and confirmation do not match.
         </div>
       ) : null}
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm" id="password">
-        <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-100 bg-gray-50/80 px-4 py-3">
+      <Card id="password">
+        <div className="flex items-center justify-between gap-4 rounded-md border border-ink-100 bg-ink-50 px-4 py-3">
           <div className="flex flex-col gap-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <p className="text-caption font-medium uppercase tracking-wide text-ink-400">
               Login
             </p>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-body-sm font-medium text-ink-900">
               {tenant.owner_email}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-caption text-ink-500">
               You sign in with this ID and your password
             </p>
           </div>
@@ -59,60 +62,50 @@ export default async function SecurityPage({
         <form
           action="/api/settings/password"
           method="POST"
-          className="mt-6 space-y-4 border-t border-gray-100 pt-6"
+          className="mt-6 space-y-4 border-t border-ink-100 pt-6"
         >
           <input type="hidden" name="redirect_to" value="/settings/security" />
-          <h2 className="text-sm font-semibold text-gray-800">
+          <h2 className="text-body-sm font-semibold text-ink-900">
             Change password
           </h2>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600">
-              Current password
-            </label>
-            <input
-              type="password"
-              name="current_password"
-              required
-              autoComplete="current-password"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-purple-400 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600">
-              New password
-            </label>
-            <input
-              type="password"
-              name="new_password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-purple-400 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600">
-              Confirm new password
-            </label>
-            <input
-              type="password"
-              name="confirm_password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-purple-400 focus:outline-none"
-            />
-          </div>
-          <button
+          <Input
+            id="current_password"
+            type="password"
+            name="current_password"
+            label="Current password"
+            required
+            autoComplete="current-password"
+          />
+          <Input
+            id="new_password"
+            type="password"
+            name="new_password"
+            label="New password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+          />
+          <Input
+            id="confirm_password"
+            type="password"
+            name="confirm_password"
+            label="Confirm new password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+          />
+          <Button
             type="submit"
-            className="w-full rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            variant="primary"
+            size="md"
+            className="w-full"
             style={{ backgroundColor: brand }}
           >
             Update password
-          </button>
+          </Button>
         </form>
-      </div>
-      {/* ── Danger zone ──────────────────────────────────────────────────── */}
+      </Card>
+      {/* Danger zone */}
       <DeleteAccountSection
         slug={tenant.slug as string}
         tenantName={tenant.name as string}

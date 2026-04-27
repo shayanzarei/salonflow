@@ -16,19 +16,19 @@ export default async function CheckoutFailedPage() {
   return (
     <CheckoutResultLayout>
       <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-danger-50 text-danger-700">
           <ShieldIcon size={32} />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">
           Payment did not go through
         </h1>
-        <p className="mt-3 text-sm text-slate-600 sm:text-base">
+        <p className="mt-3 text-sm text-ink-500 sm:text-base">
           Your bank or card issuer declined or interrupted the payment. You have
           not been charged. Try again with another method, or contact us and we
           will help you finish setup.
         </p>
-        <div className="mt-8 w-full rounded-2xl border border-slate-200/80 bg-white/90 p-5 text-left text-sm text-slate-600 shadow-sm backdrop-blur-sm">
-          <p className="font-medium text-slate-800">What you can do next</p>
+        <div className="mt-8 w-full rounded-2xl border border-ink-200/80 bg-white/90 p-5 text-left text-sm text-ink-500 shadow-sm backdrop-blur-sm">
+          <p className="font-medium text-ink-700">What you can do next</p>
           <ul className="mt-3 list-inside list-disc space-y-2">
             <li>Retry checkout from the pricing page with a different card or bank.</li>
             <li>Confirm with your bank that online payments to Stripe are allowed.</li>

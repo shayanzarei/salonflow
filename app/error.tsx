@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
 import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -59,27 +60,15 @@ export default function GlobalError({
 
       {/* Actions */}
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button
-          onClick={reset}
-          className="inline-flex min-h-11 items-center justify-center rounded-xl px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{
-            background: "linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)",
-          }}
-        >
+        <Button onClick={reset} variant="primary" size="lg">
           {t.errors.tryAgain}
-        </button>
-        <Link
-          href="/"
-          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-        >
-          {t.errors.backToHome}
-        </Link>
-        <Link
-          href="/contact"
-          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-        >
-          {t.errors.contactSupport}
-        </Link>
+        </Button>
+        <Button asChild variant="secondary" size="lg">
+          <Link href="/">{t.errors.backToHome}</Link>
+        </Button>
+        <Button asChild variant="secondary" size="lg">
+          <Link href="/contact">{t.errors.contactSupport}</Link>
+        </Button>
       </div>
 
       {/* Footer hint */}

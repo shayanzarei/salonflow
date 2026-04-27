@@ -1,6 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  Table,
+  TableContainer,
+  TBodyRow,
+  TD,
+  TH,
+  THeadRow,
+} from "@/components/ds/Table";
 
 type Plan = "solo" | "hub" | "agency";
 type BillingCycle = "monthly" | "annual";
@@ -472,7 +480,7 @@ export default function BillingPage() {
       )}
 
       {/* Payment history */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+      <TableContainer className="rounded-2xl border-gray-100 shadow-sm">
         <div className="px-6 py-4 border-b border-gray-100">
           <h2 className="text-base font-bold text-gray-900">Payment history</h2>
         </div>
@@ -483,51 +491,41 @@ export default function BillingPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <Table>
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Plan
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Status
-                  </th>
-                </tr>
+                <THeadRow>
+                  <TH>Date</TH>
+                  <TH>Description</TH>
+                  <TH>Plan</TH>
+                  <TH>Amount</TH>
+                  <TH>Status</TH>
+                </THeadRow>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-3 whitespace-nowrap text-gray-600">
+                  <TBodyRow key={p.id}>
+                    <TD className="whitespace-nowrap text-gray-600">
                       {formatDate(p.created_at)}
-                    </td>
-                    <td className="px-6 py-3 text-gray-800 font-medium">
+                    </TD>
+                    <TD className="font-medium text-gray-800">
                       {eventLabel(p.event_type)}
-                    </td>
-                    <td className="px-6 py-3 text-gray-600 capitalize">
+                    </TD>
+                    <TD className="capitalize text-gray-600">
                       {p.plan
                         ? `${p.plan}${p.billing_cycle ? ` · ${p.billing_cycle}` : ""}`
                         : "—"}
-                    </td>
-                    <td className="px-6 py-3 font-semibold text-gray-900">
+                    </TD>
+                    <TD className="font-semibold text-gray-900">
                       {formatCents(p.amount_cents, p.currency)}
-                    </td>
-                    <td className="px-6 py-3">{statusBadge(p.event_type)}</td>
-                  </tr>
+                    </TD>
+                    <TD>{statusBadge(p.event_type)}</TD>
+                  </TBodyRow>
                 ))}
               </tbody>
-            </table>
+            </Table>
           </div>
         )}
-      </div>
+      </TableContainer>
     </div>
   );
 }

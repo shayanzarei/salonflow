@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar } from "@/components/ds/Avatar";
 import { XIcon } from "@/components/ui/Icons";
 import { useState } from "react";
 
@@ -70,12 +71,12 @@ export default function StaffCalendarView({
                     className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0 text-left"
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        className="h-9 w-9 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0"
+                      <Avatar
+                        name={booking.client_name}
+                        size="sm"
+                        className="h-9 w-9 flex-shrink-0 text-sm font-medium text-white"
                         style={{ backgroundColor: brandColor }}
-                      >
-                        {booking.client_name.charAt(0)}
-                      </div>
+                      />
                       <div>
                         <p className="text-sm font-medium text-gray-900">
                           {booking.client_name}
@@ -127,12 +128,12 @@ export default function StaffCalendarView({
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium"
+                <Avatar
+                  name={selectedBooking.client_name}
+                  size="md"
+                  className="h-10 w-10 font-medium text-white"
                   style={{ backgroundColor: brandColor }}
-                >
-                  {selectedBooking.client_name.charAt(0)}
-                </div>
+                />
                 <div>
                   <p className="font-medium text-gray-900">
                     {selectedBooking.client_name}

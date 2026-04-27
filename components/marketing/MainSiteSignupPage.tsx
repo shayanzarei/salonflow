@@ -3,7 +3,6 @@
 import {
   ArrowRightIcon,
   BuildingIcon,
-  ChevronDownIcon,
   EyeIcon,
   LockIcon,
   MailIcon,
@@ -15,6 +14,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "../ds/Button";
+import { Input } from "../ds/Input";
+import { Select } from "../ds/Select";
 
 export default function MainSiteSignupPage() {
   const { t } = useLocale();
@@ -221,159 +222,103 @@ export default function MainSiteSignupPage() {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="first-name"
-                className="mb-2 block text-sm font-semibold text-slate-700"
-              >
-                {a.signupFirstName}
-              </label>
-              <input
-                id="first-name"
-                name="first-name"
-                type="text"
-                required
-                placeholder="John"
-                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="last-name"
-                className="mb-2 block text-sm font-semibold text-slate-700"
-              >
-                {a.signupLastName}
-              </label>
-              <input
-                id="last-name"
-                name="last-name"
-                type="text"
-                required
-                placeholder="Doe"
-                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-              />
-            </div>
+            <Input
+              id="first-name"
+              name="first-name"
+              type="text"
+              required
+              label={a.signupFirstName}
+              placeholder="John"
+            />
+            <Input
+              id="last-name"
+              name="last-name"
+              type="text"
+              required
+              label={a.signupLastName}
+              placeholder="Doe"
+            />
           </div>
 
-          <div>
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-semibold text-slate-700"
-            >
-              {a.signupWorkEmail}
-            </label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <MailIcon />
-              </span>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="you@company.com"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-              />
-            </div>
-          </div>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            required
+            label={a.signupWorkEmail}
+            placeholder="you@company.com"
+            leading={<MailIcon />}
+          />
 
           <div>
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-semibold text-slate-700"
-            >
-              {a.signupCreatePassword}
-            </label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <LockIcon size={16} />
-              </span>
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                minLength={8}
-                placeholder="Create a strong password"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-12 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-              />
-              <button
-                type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? a.hidePassword : a.showPassword}
-              >
-                <EyeIcon size={16} />
-              </button>
-            </div>
+            <Input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              label={a.signupCreatePassword}
+              placeholder="Create a strong password"
+              leading={<LockIcon size={16} />}
+              trailing={
+                <button
+                  type="button"
+                  className="text-ink-400 transition-colors hover:text-ink-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? a.hidePassword : a.showPassword}
+                >
+                  <EyeIcon size={16} />
+                </button>
+              }
+            />
             <div className="mt-2 flex items-center gap-2">
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink-200">
                 <div className="h-full w-[18%] bg-brand-600" />
               </div>
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-medium text-ink-500">
                 {a.signupPasswordHint}
               </span>
             </div>
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-ink-500">
               {a.signupPasswordRule}
             </p>
           </div>
 
-          <div>
-            <label
-              htmlFor="company"
-              className="mb-2 block text-sm font-semibold text-slate-700"
-            >
-              {a.signupCompany}{" "}
-              <span className="font-normal text-slate-400">
-                {a.signupOptional}
-              </span>
-            </label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <BuildingIcon />
-              </span>
-              <input
-                id="company"
-                name="company"
-                type="text"
-                placeholder="Your company"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-              />
-            </div>
-          </div>
+          <Input
+            id="company"
+            name="company"
+            type="text"
+            label={a.signupCompany}
+            optionalLabel={a.signupOptional}
+            placeholder="Your company"
+            leading={<BuildingIcon />}
+          />
 
           <div>
             <label
               htmlFor="role"
-              className="mb-2 block text-sm font-semibold text-slate-700"
+              className="mb-2 block text-sm font-semibold text-ink-700"
             >
               {a.signupRoleLabel}
             </label>
-            <div className="relative">
-              <select
-                id="role"
-                name="role"
-                defaultValue=""
-                required
-                className="w-full appearance-none rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-colors focus:border-brand-600"
-              >
-                <option value="" disabled>
-                  {a.signupRolePlaceholder}
-                </option>
-                <option value="freelancer">{a.signupRoleFreelancer}</option>
-                <option value="consultant">{a.signupRoleConsultant}</option>
-                <option value="agency-owner">{a.signupRoleAgencyOwner}</option>
-                <option value="entrepreneur">{a.signupRoleEntrepreneur}</option>
-                <option value="small-business">
-                  {a.signupRoleSmallBusiness}
-                </option>
-                <option value="other">{a.signupRoleOther}</option>
-              </select>
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
-                <ChevronDownIcon size={16} />
-              </span>
-            </div>
+            <Select
+              id="role"
+              name="role"
+              defaultValue=""
+              required
+            >
+              <option value="" disabled>
+                {a.signupRolePlaceholder}
+              </option>
+              <option value="freelancer">{a.signupRoleFreelancer}</option>
+              <option value="consultant">{a.signupRoleConsultant}</option>
+              <option value="agency-owner">{a.signupRoleAgencyOwner}</option>
+              <option value="entrepreneur">{a.signupRoleEntrepreneur}</option>
+              <option value="small-business">
+                {a.signupRoleSmallBusiness}
+              </option>
+              <option value="other">{a.signupRoleOther}</option>
+            </Select>
           </div>
 
           <label className="flex items-start gap-3">
@@ -381,9 +326,9 @@ export default function MainSiteSignupPage() {
               type="checkbox"
               name="terms"
               required
-              className="mt-0.5 h-5 w-5 rounded border-2 border-slate-300 text-brand-600 focus:ring-brand-600"
+              className="mt-0.5 h-5 w-5 rounded border-2 border-ink-300 text-brand-600 focus:ring-brand-600"
             />
-            <span className="text-sm leading-relaxed text-slate-600">
+            <span className="text-sm leading-relaxed text-ink-500">
               {a.signupAgreePrefix}{" "}
               <Link
                 href="/privacy"
@@ -405,15 +350,15 @@ export default function MainSiteSignupPage() {
             <input
               type="checkbox"
               name="marketing"
-              className="mt-0.5 h-5 w-5 rounded border-2 border-slate-300 text-brand-600 focus:ring-brand-600"
+              className="mt-0.5 h-5 w-5 rounded border-2 border-ink-300 text-brand-600 focus:ring-brand-600"
             />
-            <span className="text-sm leading-relaxed text-slate-600">
+            <span className="text-sm leading-relaxed text-ink-500">
               {a.signupMarketingOptIn}
             </span>
           </label>
 
           {error ? (
-            <p className="text-sm font-medium text-rose-600">{error}</p>
+            <p className="text-sm font-medium text-danger-600">{error}</p>
           ) : null}
 
           <Button

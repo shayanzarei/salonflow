@@ -153,8 +153,8 @@ export default function SidebarNav({
     : MENU_ITEMS.filter((item) => item.href !== "/gallery");
 
   return (
-    <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <p className="px-3 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400">
+    <nav className="flex flex-col gap-0.5">
+      <p className="px-3 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-400">
         {t.sidebar.menu}
       </p>
       {visibleMenuItems.map((item) => {
@@ -167,27 +167,17 @@ export default function SidebarNav({
             key={item.href}
             href={item.href}
             onClick={() => onNavigateAction?.()}
+            className="ml-2 flex min-h-11 items-center gap-2.5 rounded-md px-3 py-2.5 text-body-sm no-underline transition-colors"
             style={{
-              display: "flex",
-              marginLeft: 8,
-              alignItems: "center",
-              gap: 10,
-              minHeight: 44,
-              padding: "10px 12px",
-              borderRadius: 10,
-              fontSize: 14,
               fontWeight: isActive ? 600 : 400,
-              textDecoration: "none",
               background: isActive ? `${brandColor}15` : "transparent",
-              color: isActive ? brandColor : "#6B7280",
-              transition: "background 0.15s, color 0.15s",
+              color: isActive ? brandColor : "var(--color-ink-500)",
             }}
           >
             <span
+              className="flex shrink-0"
               style={{
-                flexShrink: 0,
-                color: isActive ? brandColor : "#9CA3AF",
-                display: "flex",
+                color: isActive ? brandColor : "var(--color-ink-400)",
               }}
             >
               {item.icon}
@@ -197,7 +187,7 @@ export default function SidebarNav({
         );
       })}
 
-      <p className="mt-3 px-3 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400">
+      <p className="mt-3 px-3 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-400">
         {t.sidebar.settings}
       </p>
       {SETTINGS_ITEMS.map((item) => {
@@ -209,27 +199,17 @@ export default function SidebarNav({
             key={item.href}
             href={item.href}
             onClick={() => onNavigateAction?.()}
+            className="ml-2 flex min-h-10 items-center gap-2.5 rounded-md px-3 py-2 text-body-sm no-underline transition-colors"
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginLeft: 8,
-              minHeight: 40,
-              padding: "8px 12px",
-              borderRadius: 10,
-              fontSize: 14,
               fontWeight: isActive ? 600 : 400,
-              textDecoration: "none",
               background: isActive ? `${brandColor}15` : "transparent",
-              color: isActive ? brandColor : "#6B7280",
-              transition: "background 0.15s, color 0.15s",
+              color: isActive ? brandColor : "var(--color-ink-500)",
             }}
           >
             <span
+              className="flex shrink-0"
               style={{
-                flexShrink: 0,
-                color: isActive ? brandColor : "#9CA3AF",
-                display: "flex",
+                color: isActive ? brandColor : "var(--color-ink-400)",
               }}
             >
               {item.icon}

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ds/Button";
+import { Input } from "@/components/ds/Input";
 import {
   ArrowRightIcon,
   EyeIcon,
@@ -65,7 +66,7 @@ export default function LoginPageClient() {
           "radial-gradient(at 25% 10%, hsla(262, 90%, 95%, 0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(280, 90%, 92%, 0.4) 0px, transparent 50%)",
       }}
     >
-      <div className="mx-auto w-full max-w-xl rounded-3xl border border-slate-100 bg-white/85 p-6 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:p-8">
+      <div className="mx-auto w-full max-w-xl rounded-3xl border border-ink-100 bg-white/85 p-6 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:p-8">
         <div className="mb-8">
           <Link href="/" className="mx-auto flex w-fit items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -78,71 +79,64 @@ export default function LoginPageClient() {
         </div>
 
         <div className="mb-8 text-center sm:text-left">
-          <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
+          <h1 className="text-3xl font-bold text-ink-900 sm:text-4xl">
             {t.auth.signInTitle}
           </h1>
-          <p className="mt-2 text-base text-slate-600 sm:text-lg">
+          <p className="mt-2 text-base text-ink-500 sm:text-lg">
             {t.auth.signInSubtitle}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
-              {t.auth.email}
-            </label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <MailIcon />
-              </span>
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="you@company.com"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-4 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-              />
-            </div>
-          </div>
+          <Input
+            id="login-email"
+            type="email"
+            name="email"
+            required
+            label={t.auth.email}
+            placeholder="you@company.com"
+            leading={<MailIcon />}
+          />
 
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <label className="block text-sm font-semibold text-slate-700">
+              <label
+                htmlFor="login-password"
+                className="block text-sm font-semibold text-ink-700"
+              >
                 {t.auth.password}
               </label>
               <Link
                 href="/forgot-password"
-                className="text-sm font-semibold text-brand-700 transition-colors hover:text-[#0891b2]"
+                className="text-sm font-semibold text-brand-700 transition-colors hover:text-brand-600"
               >
                 {t.auth.forgotPassword}
               </Link>
             </div>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <LockIcon size={16} />
-              </span>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                required
-                placeholder="Enter your password"
-                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-12 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-              />
-              <button
-                type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={
-                  showPassword ? t.auth.hidePassword : t.auth.showPassword
-                }
-              >
-                <EyeIcon size={16} />
-              </button>
-            </div>
+            <Input
+              id="login-password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              required
+              placeholder="Enter your password"
+              leading={<LockIcon size={16} />}
+              trailing={
+                <button
+                  type="button"
+                  className="text-ink-400 transition-colors hover:text-ink-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={
+                    showPassword ? t.auth.hidePassword : t.auth.showPassword
+                  }
+                >
+                  <EyeIcon size={16} />
+                </button>
+              }
+            />
           </div>
 
           {error ? (
-            <p className="text-sm font-medium text-rose-600">{error}</p>
+            <p className="text-sm font-medium text-danger-600">{error}</p>
           ) : null}
 
           <Button
@@ -171,21 +165,21 @@ export default function LoginPageClient() {
           </Button>
         </div>
 
-        <div className="mt-8 rounded-xl border border-blue-100 bg-blue-50 p-5">
+        <div className="mt-8 rounded-xl border border-info-50 bg-info-50 p-5">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500 text-white">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-info-600 text-white">
               <InfoIcon className="h-4 w-4" />
             </div>
             <div>
-              <h4 className="mb-1 text-sm font-semibold text-slate-900">
+              <h4 className="mb-1 text-sm font-semibold text-ink-900">
                 {t.auth.needHelpTitle}
               </h4>
-              <p className="mb-3 text-sm text-slate-600">
+              <p className="mb-3 text-sm text-ink-500">
                 {t.auth.needHelpBody}
               </p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-info-600 transition-colors hover:text-info-600"
               >
                 <span>{t.auth.contactSupportLink}</span>
                 <ArrowRightIcon className="h-3 w-3" />
@@ -194,23 +188,23 @@ export default function LoginPageClient() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-slate-200 pt-6">
+        <div className="mt-8 border-t border-ink-200 pt-6">
           <div className="flex flex-wrap items-center justify-center gap-6 opacity-70">
             <div className="flex items-center gap-2">
-              <ShieldIcon className="h-4 w-4 text-slate-600" />
-              <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
+              <ShieldIcon className="h-4 w-4 text-ink-500" />
+              <span className="text-xs font-medium uppercase tracking-wider text-ink-500">
                 {t.auth.sslBadge}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <LockIcon size={16} />
-              <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
+              <span className="text-xs font-medium uppercase tracking-wider text-ink-500">
                 {t.auth.encryptedBadge}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <ShieldIcon className="h-4 w-4 text-slate-600" />
-              <span className="text-xs font-medium uppercase tracking-wider text-slate-600">
+              <ShieldIcon className="h-4 w-4 text-ink-500" />
+              <span className="text-xs font-medium uppercase tracking-wider text-ink-500">
                 {t.auth.twoFactorBadge}
               </span>
             </div>

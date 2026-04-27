@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Input } from "@/components/ds/Input";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -74,80 +77,86 @@ export function CategoriesTab({
   return (
     <div className="space-y-6">
       {/* Add form */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-6">
-        <h2 className="mb-4 text-base font-semibold text-gray-900">Add category</h2>
+      <Card variant="outlined">
+        <h2 className="mb-4 text-body font-semibold text-ink-900">Add category</h2>
         <form onSubmit={addCategory} className="space-y-3">
           <div className="flex gap-3">
-            <input
-              type="text"
-              placeholder="Category name (e.g. Bridal, Men's Grooming)"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="min-h-11 flex-1 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-            />
-            <button
+            <div className="flex-1">
+              <Input
+                id="category-name"
+                type="text"
+                placeholder="Category name (e.g. Bridal, Men's Grooming)"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <Button
               type="submit"
               disabled={saving || !name.trim()}
-              className="shrink-0 rounded-lg px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              variant="primary"
+              size="md"
+              className="shrink-0"
               style={{ backgroundColor: brand }}
             >
               {saving ? "Saving…" : "Add"}
-            </button>
+            </Button>
           </div>
-          <input
+          <Input
+            id="category-description"
             type="text"
             placeholder="Description (optional)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="min-h-11 w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
           />
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-body-sm text-danger-600">{error}</p>}
         </form>
-      </div>
+      </Card>
 
       {/* List */}
-      <div className="rounded-2xl border border-gray-100 bg-white">
-        <div className="border-b border-gray-100 px-5 py-4 sm:px-6">
-          <h2 className="text-base font-semibold text-gray-900">
+      <Card variant="outlined" className="p-0">
+        <div className="border-b border-ink-100 px-5 py-4 sm:px-6">
+          <h2 className="text-body font-semibold text-ink-900">
             Your categories
-            <span className="ml-2 text-sm font-normal text-gray-400">
+            <span className="ml-2 text-body-sm font-normal text-ink-400">
               ({categories.length})
             </span>
           </h2>
         </div>
 
         {categories.length === 0 ? (
-          <div className="px-6 py-12 text-center text-sm text-gray-400">
+          <div className="px-6 py-12 text-center text-body-sm text-ink-400">
             No categories yet. Add one above to start organising your services.
           </div>
         ) : (
-          <ul className="divide-y divide-gray-50">
+          <ul className="divide-y divide-ink-100">
             {categories.map((cat) => (
               <li
                 key={cat.id}
                 className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6"
               >
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900">{cat.name}</p>
+                  <p className="text-body-sm font-medium text-ink-900">{cat.name}</p>
                   {cat.description && (
-                    <p className="mt-0.5 truncate text-xs text-gray-400">
+                    <p className="mt-0.5 truncate text-caption text-ink-400">
                       {cat.description}
                     </p>
                   )}
                 </div>
-                <button
+                <Button
                   onClick={() => deleteCategory(cat.id)}
                   disabled={deletingId === cat.id}
-                  className="shrink-0 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 transition-colors hover:border-red-200 hover:text-red-500 disabled:opacity-40"
+                  variant="secondary"
+                  size="sm"
+                  className="shrink-0"
                 >
                   {deletingId === cat.id ? "…" : "Delete"}
-                </button>
+                </Button>
               </li>
             ))}
           </ul>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

@@ -16,13 +16,13 @@ export default async function CheckoutCancelPage() {
   return (
     <CheckoutResultLayout>
       <div className="mx-auto flex w-full max-w-lg flex-col items-center text-center">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-200/80 text-slate-600">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-ink-200/80 text-ink-500">
           <XIcon size={32} />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">
           Checkout cancelled
         </h1>
-        <p className="mt-3 text-sm text-slate-600 sm:text-base">
+        <p className="mt-3 text-sm text-ink-500 sm:text-base">
           No charge was made. You can return to pricing whenever you are ready,
           or reach out if you need a different package or billing cycle.
         </p>

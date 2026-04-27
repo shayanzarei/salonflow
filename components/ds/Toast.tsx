@@ -17,11 +17,13 @@ type ToastItem = { id: number; message: string; tone: ToastTone };
 
 const MAX_VISIBLE = 3;
 
+// Per DS spec §4.11: white surface with a 3px left accent bar in the semantic
+// color. Icon takes the same accent color; body text stays ink-900.
 const toneClasses: Record<ToastTone, string> = {
-  info: "border-info-600 bg-info-50 text-info-600",
-  success: "border-success-600 bg-success-50 text-success-700",
-  warning: "border-warning-600 bg-warning-50 text-warning-700",
-  danger: "border-danger-600 bg-danger-50 text-danger-700",
+  info: "border-info-600 text-info-600",
+  success: "border-success-600 text-success-700",
+  warning: "border-warning-600 text-warning-700",
+  danger: "border-danger-600 text-danger-700",
 };
 
 const toneIcons: Record<ToastTone, ReactNode> = {

@@ -24,9 +24,9 @@ export function DateTimeField({
   required?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div>
-        <label htmlFor={dateId} className="mb-1.5 block text-label font-medium text-ink-700">
+        <label htmlFor={dateId} className="mb-2 block text-label font-medium text-ink-700">
           {dateLabel}
         </label>
         <input
@@ -43,7 +43,7 @@ export function DateTimeField({
         />
       </div>
       <div>
-        <label htmlFor={timeId} className="mb-1.5 block text-label font-medium text-ink-700">
+        <label htmlFor={timeId} className="mb-2 block text-label font-medium text-ink-700">
           {timeLabel}
         </label>
         <input

@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar } from "@/components/ds/Avatar";
 import { CalendarIcon, ClockIcon, ScissorsIcon, SearchIcon, XIcon } from "@/components/ui/Icons";
 import { useState } from "react";
 
@@ -423,22 +424,12 @@ export default function StaffCalendarGrid({
                 borderBottom: "1px solid #f5f5f5",
               }}
             >
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: "50%",
-                  background: brandColor,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontWeight: 700,
-                  fontSize: 16,
-                }}
-              >
-                {selectedBooking.client_name.charAt(0)}
-              </div>
+              <Avatar
+                name={selectedBooking.client_name}
+                size="md"
+                className="h-11 w-11 text-base font-bold text-white"
+                style={{ background: brandColor }}
+              />
               <div>
                 <p style={{ fontSize: 15, fontWeight: 600, color: "#111", margin: 0 }}>
                   {selectedBooking.client_name}

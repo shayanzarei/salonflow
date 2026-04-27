@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ds/Input";
 import { useEffect, useRef, useState } from "react";
 
 interface Client {
@@ -59,69 +60,58 @@ export default function ClientSearch() {
     <div className="space-y-4">
       {/* Name field with dropdown */}
       <div className="relative" ref={dropdownRef}>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Client name
-        </label>
-        <input
-          type="text"
+        <Input
+          id="client_name"
           name="client_name"
+          type="text"
+          label="Client name"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           required
           placeholder="Search existing clients or type a new name"
-          className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
           autoComplete="off"
         />
 
         {showDropdown && (
-          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+          <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-md border border-ink-200 bg-ink-0 shadow-lg">
             {results.map((client) => (
               <button
                 key={client.client_email}
                 type="button"
                 onClick={() => selectClient(client)}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0"
+                className="w-full border-b border-ink-100 px-4 py-3 text-left transition-colors hover:bg-ink-50 last:border-b-0"
               >
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-body-sm font-medium text-ink-900">
                   {client.client_name}
                 </p>
-                <p className="text-xs text-gray-400">{client.client_email}</p>
+                <p className="text-caption text-ink-400">{client.client_email}</p>
               </button>
             ))}
           </div>
         )}
       </div>
 
-      {/* Email */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Email
-        </label>
-        <input
-          type="email"
-          name="client_email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          placeholder="sarah@example.com"
-          className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-        />
-      </div>
+      <Input
+        id="client_email"
+        name="client_email"
+        type="email"
+        label="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        placeholder="sarah@example.com"
+      />
 
-      {/* Phone */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Phone <span className="text-gray-400">(optional)</span>
-        </label>
-        <input
-          type="tel"
-          name="client_phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="+31 6 12345678"
-          className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-purple-400"
-        />
-      </div>
+      <Input
+        id="client_phone"
+        name="client_phone"
+        type="tel"
+        label="Phone"
+        optionalLabel="(optional)"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        placeholder="+31 6 12345678"
+      />
     </div>
   );
 }

@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Input } from "@/components/ds/Input";
+import { Select } from "@/components/ds/Select";
 import { WEBSITE_TEMPLATES } from "@/lib/website-templates";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -36,39 +39,39 @@ export function TenantsFilters({ q, plan, status, template, sort }: Props) {
   return (
     <form
       onSubmit={onSearchSubmit}
-      className="mb-4 flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-4 sm:p-5"
+      className="mb-4 flex flex-col gap-4 rounded-lg border border-ink-200 bg-ink-0 p-4 sm:p-5"
     >
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-[4fr_3fr] lg:items-center">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <select
+          <Select
+            id="filter-plan"
             name="plan"
             value={plan}
             onChange={(e) => updateParam("plan", e.target.value)}
-            className="min-h-11 w-full rounded-[10px] border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
           >
             <option value="all">Plan: All</option>
             <option value="solo">Plan: Solo</option>
             <option value="hub">Plan: Hub</option>
             <option value="agency">Plan: Agency</option>
-          </select>
+          </Select>
 
-          <select
+          <Select
+            id="filter-status"
             name="status"
             value={status}
             onChange={(e) => updateParam("status", e.target.value)}
-            className="min-h-11 w-full rounded-[10px] border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
           >
             <option value="all">Status: All</option>
             <option value="draft">Status: Draft</option>
             <option value="pending_approval">Status: Pending approval</option>
             <option value="published">Status: Published</option>
-          </select>
+          </Select>
 
-          <select
+          <Select
+            id="filter-template"
             name="template"
             value={template}
             onChange={(e) => updateParam("template", e.target.value)}
-            className="min-h-11 w-full rounded-[10px] border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
           >
             <option value="all">Template: All</option>
             {WEBSITE_TEMPLATES.map((item) => (
@@ -76,35 +79,34 @@ export function TenantsFilters({ q, plan, status, template, sort }: Props) {
                 Template: {item.label}
               </option>
             ))}
-          </select>
+          </Select>
 
-          <select
+          <Select
+            id="filter-sort"
             name="sort"
             value={sort}
             onChange={(e) => updateParam("sort", e.target.value)}
-            className="min-h-11 w-full rounded-[10px] border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
           >
             <option value="newest">Sort: Newest</option>
             <option value="oldest">Sort: Oldest</option>
             <option value="name_asc">Sort: Name A-Z</option>
             <option value="name_desc">Sort: Name Z-A</option>
-          </select>
+          </Select>
         </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            name="q"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search name, slug..."
-            className="min-h-11 w-full rounded-[10px] border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
-          />
-          <button
-            type="submit"
-            className="min-h-11 shrink-0 rounded-[10px] border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <Input
+              id="filter-q"
+              type="text"
+              name="q"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Search name, slug..."
+            />
+          </div>
+          <Button type="submit" variant="secondary" size="md" className="shrink-0">
             Apply
-          </button>
+          </Button>
         </div>
       </div>
     </form>

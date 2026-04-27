@@ -19,12 +19,12 @@ export default async function ChooseServicePage() {
   const brand = tenant.primary_color ?? 'var(--color-brand-600)';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-ink-50">
       <div className="mx-auto max-w-[860px] px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         {/* Back */}
         <a
           href="/"
-          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
+          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-ink-500 no-underline sm:mb-8"
         >
           {t.booking.backToWebsite}
         </a>
@@ -38,10 +38,10 @@ export default async function ChooseServicePage() {
 
         {/* Title */}
         <div className="mb-8 text-center sm:mb-10 md:mb-12">
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
+          <h1 className="text-balance text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl md:text-[40px]">
             {t.booking.chooseServiceTitle}
           </h1>
-          <p className="mt-2 text-sm text-gray-500 sm:text-base">
+          <p className="mt-2 text-sm text-ink-500 sm:text-base">
             {t.booking.chooseServiceSubtitle}
           </p>
         </div>
@@ -52,7 +52,7 @@ export default async function ChooseServicePage() {
             <a
               key={service.id}
               href={`/book/staff?service=${service.id}`}
-              className="block min-h-[44px] rounded-2xl border border-gray-100 bg-white p-5 no-underline transition-shadow hover:border-gray-200 hover:shadow-md sm:p-6 md:p-7"
+              className="block min-h-[44px] rounded-2xl border border-ink-100 bg-white p-5 no-underline transition-shadow hover:border-ink-200 hover:shadow-md sm:p-6 md:p-7"
             >
               <h3
                 style={{
@@ -77,7 +77,7 @@ export default async function ChooseServicePage() {
                 </p>
               )}
               <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs text-gray-400 sm:text-[13px]">
+                <span className="text-xs text-ink-400 sm:text-[13px]">
                   {fillTemplate(t.booking.minutesShort, {
                     n: service.duration_mins,
                   })}

@@ -1,4 +1,6 @@
 import StarRating from "@/components/booking/StarRating";
+import { Button } from "@/components/ds/Button";
+import { Textarea } from "@/components/ds/Input";
 import { StarIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
@@ -156,62 +158,27 @@ export default async function ReviewPage({
 
         {/* Review text */}
         <div style={{ marginBottom: 24 }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: 14,
-              fontWeight: 500,
-              color: "#333",
-              marginBottom: 10,
-            }}
-          >
-            Your review
-          </label>
-          <textarea
+          <Textarea
+            id="review-comment"
             name="comment"
             required
             rows={5}
+            label="Your review"
             placeholder="Share details of your experience... What did you love? What could be improved?"
-            style={{
-              width: "100%",
-              border: "1px solid #e5e7eb",
-              borderRadius: 12,
-              padding: "14px 16px",
-              fontSize: 14,
-              color: "#111",
-              background: "white",
-              outline: "none",
-              resize: "none",
-              boxSizing: "border-box",
-              lineHeight: 1.6,
-            }}
+            helperText="Optional — Help others by sharing more details"
           />
-          <p style={{ fontSize: 12, color: "#aaa", margin: "6px 0 0" }}>
-            Optional — Help others by sharing more details
-          </p>
         </div>
 
         {/* Submit button */}
-        <button
+        <Button
           type="submit"
-          style={{
-            width: "100%",
-            padding: "16px",
-            background: brand,
-            color: "white",
-            border: "none",
-            borderRadius: 100,
-            fontSize: 15,
-            fontWeight: 600,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-          }}
+          variant="primary"
+          size="lg"
+          className="w-full gap-2 rounded-full"
+          style={{ backgroundColor: brand }}
         >
           ✈ Submit review
-        </button>
+        </Button>
       </form>
     </div>
   );

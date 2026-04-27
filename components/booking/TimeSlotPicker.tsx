@@ -130,7 +130,7 @@ export default function TimeSlotPicker({
     <div className="min-w-0">
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start lg:gap-6">
         {/* Calendar */}
-        <div className="rounded-[20px] border border-gray-100 bg-white p-4 sm:p-6 md:p-7">
+        <div className="rounded-[20px] border border-ink-100 bg-white p-4 sm:p-6 md:p-7">
           <h3
             style={{
               fontSize: 16,
@@ -266,7 +266,7 @@ export default function TimeSlotPicker({
           </div>
 
           {/* Legend */}
-          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t border-gray-100 pt-4">
+          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t border-ink-100 pt-4">
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div
                 style={{ width: 12, height: 12, borderRadius: "50%", background: brand }}
@@ -315,7 +315,7 @@ export default function TimeSlotPicker({
         </div>
 
         {/* Time slots */}
-        <div className="rounded-[20px] border border-gray-100 bg-white p-4 sm:p-6 md:p-7">
+        <div className="rounded-[20px] border border-ink-100 bg-white p-4 sm:p-6 md:p-7">
           <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h3
               style={{

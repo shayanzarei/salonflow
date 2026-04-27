@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Input } from "@/components/ds/Input";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { useState } from "react";
 
@@ -74,9 +77,9 @@ export function GalleryManager({
   return (
     <div className="space-y-6">
       {/* Add form */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-6">
-        <h2 className="mb-1 text-base font-semibold text-gray-900">Add before / after</h2>
-        <p className="mb-4 text-xs text-gray-400">
+      <Card variant="outlined">
+        <h2 className="mb-1 text-body font-semibold text-ink-900">Add before / after</h2>
+        <p className="mb-4 text-caption text-ink-400">
           Paste a URL for the before image and one for the after image. These will be
           displayed side-by-side in the Gallery section of your booking site.
         </p>
@@ -96,39 +99,43 @@ export function GalleryManager({
             />
           </div>
           <div className="flex gap-3">
-            <input
-              type="text"
-              placeholder="Caption (optional) — e.g. Balayage transformation"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              className="min-h-11 flex-1 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
-            />
-            <button
+            <div className="flex-1">
+              <Input
+                id="gallery-caption"
+                type="text"
+                placeholder="Caption (optional) — e.g. Balayage transformation"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+              />
+            </div>
+            <Button
               type="submit"
               disabled={saving || !beforeUrl.trim() || !afterUrl.trim()}
-              className="shrink-0 rounded-lg px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              variant="primary"
+              size="md"
+              className="shrink-0"
               style={{ backgroundColor: brand }}
             >
               {saving ? "Saving…" : "Add"}
-            </button>
+            </Button>
           </div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-body-sm text-danger-600">{error}</p>}
         </form>
-      </div>
+      </Card>
 
       {/* Grid */}
-      <div className="rounded-2xl border border-gray-100 bg-white">
-        <div className="border-b border-gray-100 px-5 py-4 sm:px-6">
-          <h2 className="text-base font-semibold text-gray-900">
+      <Card variant="outlined" className="p-0">
+        <div className="border-b border-ink-100 px-5 py-4 sm:px-6">
+          <h2 className="text-body font-semibold text-ink-900">
             Gallery items
-            <span className="ml-2 text-sm font-normal text-gray-400">
+            <span className="ml-2 text-body-sm font-normal text-ink-400">
               ({items.length})
             </span>
           </h2>
         </div>
 
         {items.length === 0 ? (
-          <div className="px-6 py-12 text-center text-sm text-gray-400">
+          <div className="px-6 py-12 text-center text-body-sm text-ink-400">
             No gallery items yet. Add a before/after pair above.
           </div>
         ) : (
@@ -136,12 +143,12 @@ export function GalleryManager({
             {items.map((item) => (
               <div
                 key={item.id}
-                className="overflow-hidden rounded-xl border border-gray-100 bg-gray-50"
+                className="overflow-hidden rounded-md border border-ink-100 bg-ink-50"
               >
                 {/* Before / After images */}
                 <div className="grid grid-cols-2">
                   <div className="relative">
-                    <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-white">
+                    <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-ink-0">
                       Before
                     </span>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -153,7 +160,7 @@ export function GalleryManager({
                   </div>
                   <div className="relative">
                     <span
-                      className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+                      className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold text-ink-0"
                       style={{ backgroundColor: brand }}
                     >
                       After
@@ -168,22 +175,24 @@ export function GalleryManager({
                 </div>
 
                 <div className="flex items-center justify-between gap-3 px-3 py-2.5">
-                  <p className="min-w-0 truncate text-xs text-gray-500">
+                  <p className="min-w-0 truncate text-caption text-ink-500">
                     {item.caption ?? "No caption"}
                   </p>
-                  <button
+                  <Button
                     onClick={() => deleteItem(item.id)}
                     disabled={deletingId === item.id}
-                    className="shrink-0 rounded px-2 py-1 text-xs text-gray-400 transition-colors hover:text-red-500 disabled:opacity-40"
+                    variant="ghost"
+                    size="sm"
+                    className="shrink-0 text-ink-400 hover:text-danger-600"
                   >
                     {deletingId === item.id ? "…" : "✕"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

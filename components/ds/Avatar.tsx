@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { cn } from "@/lib/cn";
 
 type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
@@ -15,11 +17,14 @@ export function Avatar({
   src,
   size = "md",
   className,
+  style,
 }: {
   name: string;
   src?: string | null;
   size?: AvatarSize;
   className?: string;
+  /** Inline style override — useful for per-tenant brand colors. */
+  style?: CSSProperties;
 }) {
   const initials = name
     .split(" ")
@@ -35,6 +40,7 @@ export function Avatar({
         sizeClasses[size],
         className
       )}
+      style={style}
       aria-label={name}
     >
       {src ? (

@@ -3,6 +3,11 @@ import {
   ServiceDurationField,
 } from "@/components/dashboard/ServiceEditFormExtras";
 import { ServiceImageField } from "@/components/dashboard/ServiceImageField";
+import { Avatar } from "@/components/ds/Avatar";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Input, Textarea } from "@/components/ds/Input";
+import { Select } from "@/components/ds/Select";
 import { CalendarIcon, ClockIcon, StarIcon, TrendingUpIcon, TrashIcon, UsersIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getCategoryStyle } from "@/lib/service-categories";
@@ -20,6 +25,14 @@ function formatGrowth(growth: number): { text: string; positive: boolean } {
     positive,
   };
 }
+
+const STAFF_PALETTE = [
+  'var(--color-brand-600)',
+  'var(--color-accent-500)',
+  "var(--color-success-600)",
+  "var(--color-danger-600)",
+  "var(--color-info-600)",
+];
 
 export default async function ServiceDetailPage({
   params,
@@ -50,96 +63,74 @@ export default async function ServiceDetailPage({
   const topLabel =
     pop >= 0.85 ? "Top 15%" : pop >= 0.7 ? "Top 30%" : pop >= 0.5 ? "Above average" : "";
 
+  const summaryItems = [
+    {
+      icon: <ClockIcon size={20} color="var(--color-ink-500)" />,
+      label: "Duration",
+      value: `${detail.durationMinutes} min`,
+    },
+    {
+      icon: <span className="text-lg font-bold text-ink-500">€</span>,
+      label: "Price",
+      value: `€${detail.price.toFixed(2)}`,
+      colored: true,
+    },
+    {
+      icon: <CalendarIcon size={20} color="var(--color-ink-500)" />,
+      label: "Total Bookings",
+      value: detail.totalBookings.toString(),
+    },
+    {
+      icon: <StarIcon size={20} color="var(--color-ink-500)" />,
+      label: "Avg Rating",
+      value:
+        detail.reviewCount > 0
+          ? `${detail.averageRating.toFixed(1)}`
+          : "—",
+      sub:
+        detail.reviewCount > 0
+          ? `${detail.reviewCount} reviews`
+          : "No reviews yet",
+    },
+  ] as const;
+
   return (
-    <div style={{ marginTop: -8 }}>
-      <div style={{ marginBottom: 20 }}>
+    <div className="-mt-2">
+      <div className="mb-5">
         <Link
           href="/services"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 13,
-            color: "#888",
-            textDecoration: "none",
-          }}
+          className="inline-flex items-center gap-1.5 text-body-sm text-ink-500 no-underline"
         >
           ← Back to Services
         </Link>
       </div>
 
       {detail.isDraft ? (
-        <div
-          style={{
-            marginBottom: 20,
-            padding: "12px 16px",
-            borderRadius: 12,
-            background: "#FFFBEB",
-            border: "1px solid #FDE68A",
-            fontSize: 13,
-            color: "#92400E",
-          }}
-        >
+        <Card variant="outlined" className="mb-5 bg-warning-50 px-4 py-3 text-caption text-warning-700">
           This service is a <strong>draft</strong> and is not shown on your public
           booking site. Saving changes from this page will publish it.
-        </div>
+        </Card>
       ) : null}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start">
         <div className="flex min-w-0 flex-col gap-5 sm:gap-6">
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 28,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 16,
-                marginBottom: 20,
-              }}
-            >
+          <Card variant="outlined" className="p-7">
+            <div className="mb-5 flex items-start gap-4">
               <div
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: 14,
-                  background: catStyle.bg,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 26,
-                  flexShrink: 0,
-                }}
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md text-2xl"
+                style={{ background: catStyle.bg }}
               >
                 {catStyle.icon}
               </div>
-              <div style={{ minWidth: 0 }}>
-                <h1
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 700,
-                    color: "#111",
-                    margin: "0 0 8px",
-                  }}
-                >
+              <div className="min-w-0">
+                <h1 className="mb-2 text-h2 font-bold text-ink-900">
                   {detail.name}
                 </h1>
                 <span
+                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-caption font-medium"
                   style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 5,
-                    fontSize: 12,
-                    fontWeight: 500,
                     color: catStyle.color,
                     background: catStyle.bg,
-                    padding: "3px 10px",
-                    borderRadius: 100,
                   }}
                 >
                   {catStyle.icon} {detail.category_name ?? detail.category}
@@ -148,139 +139,45 @@ export default async function ServiceDetailPage({
             </div>
 
             {detail.description ? (
-              <p
-                style={{
-                  fontSize: 14,
-                  color: "#666",
-                  lineHeight: 1.7,
-                  margin: "0 0 22px",
-                }}
-              >
+              <p className="mb-5 text-body-sm leading-relaxed text-ink-600">
                 {detail.description}
               </p>
             ) : (
-              <p
-                style={{
-                  fontSize: 14,
-                  color: "#aaa",
-                  fontStyle: "italic",
-                  margin: "0 0 22px",
-                }}
-              >
+              <p className="mb-5 text-body-sm italic text-ink-400">
                 No description yet.
               </p>
             )}
 
-            <div
-              className="grid grid-cols-1 gap-3.5 border-t border-gray-100 pt-5 sm:grid-cols-2"
-            >
-              {[
-                {
-                  icon: <ClockIcon size={20} color="#6B7280" />,
-                  label: "Duration",
-                  value: `${detail.durationMinutes} min`,
-                },
-                {
-                  icon: <span style={{ fontSize: 18, fontWeight: 700, color: "#6B7280" }}>€</span>,
-                  label: "Price",
-                  value: `€${detail.price.toFixed(2)}`,
-                  colored: true,
-                },
-                {
-                  icon: <CalendarIcon size={20} color="#6B7280" />,
-                  label: "Total Bookings",
-                  value: detail.totalBookings.toString(),
-                },
-                {
-                  icon: <StarIcon size={20} color="#6B7280" />,
-                  label: "Avg Rating",
-                  value:
-                    detail.reviewCount > 0
-                      ? `${detail.averageRating.toFixed(1)}`
-                      : "—",
-                  sub:
-                    detail.reviewCount > 0
-                      ? `${detail.reviewCount} reviews`
-                      : "No reviews yet",
-                },
-              ].map((item) => (
+            <div className="grid grid-cols-1 gap-3.5 border-t border-ink-100 pt-5 sm:grid-cols-2">
+              {summaryItems.map((item) => (
                 <div
                   key={item.label}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    background: "#f9fafb",
-                    borderRadius: 10,
-                    padding: "12px 16px",
-                  }}
+                  className="flex items-center gap-3 rounded-sm bg-ink-50 px-4 py-3"
                 >
-                  <span style={{ display: "flex", flexShrink: 0 }}>{item.icon}</span>
+                  <span className="flex shrink-0">{item.icon}</span>
                   <div>
-                    <p
-                      style={{
-                        fontSize: 11,
-                        color: "#aaa",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.05em",
-                        margin: "0 0 2px",
-                        fontWeight: 500,
-                      }}
-                    >
+                    <p className="mb-0.5 text-[11px] font-medium uppercase tracking-wider text-ink-400">
                       {item.label}
                     </p>
                     <p
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 700,
-                        color: item.colored ? brand : "#111",
-                        margin: 0,
-                      }}
+                      className="text-body font-bold"
+                      style={{ color: ("colored" in item && item.colored) ? brand : "var(--color-ink-900)" }}
                     >
                       {item.value}
                     </p>
                     {"sub" in item && item.sub ? (
-                      <p
-                        style={{
-                          fontSize: 11,
-                          color: "#aaa",
-                          margin: "4px 0 0",
-                        }}
-                      >
-                        {item.sub}
-                      </p>
+                      <p className="mt-1 text-[11px] text-ink-400">{item.sub}</p>
                     ) : null}
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 28,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              <TrendingUpIcon size={16} color="#6B7280" />
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined" className="p-7">
+            <div className="mb-5 flex items-center gap-2">
+              <TrendingUpIcon size={16} color="var(--color-ink-500)" />
+              <h2 className="text-body font-semibold text-ink-900">
                 Performance
               </h2>
             </div>
@@ -309,47 +206,22 @@ export default async function ServiceDetailPage({
               ).map((stat) => (
                 <div
                   key={stat.title}
-                  style={{
-                    background: "#f9fafb",
-                    borderRadius: 10,
-                    padding: "14px 16px",
-                    textAlign: "left",
-                  }}
+                  className="rounded-sm bg-ink-50 px-4 py-3.5 text-left"
                 >
-                  <p
-                    style={{
-                      fontSize: 11,
-                      color: "#aaa",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      margin: "0 0 8px",
-                      fontWeight: 500,
-                    }}
-                  >
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-ink-400">
                     {stat.title}
                   </p>
-                  <p
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: "#111",
-                      margin: "0 0 6px",
-                    }}
-                  >
+                  <p className="mb-1.5 text-h2 font-bold text-ink-900">
                     {stat.value}
                   </p>
                   <p
-                    style={{
-                      fontSize: 11,
-                      margin: 0,
-                      color:
-                        stat.hintTone === "growth"
-                          ? "#10B981"
-                          : stat.hintTone === "warn"
-                            ? "#EF4444"
-                            : "#888",
-                      fontWeight: 500,
-                    }}
+                    className={`text-[11px] font-medium ${
+                      stat.hintTone === "growth"
+                        ? "text-success-600"
+                        : stat.hintTone === "warn"
+                          ? "text-danger-600"
+                          : "text-ink-500"
+                    }`}
                   >
                     {stat.hint}
                   </p>
@@ -357,182 +229,74 @@ export default async function ServiceDetailPage({
               ))}
             </div>
 
-            <div style={{ marginTop: 22 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 8,
-                }}
-              >
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#555" }}>
+            <div className="mt-6">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-body-sm font-medium text-ink-600">
                   Popularity vs Other Services
                 </span>
                 {topLabel ? (
                   <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: brand,
-                    }}
+                    className="text-caption font-semibold"
+                    style={{ color: brand }}
                   >
                     {topLabel}
                   </span>
                 ) : null}
               </div>
-              <div
-                style={{
-                  height: 8,
-                  borderRadius: 4,
-                  background: "#eef0f2",
-                  overflow: "hidden",
-                }}
-              >
+              <div className="h-2 overflow-hidden rounded-full bg-ink-100">
                 <div
+                  className="h-full rounded-full transition-[width]"
                   style={{
-                    height: "100%",
                     width: `${Math.round(pop * 100)}%`,
-                    borderRadius: 4,
                     background: `linear-gradient(90deg, ${brand}aa, ${brand})`,
                     minWidth: pop > 0 ? 4 : 0,
-                    transition: "width 0.3s ease",
                   }}
                 />
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 28,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 18,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <UsersIcon size={16} color="#6B7280" />
-                <h2
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    color: "#111",
-                    margin: 0,
-                  }}
-                >
+          <Card variant="outlined" className="p-7">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UsersIcon size={16} color="var(--color-ink-500)" />
+                <h2 className="text-body font-semibold text-ink-900">
                   Assigned Staff
                 </h2>
               </div>
               <Link
                 href="/staff"
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: brand,
-                  textDecoration: "none",
-                }}
+                className="text-caption font-semibold no-underline"
+                style={{ color: brand }}
               >
                 Manage
               </Link>
             </div>
             {detail.assignedStaff.length === 0 ? (
-              <p style={{ fontSize: 13, color: "#888", margin: 0 }}>
+              <p className="text-caption text-ink-500">
                 Staff appear here once they have bookings for this service.
               </p>
             ) : (
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 12,
-                }}
-              >
+              <div className="flex flex-wrap gap-3">
                 {detail.assignedStaff.map((member, i) => {
-                  const colors = [
-                    'var(--color-brand-600)',
-                    'var(--color-accent-500)',
-                    "#10B981",
-                    "#EC4899",
-                    "#3B82F6",
-                  ];
-                  const color = colors[i % colors.length];
+                  const color = STAFF_PALETTE[i % STAFF_PALETTE.length];
                   return (
                     <div
                       key={member.id}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        padding: "10px 14px",
-                        border: "1px solid #f0f0f0",
-                        borderRadius: 12,
-                        background: "#fafafa",
-                        minWidth: 160,
-                      }}
+                      className="flex min-w-[160px] items-center gap-2.5 rounded-md border border-ink-100 bg-ink-50 px-3.5 py-2.5"
                     >
-                      {member.avatarUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={member.avatarUrl}
-                          alt=""
-                          width={36}
-                          height={36}
-                          style={{
-                            borderRadius: "50%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: "50%",
-                            background: color,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "white",
-                            fontSize: 13,
-                            fontWeight: 700,
-                          }}
-                        >
-                          {member.name.charAt(0)}
-                        </div>
-                      )}
-                      <div style={{ minWidth: 0 }}>
-                        <p
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: "#111",
-                            margin: "0 0 2px",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
+                      <Avatar
+                        name={member.name}
+                        src={member.avatarUrl}
+                        size="md"
+                        className="h-9 w-9 text-body-sm font-bold text-white"
+                        style={{ background: color }}
+                      />
+                      <div className="min-w-0">
+                        <p className="mb-0.5 truncate text-caption font-semibold text-ink-900">
                           {member.name}
                         </p>
-                        <p
-                          style={{
-                            fontSize: 11,
-                            color: "#888",
-                            margin: 0,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
+                        <p className="truncate text-[11px] text-ink-500">
                           {member.role}
                         </p>
                       </div>
@@ -541,100 +305,45 @@ export default async function ServiceDetailPage({
                 })}
               </div>
             )}
-          </div>
+          </Card>
         </div>
 
         <div className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-20 xl:self-start">
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 15,
-                fontWeight: 600,
-                color: "#111",
-                margin: "0 0 20px",
-              }}
-            >
+          <Card variant="outlined">
+            <h2 className="mb-5 text-body font-semibold text-ink-900">
               Edit Service
             </h2>
 
             <form
               action="/api/services/update"
               method="POST"
-              style={{ display: "flex", flexDirection: "column", gap: 16 }}
+              className="flex flex-col gap-4"
             >
               <input type="hidden" name="id" value={id} />
 
               <ServiceImageField initialValue={detail.imageUrl ?? ""} />
 
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    marginBottom: 8,
-                  }}
-                >
-                  Service Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  defaultValue={detail.name}
-                  required
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    padding: "10px 14px",
-                    fontSize: 14,
-                    color: "#111",
-                    background: "white",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
-                />
-              </div>
+              <Input
+                id="service-edit-name"
+                type="text"
+                name="name"
+                label="Service Name"
+                defaultValue={detail.name}
+                required
+              />
 
               <div>
                 <label
-                  style={{
-                    display: "block",
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    marginBottom: 8,
-                  }}
+                  htmlFor="service-edit-category"
+                  className="mb-2 block text-caption font-semibold uppercase tracking-wider text-ink-400"
                 >
                   Category
                 </label>
                 {customCategories.length > 0 ? (
-                  <select
+                  <Select
+                    id="service-edit-category"
                     name="category_id"
                     defaultValue={detail.category_id ?? ""}
-                    style={{
-                      width: "100%",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                      fontSize: 14,
-                      color: "#111",
-                      background: "white",
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
                   >
                     <option value="">No category</option>
                     {customCategories.map((c) => (
@@ -642,22 +351,14 @@ export default async function ServiceDetailPage({
                         {c.name}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 ) : (
-                  <div
-                    style={{
-                      padding: "10px 14px",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      fontSize: 13,
-                      color: "#9CA3AF",
-                      background: "#F9FAFB",
-                    }}
-                  >
+                  <div className="rounded-sm border border-ink-200 bg-ink-50 px-4 py-2.5 text-caption text-ink-400">
                     No categories yet —{" "}
                     <Link
                       href="/services?tab=categories"
-                      style={{ color: brand, textDecoration: "none", fontWeight: 500 }}
+                      className="font-medium no-underline"
+                      style={{ color: brand }}
                     >
                       create one first
                     </Link>
@@ -665,152 +366,62 @@ export default async function ServiceDetailPage({
                 )}
               </div>
 
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    marginBottom: 8,
-                  }}
-                >
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  defaultValue={detail.description ?? ""}
-                  rows={3}
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    padding: "10px 14px",
-                    fontSize: 14,
-                    color: "#111",
-                    background: "white",
-                    outline: "none",
-                    resize: "none",
-                    boxSizing: "border-box",
-                  }}
-                />
-              </div>
+              <Textarea
+                id="service-edit-description"
+                name="description"
+                label="Description"
+                defaultValue={detail.description ?? ""}
+                rows={3}
+              />
 
               <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: "#aaa",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Price (€)
-                  </label>
-                  <input
-                    type="number"
-                    name="price"
-                    defaultValue={detail.price}
-                    step="0.01"
-                    min="0"
-                    required
-                    style={{
-                      width: "100%",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                      fontSize: 14,
-                      color: "#111",
-                      background: "white",
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
+                <Input
+                  id="service-edit-price"
+                  type="number"
+                  name="price"
+                  label="Price (€)"
+                  defaultValue={detail.price}
+                  step="0.01"
+                  min="0"
+                  required
+                />
                 <ServiceDurationField initial={detail.durationMinutes} brand={brand} />
               </div>
 
               <ServiceActiveToggle initial={detail.isActive} brand={brand} />
 
-              <button
+              <Button
                 type="submit"
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  background: brand,
-                  color: "white",
-                  border: "none",
-                  borderRadius: 10,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  marginTop: 4,
-                }}
+                variant="primary"
+                size="lg"
+                className="mt-1 w-full"
+                style={{ backgroundColor: brand }}
               >
                 Save Changes
-              </button>
+              </Button>
             </form>
-          </div>
+          </Card>
 
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #FECACA",
-              padding: 24,
-            }}
-          >
-            <h3
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: "#EF4444",
-                margin: "0 0 8px",
-              }}
-            >
+          <Card variant="outlined" className="bg-danger-50">
+            <h3 className="mb-2 text-body-sm font-bold text-danger-600">
               Delete Service
             </h3>
-            <p
-              style={{
-                fontSize: 13,
-                color: "#666",
-                margin: "0 0 16px",
-                lineHeight: 1.6,
-              }}
-            >
+            <p className="mb-4 text-caption leading-relaxed text-ink-600">
               This permanently removes the service. Existing bookings may still
               reference it depending on your data rules.
             </p>
             <form action="/api/services/delete" method="POST">
               <input type="hidden" name="id" value={id} />
-              <button
+              <Button
                 type="submit"
-                style={{
-                  width: "100%",
-                  padding: "11px",
-                  background: "#EF4444",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 10,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                }}
+                variant="danger"
+                size="md"
+                className="w-full"
               >
                 <TrashIcon size={15} /> Delete Service
-              </button>
+              </Button>
             </form>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

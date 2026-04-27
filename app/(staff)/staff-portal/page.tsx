@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth-options';
 import pool from '@/lib/db';
 import { redirect } from 'next/navigation';
 import StaffCalendarView from '@/components/staff/StaffCalendarView';
+import { Card } from '@/components/ds/Card';
 
 export default async function StaffPortalPage() {
   const session = await getServerSession(authOptions);
@@ -51,15 +52,15 @@ export default async function StaffPortalPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">My schedule</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-h2 font-bold text-ink-900">My schedule</h1>
+        <p className="mt-1 text-ink-500">
           {new Date().toLocaleDateString('en-US', {
             weekday: 'long', month: 'long', day: 'numeric',
           })}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="mb-8 grid grid-cols-2 gap-4">
         {[
           {
             label: "Today's appointments",
@@ -73,10 +74,10 @@ export default async function StaffPortalPage() {
             value: bookings.length,
           },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white rounded-xl border border-gray-100 p-5">
-            <p className="text-sm text-gray-500">{stat.label}</p>
-            <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
-          </div>
+          <Card key={stat.label} variant="outlined">
+            <p className="text-body-sm text-ink-500">{stat.label}</p>
+            <p className="mt-1 text-h2 font-semibold text-ink-900">{stat.value}</p>
+          </Card>
         ))}
       </div>
 

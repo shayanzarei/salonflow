@@ -1,3 +1,7 @@
+import { Avatar } from "@/components/ds/Avatar";
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
 import {
   CheckCircleIcon,
   EyeIcon,
@@ -14,12 +18,12 @@ import { notFound } from "next/navigation";
 const STAFF_COLORS = [
   'var(--color-brand-600)',
   'var(--color-accent-500)',
-  "#10B981",
-  "#EC4899",
-  "#3B82F6",
-  "#EF4444",
+  "var(--color-success-600)",
+  "var(--color-danger-600)",
+  "var(--color-info-600)",
+  "var(--color-danger-700)",
   'var(--color-brand-500)',
-  "#06B6D4",
+  "var(--color-success-700)",
 ];
 
 export default async function StaffPage({
@@ -65,7 +69,7 @@ export default async function StaffPage({
     <div>
       {invited === "1" ? (
         <div
-          className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 sm:mb-6"
+          className="mb-4 rounded-sm bg-success-50 px-4 py-3 text-body-sm text-success-700 sm:mb-6"
           role="status"
         >
           Invite sent. Your team member will receive an email to set their password
@@ -75,9 +79,9 @@ export default async function StaffPage({
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Staff</h1>
+          <h1 className="text-h2 font-bold text-ink-900 sm:text-h1">Staff</h1>
           <span
-            className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium sm:text-[13px]"
+            className="shrink-0 rounded-full px-2.5 py-1 text-caption font-medium sm:text-body-sm"
             style={{
               color: brand,
               background: `${brand}15`,
@@ -87,21 +91,21 @@ export default async function StaffPage({
           </span>
         </div>
         {canAddStaff ? (
-          <Link
-            href="/staff/new"
-            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] px-4 py-2.5 text-sm font-medium text-white no-underline"
-            style={{ background: brand }}
+          <Button
+            asChild
+            variant="primary"
+            size="md"
+            style={{ backgroundColor: brand }}
+            className="shrink-0"
           >
-            <PlusIcon
-              size={14}
-              style={{ display: "inline", verticalAlign: "middle" }}
-            />
-            Add Staff Member
-          </Link>
+            <Link href="/staff/new">
+              <PlusIcon size={14} /> Add Staff Member
+            </Link>
+          </Button>
         ) : (
-          <span className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-[10px] bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500">
+          <Badge variant="neutral">
             Staff limit reached ({maxStaff})
-          </span>
+          </Badge>
         )}
       </div>
 
@@ -111,14 +115,14 @@ export default async function StaffPage({
           {
             label: "Total Appointments (This Week)",
             value: totalWeekAppointments,
-            icon: <CheckCircleIcon size={20} color="#10B981" />,
-            iconBg: "#ECFDF5",
+            icon: <CheckCircleIcon size={20} color="var(--color-success-600)" />,
+            iconBg: "var(--color-success-50)",
           },
           {
             label: "Active Staff Today",
             value: `${activeStaff} / ${staffList.length}`,
-            icon: <UsersIcon size={20} color="#6366F1" />,
-            iconBg: "#EEF2FF",
+            icon: <UsersIcon size={20} color="var(--color-info-600)" />,
+            iconBg: "var(--color-info-50)",
           },
           {
             label: "Total Revenue Generated",
@@ -127,186 +131,89 @@ export default async function StaffPage({
             iconBg: 'var(--color-brand-50)',
           },
         ].map((stat) => (
-          <div
+          <Card
             key={stat.label}
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: "20px 24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
+            variant="outlined"
+            className="flex items-center justify-between"
           >
             <div>
-              <p style={{ fontSize: 13, color: "#888", margin: "0 0 8px" }}>
-                {stat.label}
-              </p>
-              <p
-                style={{
-                  fontSize: 24,
-                  fontWeight: 700,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
-                {stat.value}
-              </p>
+              <p className="mb-2 text-caption text-ink-500">{stat.label}</p>
+              <p className="text-h2 font-bold text-ink-900">{stat.value}</p>
             </div>
             <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 12,
-                background: stat.iconBg,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md"
+              style={{ background: stat.iconBg }}
             >
               {stat.icon}
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
       {/* Team directory */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: 16,
-          border: "1px solid #f0f0f0",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            padding: "18px 24px",
-            borderBottom: "1px solid #f5f5f5",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <h2
-            style={{ fontSize: 15, fontWeight: 600, color: "#111", margin: 0 }}
-          >
+      <Card variant="outlined" className="overflow-hidden p-0">
+        <div className="flex items-center justify-between border-b border-ink-100 px-6 py-4">
+          <h2 className="text-body-sm font-semibold text-ink-900">
             Team Directory
           </h2>
         </div>
 
         {staffList.length === 0 ? (
-          <div style={{ padding: "60px 24px", textAlign: "center" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginBottom: 12,
-              }}
-            >
-              <UsersIcon size={36} color="#D1D5DB" />
+          <div className="px-6 py-[60px] text-center">
+            <div className="mb-3 flex justify-center">
+              <UsersIcon size={36} color="var(--color-ink-300)" />
             </div>
-            <h3
-              style={{
-                fontSize: 16,
-                fontWeight: 600,
-                color: "#111",
-                margin: "0 0 8px",
-              }}
-            >
+            <h3 className="mb-2 text-body font-semibold text-ink-900">
               No team members yet
             </h3>
-            <p style={{ fontSize: 14, color: "#888", margin: "0 0 20px" }}>
+            <p className="mb-5 text-body-sm text-ink-500">
               Add your first staff member to get started
             </p>
             {canAddStaff ? (
-              <Link
-                href="/staff/new"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "10px 20px",
-                  background: brand,
-                  color: "white",
-                  borderRadius: 10,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  textDecoration: "none",
-                }}
+              <Button
+                asChild
+                variant="primary"
+                size="md"
+                style={{ backgroundColor: brand }}
               >
-                <PlusIcon
-                  size={14}
-                  style={{ display: "inline", verticalAlign: "middle" }}
-                />
-                Add Staff Member
-              </Link>
+                <Link href="/staff/new">
+                  <PlusIcon size={14} /> Add Staff Member
+                </Link>
+              </Button>
             ) : (
-              <span className="inline-flex items-center rounded-[10px] bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500">
+              <Badge variant="neutral">
                 Staff limit reached ({maxStaff})
-              </span>
+              </Badge>
             )}
           </div>
         ) : (
           <div>
             {staffList.map((member, i) => {
               const color = STAFF_COLORS[i % STAFF_COLORS.length];
-              const initials = member.name
-                .split(" ")
-                .map((n: string) => n[0])
-                .join("")
-                .slice(0, 2)
-                .toUpperCase();
               const hasPortal = !!member.password_hash;
               const upcomingCount = parseInt(member.upcoming_count);
 
               return (
                 <div
                   key={member.id}
-                  className="flex flex-col gap-4 border-b border-gray-50 px-4 py-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-6"
+                  className="flex flex-col gap-4 border-b border-ink-100 px-4 py-4 transition-colors last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                 >
                   {/* Left: avatar + info */}
-                  <div className="flex min-w-0 items-center gap-3.5 sm:gap-3.5">
-                    <div
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: "50%",
-                        background: `${color}20`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: color,
-                        fontWeight: 700,
-                        fontSize: 15,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {initials}
-                    </div>
+                  <div className="flex min-w-0 items-center gap-3.5">
+                    <Avatar
+                      name={member.name}
+                      size="lg"
+                      className="h-12 w-12 text-body font-bold"
+                      style={{ background: `${color}20`, color }}
+                    />
                     <div>
-                      <p
-                        style={{
-                          fontSize: 15,
-                          fontWeight: 600,
-                          color: "#111",
-                          margin: "0 0 2px",
-                        }}
-                      >
+                      <p className="mb-0.5 text-body-sm font-semibold text-ink-900">
                         {member.name}
                       </p>
-                      <p
-                        style={{
-                          fontSize: 13,
-                          color: "#666",
-                          margin: "0 0 1px",
-                        }}
-                      >
+                      <p className="text-caption text-ink-600">
                         {member.role}
                       </p>
-                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                      <p className="text-caption text-ink-400">
                         {member.email}
                       </p>
                     </div>
@@ -314,59 +221,31 @@ export default async function StaffPage({
 
                   {/* Right: portal status + upcoming + menu */}
                   <div className="flex flex-wrap items-center gap-3 sm:justify-end sm:gap-5">
-                    <span
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 500,
-                        padding: "4px 12px",
-                        borderRadius: 100,
-                        background: hasPortal ? "#ECFDF5" : "#F5F5F5",
-                        color: hasPortal ? "#059669" : "#999",
-                      }}
-                    >
+                    <Badge variant={hasPortal ? "success" : "neutral"}>
                       {hasPortal ? "Active" : "Not set"}
-                    </span>
+                    </Badge>
 
-                    <div style={{ textAlign: "right", minWidth: 80 }}>
-                      <p
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: "#111",
-                          margin: 0,
-                        }}
-                      >
+                    <div className="min-w-[80px] text-right">
+                      <p className="text-caption font-semibold text-ink-900">
                         {upcomingCount} upcoming
                       </p>
-                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                      <p className="text-caption text-ink-400">
                         appointments
                       </p>
                     </div>
 
                     {/* Quick actions */}
-                    <div style={{ display: "flex", gap: 6 }}>
+                    <div className="flex gap-1.5">
                       <Link
                         href={`/staff/${member.id}`}
+                        className="inline-flex items-center gap-1 rounded-sm px-3.5 py-1.5 text-caption font-medium no-underline"
                         style={{
-                          fontSize: 13,
                           color: brand,
-                          textDecoration: "none",
-                          fontWeight: 500,
-                          padding: "6px 14px",
                           border: `1px solid ${brand}30`,
-                          borderRadius: 8,
                           background: `${brand}08`,
                         }}
                       >
-                        <EyeIcon
-                          size={13}
-                          style={{
-                            display: "inline",
-                            verticalAlign: "middle",
-                            marginRight: 4,
-                          }}
-                        />{" "}
-                        View
+                        <EyeIcon size={13} /> View
                       </Link>
                     </div>
                   </div>
@@ -375,7 +254,7 @@ export default async function StaffPage({
             })}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

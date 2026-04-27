@@ -1,4 +1,7 @@
 import BookingProgress from "@/components/booking/BookingProgress";
+import { Avatar } from "@/components/ds/Avatar";
+import { Button } from "@/components/ds/Button";
+import { Input } from "@/components/ds/Input";
 import { MapPinIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { fillTemplate } from "@/lib/i18n/interpolate";
@@ -41,11 +44,11 @@ export default async function ConfirmPage({
   const bookedAt = new Date(time);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-ink-50">
       <div className="mx-auto max-w-[900px] px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <a
           href={`/book/time?service=${service}&staff=${staff}`}
-          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
+          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-ink-500 no-underline sm:mb-8"
         >
           {t.booking.back}
         </a>
@@ -57,10 +60,10 @@ export default async function ConfirmPage({
         />
 
         <div className="mb-8 text-center sm:mb-10 md:mb-12">
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
+          <h1 className="text-balance text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl md:text-[40px]">
             {t.booking.confirmTitle}
           </h1>
-          <p className="mt-2 text-sm text-gray-500 sm:text-base">
+          <p className="mt-2 text-sm text-ink-500 sm:text-base">
             {t.booking.confirmSubtitle}
           </p>
         </div>
@@ -113,23 +116,12 @@ export default async function ConfirmPage({
                   borderBottom: "1px solid #f5f5f5",
                 }}
               >
-                <div
-                  style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: "50%",
-                    background: brand,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    fontSize: 18,
-                    fontWeight: 600,
-                    flexShrink: 0,
-                  }}
-                >
-                  {selectedStaff.name.charAt(0)}
-                </div>
+                <Avatar
+                  name={selectedStaff.name}
+                  size="lg"
+                  className="h-[52px] w-[52px] text-lg text-white"
+                  style={{ background: brand }}
+                />
                 <div>
                   <p
                     style={{
@@ -179,10 +171,10 @@ export default async function ConfirmPage({
                     key={item.label}
                     className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
                   >
-                    <span className="shrink-0 text-sm text-gray-500">
+                    <span className="shrink-0 text-sm text-ink-500">
                       {item.label}
                     </span>
-                    <span className="min-w-0 text-sm font-medium text-gray-900 sm:text-right">
+                    <span className="min-w-0 text-sm font-medium text-ink-900 sm:text-right">
                       {item.value}
                     </span>
                   </div>
@@ -246,7 +238,7 @@ export default async function ConfirmPage({
           </div>
 
           {/* Right — Customer form */}
-          <div className="rounded-[20px] border border-gray-100 bg-white p-5 sm:p-6 md:p-8">
+          <div className="rounded-[20px] border border-ink-100 bg-white p-5 sm:p-6 md:p-8">
             <h2
               style={{
                 fontSize: 20,
@@ -264,107 +256,58 @@ export default async function ConfirmPage({
             <form
               action="/api/bookings"
               method="POST"
-              style={{ display: "flex", flexDirection: "column", gap: 20 }}
+              className="flex flex-col gap-5"
             >
               <input type="hidden" name="tenant_id" value={tenant.id} />
               <input type="hidden" name="service_id" value={service} />
               <input type="hidden" name="staff_id" value={staff} />
               <input type="hidden" name="booked_at" value={time} />
 
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: "#444",
-                    marginBottom: 8,
-                  }}
-                >
-                  {t.booking.fullName}
-                </label>
-                <input
-                  type="text"
-                  name="client_name"
-                  required
-                  placeholder={t.booking.placeholderName}
-                  className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
-                />
-              </div>
+              <Input
+                id="confirm-client-name"
+                name="client_name"
+                type="text"
+                required
+                label={t.booking.fullName}
+                placeholder={t.booking.placeholderName}
+              />
 
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: "#444",
-                    marginBottom: 8,
-                  }}
-                >
-                  {t.booking.emailAddress}
-                </label>
-                <input
-                  type="email"
-                  name="client_email"
-                  required
-                  placeholder={t.booking.placeholderEmail}
-                  className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
-                />
-              </div>
+              <Input
+                id="confirm-client-email"
+                name="client_email"
+                type="email"
+                required
+                label={t.booking.emailAddress}
+                placeholder={t.booking.placeholderEmail}
+              />
 
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: "#444",
-                    marginBottom: 8,
-                  }}
-                >
-                  {t.booking.phoneNumber}{" "}
-                  <span style={{ color: "#bbb", fontWeight: 400 }}>
-                    {t.booking.phoneOptional}
-                  </span>
-                </label>
-                <input
-                  type="tel"
-                  name="client_phone"
-                  pattern={PHONE_INPUT_PATTERN}
-                  title="Use a valid phone number format."
-                  placeholder={t.booking.placeholderPhone}
-                  className="box-border w-full min-h-12 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 outline-none"
-                />
-              </div>
+              <Input
+                id="confirm-client-phone"
+                name="client_phone"
+                type="tel"
+                pattern={PHONE_INPUT_PATTERN}
+                title="Use a valid phone number format."
+                label={t.booking.phoneNumber}
+                optionalLabel={t.booking.phoneOptional}
+                placeholder={t.booking.placeholderPhone}
+              />
 
               {/* Cancellation policy */}
-              <div
-                style={{
-                  background: "#f9fafb",
-                  borderRadius: 12,
-                  padding: "14px 16px",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 12,
-                    color: "#888",
-                    margin: 0,
-                    lineHeight: 1.6,
-                  }}
-                >
+              <div className="rounded-xl bg-ink-50 px-4 py-3.5">
+                <p className="m-0 text-xs leading-relaxed text-ink-500">
                   {t.booking.confirmPolicyNotice}
                 </p>
               </div>
 
-              <button
+              <Button
                 type="submit"
-                className="mt-1 w-full min-h-12 rounded-full border-none py-4 text-base font-semibold text-white"
-                style={{ background: brand, cursor: "pointer" }}
+                variant="primary"
+                size="lg"
+                className="mt-1 w-full rounded-full"
+                style={{ backgroundColor: brand }}
               >
                 {t.booking.confirmBookingCta}
-              </button>
+              </Button>
             </form>
           </div>
         </div>

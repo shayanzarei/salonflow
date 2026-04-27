@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Select } from "@/components/ds/Select";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -119,10 +121,10 @@ export default function SalonWorkingHoursForm({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
-      <div className="border-b border-gray-100 px-5 py-4">
-        <h2 className="text-sm font-semibold text-gray-900">Working Hours</h2>
-        <p className="mt-1 text-sm text-gray-500">
+    <div className="overflow-hidden rounded-lg border border-ink-200 bg-ink-0">
+      <div className="border-b border-ink-100 px-5 py-4">
+        <h2 className="text-body font-semibold text-ink-900">Working Hours</h2>
+        <p className="mt-1 text-body-sm text-ink-500">
           Toggle each day on/off and set working hours. Customers can only book
           within these times.
         </p>
@@ -135,11 +137,9 @@ export default function SalonWorkingHoursForm({
           return (
             <div
               key={day.day}
-              className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-5"
-              style={{
-                borderBottom: isLast ? "none" : "1px solid #f5f5f5",
-                opacity: item.is_working ? 1 : 0.55,
-              }}
+              className={`flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-5 ${
+                isLast ? "" : "border-b border-ink-100"
+              } ${item.is_working ? "" : "opacity-55"} transition-opacity`}
             >
               <div className="flex items-center gap-3 sm:w-44 sm:shrink-0">
                 <button
@@ -148,37 +148,41 @@ export default function SalonWorkingHoursForm({
                   aria-checked={item.is_working}
                   aria-label={`${day.label} working`}
                   onClick={() => toggle(day.day)}
-                  className="relative h-6 w-11 shrink-0 rounded-full border-none p-0"
-                  style={{ background: item.is_working ? brand : "#D1D5DB" }}
+                  className="relative h-6 w-11 shrink-0 cursor-pointer rounded-full border-none p-0 transition-colors"
+                  style={{
+                    background: item.is_working ? brand : "var(--color-ink-300, #D1D5DB)",
+                  }}
                 >
                   <span
-                    className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-all"
+                    className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-ink-0 shadow-sm transition-all"
                     style={{ left: item.is_working ? 23 : 3 }}
                   />
                 </button>
-                <span className="text-sm font-medium text-gray-800">
+                <span className="select-none text-body-sm font-medium text-ink-900">
                   {day.label}
                 </span>
               </div>
 
               {item.is_working ? (
                 <div className="flex flex-wrap items-center gap-2 pl-[56px] sm:pl-0">
-                  <select
+                  <Select
+                    id={`salon-start-${day.day}`}
                     value={item.start_time}
                     onChange={(e) => setTime(day.day, "start_time", e.target.value)}
-                    className="min-h-10 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none"
+                    className="cursor-pointer"
                   >
                     {TIME_OPTIONS.map((time) => (
                       <option key={time.value} value={time.value}>
                         {time.label}
                       </option>
                     ))}
-                  </select>
-                  <span className="text-sm text-gray-400">to</span>
-                  <select
+                  </Select>
+                  <span className="shrink-0 text-body-sm text-ink-400">to</span>
+                  <Select
+                    id={`salon-end-${day.day}`}
                     value={item.end_time}
                     onChange={(e) => setTime(day.day, "end_time", e.target.value)}
-                    className="min-h-10 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none"
+                    className="cursor-pointer"
                   >
                     {TIME_OPTIONS.filter(
                       (time) => time.value > item.start_time
@@ -187,10 +191,10 @@ export default function SalonWorkingHoursForm({
                         {time.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
               ) : (
-                <span className="pl-[56px] text-sm text-gray-400 sm:pl-0">
+                <span className="pl-[56px] text-body-sm text-ink-400 sm:pl-0">
                   Day off
                 </span>
               )}
@@ -199,27 +203,29 @@ export default function SalonWorkingHoursForm({
         })}
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-        <div className="text-sm">
-          {error && <span className="text-red-500">{error}</span>}
+      <div className="flex flex-col gap-3 border-t border-ink-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="text-body-sm">
+          {error && <span className="text-danger-600">{error}</span>}
           {saved && !error && (
-            <span className="text-emerald-600">Saved successfully</span>
+            <span className="text-success-700">Saved successfully</span>
           )}
           {!error && !saved && (
-            <span className="text-gray-400">
+            <span className="text-ink-400">
               Changes are applied to future bookings immediately.
             </span>
           )}
         </div>
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex min-h-10 items-center justify-center rounded-[10px] px-5 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
-          style={{ background: brand }}
+          variant="primary"
+          size="md"
+          className="sm:shrink-0"
+          style={{ backgroundColor: brand }}
         >
           {saving ? "Saving..." : "Save Working Hours"}
-        </button>
+        </Button>
       </div>
     </div>
   );

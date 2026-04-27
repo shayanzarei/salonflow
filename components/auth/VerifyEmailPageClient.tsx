@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Input } from "@/components/ds/Input";
 import type { AuthFlowSection } from "@/lib/i18n/catalog/auth-flow";
 import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
@@ -57,22 +59,19 @@ function VerifyEmailContent() {
   if (verified) {
     return (
       <div className="mx-auto w-full max-w-md">
-        <div className="rounded-3xl border border-slate-100 bg-white/90 p-8 text-center shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm">
+        <div className="rounded-3xl border border-ink-100 bg-white/90 p-8 text-center shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full text-4xl">
             ✅
           </div>
-          <h1 className="mb-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="mb-2 text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">
             {f.verifyAllSetTitle}
           </h1>
-          <p className="mb-8 text-sm leading-relaxed text-slate-500">
+          <p className="mb-8 text-sm leading-relaxed text-ink-500">
             {f.verifyAllSetBody}
           </p>
-          <Link
-            href="/login"
-            className="inline-flex w-full items-center justify-center rounded-xl bg-accent-500 py-3 text-sm font-bold text-white hover:bg-accent-600"
-          >
-            {f.verifyGoWorkspace}
-          </Link>
+          <Button asChild variant="accent" size="lg" className="w-full">
+            <Link href="/login">{f.verifyGoWorkspace}</Link>
+          </Button>
         </div>
       </div>
     );
@@ -105,11 +104,11 @@ function VerifyEmailContent() {
 
     return (
       <div className="mx-auto w-full max-w-md">
-        <div className="rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm">
-          <h1 className="mb-2 text-2xl font-bold text-slate-900">
+        <div className="rounded-3xl border border-ink-100 bg-white/90 p-8 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm">
+          <h1 className="mb-2 text-2xl font-bold text-ink-900">
             {msg.title}
           </h1>
-          <p className="mb-7 text-sm leading-relaxed text-slate-500">
+          <p className="mb-7 text-sm leading-relaxed text-ink-500">
             {msg.body}
           </p>
           <ResendForm
@@ -127,18 +126,18 @@ function VerifyEmailContent() {
 
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
-      <div className="rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm">
-        <h1 className="mb-2 text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+      <div className="rounded-3xl border border-ink-100 bg-white/90 p-8 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-sm">
+        <h1 className="mb-2 text-center text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">
           {f.verifyCheckInbox}
         </h1>
-        <p className="my-5 truncate rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-700">
+        <p className="my-5 truncate rounded-xl border border-ink-200 bg-ink-50 px-4 py-3 text-center text-sm font-semibold text-ink-700">
           {emailParam || f.verifyYourEmailFallback}
         </p>
-        <p className="mb-6 text-center text-sm leading-relaxed text-slate-500">
+        <p className="mb-6 text-center text-sm leading-relaxed text-ink-500">
           {f.verifyInboxBody}
         </p>
         {resendState === "sent" ? (
-          <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-center text-sm font-semibold text-green-800">
+          <div className="rounded-xl border border-success-50 bg-success-50 px-4 py-3 text-center text-sm font-semibold text-success-700">
             {f.verifyResendSent}
           </div>
         ) : showResend ? (
@@ -151,22 +150,23 @@ function VerifyEmailContent() {
             onSubmit={handleResend}
           />
         ) : (
-          <p className="text-center text-sm text-slate-400">
+          <p className="text-center text-sm text-ink-400">
             {f.verifyResendPrompt}{" "}
-            <button
+            <Button
               type="button"
+              variant="link"
               onClick={() => setShowResend(true)}
-              className="font-semibold text-accent-600 underline underline-offset-2"
+              className="text-accent-600"
             >
               {f.verifyResendLink}
-            </button>{" "}
+            </Button>{" "}
             {f.verifySpamHint}
           </p>
         )}
       </div>
 
-      <div className="rounded-2xl border border-slate-100 bg-white/70 px-6 py-5 backdrop-blur-sm">
-        <p className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+      <div className="rounded-2xl border border-ink-100 bg-white/70 px-6 py-5 backdrop-blur-sm">
+        <p className="mb-4 text-xs font-bold uppercase tracking-widest text-ink-400">
           {f.verifyWhatsWaiting}
         </p>
         <div className="space-y-3">
@@ -174,10 +174,10 @@ function VerifyEmailContent() {
             <div key={perk.label} className="flex items-center gap-3">
               <span className="text-lg">{perk.icon}</span>
               <div>
-                <p className="text-sm font-semibold text-slate-800">
+                <p className="text-sm font-semibold text-ink-700">
                   {perk.label}
                 </p>
-                <p className="text-xs text-slate-400">{perk.sub}</p>
+                <p className="text-xs text-ink-400">{perk.sub}</p>
               </div>
             </div>
           ))}
@@ -204,24 +204,26 @@ function ResendForm({
 }) {
   return (
     <form onSubmit={onSubmit} className="space-y-3">
-      <input
+      <Input
+        id="verify-resend-email"
         type="email"
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder={af.verifyResendPlaceholder}
-        className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
       />
       {error ? (
-        <p className="text-sm font-medium text-rose-600">{error}</p>
+        <p className="text-sm font-medium text-danger-600">{error}</p>
       ) : null}
-      <button
+      <Button
         type="submit"
+        variant="accent"
+        size="lg"
         disabled={state === "sending"}
-        className="w-full rounded-xl bg-accent-500 py-3 text-sm font-bold text-white hover:bg-accent-600 disabled:opacity-60"
+        className="w-full"
       >
         {state === "sending" ? af.verifyResending : af.verifyResendSend}
-      </button>
+      </Button>
     </form>
   );
 }

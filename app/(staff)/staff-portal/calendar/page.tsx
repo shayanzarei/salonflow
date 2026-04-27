@@ -52,8 +52,8 @@ export default async function StaffCalendarPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
-        <p className="text-gray-500 mt-1">Your upcoming appointments for the next 60 days</p>
+        <h1 className="text-h2 font-bold text-ink-900">Calendar</h1>
+        <p className="mt-1 text-ink-500">Your upcoming appointments for the next 60 days</p>
       </div>
 
       <StaffCalendarGrid bookings={bookings} brandColor={brand} />

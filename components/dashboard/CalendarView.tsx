@@ -1,6 +1,9 @@
 "use client";
 
-import { CalendarIcon, ClockIcon, ScissorsIcon, SearchIcon, UserIcon, XIcon } from "@/components/ui/Icons";
+import { Avatar } from "@/components/ds/Avatar";
+import { Button } from "@/components/ds/Button";
+import { Modal } from "@/components/ds/Modal";
+import { CalendarIcon, ClockIcon, ScissorsIcon, SearchIcon, UserIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -23,13 +26,13 @@ interface Staff {
 }
 
 const STAFF_COLORS = [
-  "#7C3AED",
-  "#F59E0B",
-  "#10B981",
-  "#EC4899",
-  "#3B82F6",
-  "#EF4444",
-  "#8B5CF6",
+  "var(--color-brand-600)",
+  "var(--color-warning-600)",
+  "var(--color-success-600)",
+  "var(--color-accent-500)",
+  "var(--color-info-600)",
+  "var(--color-danger-600)",
+  "var(--color-brand-500)",
 ];
 
 export default function CalendarView({
@@ -119,21 +122,21 @@ export default function CalendarView({
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Calendar</h1>
-          <p className="mt-1 text-sm text-gray-500 sm:text-base">
+          <h1 className="text-h2 font-bold text-ink-900 sm:text-h1">Calendar</h1>
+          <p className="mt-1 text-body-sm text-ink-500 sm:text-body">
             Your weekly schedule
           </p>
         </div>
         <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto lg:justify-end">
           {/* Search */}
           <div className="relative min-w-0 flex-1 sm:max-w-[220px] lg:flex-initial">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400">
               <SearchIcon size={15} />
             </span>
             <input
               type="text"
               placeholder="Search clients..."
-              className="w-full rounded-full border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 outline-none"
+              className="min-h-10 w-full rounded-full border border-ink-200 bg-ink-0 py-2.5 pl-9 pr-4 text-body-sm text-ink-900 placeholder:text-ink-400 hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus focus-visible:outline-none"
             />
           </div>
 
@@ -142,11 +145,11 @@ export default function CalendarView({
             <button
               type="button"
               onClick={prevWeek}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-sm text-gray-900"
+              className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-ink-200 bg-ink-0 text-body-sm text-ink-900 hover:bg-ink-50"
             >
               ‹
             </button>
-            <span className="min-w-[7.5rem] text-center text-sm font-semibold text-gray-900 sm:text-[15px]">
+            <span className="min-w-[7.5rem] text-center text-body-sm font-semibold text-ink-900">
               {currentWeekStart.toLocaleDateString("en-US", {
                 month: "long",
                 year: "numeric",
@@ -155,7 +158,7 @@ export default function CalendarView({
             <button
               type="button"
               onClick={nextWeek}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-sm text-gray-900"
+              className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-ink-200 bg-ink-0 text-body-sm text-ink-900 hover:bg-ink-50"
             >
               ›
             </button>
@@ -164,7 +167,7 @@ export default function CalendarView({
           <button
             type="button"
             onClick={goToToday}
-            className="shrink-0 rounded-full border-[1.5px] bg-white px-5 py-2 text-sm font-semibold"
+            className="shrink-0 cursor-pointer rounded-full border-[1.5px] bg-ink-0 px-5 py-2 text-body-sm font-semibold"
             style={{ borderColor: brandColor, color: brandColor }}
           >
             Today
@@ -173,59 +176,37 @@ export default function CalendarView({
       </div>
 
       {/* Calendar grid — min width so week scrolls horizontally on phones */}
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+      <div className="overflow-hidden rounded-lg border border-ink-100 bg-ink-0">
         <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
           <div className="min-w-[760px]">
         {/* Day headers */}
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "60px repeat(7, 1fr)",
-            borderBottom: "1px solid #f0f0f0",
-          }}
+          className="grid border-b border-ink-100"
+          style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}
         >
-          <div style={{ padding: "16px 8px" }} />
+          <div className="px-2 py-4" />
           {weekDays.map((day) => {
             const isToday = day.toDateString() === today.toDateString();
             return (
               <div
                 key={day.toISOString()}
-                style={{
-                  padding: "16px 8px",
-                  textAlign: "center",
-                  borderLeft: "1px solid #f5f5f5",
-                }}
+                className="border-l border-ink-100 px-2 py-4 text-center"
               >
                 <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: isToday ? brandColor : "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    margin: "0 0 6px",
-                  }}
+                  className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider"
+                  style={{ color: isToday ? brandColor : "var(--color-ink-400)" }}
                 >
                   {day.toLocaleDateString("en-US", { weekday: "short" })}
                 </p>
                 <div
+                  className="mx-auto flex h-9 w-9 items-center justify-center rounded-full"
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: "50%",
                     background: isToday ? brandColor : "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "0 auto",
                   }}
                 >
                   <span
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 700,
-                      color: isToday ? "white" : "#111",
-                    }}
+                    className="text-base font-bold"
+                    style={{ color: isToday ? "white" : "var(--color-ink-900)" }}
                   >
                     {day.getDate()}
                   </span>
@@ -236,58 +217,32 @@ export default function CalendarView({
         </div>
 
         {/* Time grid */}
-        <div
-          style={{ position: "relative", overflowY: "auto", maxHeight: 700 }}
-        >
+        <div className="relative max-h-[700px] overflow-y-auto">
           {/* Current time line */}
           {showTimeLine && (
             <div
+              className="pointer-events-none absolute right-0 z-10 h-0.5 bg-danger-600"
               style={{
-                position: "absolute",
                 top: `${currentTimePercent}%`,
                 left: 60,
-                right: 0,
-                height: 2,
-                background: "#EF4444",
-                zIndex: 10,
-                pointerEvents: "none",
               }}
             >
-              <div
-                style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: "50%",
-                  background: "#EF4444",
-                  position: "absolute",
-                  left: -5,
-                  top: -4,
-                }}
-              />
+              <div className="absolute -left-[5px] -top-1 h-2.5 w-2.5 rounded-full bg-danger-600" />
             </div>
           )}
 
           {hours.map((hour) => (
             <div
               key={hour}
+              className="grid border-b border-ink-50"
               style={{
-                display: "grid",
                 gridTemplateColumns: "60px repeat(7, 1fr)",
                 height: 64,
-                borderBottom: "1px solid #f9f9f9",
               }}
             >
               {/* Hour label */}
-              <div
-                style={{
-                  padding: "0 12px 0 0",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-end",
-                  paddingTop: 4,
-                }}
-              >
-                <span style={{ fontSize: 11, color: "#bbb", fontWeight: 500 }}>
+              <div className="flex items-start justify-end pr-3 pt-1">
+                <span className="text-[11px] font-medium text-ink-400">
                   {hour === 12
                     ? "12 PM"
                     : hour > 12
@@ -304,11 +259,9 @@ export default function CalendarView({
                 return (
                   <div
                     key={day.toISOString()}
+                    className="relative border-l border-ink-100 px-[3px] py-[2px]"
                     style={{
-                      borderLeft: "1px solid #f5f5f5",
-                      position: "relative",
                       background: isToday ? `${brandColor}05` : "transparent",
-                      padding: "2px 3px",
                     }}
                   >
                     {dayBookings.map((booking) => {
@@ -324,58 +277,25 @@ export default function CalendarView({
                         <button
                           key={booking.id}
                           onClick={() => setSelectedBooking(booking)}
+                          className="absolute z-[5] cursor-pointer overflow-hidden rounded-md border-none px-2 py-1.5 text-left"
                           style={{
-                            position: "absolute",
                             top: topOffset + 2,
                             left: 3,
                             right: 3,
                             height: Math.max(height - 4, 28),
                             background: color,
-                            borderRadius: 8,
-                            border: "none",
-                            cursor: "pointer",
-                            textAlign: "left",
-                            padding: "6px 8px",
-                            overflow: "hidden",
-                            zIndex: 5,
                           }}
                         >
-                          <p
-                            style={{
-                              fontSize: 12,
-                              fontWeight: 600,
-                              color: "white",
-                              margin: 0,
-                              lineHeight: 1.3,
-                              overflow: "hidden",
-                              whiteSpace: "nowrap",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
+                          <p className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-caption font-semibold leading-tight text-white">
                             {booking.client_name}
                           </p>
                           {height > 40 && (
-                            <p
-                              style={{
-                                fontSize: 11,
-                                color: "rgba(255,255,255,0.85)",
-                                margin: "2px 0 0",
-                                overflow: "hidden",
-                                whiteSpace: "nowrap",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
+                            <p className="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap text-[11px] text-white/85">
                               {booking.service_name}
                             </p>
                           )}
                           {height > 56 && (
-                            <p
-                              style={{
-                                fontSize: 10,
-                                color: "rgba(255,255,255,0.75)",
-                                margin: "2px 0 0",
-                              }}
-                            >
+                            <p className="mt-0.5 text-[10px] text-white/75">
                               <ClockIcon size={10} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />
                               {new Date(booking.booked_at).toLocaleTimeString(
                                 "en-US",
@@ -394,8 +314,8 @@ export default function CalendarView({
         </div>
 
         {/* Staff legend + filter */}
-        <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden border-t border-gray-100 px-4 py-4 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] sm:flex-wrap sm:gap-4 sm:px-5">
-          <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden border-t border-ink-100 px-4 py-4 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] sm:flex-wrap sm:gap-4 sm:px-5">
+          <span className="shrink-0 text-caption font-semibold uppercase tracking-wide text-ink-400">
             Staff:
           </span>
 
@@ -403,10 +323,10 @@ export default function CalendarView({
           <button
             type="button"
             onClick={() => setSelectedStaffId("all")}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[13px] ${
+            className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border-none px-3 py-1 text-[13px] ${
               selectedStaffId === "all"
-                ? "bg-gray-900 font-semibold text-white"
-                : "font-normal text-gray-600"
+                ? "bg-ink-900 font-semibold text-ink-0"
+                : "bg-transparent font-normal text-ink-700"
             }`}
           >
             All
@@ -420,21 +340,16 @@ export default function CalendarView({
                 type="button"
                 key={member.id}
                 onClick={() => setSelectedStaffId(isActive ? "all" : member.id)}
-                className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[13px]"
+                className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border-none px-3 py-1 text-[13px]"
                 style={{
                   fontWeight: isActive ? 600 : 400,
                   background: isActive ? `${color}20` : "transparent",
-                  color: isActive ? color : "#555",
+                  color: isActive ? color : "var(--color-ink-700)",
                 }}
               >
                 <span
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    background: color,
-                    display: "inline-block",
-                  }}
+                  className="inline-block h-2.5 w-2.5 rounded-full"
+                  style={{ background: color }}
                 />
                 {member.name}
               </button>
@@ -446,115 +361,37 @@ export default function CalendarView({
       </div>
 
       {/* Booking detail modal */}
-      {selectedBooking && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.4)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 50,
-            padding: 24,
-          }}
-          onClick={() => setSelectedBooking(null)}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 20,
-              padding: 28,
-              width: "100%",
-              maxWidth: 400,
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 20,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
-                Appointment Details
-              </h3>
-              <button
-                onClick={() => setSelectedBooking(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "#aaa",
-                }}
-              >
-                <XIcon size={18} />
-              </button>
-            </div>
-
+      <Modal
+        open={Boolean(selectedBooking)}
+        onClose={() => setSelectedBooking(null)}
+        title="Appointment Details"
+        size="sm"
+      >
+        {selectedBooking ? (
+          <div>
             {/* Client */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                marginBottom: 20,
-                paddingBottom: 16,
-                borderBottom: "1px solid #f5f5f5",
-              }}
-            >
-              <div
+            <div className="mb-5 flex items-center gap-3 border-b border-ink-100 pb-4">
+              <Avatar
+                name={selectedBooking.client_name}
+                size="md"
+                className="h-11 w-11 text-base text-white"
                 style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: "50%",
                   background:
                     staffColorMap[selectedBooking.staff_id] ?? brandColor,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontWeight: 700,
-                  fontSize: 16,
                 }}
-              >
-                {selectedBooking.client_name.charAt(0)}
-              </div>
+              />
               <div>
-                <p
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    color: "#111",
-                    margin: 0,
-                  }}
-                >
+                <p className="text-body font-semibold text-ink-900">
                   {selectedBooking.client_name}
                 </p>
-                <p style={{ fontSize: 13, color: "#aaa", margin: 0 }}>
+                <p className="text-body-sm text-ink-400">
                   {selectedBooking.client_email}
                 </p>
               </div>
             </div>
 
             {/* Details */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 12,
-                marginBottom: 20,
-              }}
-            >
+            <div className="mb-5 flex flex-col gap-3">
               {[
                 {
                   icon: <ScissorsIcon size={15} />,
@@ -588,7 +425,7 @@ export default function CalendarView({
                   value: `${selectedBooking.duration_mins} mins`,
                 },
                 {
-                  icon: <span style={{ fontSize: 13, fontWeight: 600 }}>€</span>,
+                  icon: <span className="text-body-sm font-semibold">€</span>,
                   label: "Price",
                   value: `€${selectedBooking.price}`,
                   colored: true,
@@ -596,28 +433,17 @@ export default function CalendarView({
               ].map((item) => (
                 <div
                   key={item.label}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
+                  className="flex items-center justify-between"
                 >
-                  <span
-                    style={{
-                      fontSize: 13,
-                      color: "#888",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
+                  <span className="flex items-center gap-1.5 text-body-sm text-ink-500">
                     <span>{item.icon}</span> {item.label}
                   </span>
                   <span
+                    className="text-body-sm font-medium"
                     style={{
-                      fontSize: 13,
-                      fontWeight: 500,
-                      color: (item as any).colored ? brandColor : "#111",
+                      color: (item as { colored?: boolean }).colored
+                        ? brandColor
+                        : "var(--color-ink-900)",
                     }}
                   >
                     {item.value}
@@ -626,26 +452,24 @@ export default function CalendarView({
               ))}
             </div>
 
-            <Link
-              href={`/bookings/${selectedBooking.id}`}
+            <Button
+              asChild
+              variant="secondary"
+              size="md"
+              className="w-full"
               style={{
-                display: "block",
-                textAlign: "center",
-                fontSize: 14,
-                fontWeight: 500,
                 color: brandColor,
-                textDecoration: "none",
-                padding: "10px",
-                border: `1px solid ${brandColor}30`,
-                borderRadius: 10,
+                borderColor: `${brandColor}30`,
                 background: `${brandColor}08`,
               }}
             >
-              View Full Details →
-            </Link>
+              <Link href={`/bookings/${selectedBooking.id}`}>
+                View Full Details →
+              </Link>
+            </Button>
           </div>
-        </div>
-      )}
+        ) : null}
+      </Modal>
     </div>
   );
 }

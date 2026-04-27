@@ -18,14 +18,14 @@ export default async function NewBookingPage() {
       <div className="mb-6 sm:mb-7">
         <Link
           href="/bookings"
-          className="mb-3 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-500 no-underline"
+          className="mb-3 inline-flex min-h-10 items-center gap-1.5 text-body-sm text-ink-500 no-underline"
         >
           ← Back to Bookings
         </Link>
-        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
+        <h1 className="text-h2 font-bold text-ink-900 sm:text-h1">
           Add Booking
         </h1>
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        <p className="mt-1 text-body-sm text-ink-500 sm:text-body">
           Manually create a booking for a client
         </p>
       </div>

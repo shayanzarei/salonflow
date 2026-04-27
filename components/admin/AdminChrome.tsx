@@ -34,11 +34,11 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
   }, [menuOpen]);
 
   return (
-    <div className="flex min-h-screen bg-[#f5f6fa]">
+    <div className="flex min-h-screen bg-ink-50">
       <button
         type="button"
         aria-label={menuOpen ? "Close menu" : ""}
-        className={`fixed inset-0 z-30 bg-black/40 transition-opacity lg:pointer-events-none lg:hidden ${
+        className={`fixed inset-0 z-30 bg-ink-950/40 transition-opacity lg:pointer-events-none lg:hidden ${
           menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={() => setMenuOpen(false)}
@@ -46,25 +46,25 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
 
       <aside
         id="admin-sidebar"
-        className={`fixed left-0 top-0 z-40 flex h-screen w-[min(280px,88vw)] max-w-[280px] flex-col border-r border-gray-100 bg-white pb-[env(safe-area-inset-bottom)] shadow-xl [height:100dvh] transition-transform duration-200 ease-out lg:w-60 lg:max-w-none lg:translate-x-0 lg:shadow-none ${
+        className={`fixed left-0 top-0 z-40 flex h-screen w-[min(280px,88vw)] max-w-[280px] flex-col border-r border-ink-100 bg-ink-0 pb-[env(safe-area-inset-bottom)] shadow-xl [height:100dvh] transition-transform duration-200 ease-out lg:w-60 lg:max-w-none lg:translate-x-0 lg:shadow-none ${
           menuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4 lg:py-5">
+        <div className="flex items-center justify-between border-b border-ink-100 px-4 py-4 lg:py-5">
           <div className="flex min-w-0 flex-1 items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-900 text-sm font-semibold text-white">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-ink-900 text-body-sm font-semibold text-white">
               S
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-gray-900">
+              <p className="truncate text-body-sm font-semibold text-ink-900">
                 SoloHub
               </p>
-              <p className="truncate text-xs text-gray-400">{t.admin.superAdmin}</p>
+              <p className="truncate text-caption text-ink-400">{t.admin.superAdmin}</p>
             </div>
           </div>
           <button
             type="button"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-500 hover:bg-ink-100 lg:hidden"
             onClick={() => setMenuOpen(false)}
             aria-label="Close navigation menu"
           >
@@ -83,10 +83,10 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className={`flex min-h-11 items-center rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                className={`flex min-h-11 items-center rounded-md px-3 py-2.5 text-body-sm transition-colors ${
                   isActive
-                    ? "bg-gray-900 font-semibold text-white"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-ink-900 font-semibold text-white"
+                    : "text-ink-700 hover:bg-ink-50 hover:text-ink-900"
                 }`}
               >
                 {item.label}
@@ -95,16 +95,16 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="border-t border-gray-100 px-3 py-3">
+        <div className="border-t border-ink-100 px-3 py-3">
           <LogoutButton />
         </div>
       </aside>
 
       <main className="flex min-h-screen min-w-0 flex-1 flex-col lg:ml-60">
-        <header className="sticky top-0 z-20 flex min-h-14 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 py-2 sm:px-5 lg:min-h-16 lg:px-8">
+        <header className="sticky top-0 z-20 flex min-h-14 items-center justify-between gap-3 border-b border-ink-100 bg-ink-0 px-4 py-2 sm:px-5 lg:min-h-16 lg:px-8">
           <button
             type="button"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 lg:hidden"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-ink-200 bg-ink-0 text-ink-700 shadow-sm hover:bg-ink-50 lg:hidden"
             onClick={() => setMenuOpen(true)}
             aria-expanded={menuOpen}
             aria-controls="admin-sidebar"
@@ -120,7 +120,7 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
             <LanguageSwitcher variant="light" />
           </div>
 
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white sm:h-11 sm:w-11">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink-900 text-body-sm font-semibold text-white sm:h-11 sm:w-11">
             S
           </div>
         </header>

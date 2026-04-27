@@ -23,32 +23,17 @@ export default async function StaffEditPage({
 
   return (
     <div>
-      <div style={{ marginBottom: 28 }}>
+      <div className="mb-7">
         <Link
           href={`/staff/${id}`}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 13,
-            color: "#888",
-            textDecoration: "none",
-            marginBottom: 12,
-          }}
+          className="mb-3 inline-flex items-center gap-1.5 text-body-sm text-ink-500 no-underline"
         >
           ← Back to {member.name}
         </Link>
-        <h1
-          style={{
-            fontSize: 24,
-            fontWeight: 700,
-            color: "#111",
-            margin: "0 0 4px",
-          }}
-        >
+        <h1 className="mb-1 text-h2 font-bold text-ink-900">
           Edit Team Member
         </h1>
-        <p style={{ fontSize: 14, color: "#888", margin: 0 }}>
+        <p className="text-body-sm text-ink-500">
           Update staff member information, roles, and portal access.
         </p>
       </div>

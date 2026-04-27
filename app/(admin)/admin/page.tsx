@@ -1,3 +1,4 @@
+import { Card } from "@/components/ds/Card";
 import { formatEUR } from "@/lib/format-currency";
 import pool from "@/lib/db";
 
@@ -25,25 +26,22 @@ export default async function AdminOverviewPage() {
   return (
     <div className="min-w-0">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
+        <h1 className="text-h2 font-bold text-ink-900">
           Platform overview
         </h1>
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
+        <p className="mt-1 text-body-sm text-ink-500 sm:text-body">
           All salons on SoloHub
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-white rounded-xl border border-gray-100 p-5"
-          >
-            <p className="text-sm text-gray-500">{stat.label}</p>
-            <p className="text-2xl font-semibold text-gray-900 mt-1">
+          <Card key={stat.label} variant="outlined">
+            <p className="text-body-sm text-ink-500">{stat.label}</p>
+            <p className="mt-1 text-h2 font-semibold text-ink-900">
               {stat.value}
             </p>
-          </div>
+          </Card>
         ))}
       </div>
     </div>

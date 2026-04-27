@@ -1,4 +1,13 @@
 import { TenantsFilters } from "@/components/admin/TenantsFilters";
+import { Badge } from "@/components/ds/Badge";
+import {
+  Table,
+  TableContainer,
+  TBodyRow,
+  TD,
+  TH,
+  THeadRow,
+} from "@/components/ds/Table";
 import { EyeIcon, PlusIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import Link from "next/link";
@@ -117,28 +126,28 @@ export default async function AdminTenantsPage({
         sort={sort}
       />
 
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+      <TableContainer className="rounded-2xl border-gray-100">
         {tenants.length === 0 ? (
           <div className="px-6 py-12 text-center text-gray-400 text-sm">
             No tenants found.
           </div>
         ) : (
           <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-            <table className="w-full min-w-[920px] border-collapse">
+            <Table className="min-w-[920px]">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-5 py-3.5">Tenant</th>
-                  <th className="px-5 py-3.5">Plan</th>
-                  <th className="px-5 py-3.5">Template</th>
-                  <th className="px-5 py-3.5">Status</th>
-                  <th className="px-5 py-3.5">Started</th>
-                  <th className="px-5 py-3.5 text-right">Actions</th>
-                </tr>
+                <THeadRow>
+                  <TH>Tenant</TH>
+                  <TH>Plan</TH>
+                  <TH>Template</TH>
+                  <TH>Status</TH>
+                  <TH>Started</TH>
+                  <TH className="text-right">Actions</TH>
+                </THeadRow>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {tenants.map((tenant) => (
-                  <tr key={tenant.id} className="text-sm text-gray-800">
-                    <td className="px-5 py-3">
+                  <TBodyRow key={tenant.id} interactive={false}>
+                    <TD>
                       <div className="flex min-w-0 items-center gap-3">
                         <div
                           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white"
@@ -157,19 +166,19 @@ export default async function AdminTenantsPage({
                           </p>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className="inline-flex rounded-full bg-violet-50 px-2.5 py-1 text-xs font-medium capitalize text-violet-700">
+                    </TD>
+                    <TD>
+                      <Badge variant="brand" className="capitalize">
                         {PLAN_LABELS[tenant.plan_tier as keyof typeof PLAN_LABELS] ??
                           tenant.plan_tier}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium capitalize text-gray-700">
+                      </Badge>
+                    </TD>
+                    <TD>
+                      <Badge variant="neutral" className="capitalize">
                         {tenant.website_template}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3">
+                      </Badge>
+                    </TD>
+                    <TD>
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 capitalize">
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${
@@ -184,15 +193,15 @@ export default async function AdminTenantsPage({
                           ? "Pending approval"
                           : tenant.website_status}
                       </span>
-                    </td>
-                    <td className="px-5 py-3 text-gray-600">
+                    </TD>
+                    <TD className="text-gray-600">
                       {new Date(tenant.created_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "2-digit",
                         year: "numeric",
                       })}
-                    </td>
-                    <td className="px-5 py-3 text-right">
+                    </TD>
+                    <TD className="text-right">
                       <Link
                         href={`/admin/tenants/${tenant.id}`}
                         className="inline-flex min-h-9 items-center justify-center rounded-[8px] border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
@@ -207,11 +216,11 @@ export default async function AdminTenantsPage({
                         />{" "}
                         View
                       </Link>
-                    </td>
-                  </tr>
+                    </TD>
+                  </TBodyRow>
                 ))}
               </tbody>
-            </table>
+            </Table>
           </div>
         )}
         <div className="flex items-center justify-between border-t border-gray-100 px-5 py-4 text-xs text-gray-500">
@@ -235,7 +244,7 @@ export default async function AdminTenantsPage({
             </button>
           </div>
         </div>
-      </div>
+      </TableContainer>
     </div>
   );
 }

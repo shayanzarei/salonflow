@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Modal } from "@/components/ds/Modal";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 
@@ -68,110 +70,104 @@ export default function DeleteAccountSection({ slug, tenantName }: Props) {
   return (
     <>
       {/* ── Danger zone card ─────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-red-100 bg-red-50/40 p-6">
-        <h2 className="text-sm font-semibold text-red-700">Danger zone</h2>
-        <p className="mt-1 text-sm text-red-600/80">
+      <div className="rounded-lg border border-danger-600/20 bg-danger-50 p-6">
+        <h2 className="text-body-sm font-semibold text-danger-700">Danger zone</h2>
+        <p className="mt-1 text-body-sm text-danger-600">
           Permanently delete your account and all data. This is irreversible
           and required by GDPR if you request erasure of your information.
         </p>
 
-        <div className="mt-5 flex items-start justify-between gap-4 rounded-xl border border-red-200 bg-white px-4 py-4">
+        <div className="mt-5 flex items-start justify-between gap-4 rounded-md border border-danger-600/30 bg-ink-0 px-4 py-4">
           <div>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-body-sm font-medium text-ink-900">
               Delete account and all data
             </p>
-            <p className="mt-0.5 text-xs text-gray-500">
+            <p className="mt-0.5 text-caption text-ink-500">
               Removes your account, workspace, bookings, clients, and all
               associated data. This action cannot be undone.
             </p>
           </div>
-          <button
+          <Button
             type="button"
             onClick={openDialog}
-            className="shrink-0 rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-600 hover:text-white"
+            variant="danger"
+            size="sm"
+            className="shrink-0"
           >
             Delete account
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* ── Confirmation dialog ───────────────────────────────────────────── */}
-      {open ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)" }}
-        >
-          <div
-            className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_25px_80px_-20px_rgba(15,23,42,0.35)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Icon + title */}
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-2xl">
-              🗑️
-            </div>
-            <h2 className="text-lg font-bold text-gray-900">
-              Delete your account?
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-gray-500">
-              This will permanently erase{" "}
-              <span className="font-semibold text-gray-700">{tenantName}</span>{" "}
-              and all its data — bookings, clients, services, invoices, and
-              everything else. There is{" "}
-              <span className="font-semibold text-red-600">no way to undo</span>{" "}
-              this.
-            </p>
-
-            {/* Confirmation input */}
-            <div className="mt-5">
-              <label className="mb-1.5 block text-xs font-medium text-gray-600">
-                Type{" "}
-                <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs font-semibold text-gray-800">
-                  {slug}
-                </span>{" "}
-                to confirm
-              </label>
-              <input
-                type="text"
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && isConfirmed && !loading) {
-                    void handleDelete();
-                  }
-                }}
-                placeholder={slug}
-                autoFocus
-                className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-300 focus:border-red-400"
-              />
-            </div>
-
-            {error ? (
-              <p className="mt-3 text-sm font-medium text-red-600">{error}</p>
-            ) : null}
-
-            {/* Actions */}
-            <div className="mt-5 flex gap-3">
-              <button
-                type="button"
-                onClick={closeDialog}
-                disabled={loading}
-                className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={!isConfirmed || loading}
-                className="flex-1 rounded-xl py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-                style={{ backgroundColor: "#dc2626" }}
-              >
-                {loading ? "Deleting…" : "Yes, delete everything"}
-              </button>
-            </div>
-          </div>
+      <Modal open={open} onClose={closeDialog} size="sm">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-danger-50 text-2xl">
+          🗑️
         </div>
-      ) : null}
+        <h2 className="text-h3 font-bold text-ink-900">
+          Delete your account?
+        </h2>
+        <p className="mt-2 text-body-sm leading-relaxed text-ink-500">
+          This will permanently erase{" "}
+          <span className="font-semibold text-ink-700">{tenantName}</span>{" "}
+          and all its data — bookings, clients, services, invoices, and
+          everything else. There is{" "}
+          <span className="font-semibold text-danger-600">no way to undo</span>{" "}
+          this.
+        </p>
+
+        {/* Confirmation input */}
+        <div className="mt-5">
+          <label className="mb-1.5 block text-caption font-medium text-ink-500">
+            Type{" "}
+            <span className="rounded-sm bg-ink-100 px-1.5 py-0.5 font-mono text-caption font-semibold text-ink-900">
+              {slug}
+            </span>{" "}
+            to confirm
+          </label>
+          <input
+            type="text"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && isConfirmed && !loading) {
+                void handleDelete();
+              }
+            }}
+            placeholder={slug}
+            autoFocus
+            className="min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 px-4 text-body-sm text-ink-900 placeholder:text-ink-400 hover:border-ink-300 focus-visible:border-danger-600 focus-visible:shadow-focus focus-visible:outline-none"
+          />
+        </div>
+
+        {error ? (
+          <p className="mt-3 text-body-sm font-medium text-danger-600">{error}</p>
+        ) : null}
+
+        {/* Actions */}
+        <div className="mt-5 flex gap-3">
+          <Button
+            type="button"
+            onClick={closeDialog}
+            disabled={loading}
+            variant="secondary"
+            size="md"
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            onClick={handleDelete}
+            disabled={!isConfirmed || loading}
+            variant="danger"
+            size="md"
+            className="flex-1"
+          >
+            {loading ? "Deleting…" : "Yes, delete everything"}
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Input, Textarea } from "@/components/ds/Input";
 import MainSiteCta from "@/components/marketing/MainSiteCta";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
@@ -538,70 +540,50 @@ export default function MainSiteBookDemoPage() {
                   </h3>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div>
-                        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                          First Name *
-                        </label>
-                        <input
-                          required
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          type="text"
-                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
-                          placeholder="Jane"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                          Last Name *
-                        </label>
-                        <input
-                          required
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          type="text"
-                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
-                          placeholder="Doe"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                        Work Email *
-                      </label>
-                      <input
+                      <Input
+                        id="demo-first-name"
                         required
-                        value={workEmail}
-                        onChange={(e) => setWorkEmail(e.target.value)}
-                        type="email"
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
-                        placeholder="jane@company.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                        Company / Role
-                      </label>
-                      <input
-                        value={companyRole}
-                        onChange={(e) => setCompanyRole(e.target.value)}
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
                         type="text"
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
-                        placeholder="Independent Consultant"
+                        label="First Name"
+                        placeholder="Jane"
+                      />
+                      <Input
+                        id="demo-last-name"
+                        required
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        type="text"
+                        label="Last Name"
+                        placeholder="Doe"
                       />
                     </div>
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                        What are your main goals for SoloHub?
-                      </label>
-                      <textarea
-                        value={goals}
-                        onChange={(e) => setGoals(e.target.value)}
-                        rows={3}
-                        className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
-                        placeholder="e.g., I want to automate my invoicing and client onboarding..."
-                      />
-                    </div>
+                    <Input
+                      id="demo-work-email"
+                      required
+                      value={workEmail}
+                      onChange={(e) => setWorkEmail(e.target.value)}
+                      type="email"
+                      label="Work Email"
+                      placeholder="jane@company.com"
+                    />
+                    <Input
+                      id="demo-company-role"
+                      value={companyRole}
+                      onChange={(e) => setCompanyRole(e.target.value)}
+                      type="text"
+                      label="Company / Role"
+                      placeholder="Independent Consultant"
+                    />
+                    <Textarea
+                      id="demo-goals"
+                      value={goals}
+                      onChange={(e) => setGoals(e.target.value)}
+                      rows={3}
+                      label="What are your main goals for SoloHub?"
+                      placeholder="e.g., I want to automate my invoicing and client onboarding..."
+                    />
                   </div>
                 </div>
 
@@ -610,16 +592,18 @@ export default function MainSiteBookDemoPage() {
                     <LockIcon className="mr-2 h-4 w-4" />
                     Your information is secure.
                   </div>
-                  <button
+                  <Button
                     type="submit"
+                    variant="primary"
+                    size="lg"
                     disabled={isSubmitting || !selectedTime}
-                    className="flex w-full items-center justify-center space-x-2 rounded-xl bg-brand-600 px-8 py-3.5 font-bold text-white shadow-lg shadow-brand-600/20 transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                    className="w-full shadow-lg shadow-brand-600/20 sm:w-auto"
                   >
                     <span>Schedule Demo</span>
                     <ArrowRightIcon className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
-                {error ? <p className="text-sm text-red-600">{error}</p> : null}
+                {error ? <p className="text-sm text-danger-600">{error}</p> : null}
               </form>
             </div>
           </div>

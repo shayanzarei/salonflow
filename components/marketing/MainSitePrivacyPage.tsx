@@ -1,5 +1,7 @@
  "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Input } from "@/components/ds/Input";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
 import { SearchIcon, ShieldIcon } from "@/components/ui/Icons";
@@ -112,33 +114,24 @@ export default function MainSitePrivacyPage() {
         <section id="doc-nav" className="mx-auto mb-16 w-full max-w-4xl px-4">
           <div className="sticky top-24 z-40 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur-md md:flex-row md:p-6">
             <div className="flex w-full flex-wrap gap-2 md:w-auto">
-              <a
-                href="#privacy"
-                className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="#terms"
-                className="rounded-lg border border-slate-200 bg-slate-50 px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-              >
-                Terms of Service
-              </a>
-              <a
-                href="#cookies"
-                className="rounded-lg border border-slate-200 bg-slate-50 px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-              >
-                Cookie Policy
-              </a>
+              <Button asChild variant="dark" size="md">
+                <a href="#privacy">Privacy Policy</a>
+              </Button>
+              <Button asChild variant="secondary" size="md">
+                <a href="#terms">Terms of Service</a>
+              </Button>
+              <Button asChild variant="secondary" size="md">
+                <a href="#cookies">Cookie Policy</a>
+              </Button>
             </div>
-            <div className="relative w-full md:w-64">
-              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
+            <div className="w-full md:w-64">
+              <Input
+                id="privacy-search"
                 type="text"
                 placeholder="Search policies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
+                leading={<SearchIcon className="h-4 w-4" />}
               />
             </div>
           </div>

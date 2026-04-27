@@ -1,5 +1,10 @@
 "use client";
 
+import { Avatar } from "@/components/ds/Avatar";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Input, Textarea } from "@/components/ds/Input";
+import { Select } from "@/components/ds/Select";
 import { ScissorsIcon } from "@/components/ui/Icons";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import {
@@ -69,84 +74,46 @@ export function AddServiceForm({
         ? "Turn on “Show on booking site” and set a price so clients can book this service online."
         : "This service stays hidden from your public booking site until you enable “Show on booking site” on the service page.";
 
+  const staffAccentColors = [
+    "var(--color-brand-600)",
+    "var(--color-warning-600)",
+    "var(--color-success-600)",
+    "var(--color-accent-500)",
+    "var(--color-info-600)",
+  ];
+
   return (
     <form action="/api/services" method="POST">
       <input type="hidden" name="redirect_to" value={redirectTo} />
       <div className="grid grid-cols-1 gap-6 lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] xl:items-start">
         <div className="flex min-w-0 flex-col gap-5">
-          <section
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 20,
-              }}
-            >
-              <ScissorsIcon size={20} color="#6B7280" />
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined">
+            <div className="mb-5 flex items-center gap-2.5">
+              <ScissorsIcon size={20} color="var(--color-ink-500)" />
+              <h2 className="text-body font-semibold text-ink-900">
                 Basic Information
               </h2>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: 8,
-                  }}
-                >
-                  Service Name
-                </label>
-                <input
-                  name="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  placeholder="e.g. Signature Haircut"
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    padding: "11px 14px",
-                    fontSize: 14,
-                    boxSizing: "border-box",
-                  }}
-                />
-              </div>
+            <div className="flex flex-col gap-4">
+              <Input
+                id="add-service-name"
+                type="text"
+                name="name"
+                label="Service Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                placeholder="e.g. Signature Haircut"
+              />
 
               <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: 8,
-                  }}
-                >
+                <label className="mb-2 block text-label font-semibold text-ink-700">
                   Category
                 </label>
                 {categories.length > 0 ? (
-                  <select
+                  <Select
+                    id="add-service-category"
                     name="category_id"
                     value={categoryId}
                     onChange={(e) => {
@@ -155,15 +122,6 @@ export function AddServiceForm({
                       setCategoryId(selectedId);
                       setCategoryName(selectedName);
                     }}
-                    style={{
-                      width: "100%",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: "11px 14px",
-                      fontSize: 14,
-                      background: "white",
-                      boxSizing: "border-box",
-                    }}
                   >
                     <option value="">No category</option>
                     {categories.map((c) => (
@@ -171,22 +129,14 @@ export function AddServiceForm({
                         {c.name}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 ) : (
-                  <div
-                    style={{
-                      padding: "11px 14px",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      fontSize: 13,
-                      color: "#9CA3AF",
-                      background: "#F9FAFB",
-                    }}
-                  >
+                  <div className="rounded-sm border border-ink-200 bg-ink-50 px-4 py-2.5 text-body-sm text-ink-400">
                     No categories yet —{" "}
                     <a
                       href="/services?tab=categories"
-                      style={{ color: brand, textDecoration: "none", fontWeight: 500 }}
+                      className="font-medium no-underline"
+                      style={{ color: brand }}
                     >
                       create one first
                     </a>
@@ -194,36 +144,15 @@ export function AddServiceForm({
                 )}
               </div>
 
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: 8,
-                  }}
-                >
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={4}
-                  placeholder="Describe what's included in this service..."
-                  style={{
-                    width: "100%",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    padding: "11px 14px",
-                    fontSize: 14,
-                    resize: "vertical",
-                    boxSizing: "border-box",
-                    minHeight: 100,
-                  }}
-                />
-              </div>
+              <Textarea
+                id="add-service-description"
+                name="description"
+                label="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                placeholder="Describe what's included in this service..."
+              />
 
               <ImageUploadField
                 name="image_url"
@@ -233,71 +162,23 @@ export function AddServiceForm({
                 hint="Shown on your booking page service card"
               />
             </div>
-          </section>
+          </Card>
 
-          <section
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 20,
-              }}
-            >
-              <span style={{ fontSize: 20 }}>🏷</span>
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined">
+            <div className="mb-5 flex items-center gap-2.5">
+              <span className="text-xl">🏷</span>
+              <h2 className="text-body font-semibold text-ink-900">
                 Pricing &amp; Duration
               </h2>
             </div>
 
             <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
               <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: 8,
-                  }}
-                >
+                <label className="mb-2 block text-label font-semibold text-ink-700">
                   Price
                 </label>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    overflow: "hidden",
-                    background: "white",
-                  }}
-                >
-                  <span
-                    style={{
-                      padding: "0 12px",
-                      fontSize: 14,
-                      color: "#888",
-                      fontWeight: 600,
-                      borderRight: "1px solid #f0f0f0",
-                      background: "#fafafa",
-                      lineHeight: "44px",
-                    }}
-                  >
+                <div className="flex items-center overflow-hidden rounded-sm border border-ink-200 bg-ink-0 focus-within:border-brand-600 focus-within:shadow-focus">
+                  <span className="border-r border-ink-100 bg-ink-50 px-3 py-2.5 text-body-sm font-semibold leading-relaxed text-ink-500">
                     €
                   </span>
                   <input
@@ -309,31 +190,16 @@ export function AddServiceForm({
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="0.00"
-                    style={{
-                      flex: 1,
-                      border: "none",
-                      padding: "11px 12px",
-                      fontSize: 14,
-                      outline: "none",
-                      minWidth: 0,
-                    }}
+                    className="min-h-10 min-w-0 flex-1 border-none bg-transparent px-3 py-2.5 text-body-sm text-ink-900 outline-none"
                   />
                 </div>
-                <p style={{ fontSize: 12, color: "#9ca3af", margin: "8px 0 0" }}>
+                <p className="mt-2 text-caption text-ink-400">
                   Set the price customers will pay
                 </p>
               </div>
 
               <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: 8,
-                  }}
-                >
+                <label className="mb-2 block text-label font-semibold text-ink-700">
                   Duration
                 </label>
                 <ServiceDurationField
@@ -346,38 +212,17 @@ export function AddServiceForm({
                   required
                   onMinutesChangeAction={setDurationMins}
                 />
-                <p style={{ fontSize: 12, color: "#9ca3af", margin: "8px 0 0" }}>
+                <p className="mt-2 text-caption text-ink-400">
                   How long does this service take?
                 </p>
               </div>
             </div>
-          </section>
+          </Card>
 
-          <section
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 20,
-              }}
-            >
-              <span style={{ fontSize: 20 }}>⚙</span>
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined">
+            <div className="mb-5 flex items-center gap-2.5">
+              <span className="text-xl">⚙</span>
+              <h2 className="text-body font-semibold text-ink-900">
                 Availability
               </h2>
             </div>
@@ -390,100 +235,48 @@ export function AddServiceForm({
               onActiveChangeAction={setShowOnSite}
             />
 
-            <div style={{ marginTop: 24 }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#374151",
-                  marginBottom: 4,
-                }}
-              >
+            <div className="mt-6">
+              <label className="mb-1 block text-label font-semibold text-ink-700">
                 Assign to staff
               </label>
-              <p style={{ fontSize: 12, color: "#9ca3af", margin: "0 0 14px" }}>
+              <p className="mb-3.5 text-caption text-ink-400">
                 Select which staff members offer this service
               </p>
               {staff.length === 0 ? (
-                <p style={{ fontSize: 13, color: "#888", margin: 0 }}>
+                <p className="text-body-sm text-ink-500">
                   Add staff in the Staff section first.
                 </p>
               ) : (
                 <div
+                  className="grid gap-2.5"
                   style={{
-                    display: "grid",
                     gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-                    gap: 10,
                   }}
                 >
                   {staff.map((member, i) => {
                     const selected = selectedStaff.has(member.id);
-                    const colors = [
-                      "#7C3AED",
-                      "#F59E0B",
-                      "#10B981",
-                      "#EC4899",
-                      "#3B82F6",
-                    ];
-                    const color = colors[i % colors.length];
+                    const color = staffAccentColors[i % staffAccentColors.length];
                     return (
                       <button
                         key={member.id}
                         type="button"
                         onClick={() => toggleStaff(member.id)}
+                        className="flex cursor-pointer flex-col items-center gap-2 rounded-md p-3"
                         style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: 8,
-                          padding: "14px 10px",
-                          borderRadius: 12,
                           border: selected
                             ? `2px solid ${brand}`
-                            : "1px solid #f0f0f0",
-                          background: selected ? `${brand}0a` : "#fafafa",
-                          cursor: "pointer",
+                            : "1px solid var(--color-ink-100)",
+                          background: selected ? `${brand}0a` : "var(--color-ink-50)",
                         }}
                       >
-                        {member.avatar_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={member.avatar_url}
-                            alt=""
-                            width={44}
-                            height={44}
-                            style={{
-                              borderRadius: "50%",
-                              objectFit: "cover",
-                            }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: 44,
-                              height: 44,
-                              borderRadius: "50%",
-                              background: color,
-                              color: "white",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: 16,
-                              fontWeight: 700,
-                            }}
-                          >
-                            {member.name.charAt(0)}
-                          </div>
-                        )}
-                        <span
-                          style={{
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: "#111",
-                            textAlign: "center",
-                          }}
-                        >
+                        <Avatar
+                          name={member.name}
+                          src={member.avatar_url}
+                          size="md"
+                          className="h-11 w-11 text-base font-bold text-white"
+                          style={{ background: color }}
+                        />
+                        <span className="text-center text-caption font-semibold text-ink-900">
                           {member.name}
                         </span>
                       </button>
@@ -495,205 +288,99 @@ export function AddServiceForm({
                 <input key={id} type="hidden" name="staff_ids" value={id} />
               ))}
             </div>
-          </section>
+          </Card>
         </div>
 
         <div className="flex min-w-0 flex-col gap-4 xl:sticky xl:top-20 xl:self-start">
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 22,
-            }}
-          >
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: "#aaa",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                margin: "0 0 14px",
-              }}
-            >
+          <Card variant="outlined">
+            <p className="mb-3.5 text-caption font-semibold uppercase tracking-wider text-ink-400">
               Preview
             </p>
-            <div
-              style={{
-                borderRadius: 14,
-                border: "1px solid #f0f0f0",
-                padding: 20,
-                background: "#fafafa",
-              }}
-            >
+            <div className="rounded-md border border-ink-100 bg-ink-50 p-5">
               {imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={imageUrl}
                   alt=""
-                  style={{
-                    width: "100%",
-                    height: 120,
-                    objectFit: "cover",
-                    borderRadius: 10,
-                    marginBottom: 12,
-                  }}
+                  className="mb-3 h-[120px] w-full rounded-sm object-cover"
                 />
               ) : null}
               <span
+                className="mb-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold"
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  fontSize: 11,
-                  fontWeight: 600,
                   color: previewStyle.color,
                   background: previewStyle.bg,
-                  padding: "4px 10px",
-                  borderRadius: 100,
-                  marginBottom: 12,
                 }}
               >
                 {previewStyle.icon}{" "}
                 {categoryName || "No category"}
               </span>
-              <h3
-                style={{
-                  fontSize: 17,
-                  fontWeight: 700,
-                  color: "#111",
-                  margin: "0 0 8px",
-                }}
-              >
+              <h3 className="mb-2 text-body-lg font-bold text-ink-900">
                 {name || "Service name"}
               </h3>
-              <p
-                style={{
-                  fontSize: 13,
-                  color: "#666",
-                  lineHeight: 1.5,
-                  margin: "0 0 16px",
-                  minHeight: 40,
-                }}
-              >
+              <p className="mb-4 min-h-[40px] text-body-sm leading-relaxed text-ink-600">
                 {description || "Description will appear here."}
               </p>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 16,
-                }}
-              >
-                <span style={{ fontSize: 13, color: "#666" }}>
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-body-sm text-ink-600">
                   {durationMins} min
                 </span>
                 <span
-                  style={{ fontSize: 16, fontWeight: 700, color: brand }}
+                  className="text-body font-bold"
+                  style={{ color: brand }}
                 >
                   €{priceDisplay}
                 </span>
               </div>
-              <button
+              <Button
                 type="button"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: 10,
-                  border: "none",
-                  background: brand,
-                  color: "white",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "default",
-                }}
+                variant="primary"
+                size="md"
+                className="w-full cursor-default"
+                style={{ backgroundColor: brand }}
               >
                 Book
-              </button>
+              </Button>
             </div>
-            <p
-              style={{
-                fontSize: 12,
-                color: "#9ca3af",
-                margin: "12px 0 0",
-                textAlign: "center",
-              }}
-            >
+            <p className="mt-3 text-center text-caption text-ink-400">
               This is how customers will see your service
             </p>
-          </div>
+          </Card>
 
-          <button
+          <Button
             type="submit"
             name="save_intent"
             value="publish"
-            style={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              padding: "14px",
-              borderRadius: 12,
-              border: "none",
-              background: brand,
-              color: "white",
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            variant="primary"
+            size="lg"
+            className="w-full"
+            style={{ backgroundColor: brand }}
           >
             ✓ Save Service
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="submit"
             name="save_intent"
             value="draft"
             formNoValidate
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: 12,
-              border: "1px solid #e5e7eb",
-              background: "white",
-              color: "#111",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            variant="secondary"
+            size="md"
+            className="w-full"
           >
             Save as Draft
-          </button>
+          </Button>
 
           <Link
             href="/services"
-            style={{
-              display: "block",
-              textAlign: "center",
-              fontSize: 14,
-              color: "#888",
-              textDecoration: "none",
-            }}
+            className="block text-center text-body-sm text-ink-500 no-underline hover:text-ink-700"
           >
             Cancel
           </Link>
 
-          <div
-            style={{
-              borderRadius: 12,
-              border: "1px solid #BFDBFE",
-              background: "#EFF6FF",
-              padding: "14px 16px",
-              display: "flex",
-              gap: 10,
-              alignItems: "flex-start",
-            }}
-          >
-            <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ️</span>
-            <p style={{ fontSize: 12, color: "#1e40af", margin: 0, lineHeight: 1.5 }}>
+          <div className="flex items-start gap-2.5 rounded-md bg-info-50 px-4 py-3.5">
+            <span className="shrink-0 text-base">ℹ️</span>
+            <p className="text-caption leading-relaxed text-info-600">
               {infoMessage}
             </p>
           </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
 import { useState } from "react";
 
 interface Activity {
@@ -72,289 +74,108 @@ export default function PortalAccessTab({
 
   if (!hasPortal) {
     return (
-      <div
-        style={{
-          background: "white",
-          borderRadius: 16,
-          border: "1px solid #f0f0f0",
-          padding: 32,
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: "50%",
-              background: "#f5f5f5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-              margin: "0 auto 16px",
-            }}
-          >
+      <Card variant="outlined" className="p-8">
+        <div className="mb-7 text-center">
+          <div className="mx-auto mb-4 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-ink-100 text-2xl">
             🔒
           </div>
-          <h3
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              color: "#111",
-              margin: "0 0 8px",
-            }}
-          >
+          <h3 className="mb-2 text-body-lg font-bold text-ink-900">
             No Portal Access
           </h3>
-          <p style={{ fontSize: 14, color: "#888", margin: 0, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
+          <p className="mx-auto max-w-md text-body-sm text-ink-500">
             This team member cannot log in until they choose their own password.
             We will email them a secure link — you cannot set their password here.
           </p>
         </div>
 
-        <div style={{ maxWidth: 480, margin: "0 auto" }}>
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: "#aaa",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              margin: "0 0 16px",
-            }}
-          >
+        <div className="mx-auto max-w-lg">
+          <p className="mb-4 text-caption font-bold uppercase tracking-wider text-ink-400">
             Enable portal by email
           </p>
 
-          <div
-            style={{
-              background: "#EEF2FF",
-              borderRadius: 10,
-              padding: "12px 16px",
-              marginBottom: 20,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <span style={{ fontSize: 16, color: brand, flexShrink: 0 }}>ℹ</span>
-            <p style={{ fontSize: 13, color: "#555", margin: 0 }}>
+          <div className="mb-5 flex items-center gap-2.5 rounded-md bg-info-50 px-4 py-3">
+            <span className="shrink-0 text-base" style={{ color: brand }}>
+              ℹ
+            </span>
+            <p className="text-body-sm text-ink-700">
               They will log in with:{" "}
               <strong style={{ color: brand }}>{staffEmail}</strong>
             </p>
           </div>
 
           {sendError ? (
-            <p
-              style={{
-                fontSize: 13,
-                color: "#EF4444",
-                margin: "0 0 12px",
-              }}
-            >
-              ⚠ {sendError}
-            </p>
+            <p className="mb-3 text-body-sm text-danger-600">⚠ {sendError}</p>
           ) : null}
           {sendSuccess ? (
-            <p
-              style={{
-                fontSize: 13,
-                color: "#10B981",
-                margin: "0 0 12px",
-              }}
-            >
-              ✓ {sendSuccess}
-            </p>
+            <p className="mb-3 text-body-sm text-success-600">✓ {sendSuccess}</p>
           ) : null}
 
-          <button
+          <Button
             type="button"
             disabled={sendLoading}
             onClick={() => void handleSendSetupEmail()}
-            style={{
-              width: "100%",
-              padding: "14px",
-              background: brand,
-              color: "white",
-              border: "none",
-              borderRadius: 10,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: sendLoading ? "wait" : "pointer",
-              opacity: sendLoading ? 0.75 : 1,
-            }}
+            variant="primary"
+            size="lg"
+            className="w-full"
+            style={{ backgroundColor: brand }}
           >
             {sendLoading ? "Sending…" : "Email password setup link"}
-          </button>
+          </Button>
 
-          <p
-            style={{
-              fontSize: 12,
-              color: "#aaa",
-              textAlign: "center",
-              margin: "14px 0 0",
-            }}
-          >
+          <p className="mt-3.5 text-center text-caption text-ink-400">
             Link expires after 7 days. You can resend a new link anytime.
           </p>
         </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div
-      style={{
-        background: "white",
-        borderRadius: 16,
-        border: "1px solid #f0f0f0",
-        overflow: "hidden",
-      }}
-    >
-      <div style={{ padding: "20px 28px", borderBottom: "1px solid #f5f5f5" }}>
-        <h2
-          style={{
-            fontSize: 16,
-            fontWeight: 700,
-            color: "#111",
-            margin: "0 0 4px",
-          }}
-        >
+    <Card variant="outlined" className="overflow-hidden p-0">
+      <div className="border-b border-ink-100 px-7 py-5">
+        <h2 className="mb-1 text-body font-bold text-ink-900">
           Staff Portal Access
         </h2>
-        <p style={{ fontSize: 13, color: "#888", margin: 0 }}>
+        <p className="text-body-sm text-ink-500">
           Password changes are always done by the staff member via email link.
         </p>
       </div>
 
-      <div
-        style={{
-          background: "#ECFDF5",
-          padding: "14px 28px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              background: "#10B981",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "white",
-              fontSize: 12,
-            }}
-          >
+      <div className="flex items-center justify-between bg-success-50 px-7 py-3.5">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-success-600 text-caption text-ink-0">
             ✓
           </div>
-          <span style={{ fontSize: 14, fontWeight: 600, color: "#059669" }}>
+          <span className="text-body-sm font-semibold text-success-700">
             Portal Access Active
           </span>
         </div>
       </div>
 
-      <div
-        style={{
-          padding: 28,
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 32,
-        }}
-      >
+      <div className="grid grid-cols-1 gap-8 p-7 md:grid-cols-2">
         <div>
-          <h3
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: "#111",
-              margin: "0 0 16px",
-            }}
-          >
-            Login
-          </h3>
+          <h3 className="mb-4 text-body font-semibold text-ink-900">Login</h3>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              marginBottom: 32,
-            }}
-          >
-            <div
-              style={{
-                border: "1px solid #f0f0f0",
-                borderRadius: 10,
-                padding: "14px 16px",
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-              }}
-            >
-              <span style={{ fontSize: 16, color: "#aaa" }}>✉</span>
+          <div className="mb-8 flex flex-col gap-2.5">
+            <div className="flex items-center gap-3 rounded-md border border-ink-100 px-4 py-3.5">
+              <span className="text-base text-ink-400">✉</span>
               <div>
-                <p
-                  style={{
-                    fontSize: 11,
-                    color: "#aaa",
-                    margin: "0 0 2px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    fontWeight: 500,
-                  }}
-                >
+                <p className="mb-0.5 text-caption font-medium uppercase tracking-wide text-ink-400">
                   Email (username)
                 </p>
-                <p
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: "#111",
-                    margin: 0,
-                  }}
-                >
+                <p className="text-body-sm font-medium text-ink-900">
                   {staffEmail}
                 </p>
               </div>
             </div>
-            <div
-              style={{
-                border: "1px solid #f0f0f0",
-                borderRadius: 10,
-                padding: "14px 16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 16, color: "#aaa" }}>🔑</span>
+            <div className="flex items-center justify-between rounded-md border border-ink-100 px-4 py-3.5">
+              <div className="flex items-center gap-3">
+                <span className="text-base text-ink-400">🔑</span>
                 <div>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      color: "#aaa",
-                      margin: "0 0 2px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 500,
-                    }}
-                  >
+                  <p className="mb-0.5 text-caption font-medium uppercase tracking-wide text-ink-400">
                     Password
                   </p>
-                  <p
-                    style={{
-                      fontSize: 14,
-                      color: "#111",
-                      margin: 0,
-                      letterSpacing: "0.1em",
-                    }}
-                  >
+                  <p className="text-body-sm tracking-widest text-ink-900">
                     ••••••••
                   </p>
                 </div>
@@ -363,15 +184,8 @@ export default function PortalAccessTab({
                 type="button"
                 onClick={() => void handleSendSetupEmail()}
                 disabled={sendLoading}
-                style={{
-                  fontSize: 13,
-                  color: brand,
-                  background: "none",
-                  border: "none",
-                  cursor: sendLoading ? "wait" : "pointer",
-                  fontWeight: 500,
-                  opacity: sendLoading ? 0.6 : 1,
-                }}
+                className="cursor-pointer border-none bg-transparent text-body-sm font-medium disabled:cursor-wait disabled:opacity-60"
+                style={{ color: brand }}
               >
                 {sendLoading ? "Sending…" : "Email reset link"}
               </button>
@@ -379,147 +193,73 @@ export default function PortalAccessTab({
           </div>
 
           <div>
-            <h3
-              style={{
-                fontSize: 15,
-                fontWeight: 600,
-                color: "#EF4444",
-                margin: "0 0 12px",
-              }}
-            >
+            <h3 className="mb-3 text-body font-semibold text-danger-600">
               Danger Zone
             </h3>
-            <div
-              style={{
-                border: "1px solid #FECACA",
-                borderRadius: 10,
-                padding: 16,
-              }}
-            >
-              <p
-                style={{
-                  fontSize: 13,
-                  color: "#666",
-                  margin: "0 0 12px",
-                  lineHeight: 1.6,
-                }}
-              >
+            <div className="rounded-md bg-danger-50 p-4">
+              <p className="mb-3 text-body-sm leading-relaxed text-ink-600">
                 This will prevent the staff member from logging in to the portal.
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={handleRevoke}
-                style={{
-                  padding: "9px 18px",
-                  background: "white",
-                  color: "#EF4444",
-                  border: "1px solid #FECACA",
-                  borderRadius: 8,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  cursor: "pointer",
-                }}
+                variant="secondary"
+                size="sm"
+                className="text-danger-600"
               >
                 Revoke Access
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
         <div>
-          <h3
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: "#111",
-              margin: "0 0 12px",
-            }}
-          >
-            Password & access
+          <h3 className="mb-3 text-body font-semibold text-ink-900">
+            Password &amp; access
           </h3>
-          <p style={{ fontSize: 13, color: "#666", margin: "0 0 16px", lineHeight: 1.6 }}>
+          <p className="mb-4 text-body-sm leading-relaxed text-ink-600">
             To set a new password, send them a secure link. They complete the
             change themselves — you never see or type their password.
           </p>
 
           {sendError ? (
-            <p style={{ fontSize: 13, color: "#EF4444", margin: "0 0 12px" }}>
-              ⚠ {sendError}
-            </p>
+            <p className="mb-3 text-body-sm text-danger-600">⚠ {sendError}</p>
           ) : null}
           {sendSuccess ? (
-            <p style={{ fontSize: 13, color: "#10B981", margin: "0 0 12px" }}>
-              ✓ {sendSuccess}
-            </p>
+            <p className="mb-3 text-body-sm text-success-600">✓ {sendSuccess}</p>
           ) : null}
 
-          <button
+          <Button
             type="button"
             disabled={sendLoading}
             onClick={() => void handleSendSetupEmail()}
-            style={{
-              padding: "11px 24px",
-              background: brand,
-              color: "white",
-              border: "none",
-              borderRadius: 10,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: sendLoading ? "wait" : "pointer",
-              opacity: sendLoading ? 0.75 : 1,
-            }}
+            variant="primary"
+            size="md"
+            style={{ backgroundColor: brand }}
           >
             {sendLoading ? "Sending…" : "Email password setup link"}
-          </button>
+          </Button>
 
           {activity.length > 0 && (
-            <div style={{ marginTop: 32 }}>
-              <h3
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: "0 0 16px",
-                }}
-              >
+            <div className="mt-8">
+              <h3 className="mb-4 text-body font-semibold text-ink-900">
                 Recent Activity
               </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div className="flex flex-col gap-2">
                 {activity.map((item) => (
                   <div
                     key={item.id}
-                    style={{
-                      border: "1px solid #f0f0f0",
-                      borderRadius: 10,
-                      padding: "12px 16px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
+                    className="flex items-center justify-between rounded-md border border-ink-100 px-4 py-3"
                   >
                     <div>
-                      <p
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 500,
-                          color: "#111",
-                          margin: "0 0 2px",
-                        }}
-                      >
+                      <p className="mb-0.5 text-body-sm font-medium text-ink-900">
                         {item.action}
                       </p>
-                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                      <p className="text-caption text-ink-400">
                         {item.device ?? "Unknown device"}
                       </p>
                     </div>
-                    <p
-                      style={{
-                        fontSize: 12,
-                        color: "#aaa",
-                        margin: 0,
-                        flexShrink: 0,
-                      }}
-                    >
+                    <p className="shrink-0 text-caption text-ink-400">
                       {new Date(item.created_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -537,6 +277,6 @@ export default function PortalAccessTab({
           )}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

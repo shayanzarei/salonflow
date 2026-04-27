@@ -1,3 +1,4 @@
+import { Avatar } from "@/components/ds/Avatar";
 import { BookingPublicNav } from "@/components/booking/BookingPublicNav";
 import { LuxeTemplate } from "@/components/booking/templates/LuxeTemplate";
 import { MinimalistTemplate } from "@/components/booking/templates/MinimalistTemplate";
@@ -272,7 +273,7 @@ export default async function BookingHomePage({
                   </>
                 )}
               </h1>
-              <p className="mb-8 max-w-xl text-[15px] leading-relaxed text-gray-600 sm:mb-9 sm:text-base">
+              <p className="mb-8 max-w-xl text-[15px] leading-relaxed text-ink-500 sm:mb-9 sm:text-base">
                 Experience luxury treatments tailored to your unique style. Book
                 your appointment seamlessly and discover the ultimate salon
                 experience.
@@ -288,7 +289,7 @@ export default async function BookingHomePage({
 
                 <a
                   href="#services"
-                  className="inline-flex w-full min-h-[48px] items-center justify-center rounded-full border border-gray-200 px-7 py-3.5 text-[15px] font-medium text-gray-800 no-underline sm:w-auto"
+                  className="inline-flex w-full min-h-[48px] items-center justify-center rounded-full border border-ink-200 px-7 py-3.5 text-[15px] font-medium text-ink-700 no-underline sm:w-auto"
                 >
                   View Services
                 </a>
@@ -298,17 +299,17 @@ export default async function BookingHomePage({
                   {/* Avatar stack from real reviewers */}
                   <div className="flex shrink-0">
                     {reviews.slice(0, 4).map((r, i) => (
-                      <div
+                      <Avatar
                         key={r.id}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-[11px] font-semibold text-white"
+                        name={r.client_name}
+                        size="sm"
+                        className="h-8 w-8 border-2 border-white text-[11px] font-semibold text-white"
                         style={{ background: brand, marginLeft: i === 0 ? 0 : -8 }}
-                      >
-                        {r.client_name.charAt(0).toUpperCase()}
-                      </div>
+                      />
                     ))}
                     {totalReviews > 4 && (
                       <div
-                        className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-[10px] font-semibold text-gray-600"
+                        className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-ink-100 text-[10px] font-semibold text-ink-500"
                         style={{ marginLeft: -8 }}
                       >
                         +{totalReviews - 4}
@@ -327,7 +328,7 @@ export default async function BookingHomePage({
                         </span>
                       ))}
                     </div>
-                    <p className="text-xs text-gray-600 sm:text-[13px]">
+                    <p className="text-xs text-ink-500 sm:text-[13px]">
                       {avgRating.toFixed(1)}/5 from {totalReviews.toLocaleString()} review{totalReviews !== 1 ? "s" : ""}
                     </p>
                   </div>
@@ -352,10 +353,10 @@ export default async function BookingHomePage({
               {/* Next available card */}
               <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.08)] sm:inset-x-5 sm:bottom-5 sm:px-5 sm:py-4">
                 <div className="min-w-0">
-                  <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-gray-500 sm:text-[11px]">
+                  <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-ink-500 sm:text-[11px]">
                     Next Available
                   </p>
-                  <p className="truncate text-sm font-semibold text-gray-900 sm:text-base">
+                  <p className="truncate text-sm font-semibold text-ink-900 sm:text-base">
                     {nextAvailableLabel}
                   </p>
                 </div>
@@ -374,9 +375,9 @@ export default async function BookingHomePage({
       )}
 
       {/* Stats bar — stacked rows on xs; 2×2 sm; 4-col md+ */}
-      <div className="border-y border-gray-100 bg-white py-4 sm:py-8 md:py-10">
+      <div className="border-y border-ink-100 bg-white py-4 sm:py-8 md:py-10">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
-          <div className="flex flex-col divide-y divide-gray-100 sm:grid sm:grid-cols-2 sm:divide-y-0 sm:gap-x-8 sm:gap-y-10 sm:text-center md:grid-cols-4 md:gap-x-0 md:gap-y-0">
+          <div className="flex flex-col divide-y divide-ink-100 sm:grid sm:grid-cols-2 sm:divide-y-0 sm:gap-x-8 sm:gap-y-10 sm:text-center md:grid-cols-4 md:gap-x-0 md:gap-y-0">
             {[
               { value: `${yearsExperience}+`, label: "Years Experience" },
               { value: `${totalClients.toLocaleString()}+`, label: "Happy Clients" },
@@ -385,12 +386,12 @@ export default async function BookingHomePage({
             ].map((stat, i) => (
               <div
                 key={stat.label}
-                className={`flex min-w-0 items-center justify-between gap-4 py-4 sm:flex-col sm:justify-start sm:gap-2 sm:py-0 md:px-5 lg:px-6 ${i < 3 ? "md:border-r md:border-gray-100" : ""}`}
+                className={`flex min-w-0 items-center justify-between gap-4 py-4 sm:flex-col sm:justify-start sm:gap-2 sm:py-0 md:px-5 lg:px-6 ${i < 3 ? "md:border-r md:border-ink-100" : ""}`}
               >
-                <p className="shrink-0 text-3xl font-bold tabular-nums tracking-tight text-gray-900 sm:mb-0 sm:text-3xl md:text-4xl">
+                <p className="shrink-0 text-3xl font-bold tabular-nums tracking-tight text-ink-900 sm:mb-0 sm:text-3xl md:text-4xl">
                   {stat.value}
                 </p>
-                <p className="max-w-[min(100%,11rem)] text-right text-[11px] font-medium uppercase leading-snug tracking-wide text-gray-500 sm:max-w-none sm:text-center sm:text-xs md:text-[12px] md:tracking-[0.08em]">
+                <p className="max-w-[min(100%,11rem)] text-right text-[11px] font-medium uppercase leading-snug tracking-wide text-ink-500 sm:max-w-none sm:text-center sm:text-xs md:text-[12px] md:tracking-[0.08em]">
                   {stat.label}
                 </p>
               </div>
@@ -416,10 +417,10 @@ export default async function BookingHomePage({
                 >
                   Our Services
                 </p>
-                <h2 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-[40px] lg:leading-tight">
+                <h2 className="text-balance text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl lg:text-[40px] lg:leading-tight">
                   Signature Services
                 </h2>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-gray-500 sm:text-[15px]">
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-500 sm:text-[15px]">
                   Tailored treatments designed to enhance your natural beauty
                   and provide ultimate relaxation.
                 </p>
@@ -467,7 +468,7 @@ export default async function BookingHomePage({
             )}
 
             {filteredServices.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-10 text-center text-sm text-gray-500">
+              <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50 px-6 py-10 text-center text-sm text-ink-500">
                 No services found for this category.
               </div>
             ) : (
@@ -475,7 +476,7 @@ export default async function BookingHomePage({
               {filteredServices.map((service) => (
                 <div
                   key={service.id}
-                  className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md"
+                  className="overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm transition-shadow hover:shadow-md"
                 >
                   <div
                     className="flex h-40 items-center justify-center overflow-hidden sm:h-48 lg:h-[200px]"
@@ -509,11 +510,11 @@ export default async function BookingHomePage({
                             {service.category_name ?? service.category}
                           </p>
                         )}
-                        <h3 className="text-base font-bold leading-snug text-gray-900 sm:text-lg">
+                        <h3 className="text-base font-bold leading-snug text-ink-900 sm:text-lg">
                           {service.name}
                         </h3>
                       </div>
-                      <span className="shrink-0 text-base font-bold text-gray-900 sm:text-right">
+                      <span className="shrink-0 text-base font-bold text-ink-900 sm:text-right">
                         €{service.price}
                       </span>
                     </div>
@@ -530,7 +531,7 @@ export default async function BookingHomePage({
                       </p>
                     )}
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-[13px] text-gray-500">
+                      <p className="text-[13px] text-ink-500">
                         <ClockIcon size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} /> {service.duration_mins} min
                       </p>
 
@@ -556,10 +557,10 @@ export default async function BookingHomePage({
         <section id="team" className="bg-[#fafafa] py-12 sm:py-16 md:py-24 lg:py-[100px]">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
             <div className="mb-10 text-center sm:mb-12 md:mb-14 lg:mb-16">
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-gray-500">
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-ink-500">
                 Our Experts
               </p>
-              <h2 className="text-balance text-3xl font-bold text-gray-900 sm:text-4xl lg:text-[40px]">
+              <h2 className="text-balance text-3xl font-bold text-ink-900 sm:text-4xl lg:text-[40px]">
                 Meet Our Team
               </h2>
             </div>
@@ -590,10 +591,10 @@ export default async function BookingHomePage({
                       member.name.charAt(0)
                     )}
                   </div>
-                  <h3 className="mb-1.5 text-base font-semibold text-gray-900 sm:text-[17px]">
+                  <h3 className="mb-1.5 text-base font-semibold text-ink-900 sm:text-[17px]">
                     {member.name}
                   </h3>
-                  <p className="text-sm text-gray-500">{member.role}</p>
+                  <p className="text-sm text-ink-500">{member.role}</p>
                 </div>
               ))}
             </div>
@@ -606,16 +607,16 @@ export default async function BookingHomePage({
         <section id="gallery" className="bg-[#fafafa] py-12 sm:py-16 md:py-24 lg:py-[100px]">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
             <div className="mb-10 text-center sm:mb-12 md:mb-14 lg:mb-16">
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-gray-500">
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-ink-500">
                 Transformations
               </p>
-              <h2 className="text-balance text-3xl font-bold text-gray-900 sm:text-4xl lg:text-[40px]">
+              <h2 className="text-balance text-3xl font-bold text-ink-900 sm:text-4xl lg:text-[40px]">
                 Before &amp; After
               </h2>
             </div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {galleryItems.map((item) => (
-                <div key={item.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                <div key={item.id} className="overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm">
                   <div className="grid grid-cols-2">
                     <div className="relative overflow-hidden">
                       <span className="absolute left-2 top-2 z-10 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-white">
@@ -636,7 +637,7 @@ export default async function BookingHomePage({
                     </div>
                   </div>
                   {item.caption && (
-                    <p className="px-4 py-3 text-sm text-gray-600">{item.caption}</p>
+                    <p className="px-4 py-3 text-sm text-ink-500">{item.caption}</p>
                   )}
                 </div>
               ))}
@@ -650,10 +651,10 @@ export default async function BookingHomePage({
         <section id="reviews" className="bg-white py-12 sm:py-16 md:py-24 lg:py-[100px]">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
             <div className="mb-10 text-center sm:mb-12 md:mb-14 lg:mb-16">
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-gray-500">
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-ink-500">
                 Testimonials
               </p>
-              <h2 className="text-balance text-3xl font-bold text-gray-900 sm:text-4xl lg:text-[40px]">
+              <h2 className="text-balance text-3xl font-bold text-ink-900 sm:text-4xl lg:text-[40px]">
                 What Our Clients Say
               </h2>
             </div>
@@ -661,28 +662,28 @@ export default async function BookingHomePage({
               {reviews.map((review) => (
                 <div
                   key={review.id}
-                  className="rounded-[20px] border border-gray-100 bg-white p-5 sm:p-6 md:p-8"
+                  className="rounded-[20px] border border-ink-100 bg-white p-5 sm:p-6 md:p-8"
                 >
                   <div className="mb-3 flex gap-0.5 sm:mb-4">
                     {Array.from({ length: review.rating }).map((_, i) => (
-                      <span key={i} className="text-base text-amber-500">
+                      <span key={i} className="text-base text-warning-600">
                         ★
                       </span>
                     ))}
                   </div>
-                  <p className="mb-4 text-[15px] leading-relaxed text-gray-700 sm:mb-5">
-                    <span className="text-gray-400">&ldquo;</span>
+                  <p className="mb-4 text-[15px] leading-relaxed text-ink-700 sm:mb-5">
+                    <span className="text-ink-400">&ldquo;</span>
                     {review.comment}
-                    <span className="text-gray-400">&rdquo;</span>
+                    <span className="text-ink-400">&rdquo;</span>
                   </p>
                   <div className="flex items-center gap-3">
-                    <div
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
+                    <Avatar
+                      name={review.client_name}
+                      size="md"
+                      className="h-10 w-10 shrink-0 text-sm font-semibold text-white"
                       style={{ background: brand }}
-                    >
-                      {review.client_name.charAt(0)}
-                    </div>
-                    <p className="min-w-0 truncate text-sm font-semibold text-gray-900">
+                    />
+                    <p className="min-w-0 truncate text-sm font-semibold text-ink-900">
                       {review.client_name}
                     </p>
                   </div>
@@ -710,13 +711,13 @@ export default async function BookingHomePage({
               )}
             </div>
             <div className="order-1 min-w-0 lg:order-2">
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-gray-500">
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-ink-500">
                 Our Story
               </p>
-              <h2 className="mb-4 text-balance text-3xl font-bold text-gray-900 sm:mb-5 sm:text-4xl lg:text-[40px]">
+              <h2 className="mb-4 text-balance text-3xl font-bold text-ink-900 sm:mb-5 sm:text-4xl lg:text-[40px]">
                 About {tenant.name}
               </h2>
-              <p className="text-[15px] leading-[1.8] text-gray-600 sm:text-base">
+              <p className="text-[15px] leading-[1.8] text-ink-500 sm:text-base">
                 {tenant.about}
               </p>
             </div>
@@ -751,7 +752,7 @@ export default async function BookingHomePage({
             {(tenant.address || tenant.hours) && (
               <div className="mt-8 flex flex-col items-center gap-4 text-center sm:mt-10 md:flex-row md:justify-center md:gap-10">
                 {tenant.address && (
-                  <p className="flex items-center gap-1.5 max-w-md text-sm text-gray-500 md:text-left">
+                  <p className="flex items-center gap-1.5 max-w-md text-sm text-ink-500 md:text-left">
                     <MapPinIcon size={14} />{" "}
                     <a href={getGoogleMapsSearchUrl(tenant.address)} target="_blank" rel="noopener noreferrer" className="hover:underline">
                       {tenant.address}
@@ -759,7 +760,7 @@ export default async function BookingHomePage({
                   </p>
                 )}
                 {tenant.hours && (
-                  <p className="flex items-center gap-1.5 max-w-md text-sm text-gray-500 md:text-left">
+                  <p className="flex items-center gap-1.5 max-w-md text-sm text-ink-500 md:text-left">
                     <ClockIcon size={14} /> {tenant.hours}
                   </p>
                 )}
@@ -786,7 +787,7 @@ export default async function BookingHomePage({
                   {tenant.name}
                 </span>
               </div>
-              <p className="max-w-xs text-sm leading-relaxed text-gray-500">
+              <p className="max-w-xs text-sm leading-relaxed text-ink-500">
                 Your premium destination for luxury beauty treatments.
                 Experience the perfect blend of expertise and relaxation.
               </p>
@@ -795,22 +796,22 @@ export default async function BookingHomePage({
                 <div className="mt-4 flex items-center gap-3">
                   {tenant.social_instagram && (
                     <a href={tenant.social_instagram} target="_blank" rel="noopener noreferrer"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition-colors hover:border-gray-500 hover:text-white no-underline"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-700 text-ink-400 transition-colors hover:border-ink-500 hover:text-white no-underline"
                       aria-label="Instagram"><InstagramIcon size={16} /></a>
                   )}
                   {tenant.social_facebook && (
                     <a href={tenant.social_facebook} target="_blank" rel="noopener noreferrer"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition-colors hover:border-gray-500 hover:text-white no-underline"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-700 text-ink-400 transition-colors hover:border-ink-500 hover:text-white no-underline"
                       aria-label="Facebook"><FacebookIcon size={16} /></a>
                   )}
                   {tenant.social_tiktok && (
                     <a href={tenant.social_tiktok} target="_blank" rel="noopener noreferrer"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition-colors hover:border-gray-500 hover:text-white no-underline"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-700 text-ink-400 transition-colors hover:border-ink-500 hover:text-white no-underline"
                       aria-label="TikTok"><TikTokIcon size={16} /></a>
                   )}
                   {tenant.social_youtube && (
                     <a href={tenant.social_youtube} target="_blank" rel="noopener noreferrer"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition-colors hover:border-gray-500 hover:text-white no-underline"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-700 text-ink-400 transition-colors hover:border-ink-500 hover:text-white no-underline"
                       aria-label="YouTube"><YoutubeIcon size={16} /></a>
                   )}
                 </div>
@@ -824,13 +825,13 @@ export default async function BookingHomePage({
                 <a
                   key={s.id}
                   href={`/book/staff?service=${s.id}`}
-                  className="mb-2.5 block text-sm text-gray-500 no-underline last:mb-0 hover:text-gray-400"
+                  className="mb-2.5 block text-sm text-ink-500 no-underline last:mb-0 hover:text-ink-400"
                 >
                   {s.name}
                 </a>
               ))}
               {filteredServices.length === 0 && (
-                <p className="text-sm text-gray-500">No services in this category.</p>
+                <p className="text-sm text-ink-500">No services in this category.</p>
               )}
             </div>
 
@@ -846,7 +847,7 @@ export default async function BookingHomePage({
                 <a
                   key={item.label}
                   href={item.href}
-                  className="mb-2.5 block text-sm text-gray-500 no-underline last:mb-0 hover:text-gray-400"
+                  className="mb-2.5 block text-sm text-ink-500 no-underline last:mb-0 hover:text-ink-400"
                 >
                   {item.label}
                 </a>
@@ -857,7 +858,7 @@ export default async function BookingHomePage({
             <div className="sm:col-span-2 lg:col-span-1">
               <h4 className="mb-4 text-sm font-semibold text-white">Contact</h4>
               {tenant.address && (
-                <p className="mb-2.5 flex items-center gap-1.5 text-sm text-gray-500">
+                <p className="mb-2.5 flex items-center gap-1.5 text-sm text-ink-500">
                   <MapPinIcon size={13} />{" "}
                   <a href={getGoogleMapsSearchUrl(tenant.address)} target="_blank" rel="noopener noreferrer" className="hover:underline">
                     {tenant.address}
@@ -865,16 +866,16 @@ export default async function BookingHomePage({
                 </p>
               )}
               {tenant.hours && (
-                <p className="flex items-center gap-1.5 text-sm text-gray-500"><ClockIcon size={13} /> {tenant.hours}</p>
+                <p className="flex items-center gap-1.5 text-sm text-ink-500"><ClockIcon size={13} /> {tenant.hours}</p>
               )}
             </div>
           </div>
 
           <div className="flex flex-col gap-3 border-t border-[#1a1a1a] pt-6 sm:flex-row sm:items-center sm:justify-between sm:pt-8">
-            <p className="text-center text-[13px] text-gray-600 sm:text-left">
+            <p className="text-center text-[13px] text-ink-500 sm:text-left">
               © 2026 {tenant.name}. All rights reserved.
             </p>
-            <p className="text-center text-[13px] text-gray-700 sm:text-right">
+            <p className="text-center text-[13px] text-ink-700 sm:text-right">
               Powered by SoloHub
             </p>
           </div>

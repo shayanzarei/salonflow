@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Modal } from "@/components/ds/Modal";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -70,111 +72,104 @@ export default function AdminDeleteTenantButton({
   return (
     <>
       {/* ── Danger zone card ─────────────────────────────────────────────── */}
-      <div className="overflow-hidden rounded-xl border border-red-200 bg-red-50/50">
-        <div className="border-b border-red-200 px-4 py-4 sm:px-6">
-          <h2 className="font-semibold text-red-700">Danger zone</h2>
-          <p className="mt-0.5 text-xs text-red-500">
+      <div className="overflow-hidden rounded-lg bg-danger-50">
+        <div className="border-b border-danger-600/20 px-4 py-4 sm:px-6">
+          <h2 className="font-semibold text-danger-700">Danger zone</h2>
+          <p className="mt-0.5 text-caption text-danger-600">
             Irreversible actions — proceed with caution.
           </p>
         </div>
 
         <div className="flex items-start justify-between gap-4 p-4 sm:p-6">
           <div>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-body-sm font-medium text-ink-900">
               Permanently delete this tenant
             </p>
-            <p className="mt-0.5 text-xs text-gray-500">
+            <p className="mt-0.5 text-caption text-ink-500">
               Deletes{" "}
-              <span className="font-semibold text-gray-700">{tenantName}</span>{" "}
+              <span className="font-semibold text-ink-700">{tenantName}</span>{" "}
               and all associated data: bookings, clients, services, staff,
               gallery, notifications, tokens, and Stripe subscription. This
               cannot be undone.
             </p>
           </div>
-          <button
+          <Button
             type="button"
             onClick={openDialog}
-            className="shrink-0 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            variant="danger"
+            size="sm"
+            className="shrink-0"
           >
             Delete tenant
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* ── Confirmation dialog ───────────────────────────────────────────── */}
-      {open ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{
-            backgroundColor: "rgba(15, 23, 42, 0.65)",
-            backdropFilter: "blur(4px)",
-          }}
-        >
-          <div
-            className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_25px_80px_-20px_rgba(15,23,42,0.35)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-2xl">
-              ⚠️
-            </div>
-            <h2 className="text-lg font-bold text-gray-900">
-              Delete {tenantName}?
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-gray-500">
-              You are about to permanently erase this tenant account and{" "}
-              <span className="font-semibold text-red-600">all its data</span>.
-              Stripe subscription will be cancelled immediately. This action is{" "}
-              <span className="font-semibold text-red-600">irreversible</span>.
-            </p>
-
-            <div className="mt-5">
-              <label className="mb-1.5 block text-xs font-medium text-gray-600">
-                Type{" "}
-                <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs font-semibold text-gray-800">
-                  {tenantSlug}
-                </span>{" "}
-                to confirm
-              </label>
-              <input
-                type="text"
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && isConfirmed && !loading) {
-                    void handleDelete();
-                  }
-                }}
-                placeholder={tenantSlug}
-                autoFocus
-                className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-300 focus:border-red-400"
-              />
-            </div>
-
-            {error ? (
-              <p className="mt-3 text-sm font-medium text-red-600">{error}</p>
-            ) : null}
-
-            <div className="mt-5 flex gap-3">
-              <button
-                type="button"
-                onClick={closeDialog}
-                disabled={loading}
-                className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={!isConfirmed || loading}
-                className="flex-1 rounded-xl bg-red-600 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {loading ? "Deleting…" : "Delete permanently"}
-              </button>
-            </div>
-          </div>
+      <Modal open={open} onClose={closeDialog} size="sm">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-danger-50 text-2xl">
+          ⚠️
         </div>
-      ) : null}
+        <h2 className="text-h3 font-bold text-ink-900">
+          Delete {tenantName}?
+        </h2>
+        <p className="mt-2 text-body-sm leading-relaxed text-ink-500">
+          You are about to permanently erase this tenant account and{" "}
+          <span className="font-semibold text-danger-600">all its data</span>.
+          Stripe subscription will be cancelled immediately. This action is{" "}
+          <span className="font-semibold text-danger-600">irreversible</span>.
+        </p>
+
+        <div className="mt-5">
+          <label className="mb-1.5 block text-caption font-medium text-ink-500">
+            Type{" "}
+            <span className="rounded-sm bg-ink-100 px-1.5 py-0.5 font-mono text-caption font-semibold text-ink-900">
+              {tenantSlug}
+            </span>{" "}
+            to confirm
+          </label>
+          <input
+            type="text"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && isConfirmed && !loading) {
+                void handleDelete();
+              }
+            }}
+            placeholder={tenantSlug}
+            autoFocus
+            className="min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 px-4 text-body-sm text-ink-900 placeholder:text-ink-400 hover:border-ink-300 focus-visible:border-danger-600 focus-visible:shadow-focus focus-visible:outline-none"
+          />
+        </div>
+
+        {error ? (
+          <p className="mt-3 text-body-sm font-medium text-danger-600">{error}</p>
+        ) : null}
+
+        <div className="mt-5 flex gap-3">
+          <Button
+            type="button"
+            onClick={closeDialog}
+            disabled={loading}
+            variant="secondary"
+            size="md"
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            onClick={handleDelete}
+            disabled={!isConfirmed || loading}
+            variant="danger"
+            size="md"
+            className="flex-1"
+          >
+            {loading ? "Deleting…" : "Delete permanently"}
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 }

@@ -69,12 +69,12 @@ export function BrandingColorPicker({
             type="color"
             value={colorInputValue}
             onChange={(e) => setHex(e.target.value.toUpperCase())}
-            className="h-12 w-16 cursor-pointer rounded-xl border border-gray-200 bg-white p-1 shadow-sm"
+            className="h-12 w-16 cursor-pointer rounded-md border border-ink-200 bg-ink-0 p-1 shadow-sm"
             title="Open color picker"
           />
         </label>
         <div className="flex min-w-[200px] flex-1 items-center gap-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+          <span className="text-caption font-medium uppercase tracking-wide text-ink-400">
             Hex
           </span>
           <input
@@ -85,14 +85,14 @@ export function BrandingColorPicker({
             placeholder="#7C3AED"
             spellCheck={false}
             autoComplete="off"
-            className="flex-1 rounded-lg border border-gray-200 px-3 py-2.5 font-mono text-sm text-gray-900 focus:border-purple-400 focus:outline-none"
+            className="min-h-10 flex-1 rounded-sm border border-ink-200 bg-ink-0 px-4 font-mono text-body-sm text-ink-900 hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus focus-visible:outline-none"
             aria-label="Brand color hex value"
           />
         </div>
       </div>
-      <p className="text-xs text-gray-400">
+      <p className="text-caption text-ink-400">
         Use the swatch to open your system color picker, or type any{" "}
-        <code className="rounded bg-gray-100 px-1">#RRGGBB</code> value.
+        <code className="rounded bg-ink-100 px-1">#RRGGBB</code> value.
       </p>
     </div>
   );

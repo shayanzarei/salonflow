@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Select } from "@/components/ds/Select";
 import { useState } from "react";
 
 const DAYS = [
@@ -115,25 +117,11 @@ export default function WorkingHoursTab({
   }
 
   return (
-    <div
-      style={{
-        background: "white",
-        borderRadius: 16,
-        border: "1px solid #f0f0f0",
-        overflow: "hidden",
-      }}
-    >
+    <div className="overflow-hidden rounded-lg border border-ink-200 bg-ink-0">
       {/* Header */}
-      <div
-        style={{
-          padding: "18px 20px",
-          borderBottom: "1px solid #f5f5f5",
-        }}
-      >
-        <h3 style={{ fontSize: 15, fontWeight: 600, color: "#111", margin: 0 }}>
-          Working Hours
-        </h3>
-        <p style={{ fontSize: 13, color: "#888", margin: "4px 0 0" }}>
+      <div className="border-b border-ink-100 px-5 py-4">
+        <h3 className="text-body font-semibold text-ink-900">Working Hours</h3>
+        <p className="mt-1 text-body-sm text-ink-500">
           Toggle each day on/off and set working hours. Customers can only book within these times.
         </p>
       </div>
@@ -147,12 +135,9 @@ export default function WorkingHoursTab({
           return (
             <div
               key={d.day}
-              className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-5"
-              style={{
-                borderBottom: isLast ? "none" : "1px solid #f5f5f5",
-                opacity: data.is_working ? 1 : 0.55,
-                transition: "opacity 0.15s",
-              }}
+              className={`flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-5 ${
+                isLast ? "" : "border-b border-ink-100"
+              } ${data.is_working ? "" : "opacity-55"} transition-opacity`}
             >
               {/* Toggle + day label */}
               <div className="flex items-center gap-3 sm:w-44 sm:shrink-0">
@@ -163,32 +148,18 @@ export default function WorkingHoursTab({
                   aria-checked={data.is_working}
                   aria-label={`${d.label} working`}
                   onClick={() => toggle(d.day)}
-                  className="relative shrink-0 cursor-pointer border-none p-0 transition-colors"
+                  className="relative h-6 w-11 shrink-0 cursor-pointer rounded-full border-none p-0 transition-colors"
                   style={{
-                    width: 44,
-                    height: 24,
-                    borderRadius: 12,
-                    background: data.is_working ? brand : "#D1D5DB",
-                    transition: "background 0.2s",
+                    background: data.is_working ? brand : "var(--color-ink-300, #D1D5DB)",
                   }}
                 >
                   <span
-                    className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-all"
-                    style={{
-                      left: data.is_working ? 23 : 3,
-                      transition: "left 0.2s",
-                    }}
+                    className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-ink-0 shadow-sm transition-all"
+                    style={{ left: data.is_working ? 23 : 3 }}
                   />
                 </button>
 
-                <span
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: "#1F2937",
-                    userSelect: "none",
-                  }}
-                >
+                <span className="select-none text-body-sm font-medium text-ink-900">
                   {d.label}
                 </span>
               </div>
@@ -196,41 +167,36 @@ export default function WorkingHoursTab({
               {/* Time pickers or "Day off" */}
               {data.is_working ? (
                 <div className="flex flex-wrap items-center gap-2 pl-[56px] sm:pl-0">
-                  <select
+                  <Select
+                    id={`start-${d.day}`}
                     value={data.start_time}
                     onChange={(e) => setTime(d.day, "start_time", e.target.value)}
-                    className="min-h-10 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none"
-                    style={{ cursor: "pointer" }}
+                    className="cursor-pointer"
                   >
                     {TIME_OPTIONS.map((t) => (
                       <option key={t.value} value={t.value}>
                         {t.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
 
-                  <span style={{ fontSize: 13, color: "#9CA3AF", flexShrink: 0 }}>
-                    to
-                  </span>
+                  <span className="shrink-0 text-body-sm text-ink-400">to</span>
 
-                  <select
+                  <Select
+                    id={`end-${d.day}`}
                     value={data.end_time}
                     onChange={(e) => setTime(d.day, "end_time", e.target.value)}
-                    className="min-h-10 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none"
-                    style={{ cursor: "pointer" }}
+                    className="cursor-pointer"
                   >
                     {TIME_OPTIONS.filter((t) => t.value > data.start_time).map((t) => (
                       <option key={t.value} value={t.value}>
                         {t.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
               ) : (
-                <span
-                  className="pl-[56px] text-sm sm:pl-0"
-                  style={{ color: "#9CA3AF" }}
-                >
+                <span className="pl-[56px] text-body-sm text-ink-400 sm:pl-0">
                   Day off
                 </span>
               )}
@@ -240,34 +206,30 @@ export default function WorkingHoursTab({
       </div>
 
       {/* Footer */}
-      <div
-        className="flex flex-col gap-3 border-t border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
-      >
-        <div className="text-sm">
-          {error && <span style={{ color: "#EF4444" }}>{error}</span>}
+      <div className="flex flex-col gap-3 border-t border-ink-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="text-body-sm">
+          {error && <span className="text-danger-600">{error}</span>}
           {saved && !error && (
-            <span style={{ color: "#059669" }}>✓ Saved successfully</span>
+            <span className="text-success-700">✓ Saved successfully</span>
           )}
           {!error && !saved && (
-            <span style={{ color: "#9CA3AF" }}>
+            <span className="text-ink-400">
               Changes are applied to future bookings immediately.
             </span>
           )}
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex min-h-10 items-center justify-center rounded-[10px] px-5 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-60 sm:shrink-0"
-          style={{
-            background: brand,
-            border: "none",
-            cursor: saving ? "not-allowed" : "pointer",
-          }}
+          variant="primary"
+          size="md"
+          className="sm:shrink-0"
+          style={{ backgroundColor: brand }}
         >
           {saving ? "Saving…" : "Save Working Hours"}
-        </button>
+        </Button>
       </div>
     </div>
   );

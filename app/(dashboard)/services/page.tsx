@@ -1,4 +1,14 @@
 import { CategoriesTab } from "@/components/dashboard/CategoriesTab";
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import {
+  Table,
+  TBodyRow,
+  TD,
+  TH,
+  THeadRow,
+} from "@/components/ds/Table";
 import {
   ClockIcon,
   EyeIcon,
@@ -81,75 +91,51 @@ export default async function ServicesPage({
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h1
-            style={{ fontSize: 24, fontWeight: 700, color: "#111", margin: 0 }}
-          >
-            Services
-          </h1>
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: brand,
-              background: `${brand}15`,
-              padding: "3px 10px",
-              borderRadius: 100,
-            }}
-          >
-            {totalCount} Services
-          </span>
+          <h1 className="text-h1 font-bold text-ink-900">Services</h1>
+          <Badge variant="brand">{totalCount} Services</Badge>
         </div>
         {activeTab === "services" &&
           (canAddService ? (
-            <Link
-              href={`/services/new${redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : ""}`}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "10px 18px",
-                background: brand,
-                color: "white",
-                borderRadius: 10,
-                fontSize: 14,
-                fontWeight: 500,
-                textDecoration: "none",
-              }}
+            <Button
+              asChild
+              variant="primary"
+              size="md"
+              style={{ backgroundColor: brand }}
             >
-              <PlusIcon
-                size={14}
-                style={{ display: "inline", verticalAlign: "middle" }}
-              />
-              Add Service
-            </Link>
+              <Link
+                href={`/services/new${redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : ""}`}
+              >
+                <PlusIcon size={14} /> Add Service
+              </Link>
+            </Button>
           ) : (
-            <span className="inline-flex items-center rounded-[10px] bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500">
+            <Badge variant="neutral">
               Service limit reached ({maxServices})
-            </span>
+            </Badge>
           ))}
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 rounded-xl border border-gray-100 bg-white p-1 w-fit">
+      <div className="mb-6 flex w-fit gap-1 rounded-md border border-ink-100 bg-ink-0 p-1">
         {[
           { key: "services", label: "Services" },
           { key: "categories", label: "Categories" },
-        ].map((t) => (
+        ].map((tabItem) => (
           <Link
-            key={t.key}
+            key={tabItem.key}
             href={
-              t.key === "services"
+              tabItem.key === "services"
                 ? `/services${redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : ""}`
                 : `/services?tab=categories${redirectTo ? `&redirect_to=${encodeURIComponent(redirectTo)}` : ""}`
             }
-            className="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            className="rounded-sm px-4 py-2 text-body-sm font-medium no-underline transition-colors"
             style={
-              activeTab === t.key
+              activeTab === tabItem.key
                 ? { background: brand, color: "white" }
-                : { color: "#6B7280" }
+                : { color: "var(--color-ink-500)" }
             }
           >
-            {t.label}
+            {tabItem.label}
           </Link>
         ))}
       </div>
@@ -168,299 +154,94 @@ export default async function ServicesPage({
         <>
           {/* Stats cards */}
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div
-              style={{
-                background: "white",
-                borderRadius: 16,
-                border: "1px solid #f0f0f0",
-                padding: "20px 24px",
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  background: 'var(--color-brand-50)',
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
+            <Card variant="outlined" className="flex items-center gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-brand-50">
                 <ScissorsIcon size={20} color='var(--color-brand-600)' />
               </div>
               <div>
-                <p style={{ fontSize: 13, color: "#888", margin: "0 0 4px" }}>
-                  Active services
-                </p>
-                <p
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 700,
-                    color: "#111",
-                    margin: 0,
-                  }}
-                >
-                  {stats.total}
-                </p>
+                <p className="mb-1 text-caption text-ink-500">Active services</p>
+                <p className="text-h2 font-bold text-ink-900">{stats.total}</p>
               </div>
-            </div>
+            </Card>
 
-            <div
-              style={{
-                background: "white",
-                borderRadius: 16,
-                border: "1px solid #f0f0f0",
-                padding: "20px 24px",
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  background: "#FFFBEB",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
+            <Card variant="outlined" className="flex items-center gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-warning-50">
                 <TrophyIcon size={20} color='var(--color-accent-600)' />
               </div>
               <div>
-                <p style={{ fontSize: 13, color: "#888", margin: "0 0 4px" }}>
-                  Most booked
-                </p>
-                <p
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 700,
-                    color: "#111",
-                    margin: 0,
-                  }}
-                >
+                <p className="mb-1 text-caption text-ink-500">Most booked</p>
+                <p className="text-body font-bold text-ink-900">
                   {stats.most_popular ?? "—"}
                 </p>
               </div>
-            </div>
+            </Card>
 
-            <div
-              style={{
-                background: "white",
-                borderRadius: 16,
-                border: "1px solid #f0f0f0",
-                padding: "20px 24px",
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  background: "#ECFDF5",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 18,
-                  fontWeight: 700,
-                  flexShrink: 0,
-                  color: "#059669",
-                }}
-              >
+            <Card variant="outlined" className="flex items-center gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-success-50 text-body font-bold text-success-600">
                 €
               </div>
               <div>
-                <p style={{ fontSize: 13, color: "#888", margin: "0 0 4px" }}>
-                  Avg Service Price
-                </p>
-                <p
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 700,
-                    color: "#111",
-                    margin: 0,
-                  }}
-                >
+                <p className="mb-1 text-caption text-ink-500">Avg Service Price</p>
+                <p className="text-h2 font-bold text-ink-900">
                   €{parseFloat(stats.avg_price).toFixed(2)}
                 </p>
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Services table */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                padding: "18px 24px",
-                borderBottom: "1px solid #f5f5f5",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined" className="overflow-hidden p-0">
+            <div className="flex items-center justify-between border-b border-ink-100 px-6 py-4">
+              <h2 className="text-body-sm font-semibold text-ink-900">
                 All Services
               </h2>
-              {/* <div style={{ display: "flex", gap: 8 }}>
-            <button
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "7px 14px",
-                border: "1px solid #e5e7eb",
-                borderRadius: 8,
-                background: "white",
-                fontSize: 13,
-                color: "#555",
-                cursor: "pointer",
-              }}
-            >
-              🎛 Filter
-            </button>
-            <button
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "7px 14px",
-                border: "1px solid #e5e7eb",
-                borderRadius: 8,
-                background: "white",
-                fontSize: 13,
-                color: "#555",
-                cursor: "pointer",
-              }}
-            >
-              ↕ Sort
-            </button>
-          </div> */}
             </div>
 
             <div className="-mx-1 overflow-x-auto sm:mx-0">
-              <table
-                style={{
-                  width: "100%",
-                  minWidth: 640,
-                  borderCollapse: "collapse",
-                }}
-              >
+              <Table className="min-w-[640px]">
                 <thead>
-                  <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
-                    {[
-                      "Service",
-                      "Description",
-                      "Duration",
-                      "Price",
-                      "Bookings",
-                      "Action",
-                    ].map((h) => (
-                      <th
-                        key={h}
-                        style={{
-                          padding: "12px 20px",
-                          textAlign: "left",
-                          fontSize: 11,
-                          fontWeight: 600,
-                          color: "#aaa",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
+                  <THeadRow>
+                    <TH>Service</TH>
+                    <TH>Description</TH>
+                    <TH>Duration</TH>
+                    <TH>Price</TH>
+                    <TH>Bookings</TH>
+                    <TH>Action</TH>
+                  </THeadRow>
                 </thead>
                 <tbody>
                   {services.length === 0 ? (
                     <tr>
                       <td
                         colSpan={6}
-                        style={{ padding: "60px 24px", textAlign: "center" }}
+                        className="px-6 py-14 text-center"
                       >
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            marginBottom: 12,
-                          }}
-                        >
-                          <ScissorsIcon size={32} color="#D1D5DB" />
+                        <div className="mb-3 flex justify-center">
+                          <ScissorsIcon size={32} color="var(--color-ink-300)" />
                         </div>
-                        <p
-                          style={{
-                            fontSize: 16,
-                            fontWeight: 600,
-                            color: "#111",
-                            margin: "0 0 6px",
-                          }}
-                        >
+                        <p className="mb-1.5 text-body font-semibold text-ink-900">
                           No services yet
                         </p>
-                        <p
-                          style={{
-                            fontSize: 14,
-                            color: "#888",
-                            margin: "0 0 20px",
-                          }}
-                        >
+                        <p className="mb-5 text-body-sm text-ink-500">
                           Add your first service to start accepting bookings
                         </p>
                         {canAddService ? (
-                          <Link
-                            href={`/services/new${redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : ""}`}
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: 6,
-                              padding: "10px 20px",
-                              background: brand,
-                              color: "white",
-                              borderRadius: 10,
-                              fontSize: 14,
-                              fontWeight: 500,
-                              textDecoration: "none",
-                            }}
+                          <Button
+                            asChild
+                            variant="primary"
+                            size="md"
+                            style={{ backgroundColor: brand }}
                           >
-                            <PlusIcon
-                              size={14}
-                              style={{
-                                display: "inline",
-                                verticalAlign: "middle",
-                              }}
-                            />
-                            Add Service
-                          </Link>
+                            <Link
+                              href={`/services/new${redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : ""}`}
+                            >
+                              <PlusIcon size={14} /> Add Service
+                            </Link>
+                          </Button>
                         ) : (
-                          <span className="inline-flex items-center rounded-[10px] bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500">
+                          <Badge variant="neutral">
                             Service limit reached ({maxServices})
-                          </span>
+                          </Badge>
                         )}
                       </td>
                     </tr>
@@ -471,72 +252,26 @@ export default async function ServicesPage({
                         service.name
                       );
                       return (
-                        <tr
-                          key={service.id}
-                          style={{ borderBottom: "1px solid #f9f9f9" }}
-                        >
+                        <TBodyRow key={service.id} interactive={false}>
                           {/* Service */}
-                          <td style={{ padding: "16px 20px" }}>
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 12,
-                              }}
-                            >
+                          <TD>
+                            <div className="flex items-center gap-3">
                               <div
-                                style={{
-                                  width: 40,
-                                  height: 40,
-                                  borderRadius: 10,
-                                  background: catStyle.bg,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  fontSize: 18,
-                                  flexShrink: 0,
-                                }}
+                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm text-lg"
+                                style={{ background: catStyle.bg }}
                               >
                                 {catStyle.icon}
                               </div>
                               <div>
-                                <p
-                                  style={{
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    color: "#111",
-                                    margin: "0 0 2px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 8,
-                                    flexWrap: "wrap",
-                                  }}
-                                >
+                                <p className="mb-0.5 flex flex-wrap items-center gap-2 text-body-sm font-semibold text-ink-900">
                                   {service.name}
                                   {service.is_draft ? (
-                                    <span
-                                      style={{
-                                        fontSize: 10,
-                                        fontWeight: 700,
-                                        textTransform: "uppercase",
-                                        letterSpacing: "0.04em",
-                                        color: "#B45309",
-                                        background: "#FEF3C7",
-                                        padding: "2px 8px",
-                                        borderRadius: 100,
-                                      }}
-                                    >
-                                      Draft
-                                    </span>
+                                    <Badge variant="warning">Draft</Badge>
                                   ) : null}
                                 </p>
                                 <p
-                                  style={{
-                                    fontSize: 11,
-                                    color: catStyle.color,
-                                    margin: 0,
-                                    fontWeight: 500,
-                                  }}
+                                  className="text-[11px] font-medium"
+                                  style={{ color: catStyle.color }}
                                 >
                                   {service.category_name ??
                                     service.category ??
@@ -544,177 +279,107 @@ export default async function ServicesPage({
                                 </p>
                               </div>
                             </div>
-                          </td>
+                          </TD>
 
                           {/* Description */}
-                          <td style={{ padding: "16px 20px", maxWidth: 240 }}>
-                            <p
-                              style={{
-                                fontSize: 13,
-                                color: "#888",
-                                margin: 0,
-                                overflow: "hidden",
-                                whiteSpace: "nowrap",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
+                          <TD className="max-w-[240px]">
+                            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-caption text-ink-500">
                               {service.description ?? "—"}
                             </p>
-                          </td>
+                          </TD>
 
                           {/* Duration */}
-                          <td style={{ padding: "16px 20px" }}>
-                            <span
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 5,
-                                fontSize: 14,
-                                fontWeight: 500,
-                                color: "#333",
-                              }}
-                            >
-                              <ClockIcon
-                                size={14}
-                                style={{
-                                  display: "inline",
-                                  verticalAlign: "middle",
-                                  marginRight: 4,
-                                }}
-                              />{" "}
-                              {service.duration_mins} min
+                          <TD>
+                            <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-ink-700">
+                              <ClockIcon size={14} /> {service.duration_mins} min
                             </span>
-                          </td>
+                          </TD>
 
                           {/* Price */}
-                          <td style={{ padding: "16px 20px" }}>
+                          <TD>
                             <span
-                              style={{
-                                fontSize: 15,
-                                fontWeight: 700,
-                                color: brand,
-                              }}
+                              className="text-body-sm font-bold"
+                              style={{ color: brand }}
                             >
                               €{service.price}
                             </span>
-                          </td>
+                          </TD>
 
                           {/* Bookings */}
-                          <td style={{ padding: "16px 20px" }}>
-                            <span style={{ fontSize: 13, color: "#888" }}>
+                          <TD>
+                            <span className="text-caption text-ink-500">
                               {service.booking_count} total
                             </span>
-                          </td>
+                          </TD>
 
-                          <td style={{ padding: "16px 20px" }}>
+                          <TD>
                             <Link
                               href={`/services/${service.id}`}
+                              className="inline-flex items-center gap-1 rounded-sm px-3.5 py-1.5 text-caption font-medium no-underline"
                               style={{
-                                padding: "6px 14px",
-                                border: `1px solid ${brand}30`,
-                                borderRadius: 8,
-                                fontSize: 12,
                                 color: brand,
-                                textDecoration: "none",
-                                fontWeight: 500,
+                                border: `1px solid ${brand}30`,
                                 background: `${brand}08`,
                               }}
                             >
-                              <EyeIcon
-                                size={13}
-                                style={{
-                                  display: "inline",
-                                  verticalAlign: "middle",
-                                  marginRight: 4,
-                                }}
-                              />{" "}
-                              View
+                              <EyeIcon size={13} /> View
                             </Link>
-                          </td>
-                        </tr>
+                          </TD>
+                        </TBodyRow>
                       );
                     })
                   )}
                 </tbody>
-              </table>
+              </Table>
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div
-                style={{
-                  padding: "16px 24px",
-                  borderTop: "1px solid #f5f5f5",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <p style={{ fontSize: 13, color: "#888", margin: 0 }}>
+              <div className="flex items-center justify-between border-t border-ink-100 px-6 py-4">
+                <p className="text-caption text-ink-500">
                   Showing {offset + 1} to{" "}
                   {Math.min(offset + PAGE_SIZE, totalCount)} of {totalCount}{" "}
                   entries
                 </p>
-                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <div className="flex items-center gap-1.5">
                   {currentPage > 1 && (
                     <Link
                       href={`/services?page=${currentPage - 1}`}
-                      style={{
-                        width: 32,
-                        height: 32,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 8,
-                        color: "#666",
-                        textDecoration: "none",
-                        fontSize: 14,
-                      }}
+                      className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-200 text-body-sm text-ink-600 no-underline"
                     >
                       ‹
                     </Link>
                   )}
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (p) => (
-                      <Link
-                        key={p}
-                        href={`/services?page=${p}`}
-                        style={{
-                          width: 32,
-                          height: 32,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          border:
-                            p === currentPage ? "none" : "1px solid #e5e7eb",
-                          borderRadius: 8,
-                          background: p === currentPage ? brand : "white",
-                          color: p === currentPage ? "white" : "#666",
-                          textDecoration: "none",
-                          fontSize: 14,
-                          fontWeight: p === currentPage ? 600 : 400,
-                        }}
-                      >
-                        {p}
-                      </Link>
-                    )
+                    (p) => {
+                      const isActive = p === currentPage;
+                      if (isActive) {
+                        return (
+                          <Link
+                            key={p}
+                            href={`/services?page=${p}`}
+                            className="flex h-8 w-8 items-center justify-center rounded-sm text-body-sm font-semibold text-white no-underline"
+                            style={{ background: brand }}
+                          >
+                            {p}
+                          </Link>
+                        );
+                      }
+                      return (
+                        <Link
+                          key={p}
+                          href={`/services?page=${p}`}
+                          className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-200 bg-ink-0 text-body-sm text-ink-600 no-underline"
+                        >
+                          {p}
+                        </Link>
+                      );
+                    }
                   )}
                   {currentPage < totalPages && (
                     <Link
                       href={`/services?page=${currentPage + 1}`}
-                      style={{
-                        width: 32,
-                        height: 32,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 8,
-                        color: "#666",
-                        textDecoration: "none",
-                        fontSize: 14,
-                      }}
+                      className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-200 text-body-sm text-ink-600 no-underline"
                     >
                       ›
                     </Link>
@@ -722,7 +387,7 @@ export default async function ServicesPage({
                 </div>
               </div>
             )}
-          </div>
+          </Card>
         </>
       )}
     </div>

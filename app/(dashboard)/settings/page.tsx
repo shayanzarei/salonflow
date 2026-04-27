@@ -18,8 +18,8 @@ export default async function SettingsPage({
   return (
     <div className="mx-auto max-w-3xl pb-12">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-        <p className="mt-1 text-gray-500">
+        <h1 className="text-h2 font-bold text-ink-900">Profile</h1>
+        <p className="mt-1 text-ink-500">
           Manage salon profile and branding in one place.
         </p>
       </div>

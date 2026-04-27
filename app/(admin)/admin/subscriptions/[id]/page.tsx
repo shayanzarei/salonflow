@@ -1,5 +1,8 @@
 "use client";
 
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -28,9 +31,9 @@ type PaymentDetailRow = {
 
 function DetailItem({ label, value }: { label: string; value: string | null }) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3">
-      <p className="text-[11px] uppercase tracking-wide text-gray-500">{label}</p>
-      <p className="mt-1 break-all text-sm font-medium text-gray-900">{value || "—"}</p>
+    <div className="rounded-md border border-ink-100 bg-ink-50 p-3">
+      <p className="text-caption uppercase tracking-wide text-ink-500">{label}</p>
+      <p className="mt-1 break-all text-body-sm font-medium text-ink-900">{value || "—"}</p>
     </div>
   );
 }
@@ -81,14 +84,14 @@ export default function AdminPaymentDetailPage() {
   if (loading) {
     return (
       <div className="animate-pulse space-y-4">
-        <div className="h-8 w-48 rounded bg-gray-100" />
-        <div className="h-64 rounded-2xl bg-gray-100" />
+        <div className="h-8 w-48 rounded-sm bg-ink-100" />
+        <div className="h-64 rounded-lg bg-ink-100" />
       </div>
     );
   }
 
   if (!row) {
-    return <p className="text-sm text-gray-500">Payment log not found.</p>;
+    return <p className="text-body-sm text-ink-500">Payment log not found.</p>;
   }
 
   const amount =
@@ -116,57 +119,53 @@ export default function AdminPaymentDetailPage() {
     <div className="min-w-0">
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Payment Detail</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-h2 font-bold text-ink-900">Payment Detail</h1>
+          <p className="mt-1 text-body-sm text-ink-500">
             Inspect one Stripe payment log event in depth.
           </p>
         </div>
-        <Link
-          href="/admin/subscriptions"
-          className="inline-flex rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-        >
-          Back to payments
-        </Link>
+        <Button asChild variant="secondary" size="md">
+          <Link href="/admin/subscriptions">Back to payments</Link>
+        </Button>
       </div>
 
       {/* Resync banner */}
       {canResync && (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-md border border-warning-600/30 bg-warning-50 px-4 py-3">
           <div>
-            <p className="text-sm font-semibold text-amber-800">Manual provisioning</p>
-            <p className="text-xs text-amber-700 mt-0.5">
+            <p className="text-body-sm font-semibold text-warning-700">Manual provisioning</p>
+            <p className="mt-0.5 text-caption text-warning-700">
               If the webhook was missed, click resync to manually link this checkout to the user account.
             </p>
             {resyncResult && (
-              <p className="mt-1.5 text-sm font-medium text-gray-800">{resyncResult}</p>
+              <p className="mt-1.5 text-body-sm font-medium text-ink-900">{resyncResult}</p>
             )}
           </div>
-          <button
+          <Button
+            type="button"
             onClick={handleResync}
             disabled={resyncing}
-            className="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-60"
+            variant="primary"
+            size="md"
+            className="shrink-0"
           >
             {resyncing ? "Running…" : "Resync provisioning"}
-          </button>
+          </Button>
         </div>
       )}
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-6">
+      <Card variant="outlined">
         <div className="mb-5 flex flex-wrap items-center gap-2">
-          <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
-            {row.source}
-          </span>
-          <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
-            {row.event_type}
-          </span>
+          <Badge variant="neutral">{row.source}</Badge>
+          <Badge variant="info">{row.event_type}</Badge>
           {row.payment_status ? (
-            <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold capitalize text-emerald-700">
+            <Badge variant="success" className="capitalize">
               {row.payment_status.replace(/_/g, " ")}
-            </span>
+            </Badge>
           ) : null}
-          <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
+          <Badge variant="neutral">
             {row.livemode === null ? "—" : row.livemode ? "Live" : "Test"}
-          </span>
+          </Badge>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -202,12 +201,12 @@ export default function AdminPaymentDetailPage() {
         </div>
 
         <div className="mt-6">
-          <h2 className="text-sm font-semibold text-gray-900">Raw metadata</h2>
-          <pre className="mt-2 overflow-x-auto rounded-xl border border-gray-100 bg-gray-50 p-4 text-xs text-gray-700">
+          <h2 className="text-body-sm font-semibold text-ink-900">Raw metadata</h2>
+          <pre className="mt-2 overflow-x-auto rounded-md border border-ink-100 bg-ink-50 p-4 text-caption text-ink-700">
             {JSON.stringify(metadata, null, 2)}
           </pre>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

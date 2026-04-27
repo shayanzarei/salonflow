@@ -1,3 +1,8 @@
+import { Avatar } from "@/components/ds/Avatar";
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Select } from "@/components/ds/Select";
 import { CalendarIcon, ClockIcon, MapPinIcon, ScissorsIcon, TrashIcon, UserIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
@@ -55,78 +60,88 @@ export default async function BookingDetailPage({
   );
 
   const stats = clientStats.rows[0];
-  const initials = booking.client_name
-    .split(" ")
-    .map((n: string) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
 
-  const statusConfig: Record<
-    string,
-    { color: string; bg: string; dot: string }
-  > = {
-    confirmed: { color: "#059669", bg: "#ECFDF5", dot: "#10B981" },
-    pending: { color: 'var(--color-accent-600)', bg: "#FFFBEB", dot: 'var(--color-accent-500)' },
-    cancelled: { color: "#DC2626", bg: "#FEF2F2", dot: "#EF4444" },
+  const statusVariant: Record<string, "success" | "warning" | "danger"> = {
+    confirmed: "success",
+    pending: "warning",
+    cancelled: "danger",
   };
 
-  const sc = statusConfig[booking.status] ?? statusConfig.pending;
+  const badgeVariant = statusVariant[booking.status] ?? "warning";
   const bookingRef = `#BK-${booking.id.split("-")[0].toUpperCase()}`;
+
+  const detailItems = [
+    {
+      icon: <ScissorsIcon size={15} color="var(--color-ink-500)" />,
+      label: "Service",
+      value: booking.service_name,
+      colored: false,
+    },
+    {
+      icon: <UserIcon size={15} color="var(--color-ink-500)" />,
+      label: "Staff",
+      value: booking.staff_name,
+      colored: false,
+    },
+    {
+      icon: <CalendarIcon size={15} color="var(--color-ink-500)" />,
+      label: "Date",
+      colored: false,
+      value: new Date(booking.booked_at).toLocaleDateString(
+        "en-US",
+        { month: "short", day: "numeric", year: "numeric" }
+      ),
+    },
+    {
+      icon: <ClockIcon size={15} color="var(--color-ink-500)" />,
+      label: "Time",
+      colored: false,
+      value: new Date(booking.booked_at).toLocaleTimeString(
+        "en-US",
+        { hour: "numeric", minute: "2-digit" }
+      ),
+    },
+    {
+      icon: <ClockIcon size={15} color="var(--color-ink-500)" />,
+      label: "Duration",
+      value: `${booking.duration_mins} minutes`,
+      colored: false,
+    },
+    {
+      icon: <span className="text-caption font-bold text-ink-500">€</span>,
+      label: "Price",
+      value: `€${booking.price}`,
+      colored: true,
+    },
+    ...(tenant.address
+      ? [
+          {
+            icon: <MapPinIcon size={15} color="var(--color-ink-500)" />,
+            label: "Location",
+            value: tenant.address,
+            colored: false,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: 24 }}>
+      <div className="mb-6">
         <Link
           href="/bookings"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 13,
-            color: "#888",
-            textDecoration: "none",
-            marginBottom: 12,
-          }}
+          className="mb-3 inline-flex items-center gap-1.5 text-body-sm text-ink-500 no-underline"
         >
           ← Back to Bookings
         </Link>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <h1
-            style={{ fontSize: 24, fontWeight: 700, color: "#111", margin: 0 }}
-          >
+        <div className="flex items-center justify-between">
+          <h1 className="text-h1 font-bold text-ink-900">
             Booking {bookingRef}
           </h1>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: 13,
-              fontWeight: 500,
-              color: sc.color,
-              background: sc.bg,
-              padding: "6px 14px",
-              borderRadius: 100,
-            }}
-          >
-            <span
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                background: sc.dot,
-              }}
-            />
+          <Badge variant={badgeVariant} dot>
             {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-          </span>
+          </Badge>
         </div>
       </div>
 
@@ -135,94 +150,30 @@ export default async function BookingDetailPage({
         {/* Left column */}
         <div className="flex min-w-0 flex-col gap-5">
           {/* Client info card */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              <UserIcon size={16} color="#6B7280" />
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined">
+            <div className="mb-5 flex items-center gap-2">
+              <UserIcon size={16} color="var(--color-ink-500)" />
+              <h2 className="text-body font-semibold text-ink-900">
                 Client Information
               </h2>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                marginBottom: 20,
-              }}
-            >
-              <div
-                style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: "50%",
-                  background: brand,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontWeight: 700,
-                  fontSize: 18,
-                  flexShrink: 0,
-                }}
-              >
-                {initials}
-              </div>
+            <div className="mb-5 flex items-center gap-4">
+              <Avatar
+                name={booking.client_name}
+                size="lg"
+                className="h-[52px] w-[52px] text-lg text-white"
+                style={{ background: brand }}
+              />
               <div>
-                <p
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 700,
-                    color: "#111",
-                    margin: "0 0 4px",
-                  }}
-                >
+                <p className="mb-1 text-body-lg font-bold text-ink-900">
                   {booking.client_name}
                 </p>
-                <p
-                  style={{
-                    fontSize: 13,
-                    color: "#888",
-                    margin: "0 0 2px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                  }}
-                >
+                <p className="mb-0.5 flex items-center gap-1.5 text-caption text-ink-500">
                   <span>✉</span> {booking.client_email}
                 </p>
                 {booking.client_phone && (
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: "#888",
-                      margin: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 5,
-                    }}
-                  >
+                  <p className="flex items-center gap-1.5 text-caption text-ink-500">
                     <span>📞</span> {booking.client_phone}
                   </p>
                 )}
@@ -230,7 +181,7 @@ export default async function BookingDetailPage({
             </div>
 
             {/* Stats pills */}
-            <div style={{ display: "flex", gap: 10 }}>
+            <div className="flex gap-2.5">
               {[
                 { label: "TOTAL BOOKINGS", value: stats.total_bookings },
                 {
@@ -247,187 +198,62 @@ export default async function BookingDetailPage({
               ].map((s) => (
                 <div
                   key={s.label}
-                  style={{
-                    flex: 1,
-                    background: "#f9fafb",
-                    borderRadius: 10,
-                    padding: "10px 14px",
-                  }}
+                  className="flex-1 rounded-sm bg-ink-50 px-3.5 py-2.5"
                 >
-                  <p
-                    style={{
-                      fontSize: 10,
-                      color: "#aaa",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      margin: "0 0 4px",
-                      fontWeight: 500,
-                    }}
-                  >
+                  <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-ink-400">
                     {s.label}
                   </p>
-                  <p
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: "#111",
-                      margin: 0,
-                    }}
-                  >
+                  <p className="text-body-sm font-bold text-ink-900">
                     {s.value}
                   </p>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
           {/* Appointment details card */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              <CalendarIcon size={16} color="#6B7280" />
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined">
+            <div className="mb-5 flex items-center gap-2">
+              <CalendarIcon size={16} color="var(--color-ink-500)" />
+              <h2 className="text-body font-semibold text-ink-900">
                 Appointment Details
               </h2>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {[
-                {
-                  icon: <ScissorsIcon size={15} color="#6B7280" />,
-                  label: "Service",
-                  value: booking.service_name,
-                  colored: false,
-                },
-                {
-                  icon: <UserIcon size={15} color="#6B7280" />,
-                  label: "Staff",
-                  value: booking.staff_name,
-                  colored: false,
-                },
-                {
-                  icon: <CalendarIcon size={15} color="#6B7280" />,
-                  label: "Date",
-                  colored: false,
-                  value: new Date(booking.booked_at).toLocaleDateString(
-                    "en-US",
-                    { month: "short", day: "numeric", year: "numeric" }
-                  ),
-                },
-                {
-                  icon: <ClockIcon size={15} color="#6B7280" />,
-                  label: "Time",
-                  colored: false,
-                  value: new Date(booking.booked_at).toLocaleTimeString(
-                    "en-US",
-                    { hour: "numeric", minute: "2-digit" }
-                  ),
-                },
-                {
-                  icon: <ClockIcon size={15} color="#6B7280" />,
-                  label: "Duration",
-                  value: `${booking.duration_mins} minutes`,
-                  colored: false,
-                },
-                {
-                  icon: <span style={{ fontSize: 13, fontWeight: 700, color: "#6B7280" }}>€</span>,
-                  label: "Price",
-                  value: `€${booking.price}`,
-                  colored: true,
-                },
-                ...(tenant.address
-                  ? [
-                      {
-                        icon: <MapPinIcon size={15} color="#6B7280" />,
-                        label: "Location",
-                        value: tenant.address,
-                        colored: false,
-                      },
-                    ]
-                  : []),
-              ].map((item, i) => (
+            <div className="flex flex-col">
+              {detailItems.map((item, i) => (
                 <div
                   key={item.label}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "14px 0",
-                    borderBottom: i < 6 ? "1px solid #f5f5f5" : "none",
-                  }}
+                  className={`flex items-center justify-between py-3.5 ${
+                    i < detailItems.length - 1 ? "border-b border-ink-100" : ""
+                  }`}
                 >
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 10 }}
-                  >
-                    <span style={{ display: "flex", flexShrink: 0 }}>{item.icon}</span>
-                    <span style={{ fontSize: 14, color: "#666" }}>
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex shrink-0">{item.icon}</span>
+                    <span className="text-body-sm text-ink-600">
                       {item.label}
                     </span>
                   </div>
                   <span
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 500,
-                      color: item.colored ? brand : "#111",
-                    }}
+                    className="text-body-sm font-medium"
+                    style={{ color: item.colored ? brand : "var(--color-ink-900)" }}
                   >
                     {item.value}
                   </span>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Right column */}
         <div className="flex min-w-0 flex-col gap-5 xl:sticky xl:top-20 xl:self-start">
           {/* Edit booking card */}
           {booking.status !== "cancelled" && (
-            <div
-              style={{
-                background: "white",
-                borderRadius: 16,
-                border: "1px solid #f0f0f0",
-                padding: 24,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginBottom: 20,
-                }}
-              >
-                <span style={{ fontSize: 16 }}>✏️</span>
-                <h2
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    color: "#111",
-                    margin: 0,
-                  }}
-                >
+            <Card variant="outlined">
+              <div className="mb-5 flex items-center gap-2">
+                <span className="text-base">✏️</span>
+                <h2 className="text-body font-semibold text-ink-900">
                   Edit Booking
                 </h2>
               </div>
@@ -435,238 +261,108 @@ export default async function BookingDetailPage({
               <form
                 action="/api/bookings/update"
                 method="POST"
-                style={{ display: "flex", flexDirection: "column", gap: 16 }}
+                className="flex flex-col gap-4"
               >
                 <input type="hidden" name="booking_id" value={booking.id} />
                 <input type="hidden" name="tenant_id" value={tenant.id} />
 
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: "#aaa",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Service
-                  </label>
-                  <select
-                    name="service_id"
-                    defaultValue={booking.service_id}
-                    style={{
-                      width: "100%",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                      fontSize: 14,
-                      color: "#111",
-                      background: "white",
-                      outline: "none",
-                    }}
-                  >
-                    {services.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  id="booking-edit-service"
+                  name="service_id"
+                  label="Service"
+                  defaultValue={booking.service_id}
+                >
+                  {services.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </Select>
 
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: "#aaa",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Staff
-                  </label>
-                  <select
-                    name="staff_id"
-                    defaultValue={booking.staff_id}
-                    style={{
-                      width: "100%",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                      fontSize: 14,
-                      color: "#111",
-                      background: "white",
-                      outline: "none",
-                    }}
-                  >
-                    {staffList.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  id="booking-edit-staff"
+                  name="staff_id"
+                  label="Staff"
+                  defaultValue={booking.staff_id}
+                >
+                  {staffList.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </Select>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
                     <label
-                      style={{
-                        display: "block",
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: "#aaa",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.06em",
-                        marginBottom: 8,
-                      }}
+                      htmlFor="booking-edit-date"
+                      className="mb-2 block text-caption font-semibold uppercase tracking-wider text-ink-400"
                     >
                       Date
                     </label>
                     <input
+                      id="booking-edit-date"
                       type="date"
                       name="date"
                       defaultValue={
                         new Date(booking.booked_at).toISOString().split("T")[0]
                       }
-                      style={{
-                        width: "100%",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 10,
-                        padding: "10px 14px",
-                        fontSize: 14,
-                        color: "#111",
-                        background: "white",
-                        outline: "none",
-                        boxSizing: "border-box",
-                      }}
+                      className="min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 px-4 py-2.5 text-body-sm text-ink-900 outline-none hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus"
                     />
                   </div>
                   <div>
                     <label
-                      style={{
-                        display: "block",
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: "#aaa",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.06em",
-                        marginBottom: 8,
-                      }}
+                      htmlFor="booking-edit-time"
+                      className="mb-2 block text-caption font-semibold uppercase tracking-wider text-ink-400"
                     >
                       Time
                     </label>
                     <input
+                      id="booking-edit-time"
                       type="time"
                       name="time"
                       defaultValue={new Date(booking.booked_at)
                         .toTimeString()
                         .slice(0, 5)}
-                      style={{
-                        width: "100%",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 10,
-                        padding: "10px 14px",
-                        fontSize: 14,
-                        color: "#111",
-                        background: "white",
-                        outline: "none",
-                        boxSizing: "border-box",
-                      }}
+                      className="min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 px-4 py-2.5 text-body-sm text-ink-900 outline-none hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: "#aaa",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Status
-                  </label>
-                  <select
-                    name="status"
-                    defaultValue={booking.status}
-                    style={{
-                      width: "100%",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                      fontSize: 14,
-                      color: "#111",
-                      background: "white",
-                      outline: "none",
-                    }}
-                  >
-                    <option value="confirmed">● Confirmed</option>
-                    <option value="pending">● Pending</option>
-                    <option value="cancelled">● Cancelled</option>
-                  </select>
-                </div>
+                <Select
+                  id="booking-edit-status"
+                  name="status"
+                  label="Status"
+                  defaultValue={booking.status}
+                >
+                  <option value="confirmed">● Confirmed</option>
+                  <option value="pending">● Pending</option>
+                  <option value="cancelled">● Cancelled</option>
+                </Select>
 
-                <button
+                <Button
                   type="submit"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    background: brand,
-                    color: "white",
-                    border: "none",
-                    borderRadius: 10,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    marginTop: 4,
-                  }}
+                  variant="primary"
+                  size="lg"
+                  className="mt-1 w-full"
+                  style={{ backgroundColor: brand }}
                 >
                   Save Changes
-                </button>
+                </Button>
               </form>
-            </div>
+            </Card>
           )}
 
           {/* Quick actions card */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              <span style={{ fontSize: 16 }}>⚡</span>
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined">
+            <div className="mb-5 flex items-center gap-2">
+              <span className="text-base">⚡</span>
+              <h2 className="text-body font-semibold text-ink-900">
                 Quick Actions
               </h2>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="flex flex-col gap-2.5">
               {booking.status !== "cancelled" && (
                 <form action="/api/bookings/update-status" method="POST">
                   <input type="hidden" name="booking_id" value={booking.id} />
@@ -677,70 +373,35 @@ export default async function BookingDetailPage({
                     name="redirect"
                     value={`/bookings/${booking.id}`}
                   />
-                  <button
+                  <Button
                     type="submit"
-                    style={{
-                      width: "100%",
-                      padding: "11px",
-                      background: "white",
-                      color: "#DC2626",
-                      border: "1px solid #FECACA",
-                      borderRadius: 10,
-                      fontSize: 14,
-                      fontWeight: 500,
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                    }}
+                    variant="secondary"
+                    size="md"
+                    className="w-full text-danger-600"
                   >
                     ✕ Cancel Booking
-                  </button>
+                  </Button>
                 </form>
               )}
 
               <form action="/api/bookings/delete" method="POST">
                 <input type="hidden" name="booking_id" value={booking.id} />
                 <input type="hidden" name="tenant_id" value={tenant.id} />
-                <button
+                <Button
                   type="submit"
-                  style={{
-                    width: "100%",
-                    padding: "11px",
-                    background: "#EF4444",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 10,
-                    fontSize: 14,
-                    fontWeight: 500,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 6,
-                  }}
+                  variant="danger"
+                  size="md"
+                  className="w-full"
                 >
                   <TrashIcon size={15} /> Delete Booking
-                </button>
+                </Button>
               </form>
 
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "#aaa",
-                  textAlign: "center",
-                  margin: "4px 0 0",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 4,
-                }}
-              >
+              <p className="mt-1 flex items-center justify-center gap-1 text-center text-caption text-ink-400">
                 ⚠ This action cannot be undone
               </p>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

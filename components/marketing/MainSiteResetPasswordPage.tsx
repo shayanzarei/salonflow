@@ -7,6 +7,7 @@ import {
   LockIcon,
 } from "@/components/ui/Icons";
 import { Button } from "@/components/ds/Button";
+import { Input } from "@/components/ds/Input";
 import { useLocale } from "@/lib/i18n/context";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -64,75 +65,61 @@ export default function MainSiteResetPasswordPage() {
           "radial-gradient(at 25% 10%, hsla(262, 90%, 95%, 0.7) 0px, transparent 45%), radial-gradient(at 90% 0%, hsla(280, 90%, 92%, 0.4) 0px, transparent 50%)",
       }}
     >
-      <div className="mx-auto w-full max-w-xl rounded-3xl border border-slate-100 bg-white/85 p-6 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:p-8">
-        <Link href="/login" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900">
+      <div className="mx-auto w-full max-w-xl rounded-3xl border border-ink-100 bg-white/85 p-6 shadow-[0_25px_80px_-35px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:p-8">
+        <Link href="/login" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-ink-700 hover:text-ink-900">
           <ArrowLeftIcon size={14} />
           {f.backToLogin}
         </Link>
 
-        <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
+        <h1 className="text-3xl font-bold text-ink-900 sm:text-4xl">
           {f.resetTitle}
         </h1>
-        <p className="mt-2 text-base text-slate-600 sm:text-lg">
+        <p className="mt-2 text-base text-ink-500 sm:text-lg">
           {f.resetSubtitle}
         </p>
 
         {!token ? (
-          <p className="mt-8 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <p className="mt-8 rounded-xl border border-danger-50 bg-danger-50 px-4 py-3 text-sm text-danger-700">
             {f.resetInvalidToken}
           </p>
         ) : (
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                {f.resetNewPassword}
-              </label>
-              <div className="relative">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  <LockIcon size={16} />
-                </span>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  placeholder={f.resetPlaceholderNew}
-                  className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-12 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-                />
+            <Input
+              id="reset-new-password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              label={f.resetNewPassword}
+              placeholder={f.resetPlaceholderNew}
+              leading={<LockIcon size={16} />}
+              trailing={
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+                  className="text-ink-400 transition-colors hover:text-ink-500"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={
-                    showPassword ? a.hidePassword : a.showPassword
-                  }
+                  aria-label={showPassword ? a.hidePassword : a.showPassword}
                 >
                   <EyeIcon size={16} />
                 </button>
-              </div>
-            </div>
+              }
+            />
 
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
-                {f.resetConfirmPassword}
-              </label>
-              <div className="relative">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  <LockIcon size={16} />
-                </span>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  placeholder={f.resetPlaceholderConfirm}
-                  className="w-full rounded-xl border-2 border-slate-200 py-3 pl-11 pr-12 text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-brand-600"
-                />
+            <Input
+              id="reset-confirm-password"
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={8}
+              label={f.resetConfirmPassword}
+              placeholder={f.resetPlaceholderConfirm}
+              leading={<LockIcon size={16} />}
+              trailing={
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+                  className="text-ink-400 transition-colors hover:text-ink-500"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                   aria-label={
                     showConfirmPassword
@@ -142,15 +129,15 @@ export default function MainSiteResetPasswordPage() {
                 >
                   <EyeIcon size={16} />
                 </button>
-              </div>
-            </div>
+              }
+            />
 
             {done ? (
-              <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              <p className="rounded-xl border border-success-50 bg-success-50 px-4 py-3 text-sm text-success-700">
                 {f.resetDoneRedirecting}
               </p>
             ) : null}
-            {error ? <p className="text-sm font-medium text-rose-600">{error}</p> : null}
+            {error ? <p className="text-sm font-medium text-danger-600">{error}</p> : null}
 
             <Button
               type="submit"

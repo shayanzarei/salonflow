@@ -89,7 +89,7 @@ export default function NotificationsBell() {
     <div className="relative" ref={panelRef}>
       <button
         type="button"
-        className="relative cursor-pointer flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-base text-gray-600 hover:bg-gray-50 sm:h-11 sm:w-11"
+        className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-ink-200 bg-ink-0 text-base text-ink-700 hover:bg-ink-50 sm:h-11 sm:w-11"
         aria-label="Notifications"
         onClick={() => {
           setOpen((prev) => !prev);
@@ -98,19 +98,19 @@ export default function NotificationsBell() {
       >
         <BellIcon size={18} />
         {hasUnread ? (
-          <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full bg-red-500 px-1 text-center text-[10px] font-semibold leading-4 text-white">
+          <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full bg-danger-600 px-1 text-center text-[10px] font-semibold leading-4 text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         ) : null}
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-50 mt-2 w-[min(92vw,360px)] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
-          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-            <p className="text-sm font-semibold text-gray-900">Notifications</p>
+        <div className="absolute right-0 z-50 mt-2 w-[min(92vw,360px)] overflow-hidden rounded-lg border border-ink-200 bg-ink-0 shadow-xl">
+          <div className="flex items-center justify-between border-b border-ink-100 px-4 py-3">
+            <p className="text-body-sm font-semibold text-ink-900">Notifications</p>
             <button
               type="button"
-              className="text-xs font-medium text-gray-500 hover:text-gray-700"
+              className="text-caption font-medium text-ink-500 hover:text-ink-700 disabled:opacity-50"
               onClick={() => markRead()}
               disabled={!hasUnread}
             >
@@ -120,31 +120,31 @@ export default function NotificationsBell() {
 
           <div className="max-h-96 overflow-y-auto">
             {loading && sortedItems.length === 0 ? (
-              <p className="px-4 py-4 text-sm text-gray-500">Loading...</p>
+              <p className="px-4 py-4 text-body-sm text-ink-500">Loading...</p>
             ) : null}
 
             {!loading && sortedItems.length === 0 ? (
-              <p className="px-4 py-4 text-sm text-gray-500">
+              <p className="px-4 py-4 text-body-sm text-ink-500">
                 No notifications yet.
               </p>
             ) : null}
 
             {sortedItems.map((item) => {
               const content = (
-                <div className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left hover:bg-gray-50">
+                <div className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left hover:bg-ink-50">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-body-sm font-medium text-ink-900">
                       {item.title}
                     </p>
-                    <p className="mt-0.5 text-xs text-gray-600">
+                    <p className="mt-0.5 text-caption text-ink-700">
                       {item.message}
                     </p>
-                    <p className="mt-1 text-[11px] text-gray-400">
+                    <p className="mt-1 text-[11px] text-ink-400">
                       {formatRelative(item.createdAt)}
                     </p>
                   </div>
                   {!item.readAt ? (
-                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-info-600" />
                   ) : null}
                 </div>
               );
@@ -153,7 +153,7 @@ export default function NotificationsBell() {
                 <Link
                   key={item.id}
                   href={item.linkUrl}
-                  className="block border-b border-gray-50 last:border-0"
+                  className="block border-b border-ink-100 last:border-0"
                   onClick={async () => {
                     await markRead(item.id);
                     setOpen(false);
@@ -165,7 +165,7 @@ export default function NotificationsBell() {
                 <button
                   key={item.id}
                   type="button"
-                  className="block w-full border-b border-gray-50 last:border-0"
+                  className="block w-full border-b border-ink-100 last:border-0"
                   onClick={() => markRead(item.id)}
                 >
                   {content}

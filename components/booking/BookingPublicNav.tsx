@@ -55,7 +55,7 @@ export function BookingPublicNav({
         />
       ) : null}
 
-      <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md">
+      <nav className="sticky top-0 z-50 border-b border-ink-100 bg-white/95 shadow-sm backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-5 md:px-8">
           <Link
             href={homeHref}
@@ -77,7 +77,7 @@ export function BookingPublicNav({
                 salonName.charAt(0)
               )}
             </div>
-            <span className="truncate text-sm font-semibold text-gray-900 sm:text-base">
+            <span className="truncate text-sm font-semibold text-ink-900 sm:text-base">
               {salonName}
             </span>
           </Link>
@@ -87,7 +87,7 @@ export function BookingPublicNav({
               <Link
                 key={item.hash}
                 href={`/#${item.hash}`}
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                className="text-sm font-medium text-ink-500 transition-colors hover:text-ink-900"
               >
                 {item.label}
               </Link>
@@ -105,7 +105,7 @@ export function BookingPublicNav({
 
             <button
               type="button"
-              className="flex h-11 w-11 items-center justify-center rounded-lg border border-gray-200 bg-white md:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border border-ink-200 bg-white md:hidden"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-label={open ? "Close menu" : "Open menu"}
@@ -114,9 +114,9 @@ export function BookingPublicNav({
                 <XIcon size={18} color="#374151" />
               ) : (
                 <span className="flex flex-col gap-1" aria-hidden>
-                  <span className="block h-0.5 w-5 rounded-full bg-gray-700" />
-                  <span className="block h-0.5 w-5 rounded-full bg-gray-700" />
-                  <span className="block h-0.5 w-5 rounded-full bg-gray-700" />
+                  <span className="block h-0.5 w-5 rounded-full bg-ink-700" />
+                  <span className="block h-0.5 w-5 rounded-full bg-ink-700" />
+                  <span className="block h-0.5 w-5 rounded-full bg-ink-700" />
                 </span>
               )}
             </button>
@@ -124,13 +124,13 @@ export function BookingPublicNav({
         </div>
 
         {open ? (
-          <div className="border-t border-gray-200 bg-white px-4 py-4 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.18)] md:hidden">
+          <div className="border-t border-ink-200 bg-white px-4 py-4 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.18)] md:hidden">
             <ul className="flex flex-col gap-1">
               {LINKS.map((item) => (
                 <li key={item.hash}>
                   <Link
                     href={`/#${item.hash}`}
-                    className="flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-gray-800 hover:bg-gray-50"
+                    className="flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-ink-700 hover:bg-ink-50"
                     onClick={() => setOpen(false)}
                   >
                     {item.label}

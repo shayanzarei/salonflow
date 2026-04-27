@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Input, Textarea } from "@/components/ds/Input";
+import { Select } from "@/components/ds/Select";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
 import {
@@ -181,73 +184,48 @@ export default function MainSiteContactPage() {
                 </h2>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                      <label
-                        className="mb-2 block text-sm font-medium text-slate-700"
-                        htmlFor="firstName"
-                      >
-                        {m.contactFirstName}
-                      </label>
-                      <input
-                        id="firstName"
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                        placeholder={m.phFirstName}
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className="mb-2 block text-sm font-medium text-slate-700"
-                        htmlFor="lastName"
-                      >
-                        {m.contactLastName}
-                      </label>
-                      <input
-                        id="lastName"
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                        placeholder={m.phLastName}
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      className="mb-2 block text-sm font-medium text-slate-700"
-                      htmlFor="workEmail"
-                    >
-                      {m.contactWorkEmail}
-                    </label>
-                    <input
-                      id="workEmail"
-                      type="email"
-                      value={workEmail}
-                      onChange={(e) => setWorkEmail(e.target.value)}
+                    <Input
+                      id="firstName"
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       required
-                      placeholder={m.phWorkEmail}
-                      className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
+                      label={m.contactFirstName}
+                      placeholder={m.phFirstName}
+                    />
+                    <Input
+                      id="lastName"
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                      label={m.contactLastName}
+                      placeholder={m.phLastName}
                     />
                   </div>
 
+                  <Input
+                    id="workEmail"
+                    type="email"
+                    value={workEmail}
+                    onChange={(e) => setWorkEmail(e.target.value)}
+                    required
+                    label={m.contactWorkEmail}
+                    placeholder={m.phWorkEmail}
+                  />
+
                   <div>
                     <label
-                      className="mb-2 block text-sm font-medium text-slate-700"
+                      className="mb-2 block text-sm font-medium text-ink-700"
                       htmlFor="topic"
                     >
                       {m.contactTopicLabel}
                     </label>
-                    <select
+                    <Select
                       id="topic"
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
                       required
-                      className="w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
                     >
                       <option value="" disabled>
                         {m.contactTopicPlaceholder}
@@ -256,43 +234,37 @@ export default function MainSiteContactPage() {
                       <option value="support">{m.contactTopicSupport}</option>
                       <option value="billing">{m.contactTopicBilling}</option>
                       <option value="other">{m.contactTopicOther}</option>
-                    </select>
+                    </Select>
                   </div>
 
-                  <div>
-                    <label
-                      className="mb-2 block text-sm font-medium text-slate-700"
-                      htmlFor="message"
-                    >
-                      {m.contactMessageLabel}
-                    </label>
-                    <textarea
-                      id="message"
-                      rows={4}
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      required
-                      placeholder={m.contactMessagePlaceholder}
-                      className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 transition-all focus:border-brand-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-600/20"
-                    />
-                  </div>
+                  <Textarea
+                    id="message"
+                    rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    required
+                    label={m.contactMessageLabel}
+                    placeholder={m.contactMessagePlaceholder}
+                  />
 
-                  <button
+                  <Button
                     type="submit"
+                    variant="primary"
+                    size="lg"
                     disabled={isSubmitting}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 py-3.5 text-base font-bold text-white shadow-lg shadow-brand-600/20 transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="w-full shadow-lg shadow-brand-600/20"
                   >
                     {isSubmitting ? m.contactSending : m.contactSend}
                     <PaperPlaneIcon className="h-4 w-4" />
-                  </button>
+                  </Button>
                   {submitMessage ? (
                     <div
                       role="status"
                       aria-live="polite"
                       className={`rounded-xl border px-4 py-3 text-sm ${
                         submitStatus === "success"
-                          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                          : "border-rose-200 bg-rose-50 text-rose-700"
+                          ? "border-success-50 bg-success-50 text-success-700"
+                          : "border-danger-50 bg-danger-50 text-danger-700"
                       }`}
                     >
                       <p className="font-semibold">

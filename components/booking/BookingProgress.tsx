@@ -41,10 +41,10 @@ export default function BookingProgress({
               <span
                 className={`hidden text-sm sm:inline ${
                   variant === "complete"
-                    ? "font-medium text-gray-800"
+                    ? "font-medium text-ink-700"
                     : s.num === step
-                      ? "font-semibold text-gray-900"
-                      : "font-normal text-gray-500"
+                      ? "font-semibold text-ink-900"
+                      : "font-normal text-ink-500"
                 }`}
               >
                 {s.label}
@@ -62,7 +62,7 @@ export default function BookingProgress({
           </div>
         ))}
       </div>
-      <p className="mt-2 text-center text-xs font-medium text-gray-600 sm:hidden">
+      <p className="mt-2 text-center text-xs font-medium text-ink-500 sm:hidden">
         {variant === "complete"
           ? progressLabels.allCompleteMobile
           : fillTemplate(progressLabels.stepMobile, {

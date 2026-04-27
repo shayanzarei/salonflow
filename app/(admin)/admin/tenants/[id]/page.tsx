@@ -1,3 +1,8 @@
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Input, Textarea } from "@/components/ds/Input";
+import { Select } from "@/components/ds/Select";
 import { PACKAGE_ENTITLEMENTS, type PackageId } from "@/config/packages";
 import { SITE_SECTIONS } from "@/config/plans";
 import pool from "@/lib/db";
@@ -54,80 +59,74 @@ export default async function TenantDetailPage({
     overrideEntries.map((item) => [item.key, item.value])
   ) as Record<string, boolean | number | null>;
 
+  const statusBadgeVariant: "success" | "warning" | "neutral" =
+    tenant.website_status === "published"
+      ? "success"
+      : tenant.website_status === "pending_approval"
+        ? "warning"
+        : "neutral";
+  const statusLabel =
+    tenant.website_status === "pending_approval"
+      ? "Pending approval"
+      : tenant.website_status === "published"
+        ? "Published"
+        : "Draft";
+
   return (
     <>
       <div className="mb-2">
         <Link
           href="/admin/tenants"
-          className="inline-flex min-h-9 items-center text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex min-h-9 items-center text-body-sm text-ink-500 hover:text-ink-700"
         >
           ← Back to tenants
         </Link>
       </div>
       <div className="w-full min-w-0 max-w-6xl">
-        <div className="mb-4 rounded-2xl border border-gray-100 bg-white p-4 sm:p-5">
+        <Card variant="outlined" className="mb-4 p-4 sm:p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <div className="flex items-center gap-3">
                 <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-semibold text-white"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-body-sm font-semibold text-white"
                   style={{ backgroundColor: tenant.primary_color ?? 'var(--color-brand-600)' }}
                 >
                   {tenant.name.charAt(0)}
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h1 className="truncate text-2xl font-bold text-gray-900">
+                    <h1 className="truncate text-h2 font-bold text-ink-900">
                       {tenant.name}
                     </h1>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                        tenant.website_status === "published"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : tenant.website_status === "pending_approval"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {tenant.website_status === "pending_approval"
-                        ? "Pending approval"
-                        : tenant.website_status === "published"
-                          ? "Published"
-                          : "Draft"}
-                    </span>
+                    <Badge variant={statusBadgeVariant}>{statusLabel}</Badge>
                   </div>
-                  <p className="truncate text-xs text-gray-500">
+                  <p className="truncate text-caption text-ink-500">
                     {tenant.slug}.SoloHub.nl
                   </p>
                 </div>
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                className="inline-flex min-h-10 items-center rounded-[10px] border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700"
-              >
+              <Button type="button" variant="secondary" size="sm">
                 Copy URL
-              </button>
-              <Link
-                href={`https://${tenant.slug}.solohub.nl`}
-                target="_blank"
-                className="inline-flex min-h-10 items-center rounded-[10px] bg-violet-600 px-3 text-xs font-medium text-white hover:opacity-90"
-              >
-                Open live site
-              </Link>
+              </Button>
+              <Button asChild variant="primary" size="sm">
+                <Link href={`https://${tenant.slug}.solohub.nl`} target="_blank">
+                  Open live site
+                </Link>
+              </Button>
             </div>
           </div>
-        </div>
+        </Card>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[320px_1fr]">
           <div className="space-y-4">
-            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-              <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
-                <h2 className="font-semibold text-gray-900">
+            <Card variant="outlined" className="overflow-hidden p-0">
+              <div className="border-b border-ink-100 px-4 py-4 sm:px-6">
+                <h2 className="font-semibold text-ink-900">
                   Website template
                 </h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="mt-0.5 text-caption text-ink-400">
                   Select which public website template this salon uses.
                 </p>
               </div>
@@ -137,39 +136,32 @@ export default async function TenantDetailPage({
                 className="space-y-4 p-4 sm:p-6"
               >
                 <input type="hidden" name="tenant_id" value={id} />
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Template
-                  </label>
-                  <select
-                    name="website_template"
-                    defaultValue={selectedTemplate}
-                    className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
-                  >
-                    {WEBSITE_TEMPLATES.map((template) => (
-                      <option key={template.id} value={template.id}>
-                        {template.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  id="tenant-website-template"
+                  name="website_template"
+                  label="Template"
+                  defaultValue={selectedTemplate}
+                >
+                  {WEBSITE_TEMPLATES.map((template) => (
+                    <option key={template.id} value={template.id}>
+                      {template.label}
+                    </option>
+                  ))}
+                </Select>
                 <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="min-h-11 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
-                  >
+                  <Button type="submit" variant="dark" size="md">
                     Save template
-                  </button>
+                  </Button>
                 </div>
               </form>
-            </div>
+            </Card>
 
-            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-              <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
-                <h2 className="font-semibold text-gray-900">
+            <Card variant="outlined" className="overflow-hidden p-0">
+              <div className="border-b border-ink-100 px-4 py-4 sm:px-6">
+                <h2 className="font-semibold text-ink-900">
                   Business experience
                 </h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="mt-0.5 text-caption text-ink-400">
                   Set when this salon business started. Public site shows this
                   as years of experience.
                 </p>
@@ -181,33 +173,34 @@ export default async function TenantDetailPage({
               >
                 <input type="hidden" name="tenant_id" value={id} />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="tenant-business-started"
+                    className="mb-1 block text-label font-medium text-ink-700"
+                  >
                     Business started date
                   </label>
                   <input
+                    id="tenant-business-started"
                     type="date"
                     name="business_started_at"
                     defaultValue={businessStartedValue}
-                    className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-base focus:border-gray-400 focus:outline-none sm:text-sm"
+                    className="min-h-10 w-full rounded-sm border border-ink-200 px-4 py-2.5 text-body-sm focus:border-brand-600 focus:outline-none"
                   />
                 </div>
                 <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="min-h-11 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
-                  >
+                  <Button type="submit" variant="dark" size="md">
                     Save date
-                  </button>
+                  </Button>
                 </div>
               </form>
-            </div>
+            </Card>
 
-            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-              <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
-                <h2 className="font-semibold text-gray-900">
+            <Card variant="outlined" className="overflow-hidden p-0">
+              <div className="border-b border-ink-100 px-4 py-4 sm:px-6">
+                <h2 className="font-semibold text-ink-900">
                   Subscription & lifecycle
                 </h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="mt-0.5 text-caption text-ink-400">
                   Control trial dates and account status for testing.
                 </p>
               </div>
@@ -218,61 +211,62 @@ export default async function TenantDetailPage({
               >
                 <input type="hidden" name="tenant_id" value={id} />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tenant status
-                  </label>
-                  <select
-                    name="tenant_status"
-                    defaultValue={tenant.tenant_status ?? "trial"}
-                    className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-gray-400 focus:outline-none"
-                  >
-                    <option value="trial">Trial</option>
-                    <option value="active">Active</option>
-                    <option value="suspended">Suspended</option>
-                  </select>
-                </div>
+                <Select
+                  id="tenant-status"
+                  name="tenant_status"
+                  label="Tenant status"
+                  defaultValue={tenant.tenant_status ?? "trial"}
+                >
+                  <option value="trial">Trial</option>
+                  <option value="active">Active</option>
+                  <option value="suspended">Suspended</option>
+                </Select>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="tenant-trial-started"
+                      className="mb-1 block text-label font-medium text-ink-700"
+                    >
                       Trial start date
                     </label>
                     <input
+                      id="tenant-trial-started"
                       type="date"
                       name="trial_started_at"
                       defaultValue={trialStartedValue}
-                      className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-gray-400 focus:outline-none"
+                      className="min-h-10 w-full rounded-sm border border-ink-200 px-4 py-2.5 text-body-sm focus:border-brand-600 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="tenant-trial-ends"
+                      className="mb-1 block text-label font-medium text-ink-700"
+                    >
                       Trial end date
                     </label>
                     <input
+                      id="tenant-trial-ends"
                       type="date"
                       name="trial_ends_at"
                       defaultValue={trialEndsValue}
-                      className="min-h-11 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-gray-400 focus:outline-none"
+                      className="min-h-10 w-full rounded-sm border border-ink-200 px-4 py-2.5 text-body-sm focus:border-brand-600 focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="min-h-10 rounded-[10px] bg-gray-900 px-4 text-sm font-semibold text-white hover:opacity-90"
-                  >
+                  <Button type="submit" variant="dark" size="md">
                     Save lifecycle
-                  </button>
+                  </Button>
                 </div>
               </form>
-            </div>
+            </Card>
 
-            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-              <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
-                <h2 className="font-semibold text-gray-900">Website approval</h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+            <Card variant="outlined" className="overflow-hidden p-0">
+              <div className="border-b border-ink-100 px-4 py-4 sm:px-6">
+                <h2 className="font-semibold text-ink-900">Website approval</h2>
+                <p className="mt-0.5 text-caption text-ink-400">
                   Control when this tenant&apos;s public site is visible.
                 </p>
               </div>
@@ -280,27 +274,31 @@ export default async function TenantDetailPage({
                 <form action="/api/admin/tenants/website-status" method="POST">
                   <input type="hidden" name="tenant_id" value={id} />
                   <input type="hidden" name="website_status" value="published" />
-                  <button
+                  <Button
                     type="submit"
-                    className="min-h-10 w-full rounded-[10px] bg-emerald-600 px-4 text-sm font-semibold text-white hover:opacity-90"
+                    variant="primary"
+                    size="md"
+                    className="w-full bg-success-600 hover:bg-success-700"
                     disabled={tenant.website_status === "published"}
                   >
                     Approve & Publish
-                  </button>
+                  </Button>
                 </form>
                 <form action="/api/admin/tenants/website-status" method="POST">
                   <input type="hidden" name="tenant_id" value={id} />
                   <input type="hidden" name="website_status" value="draft" />
-                  <button
+                  <Button
                     type="submit"
-                    className="min-h-10 w-full rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    variant="secondary"
+                    size="md"
+                    className="w-full"
                     disabled={tenant.website_status === "draft"}
                   >
                     Move to Draft
-                  </button>
+                  </Button>
                 </form>
               </div>
-            </div>
+            </Card>
 
             {/* Danger zone */}
             <AdminDeleteTenantButton
@@ -310,16 +308,16 @@ export default async function TenantDetailPage({
             />
 
             {/* Website sections */}
-            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-              <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
-                <h2 className="font-semibold text-gray-900">
+            <Card variant="outlined" className="overflow-hidden p-0">
+              <div className="border-b border-ink-100 px-4 py-4 sm:px-6">
+                <h2 className="font-semibold text-ink-900">
                   Website sections
                 </h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="mt-0.5 text-caption text-ink-400">
                   Toggle visibility of public website blocks.
                 </p>
               </div>
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-ink-50">
                 {SITE_SECTIONS.map((section) => {
                   const isEnabled = section.required
                     ? true
@@ -331,21 +329,21 @@ export default async function TenantDetailPage({
                       className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                     >
                       <div className="min-w-0 pr-0 sm:pr-4">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-body-sm font-medium text-ink-900">
                           {section.label}
                           {section.required && (
-                            <span className="ml-2 text-xs text-gray-400">
+                            <span className="ml-2 text-caption text-ink-400">
                               (always on)
                             </span>
                           )}
                         </p>
-                        <p className="mt-0.5 text-xs text-gray-400">
+                        <p className="mt-0.5 text-caption text-ink-400">
                           {section.description}
                         </p>
                       </div>
                       {section.required ? (
                         <div
-                          className="relative h-6 w-11 shrink-0 self-start rounded-full bg-violet-600 opacity-40 sm:self-center"
+                          className="relative h-6 w-11 shrink-0 self-start rounded-full bg-brand-600 opacity-40 sm:self-center"
                           aria-hidden
                         >
                           <span className="absolute left-[23px] top-[3px] h-[18px] w-[18px] rounded-full bg-white" />
@@ -390,19 +388,19 @@ export default async function TenantDetailPage({
                   );
                 })}
               </div>
-            </div>
+            </Card>
           </div>
 
           <div className="space-y-4">
-            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-              <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
-                <h2 className="font-semibold text-gray-900">Package overrides</h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+            <Card variant="outlined" className="overflow-hidden p-0">
+              <div className="border-b border-ink-100 px-4 py-4 sm:px-6">
+                <h2 className="font-semibold text-ink-900">Package overrides</h2>
+                <p className="mt-0.5 text-caption text-ink-400">
                   Override this tenant&apos;s package features and limits without changing
                   the shared package defaults.
                 </p>
               </div>
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-ink-50">
                 {PACKAGE_ENTITLEMENTS.map((feat) => {
                   const packageValue = tenantPackage?.entitlements[feat.key];
                   const overrideValue = overrideMap[feat.key];
@@ -414,23 +412,19 @@ export default async function TenantDetailPage({
                       className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
                     >
                       <div className="min-w-0 pr-0 sm:pr-4">
-                        <p className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                        <p className="flex items-center gap-2 text-body-sm font-medium text-ink-900">
                           {feat.label}
-                          <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-600">
-                            Package default
-                          </span>
+                          <Badge variant="brand">Package default</Badge>
                           {overrideValue !== undefined && (
-                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">
-                              Overridden
-                            </span>
+                            <Badge variant="warning">Overridden</Badge>
                           )}
                         </p>
-                        <p className="mt-0.5 text-xs text-gray-400">
+                        <p className="mt-0.5 text-caption text-ink-400">
                           {feat.description}
                         </p>
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-caption text-ink-500">
                           Current package value:{" "}
-                          <span className="font-medium text-gray-700">
+                          <span className="font-medium text-ink-700">
                             {packageValue === null
                               ? "Unlimited"
                               : typeof packageValue === "boolean"
@@ -483,22 +477,21 @@ export default async function TenantDetailPage({
                           <input type="hidden" name="key" value={feat.key} />
                           <input type="hidden" name="value_type" value="limit" />
                           <div className="flex gap-2">
-                            <input
-                              type="number"
-                              min="0"
-                              name="value"
-                              defaultValue={
-                                effectiveValue === null ? "" : String(effectiveValue)
-                              }
-                              placeholder="Unlimited"
-                              className="min-h-10 w-full rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-violet-400"
-                            />
-                            <button
-                              type="submit"
-                              className="min-h-10 rounded-lg bg-gray-900 px-3 text-xs font-semibold text-white hover:opacity-90"
-                            >
+                            <div className="flex-1">
+                              <Input
+                                id={`tenant-ent-${feat.key}`}
+                                type="number"
+                                min="0"
+                                name="value"
+                                defaultValue={
+                                  effectiveValue === null ? "" : String(effectiveValue)
+                                }
+                                placeholder="Unlimited"
+                              />
+                            </div>
+                            <Button type="submit" variant="dark" size="sm">
                               Save
-                            </button>
+                            </Button>
                           </div>
                         </form>
                       )}
@@ -506,15 +499,15 @@ export default async function TenantDetailPage({
                   );
                 })}
               </div>
-            </div>
+            </Card>
 
             {/* Tenant content editor */}
-            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-              <div className="border-b border-gray-100 px-4 py-4 sm:px-6">
-                <h2 className="font-semibold text-gray-900">
+            <Card variant="outlined" className="overflow-hidden p-0">
+              <div className="border-b border-ink-100 px-4 py-4 sm:px-6">
+                <h2 className="font-semibold text-ink-900">
                   Site content editor
                 </h2>
-                <p className="mt-0.5 text-xs text-gray-400">
+                <p className="mt-0.5 text-caption text-ink-400">
                   Edit this salon&apos;s website content
                 </p>
               </div>
@@ -525,57 +518,41 @@ export default async function TenantDetailPage({
               >
                 <input type="hidden" name="tenant_id" value={id} />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tagline
-                  </label>
-                  <input
-                    type="text"
-                    name="tagline"
-                    defaultValue={tenant.tagline ?? ""}
-                    placeholder="Where beauty meets craft"
-                    className="min-h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
-                  />
-                </div>
+                <Input
+                  id="tenant-content-tagline"
+                  type="text"
+                  name="tagline"
+                  label="Tagline"
+                  defaultValue={tenant.tagline ?? ""}
+                  placeholder="Where beauty meets craft"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    About
-                  </label>
-                  <textarea
-                    name="about"
-                    defaultValue={tenant.about ?? ""}
-                    placeholder="Tell the salon's story..."
-                    rows={3}
-                    className="w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
-                  />
-                </div>
+                <Textarea
+                  id="tenant-content-about"
+                  name="about"
+                  label="About"
+                  defaultValue={tenant.about ?? ""}
+                  placeholder="Tell the salon's story..."
+                  rows={3}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    defaultValue={tenant.address ?? ""}
-                    placeholder="123 Beauty Lane, Amsterdam"
-                    className="min-h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
-                  />
-                </div>
+                <Input
+                  id="tenant-content-address"
+                  type="text"
+                  name="address"
+                  label="Address"
+                  defaultValue={tenant.address ?? ""}
+                  placeholder="123 Beauty Lane, Amsterdam"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Hours
-                  </label>
-                  <input
-                    type="text"
-                    name="hours"
-                    defaultValue={tenant.hours ?? ""}
-                    placeholder="Mon–Sat 9am–7pm"
-                    className="min-h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-900 focus:border-purple-400 focus:outline-none sm:text-sm"
-                  />
-                </div>
+                <Input
+                  id="tenant-content-hours"
+                  type="text"
+                  name="hours"
+                  label="Hours"
+                  defaultValue={tenant.hours ?? ""}
+                  placeholder="Mon–Sat 9am–7pm"
+                />
 
                 <div>
                   <UploadInput
@@ -590,19 +567,21 @@ export default async function TenantDetailPage({
                   <Link
                     href={`https://${tenant.slug}.solohub.nl`}
                     target="_blank"
-                    className="order-2 text-sm text-purple-600 hover:text-purple-700 sm:order-1"
+                    className="order-2 text-body-sm text-brand-600 hover:text-brand-700 sm:order-1"
                   >
                     Preview site →
                   </Link>
-                  <button
+                  <Button
                     type="submit"
-                    className="order-1 min-h-11 w-full rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 sm:order-2 sm:w-auto"
+                    variant="dark"
+                    size="md"
+                    className="order-1 w-full sm:order-2 sm:w-auto"
                   >
                     Save content
-                  </button>
+                  </Button>
                 </div>
               </form>
-            </div>
+            </Card>
           </div>
         </div>
       </div>

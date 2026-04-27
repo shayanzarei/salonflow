@@ -1,4 +1,5 @@
 import BookingProgress from "@/components/booking/BookingProgress";
+import { Avatar } from "@/components/ds/Avatar";
 import pool from "@/lib/db";
 import { getServerTranslations } from "@/lib/i18n/server";
 import { bookableServiceSql } from "@/lib/services/bookable";
@@ -51,11 +52,11 @@ export default async function ChooseStaffPage({
   const selectedService = serviceResult.rows[0] ?? null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-ink-50">
       <div className="mx-auto max-w-[860px] px-4 py-8 sm:px-6 sm:py-10 md:py-12">
         <a
           href="/book"
-          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-gray-600 no-underline sm:mb-8"
+          className="mb-6 inline-flex min-h-10 items-center gap-1.5 text-sm text-ink-500 no-underline sm:mb-8"
         >
           {t.booking.back}
         </a>
@@ -67,13 +68,13 @@ export default async function ChooseStaffPage({
         />
 
         <div className="mb-8 text-center sm:mb-10 md:mb-12">
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-[40px]">
+          <h1 className="text-balance text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl md:text-[40px]">
             {t.booking.chooseStaffTitle}
           </h1>
           {selectedService && (
-            <p className="mt-2 text-sm text-gray-500 sm:text-[15px]">
+            <p className="mt-2 text-sm text-ink-500 sm:text-[15px]">
               {t.booking.selectedLabel}{" "}
-              <strong className="text-gray-700">{selectedService.name}</strong>
+              <strong className="text-ink-700">{selectedService.name}</strong>
             </p>
           )}
         </div>
@@ -86,40 +87,16 @@ export default async function ChooseStaffPage({
             <a
               key={member.id}
               href={`/book/time?service=${service}&staff=${member.id}`}
-              className="flex cursor-pointer flex-col items-center rounded-2xl border border-gray-100 bg-white p-6 no-underline transition-shadow hover:border-gray-200 hover:shadow-md sm:p-8"
+              className="flex cursor-pointer flex-col items-center rounded-2xl border border-ink-100 bg-white p-6 no-underline transition-shadow hover:border-ink-200 hover:shadow-md sm:p-8"
             >
               {/* Avatar */}
-              <div
-                style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: "50%",
-                  background: brand,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontSize: 28,
-                  fontWeight: 600,
-                  marginBottom: 16,
-                  overflow: "hidden",
-                  flexShrink: 0,
-                }}
-              >
-                {member.avatar_url ? (
-                  <img
-                    src={member.avatar_url}
-                    alt={member.name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  member.name.charAt(0)
-                )}
-              </div>
+              <Avatar
+                name={member.name}
+                src={member.avatar_url}
+                size="xl"
+                className="mb-4 h-20 w-20 text-[28px] text-white"
+                style={{ background: brand }}
+              />
 
               {/* Name & role */}
               <h3

@@ -2,6 +2,7 @@
 
 import LogoutButton from "@/components/dashboard/LogoutButton";
 import NotificationsBell from "@/components/dashboard/NotificationsBell";
+import { Avatar } from "@/components/ds/Avatar";
 import { XIcon } from "@/components/ui/Icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -69,12 +70,12 @@ export function StaffChrome({ brand, staffName, salonName, children }: Props) {
       >
         <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
           <div className="flex min-w-0 flex-1 items-center gap-3">
-            <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
+            <Avatar
+              name={staffName}
+              size="sm"
+              className="h-9 w-9 shrink-0 text-sm font-semibold text-white"
               style={{ backgroundColor: brand }}
-            >
-              {staffName.charAt(0)}
-            </div>
+            />
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-gray-900">
                 {staffName}

@@ -1,3 +1,11 @@
+import {
+  Table,
+  TableContainer,
+  TBodyRow,
+  TD,
+  TH,
+  THeadRow,
+} from "@/components/ds/Table";
 import pool from "@/lib/db";
 import Link from "next/link";
 
@@ -98,7 +106,7 @@ export default async function AdminPaymentsPage() {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+      <TableContainer className="rounded-2xl border-gray-100">
         {loadError && (
           <div className="border-b border-amber-100 bg-amber-50 px-5 py-3 text-sm text-amber-900">
             <p className="font-medium">Could not read payment logs</p>
@@ -113,22 +121,22 @@ export default async function AdminPaymentsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-            <table className="w-full min-w-[1200px] border-collapse">
+            <Table className="min-w-[1200px]">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-5 py-3.5">Time</th>
-                  <th className="px-5 py-3.5">Source</th>
-                  <th className="px-5 py-3.5">Event</th>
-                  <th className="px-5 py-3.5">Plan</th>
-                  <th className="px-5 py-3.5">Email</th>
-                  <th className="px-5 py-3.5">Amount</th>
-                  <th className="px-5 py-3.5">Status</th>
-                  <th className="px-5 py-3.5">Stripe refs</th>
-                  <th className="px-5 py-3.5">Mode</th>
-                  <th className="px-5 py-3.5 text-right">Details</th>
-                </tr>
+                <THeadRow>
+                  <TH>Time</TH>
+                  <TH>Source</TH>
+                  <TH>Event</TH>
+                  <TH>Plan</TH>
+                  <TH>Email</TH>
+                  <TH>Amount</TH>
+                  <TH>Status</TH>
+                  <TH>Stripe refs</TH>
+                  <TH>Mode</TH>
+                  <TH className="text-right">Details</TH>
+                </THeadRow>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {(() => {
                   const byCheckoutSession = new Map<string, string>();
                   const byCustomer = new Map<string, string>();
@@ -176,8 +184,8 @@ export default async function AdminPaymentsPage() {
                     .join(" · ");
 
                   return (
-                    <tr key={row.id} className="text-sm text-gray-800">
-                      <td className="whitespace-nowrap px-5 py-3 text-xs text-gray-500">
+                    <TBodyRow key={row.id} interactive={false}>
+                      <TD className="whitespace-nowrap text-xs text-gray-500">
                         {new Date(row.created_at).toLocaleString("en-US", {
                           month: "short",
                           day: "2-digit",
@@ -186,13 +194,13 @@ export default async function AdminPaymentsPage() {
                           minute: "2-digit",
                           second: "2-digit",
                         })}
-                      </td>
-                      <td className="px-5 py-3">
+                      </TD>
+                      <TD>
                         <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
                           {row.source}
                         </span>
-                      </td>
-                      <td className="max-w-[220px] px-5 py-3">
+                      </TD>
+                      <TD className="max-w-[220px]">
                         <p className="break-words font-medium text-gray-900">
                           {row.event_type}
                         </p>
@@ -201,8 +209,8 @@ export default async function AdminPaymentsPage() {
                             {row.message}
                           </p>
                         )}
-                      </td>
-                      <td className="px-5 py-3 text-xs">
+                      </TD>
+                      <TD className="text-xs">
                         {row.plan ? (
                           <span className="capitalize text-gray-900">
                             {row.plan}
@@ -213,14 +221,14 @@ export default async function AdminPaymentsPage() {
                         ) : (
                           "—"
                         )}
-                      </td>
-                      <td className="max-w-[180px] px-5 py-3 break-all text-xs text-gray-600">
+                      </TD>
+                      <TD className="max-w-[180px] break-all text-xs text-gray-600">
                         {resolvedEmail ?? "—"}
-                      </td>
-                      <td className="whitespace-nowrap px-5 py-3 text-xs">
+                      </TD>
+                      <TD className="whitespace-nowrap text-xs">
                         {amount}
-                      </td>
-                      <td className="px-5 py-3">
+                      </TD>
+                      <TD>
                         {row.payment_status ? (
                           <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium capitalize text-emerald-800">
                             {row.payment_status.replace(/_/g, " ")}
@@ -228,34 +236,34 @@ export default async function AdminPaymentsPage() {
                         ) : (
                           "—"
                         )}
-                      </td>
-                      <td className="max-w-[200px] px-5 py-3 font-mono text-[11px] text-gray-500">
+                      </TD>
+                      <TD className="max-w-[200px] font-mono text-[11px] text-gray-500">
                         {refs || "—"}
-                      </td>
-                      <td className="px-5 py-3 text-xs">
+                      </TD>
+                      <TD className="text-xs">
                         {row.livemode === null
                           ? "—"
                           : row.livemode
                             ? "Live"
                             : "Test"}
-                      </td>
-                      <td className="px-5 py-3 text-right">
+                      </TD>
+                      <TD className="text-right">
                         <Link
                           href={`/admin/subscriptions/${row.id}`}
                           className="inline-flex rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
                         >
                           View
                         </Link>
-                      </td>
-                    </tr>
+                      </TD>
+                    </TBodyRow>
                   );
                   });
                 })()}
               </tbody>
-            </table>
+            </Table>
           </div>
         )}
-      </div>
+      </TableContainer>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandingColorPicker } from "@/components/dashboard/BrandingColorPicker";
+import { Button } from "@/components/ds/Button";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import Link from "next/link";
 import { useState } from "react";
@@ -31,7 +32,7 @@ export function SettingsBrandingForm({
       <input type="hidden" name="redirect_to" value={cancelHref} />
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
+        <label className="mb-2 block text-label font-medium text-ink-700">
           Primary brand color
         </label>
         <BrandingColorPicker
@@ -51,20 +52,21 @@ export function SettingsBrandingForm({
         />
       </div>
 
-      <div className="flex items-center justify-between gap-4 border-t border-gray-100 pt-4">
+      <div className="flex items-center justify-between gap-4 border-t border-ink-100 pt-4">
         <Link
           href={cancelHref}
-          className="text-sm font-medium text-gray-500 hover:text-gray-700"
+          className="text-body-sm font-medium text-ink-500 hover:text-ink-700"
         >
           Cancel
         </Link>
-        <button
+        <Button
           type="submit"
-          className="rounded-lg px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+          variant="primary"
+          size="md"
           style={{ backgroundColor: previewColor }}
         >
           {saveButtonLabel}
-        </button>
+        </Button>
       </div>
     </form>
   );

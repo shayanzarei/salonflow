@@ -41,62 +41,27 @@ export function ServiceDurationField({
       required={fieldRequired}
       value={mins}
       onChange={(e) => setMins(parseInt(e.target.value, 10) || 0)}
-      style={{
-        width: borderedRow ? undefined : "100%",
-        flex: borderedRow ? 1 : undefined,
-        minWidth: borderedRow ? 0 : undefined,
-        border: borderedRow ? "none" : "1px solid #e5e7eb",
-        borderRadius: borderedRow ? 0 : 10,
-        padding: borderedRow ? "11px 12px" : "10px 14px",
-        fontSize: 14,
-        color: "#111",
-        background: borderedRow ? "transparent" : "white",
-        outline: "none",
-        boxSizing: "border-box",
-      }}
+      className={
+        borderedRow
+          ? "min-h-10 min-w-0 flex-1 border-none bg-transparent px-3 py-2.5 text-body-sm text-ink-900 outline-none"
+          : "min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 px-4 py-2.5 text-body-sm text-ink-900 hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus focus-visible:outline-none"
+      }
     />
   );
 
   return (
     <div>
       {labelText ? (
-        <label
-          style={{
-            display: "block",
-            fontSize: 11,
-            fontWeight: 600,
-            color: "#aaa",
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-            marginBottom: 8,
-          }}
-        >
+        <label className="mb-2 block text-caption font-semibold uppercase tracking-wider text-ink-400">
           {labelText}
         </label>
       ) : null}
       <input type="hidden" name="duration_mins" value={mins} />
       {borderedRow ? (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            border: "1px solid #e5e7eb",
-            borderRadius: 10,
-            overflow: "hidden",
-            background: "white",
-          }}
-        >
+        <div className="flex items-center overflow-hidden rounded-sm border border-ink-200 bg-ink-0 focus-within:border-brand-600 focus-within:shadow-focus">
           {numberInput}
           {inputSuffix != null ? (
-            <span
-              style={{
-                padding: "0 12px",
-                fontSize: 13,
-                color: "#888",
-                fontWeight: 500,
-                whiteSpace: "nowrap",
-              }}
-            >
+            <span className="whitespace-nowrap px-3 text-body-sm font-medium text-ink-500">
               {inputSuffix}
             </span>
           ) : null}
@@ -106,34 +71,21 @@ export function ServiceDurationField({
       )}
       {quickSelectionTitle ? (
         <>
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: "#aaa",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              margin: "12px 0 8px",
-            }}
-          >
+          <p className="mb-2 mt-3 text-caption font-semibold uppercase tracking-wider text-ink-400">
             {quickSelectionTitle}
           </p>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          <div className="flex flex-wrap gap-1.5">
             {DURATION_PILLS.map((d) => (
               <button
                 key={d}
                 type="button"
                 onClick={() => setMins(d)}
+                className="cursor-pointer rounded-full px-3.5 py-1.5 text-caption font-medium"
                 style={{
-                  padding: "6px 14px",
-                  borderRadius: 100,
-                  fontSize: 12,
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  background: mins === d ? brand : "white",
-                  color: mins === d ? "white" : "#666",
+                  background: mins === d ? brand : "var(--color-ink-0)",
+                  color: mins === d ? "white" : "var(--color-ink-600)",
                   border:
-                    mins === d ? `2px solid ${brand}` : "1px solid #e5e7eb",
+                    mins === d ? `2px solid ${brand}` : "1px solid var(--color-ink-200)",
                 }}
               >
                 {d}
@@ -167,27 +119,12 @@ export function ServiceActiveToggle({
   }, [on, onActiveChangeAction]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 12,
-        paddingTop: 4,
-      }}
-    >
+    <div className="flex items-center justify-between gap-3 pt-1">
       <div>
-        <p
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: "#111",
-            margin: "0 0 2px",
-          }}
-        >
+        <p className="mb-0.5 text-body-sm font-semibold text-ink-900">
           {title}
         </p>
-        <p style={{ fontSize: 12, color: "#888", margin: 0 }}>{subtitle}</p>
+        <p className="text-caption text-ink-500">{subtitle}</p>
       </div>
       <input type="hidden" name="is_active" value={on ? "true" : "false"} />
       <button
@@ -195,30 +132,14 @@ export function ServiceActiveToggle({
         role="switch"
         aria-checked={on}
         onClick={() => setOn((v) => !v)}
+        className="relative h-7 w-12 shrink-0 cursor-pointer rounded-full border-none p-0 transition-colors"
         style={{
-          width: 48,
-          height: 28,
-          borderRadius: 14,
-          border: "none",
-          cursor: "pointer",
-          background: on ? brand : "#e5e7eb",
-          position: "relative",
-          flexShrink: 0,
-          transition: "background 0.15s ease",
+          background: on ? brand : "var(--color-ink-200)",
         }}
       >
         <span
-          style={{
-            position: "absolute",
-            top: 3,
-            left: on ? 24 : 3,
-            width: 22,
-            height: 22,
-            borderRadius: "50%",
-            background: "white",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
-            transition: "left 0.15s ease",
-          }}
+          className="absolute top-[3px] h-[22px] w-[22px] rounded-full bg-ink-0 shadow-sm transition-all"
+          style={{ left: on ? 24 : 3 }}
         />
       </button>
     </div>

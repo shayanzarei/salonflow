@@ -1,3 +1,14 @@
+import { Avatar } from "@/components/ds/Avatar";
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import {
+  Table,
+  TBodyRow,
+  TD,
+  TH,
+  THeadRow,
+} from "@/components/ds/Table";
 import pool from "@/lib/db";
 import { formatEUR } from "@/lib/format-currency";
 import { fillTemplate } from "@/lib/i18n/interpolate";
@@ -9,12 +20,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const PAGE_SIZE = 12;
-
-function getInitials(name: string) {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-}
 
 function getStatus(
   totalBookings: number,
@@ -60,11 +65,12 @@ function customerStatusLabel(
   }
 }
 
-const STATUS_STYLE: Record<string, { color: string; bg: string }> = {
-  VIP: { color: "#92400E", bg: "#FEF3C7" },
-  Regular: { color: "#374151", bg: "#F3F4F6" },
-  New: { color: "#065F46", bg: "#D1FAE5" },
-  "At Risk": { color: "#991B1B", bg: "#FEE2E2" },
+type BadgeVariant = "neutral" | "info" | "success" | "warning" | "danger" | "brand";
+const STATUS_VARIANT: Record<string, BadgeVariant> = {
+  VIP: "warning",
+  Regular: "neutral",
+  New: "success",
+  "At Risk": "danger",
 };
 
 export default async function CustomersPage({
@@ -169,7 +175,7 @@ export default async function CustomersPage({
     <div>
       {/* Header */}
       <div className="mb-5 sm:mb-6">
-        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
+        <h1 className="text-h2 font-bold text-ink-900 sm:text-h1">
           {dc.title}
         </h1>
       </div>
@@ -177,46 +183,17 @@ export default async function CustomersPage({
       {/* Stat Cards */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:mb-7 sm:grid-cols-2 lg:grid-cols-3">
         {/* Total Customers */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: 16,
-            border: "1px solid #f0f0f0",
-            padding: "20px 24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <Card variant="outlined" className="flex items-center justify-between">
           <div>
-            <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
-              {dc.totalCustomers}
-            </p>
-            <p
-              style={{
-                fontSize: 30,
-                fontWeight: 700,
-                color: "#111",
-                margin: "0 0 2px",
-              }}
-            >
+            <p className="mb-1 text-caption text-ink-500">{dc.totalCustomers}</p>
+            <p className="mb-0.5 text-3xl font-bold text-ink-900">
               {totalCustomers.toLocaleString()}
             </p>
-            <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
-              {dc.allTime}
-            </p>
+            <p className="text-caption text-ink-400">{dc.allTime}</p>
           </div>
           <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: "50%",
-              background: `${brand}18`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
+            style={{ background: `${brand}18` }}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path
@@ -244,64 +221,28 @@ export default async function CustomersPage({
               />
             </svg>
           </div>
-        </div>
+        </Card>
 
         {/* New This Month */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: 16,
-            border: "1px solid #f0f0f0",
-            padding: "20px 24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <Card variant="outlined" className="flex items-center justify-between">
           <div>
-            <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
-              {dc.newThisMonth}
-            </p>
-            <p
-              style={{
-                fontSize: 30,
-                fontWeight: 700,
-                color: "#111",
-                margin: "0 0 6px",
-              }}
-            >
+            <p className="mb-1 text-caption text-ink-500">{dc.newThisMonth}</p>
+            <p className="mb-1.5 text-3xl font-bold text-ink-900">
               {newThisMonth}
             </p>
             {newGrowthPct !== null && (
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: newGrowthPct >= 0 ? "#059669" : "#DC2626",
-                  background: newGrowthPct >= 0 ? "#D1FAE5" : "#FEE2E2",
-                  padding: "2px 8px",
-                  borderRadius: 100,
-                }}
-              >
+              <Badge variant={newGrowthPct >= 0 ? "success" : "danger"}>
                 {fillTemplate(dc.growthLineTemplate, {
                   arrow: newGrowthPct >= 0 ? "↑" : "↓",
                   n: Math.abs(newGrowthPct),
                   vs: dc.growthVsLastMonth,
                 })}
-              </span>
+              </Badge>
             )}
           </div>
           <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: "50%",
-              background: `${brand}18`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
+            style={{ background: `${brand}18` }}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path
@@ -332,79 +273,45 @@ export default async function CustomersPage({
               />
             </svg>
           </div>
-        </div>
+        </Card>
 
         {/* Average Spend */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: 16,
-            border: "1px solid #f0f0f0",
-            padding: "20px 24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <Card variant="outlined" className="flex items-center justify-between">
           <div>
-            <p style={{ fontSize: 13, color: "#6B7280", margin: "0 0 4px" }}>
-              Average Spend
-            </p>
-            <p
-              style={{
-                fontSize: 30,
-                fontWeight: 700,
-                color: "#111",
-                margin: "0 0 2px",
-              }}
-            >
+            <p className="mb-1 text-caption text-ink-500">Average Spend</p>
+            <p className="mb-0.5 text-3xl font-bold text-ink-900">
               {formatEUR(avgSpend)}
             </p>
-            <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
-              {dc.perCustomer}
-            </p>
+            <p className="text-caption text-ink-400">{dc.perCustomer}</p>
           </div>
           <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: "50%",
-              background: `${brand}18`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              fontSize: 22,
-              color: brand,
-              fontWeight: 500,
-            }}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-xl font-medium"
+            style={{ background: `${brand}18`, color: brand }}
           >
             €
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Tabs — scroll horizontally on small screens */}
-      <div className="-mx-1 mb-5 flex gap-0 overflow-x-auto overflow-y-hidden border-b border-gray-200 px-1 pb-px [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
-        {tabs.map((t) => {
-          const isActive = activeTab === t.value;
+      <div className="-mx-1 mb-5 flex gap-0 overflow-x-auto overflow-y-hidden border-b border-ink-200 px-1 pb-px [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
+        {tabs.map((tabItem) => {
+          const isActive = activeTab === tabItem.value;
           return (
             <Link
-              key={t.value}
-              href={tabHref(t.value)}
-              className="shrink-0 whitespace-nowrap border-b-2 border-transparent px-3 py-2.5 text-sm no-underline sm:px-[18px]"
+              key={tabItem.value}
+              href={tabHref(tabItem.value)}
+              className="shrink-0 whitespace-nowrap border-b-2 border-transparent px-3 py-2.5 text-body-sm no-underline sm:px-[18px]"
               style={{
                 fontWeight: isActive ? 600 : 400,
-                color: isActive ? brand : "#6B7280",
+                color: isActive ? brand : "var(--color-ink-500)",
                 borderBottomColor: isActive ? brand : "transparent",
               }}
             >
-              {t.label}
-              {t.suffix && (
-                <span
-                  style={{ color: "#9CA3AF", fontWeight: 400, marginLeft: 4 }}
-                >
-                  {t.suffix}
+              {tabItem.label}
+              {tabItem.suffix && (
+                <span className="ml-1 font-normal text-ink-400">
+                  {tabItem.suffix}
                 </span>
               )}
             </Link>
@@ -413,139 +320,71 @@ export default async function CustomersPage({
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+      <Card variant="outlined" className="overflow-hidden p-0">
         {customers.length === 0 ? (
           allCustomers.length === 0 ? (
             /* ── First-time: no clients yet ── */
-            <div style={{ padding: "72px 24px", textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
-              <p style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", margin: "0 0 8px" }}>
+            <div className="px-6 py-[72px] text-center">
+              <div className="mb-4 text-5xl">👥</div>
+              <p className="mb-2 text-body-lg font-bold text-ink-900">
                 {dc.emptyNoClientsTitle}
               </p>
-              <p style={{ fontSize: 14, color: "#64748B", margin: "0 0 24px", maxWidth: 380, display: "inline-block", lineHeight: 1.6 }}>
+              <p className="mb-6 inline-block max-w-[380px] text-body-sm leading-relaxed text-ink-500">
                 {dc.emptyNoClientsBody}
               </p>
-              <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                <Link
-                  href="/bookings/new"
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    padding: "10px 20px", borderRadius: 10, fontSize: 14,
-                    fontWeight: 600, color: "#fff", background: brand,
-                    textDecoration: "none",
-                  }}
-                >
-                  {dc.addFirstBooking}
-                </Link>
-                <Link
-                  href="/settings/site"
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    padding: "10px 20px", borderRadius: 10, fontSize: 14,
-                    fontWeight: 600, color: "#475569",
-                    border: "1px solid #E2E8F0", textDecoration: "none",
-                  }}
-                >
-                  {dc.setupBookingSite}
-                </Link>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button asChild variant="primary" size="md" style={{ backgroundColor: brand }}>
+                  <Link href="/bookings/new">{dc.addFirstBooking}</Link>
+                </Button>
+                <Button asChild variant="secondary" size="md">
+                  <Link href="/settings/site">{dc.setupBookingSite}</Link>
+                </Button>
               </div>
             </div>
           ) : (
             /* ── Has clients but filter matched nothing ── */
-            <div style={{ padding: "48px 24px", textAlign: "center", color: "#94A3B8", fontSize: 14 }}>
+            <div className="px-6 py-12 text-center text-body-sm text-ink-400">
               {dc.emptyFilter}
             </div>
           )
         ) : (
           <>
             <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-              <table className="w-full min-w-[960px] border-collapse">
+              <Table className="min-w-[960px]">
                 <thead>
-                  <tr style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    {[
-                      dc.colClient,
-                      dc.colContact,
-                      dc.colVisits,
-                      dc.colLastVisit,
-                      dc.colTotalSpent,
-                      dc.colStatus,
-                      dc.colAction,
-                    ].map((h) => (
-                      <th
-                        key={h}
-                        style={{
-                          padding: "14px 20px",
-                          textAlign: "left",
-                          fontSize: 11,
-                          fontWeight: 600,
-                          color: "#9CA3AF",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
+                  <THeadRow>
+                    <TH>{dc.colClient}</TH>
+                    <TH>{dc.colContact}</TH>
+                    <TH>{dc.colVisits}</TH>
+                    <TH>{dc.colLastVisit}</TH>
+                    <TH>{dc.colTotalSpent}</TH>
+                    <TH>{dc.colStatus}</TH>
+                    <TH>{dc.colAction}</TH>
+                  </THeadRow>
                 </thead>
                 <tbody>
                   {customers.map((customer, i) => {
-                    const cfg =
-                      STATUS_STYLE[customer.status] ?? STATUS_STYLE.Regular;
+                    const variant =
+                      STATUS_VARIANT[customer.status] ?? STATUS_VARIANT.Regular;
                     return (
-                      <tr
+                      <TBodyRow
                         key={customer.client_email + i}
-                        style={{
-                          borderBottom:
-                            i < customers.length - 1
-                              ? "1px solid #F9FAFB"
-                              : "none",
-                        }}
+                        interactive={false}
                       >
                         {/* Client */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 12,
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: 38,
-                                height: 38,
-                                borderRadius: "50%",
-                                background: brand,
-                                color: "white",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontSize: 13,
-                                fontWeight: 600,
-                                flexShrink: 0,
-                              }}
-                            >
-                              {getInitials(customer.client_name)}
-                            </div>
+                        <TD>
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              name={customer.client_name}
+                              size="md"
+                              className="text-body-sm text-white"
+                              style={{ background: brand }}
+                            />
                             <div>
-                              <p
-                                style={{
-                                  margin: 0,
-                                  fontSize: 14,
-                                  fontWeight: 600,
-                                  color: "#111827",
-                                }}
-                              >
+                              <p className="text-body-sm font-semibold text-ink-900">
                                 {customer.client_name}
                               </p>
-                              <p
-                                style={{
-                                  margin: 0,
-                                  fontSize: 12,
-                                  color: "#9CA3AF",
-                                }}
-                              >
+                              <p className="text-caption text-ink-400">
                                 Member since{" "}
                                 {new Date(
                                   customer.member_since
@@ -556,26 +395,12 @@ export default async function CustomersPage({
                               </p>
                             </div>
                           </div>
-                        </td>
+                        </TD>
 
                         {/* Contact */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: 4,
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 6,
-                                fontSize: 13,
-                                color: "#374151",
-                              }}
-                            >
+                        <TD>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1.5 text-caption text-ink-700">
                               <svg
                                 width="13"
                                 height="13"
@@ -584,14 +409,14 @@ export default async function CustomersPage({
                               >
                                 <path
                                   d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                                  stroke="#9CA3AF"
+                                  stroke="var(--color-ink-400)"
                                   strokeWidth="2"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                 />
                                 <polyline
                                   points="22,6 12,13 2,6"
-                                  stroke="#9CA3AF"
+                                  stroke="var(--color-ink-400)"
                                   strokeWidth="2"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
@@ -600,15 +425,7 @@ export default async function CustomersPage({
                               {customer.client_email}
                             </div>
                             {customer.client_phone && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 6,
-                                  fontSize: 13,
-                                  color: "#374151",
-                                }}
-                              >
+                              <div className="flex items-center gap-1.5 text-caption text-ink-700">
                                 <svg
                                   width="13"
                                   height="13"
@@ -617,7 +434,7 @@ export default async function CustomersPage({
                                 >
                                   <path
                                     d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.4 2 2 0 0 1 3.64 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.86a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-                                    stroke="#9CA3AF"
+                                    stroke="var(--color-ink-400)"
                                     strokeWidth="2"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -627,41 +444,21 @@ export default async function CustomersPage({
                               </div>
                             )}
                           </div>
-                        </td>
+                        </TD>
 
                         {/* Visits */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <p
-                            style={{
-                              margin: 0,
-                              fontSize: 15,
-                              fontWeight: 600,
-                              color: "#111827",
-                            }}
-                          >
+                        <TD>
+                          <p className="text-body-sm font-semibold text-ink-900">
                             {customer.total_bookings}
                           </p>
-                          <p
-                            style={{
-                              margin: 0,
-                              fontSize: 12,
-                              color: "#9CA3AF",
-                            }}
-                          >
+                          <p className="text-caption text-ink-400">
                             {dc.visitsSubline}
                           </p>
-                        </td>
+                        </TD>
 
                         {/* Last Visit */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <p
-                            style={{
-                              margin: 0,
-                              fontSize: 14,
-                              fontWeight: 500,
-                              color: "#111827",
-                            }}
-                          >
+                        <TD>
+                          <p className="text-body-sm font-medium text-ink-900">
                             {new Date(customer.last_visit).toLocaleDateString(
                               dateLocale,
                               {
@@ -671,72 +468,48 @@ export default async function CustomersPage({
                               }
                             )}
                           </p>
-                          <p
-                            style={{
-                              margin: 0,
-                              fontSize: 12,
-                              color: "#9CA3AF",
-                            }}
-                          >
+                          <p className="text-caption text-ink-400">
                             {getDaysAgo(customer.last_visit, dc)}
                           </p>
-                        </td>
+                        </TD>
 
                         {/* Total Spent */}
-                        <td style={{ padding: "16px 20px" }}>
+                        <TD>
                           <p
-                            style={{
-                              margin: 0,
-                              fontSize: 15,
-                              fontWeight: 700,
-                              color: brand,
-                            }}
+                            className="text-body-sm font-bold"
+                            style={{ color: brand }}
                           >
                             {formatEUR(customer.total_spent)}
                           </p>
-                        </td>
+                        </TD>
 
                         {/* Status */}
-                        <td style={{ padding: "16px 20px" }}>
-                          <span
-                            style={{
-                              display: "inline-block",
-                              padding: "4px 12px",
-                              borderRadius: 100,
-                              fontSize: 12,
-                              fontWeight: 600,
-                              color: cfg.color,
-                              background: cfg.bg,
-                            }}
-                          >
+                        <TD>
+                          <Badge variant={variant}>
                             {customerStatusLabel(customer.status, dc)}
-                          </span>
-                        </td>
+                          </Badge>
+                        </TD>
 
                         {/* Action */}
-                        <td style={{ padding: "16px 20px" }}>
+                        <TD>
                           <Link
                             href={`/bookings?search=${encodeURIComponent(customer.client_name)}`}
-                            style={{
-                              fontSize: 13,
-                              fontWeight: 600,
-                              color: brand,
-                              textDecoration: "none",
-                            }}
+                            className="text-caption font-semibold no-underline"
+                            style={{ color: brand }}
                           >
                             {dc.viewHistory}
                           </Link>
-                        </td>
-                      </tr>
+                        </TD>
+                      </TBodyRow>
                     );
                   })}
                 </tbody>
-              </table>
+              </Table>
             </div>
 
             {/* Pagination */}
-            <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-              <p style={{ margin: 0, fontSize: 13, color: "#6B7280" }}>
+            <div className="flex flex-col gap-4 border-t border-ink-100 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <p className="text-caption text-ink-500">
                 {fillTemplate(dc.showingRangeTemplate, {
                   from: showingFrom,
                   to: showingTo,
@@ -749,35 +522,12 @@ export default async function CustomersPage({
                 {currentPage > 1 ? (
                   <Link
                     href={`/customers?${activeTab !== "all" ? `tab=${activeTab}&` : ""}page=${currentPage - 1}`}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 8,
-                      border: "1px solid #E5E7EB",
-                      fontSize: 14,
-                      color: "#374151",
-                      textDecoration: "none",
-                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-200 text-body-sm text-ink-700 no-underline"
                   >
                     ‹
                   </Link>
                 ) : (
-                  <span
-                    style={{
-                      width: 32,
-                      height: 32,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 8,
-                      border: "1px solid #E5E7EB",
-                      fontSize: 14,
-                      color: "#D1D5DB",
-                    }}
-                  >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-200 text-body-sm text-ink-300">
                     ‹
                   </span>
                 )}
@@ -786,24 +536,23 @@ export default async function CustomersPage({
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                   const p = i + 1;
                   const isActive = p === currentPage;
+                  if (isActive) {
+                    return (
+                      <Link
+                        key={p}
+                        href={`/customers?${activeTab !== "all" ? `tab=${activeTab}&` : ""}page=${p}`}
+                        className="flex h-8 w-8 items-center justify-center rounded-sm text-body-sm font-bold text-white no-underline"
+                        style={{ background: brand }}
+                      >
+                        {p}
+                      </Link>
+                    );
+                  }
                   return (
                     <Link
                       key={p}
                       href={`/customers?${activeTab !== "all" ? `tab=${activeTab}&` : ""}page=${p}`}
-                      style={{
-                        width: 32,
-                        height: 32,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: 8,
-                        border: isActive ? "none" : "1px solid #E5E7EB",
-                        fontSize: 14,
-                        fontWeight: isActive ? 700 : 400,
-                        color: isActive ? "white" : "#374151",
-                        background: isActive ? brand : "white",
-                        textDecoration: "none",
-                      }}
+                      className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-200 bg-ink-0 text-body-sm text-ink-700 no-underline"
                     >
                       {p}
                     </Link>
@@ -811,46 +560,19 @@ export default async function CustomersPage({
                 })}
 
                 {totalPages > 5 && (
-                  <span
-                    style={{ fontSize: 14, color: "#9CA3AF", padding: "0 4px" }}
-                  >
-                    …
-                  </span>
+                  <span className="px-1 text-body-sm text-ink-400">…</span>
                 )}
 
                 {/* Next */}
                 {currentPage < totalPages ? (
                   <Link
                     href={`/customers?${activeTab !== "all" ? `tab=${activeTab}&` : ""}page=${currentPage + 1}`}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 8,
-                      border: "1px solid #E5E7EB",
-                      fontSize: 14,
-                      color: "#374151",
-                      textDecoration: "none",
-                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-200 text-body-sm text-ink-700 no-underline"
                   >
                     ›
                   </Link>
                 ) : (
-                  <span
-                    style={{
-                      width: 32,
-                      height: 32,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 8,
-                      border: "1px solid #E5E7EB",
-                      fontSize: 14,
-                      color: "#D1D5DB",
-                    }}
-                  >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-200 text-body-sm text-ink-300">
                     ›
                   </span>
                 )}
@@ -858,7 +580,7 @@ export default async function CustomersPage({
             </div>
           </>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

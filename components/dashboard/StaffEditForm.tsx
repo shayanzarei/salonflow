@@ -1,5 +1,11 @@
 "use client";
 
+import { Avatar } from "@/components/ds/Avatar";
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import { Card } from "@/components/ds/Card";
+import { Input, Textarea } from "@/components/ds/Input";
+import { Select } from "@/components/ds/Select";
 import { TrashIcon, UserIcon } from "@/components/ui/Icons";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { useRouter } from "next/navigation";
@@ -59,35 +65,6 @@ export default function StaffEditForm({
   const [bio, setBio] = useState(initial.bio);
   const [loading, setLoading] = useState(false);
 
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  const inputStyle = {
-    width: "100%",
-    border: "1px solid #e5e7eb",
-    borderRadius: 10,
-    padding: "10px 14px",
-    fontSize: 14,
-    color: "#111",
-    background: "white",
-    outline: "none",
-    boxSizing: "border-box" as const,
-  };
-
-  const labelStyle = {
-    display: "block",
-    fontSize: 11,
-    fontWeight: 600,
-    color: "#aaa",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.06em",
-    marginBottom: 8,
-  };
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -109,127 +86,47 @@ export default function StaffEditForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 300px",
-          gap: 20,
-          alignItems: "start",
-        }}
-      >
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[1fr_300px]">
         {/* Left column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div className="flex flex-col gap-5">
           {/* Personal Information */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 28,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 24,
-              }}
-            >
-              <UserIcon size={16} color="#6B7280" />
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined" className="p-7">
+            <div className="mb-6 flex items-center gap-2">
+              <UserIcon size={16} color="var(--color-ink-500)" />
+              <h2 className="text-body font-semibold text-ink-900">
                 Personal Information
               </h2>
             </div>
 
             {/* Avatar + color picker */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 24,
-                marginBottom: 24,
-              }}
-            >
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "50%",
-                  background: avatarColor,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontWeight: 700,
-                  fontSize: 20,
-                  flexShrink: 0,
-                  overflow: "hidden",
-                }}
-              >
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  initials
-                )}
-              </div>
+            <div className="mb-6 flex items-center gap-6">
+              <Avatar
+                name={name || "?"}
+                src={avatarUrl}
+                size="lg"
+                className="h-16 w-16 flex-shrink-0 text-xl font-bold text-white"
+                style={{ background: avatarColor }}
+              />
               <div>
-                <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    margin: "0 0 10px",
-                  }}
-                >
+                <p className="mb-2.5 text-caption font-semibold uppercase tracking-wider text-ink-400">
                   Avatar Color
                 </p>
-                <div style={{ display: "flex", gap: 8 }}>
+                <div className="flex gap-2">
                   {COLORS.map((c) => (
                     <button
                       key={c}
                       type="button"
                       onClick={() => setAvatarColor(c)}
+                      className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full"
                       style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
                         background: c,
                         border: avatarColor === c ? "2px solid white" : "none",
                         boxShadow:
                           avatarColor === c ? `0 0 0 2px ${c}` : "none",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
                       }}
                     >
                       {avatarColor === c && (
-                        <span
-                          style={{
-                            color: "white",
-                            fontSize: 12,
-                            fontWeight: 700,
-                          }}
-                        >
+                        <span className="text-caption font-bold text-white">
                           ✓
                         </span>
                       )}
@@ -240,321 +137,152 @@ export default function StaffEditForm({
             </div>
 
             {/* Fields */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={labelStyle}>Full Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+            <div className="flex flex-col gap-4">
+              <Input
+                id="staff-edit-name"
+                type="text"
+                label="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+
+              <Select
+                id="staff-edit-role"
+                label="Primary Role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              >
+                {ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+                {!ROLES.includes(role) && role ? (
+                  <option value={role}>{role}</option>
+                ) : null}
+              </Select>
+
+              <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+                <Input
+                  id="staff-edit-email"
+                  type="email"
+                  label="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={inputStyle}
+                />
+                <Input
+                  id="staff-edit-phone"
+                  type="tel"
+                  label="Phone Number (optional)"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
-
-              <div>
-                <label style={labelStyle}>Primary Role</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  style={{ ...inputStyle, appearance: "none" as const }}
-                >
-                  {ROLES.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                  <option value={role}>
-                    {ROLES.includes(role) ? "" : role}
-                  </option>
-                </select>
-              </div>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 14,
-                }}
-              >
-                <div>
-                  <label style={labelStyle}>Email Address</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    style={inputStyle}
-                  />
-                </div>
-                <div>
-                  <label style={labelStyle}>
-                    Phone Number{" "}
-                    <span style={{ textTransform: "none", fontWeight: 400 }}>
-                      (optional)
-                    </span>
-                  </label>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    style={inputStyle}
-                  />
-                </div>
-              </div>
             </div>
-          </div>
+          </Card>
 
           {/* Additional Settings */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 28,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 24,
-              }}
-            >
-              <span style={{ fontSize: 16 }}>⚙️</span>
-              <h2
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: "#111",
-                  margin: 0,
-                }}
-              >
+          <Card variant="outlined" className="p-7">
+            <div className="mb-6 flex items-center gap-2">
+              <span className="text-base">⚙️</span>
+              <h2 className="text-body font-semibold text-ink-900">
                 Additional Settings
               </h2>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <ImageUploadField
-                  label="Profile photo"
-                  value={avatarUrl}
-                  onChange={setAvatarUrl}
-                  hint="Optional — upload a profile photo. Overrides the colored circle."
-                />
-              </div>
+            <div className="flex flex-col gap-4">
+              <ImageUploadField
+                label="Profile photo"
+                value={avatarUrl}
+                onChange={setAvatarUrl}
+                hint="Optional — upload a profile photo. Overrides the colored circle."
+              />
 
-              <div>
-                <label style={labelStyle}>Bio / Internal Notes</label>
-                <textarea
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Add a short bio or internal notes about this staff member..."
-                  rows={4}
-                  style={{
-                    ...inputStyle,
-                    resize: "none" as const,
-                    lineHeight: 1.6,
-                  }}
-                />
-              </div>
+              <Textarea
+                id="staff-edit-bio"
+                label="Bio / Internal Notes"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Add a short bio or internal notes about this staff member..."
+                rows={4}
+              />
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Right column */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 16,
-            position: "sticky",
-            top: 80,
-          }}
-        >
+        <div className="sticky top-20 flex flex-col gap-4">
           {/* Live preview */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #f0f0f0",
-              padding: 24,
-            }}
-          >
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: "#aaa",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                margin: "0 0 20px",
-              }}
-            >
+          <Card variant="outlined">
+            <p className="mb-5 text-caption font-semibold uppercase tracking-wider text-ink-400">
               Live Preview
             </p>
-            <div style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: "50%",
-                  background: avatarColor,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontWeight: 700,
-                  fontSize: 22,
-                  margin: "0 auto 16px",
-                  overflow: "hidden",
-                }}
-              >
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  initials
-                )}
-              </div>
-              <p
-                style={{
-                  fontSize: 17,
-                  fontWeight: 700,
-                  color: "#111",
-                  margin: "0 0 4px",
-                }}
-              >
+            <div className="text-center">
+              <Avatar
+                name={name || "?"}
+                src={avatarUrl}
+                size="xl"
+                className="mx-auto mb-4 h-[72px] w-[72px] text-[22px] font-bold text-white"
+                style={{ background: avatarColor }}
+              />
+              <p className="mb-1 text-body-lg font-bold text-ink-900">
                 {name || "Staff Name"}
               </p>
               <p
-                style={{
-                  fontSize: 13,
-                  color: avatarColor,
-                  margin: "0 0 6px",
-                  fontWeight: 500,
-                }}
+                className="mb-1.5 text-body-sm font-medium"
+                style={{ color: avatarColor }}
               >
                 {role || "Role"}
               </p>
-              <p style={{ fontSize: 12, color: "#aaa", margin: "0 0 12px" }}>
+              <p className="mb-3 text-caption text-ink-400">
                 {email || "email@example.com"}
               </p>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 5,
-                  fontSize: 12,
-                  fontWeight: 500,
-                  padding: "4px 12px",
-                  borderRadius: 100,
-                  background: hasPortal ? "#ECFDF5" : "#f5f5f5",
-                  color: hasPortal ? "#059669" : "#999",
-                }}
-              >
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: hasPortal ? "#10B981" : "#ccc",
-                  }}
-                />
+              <Badge variant={hasPortal ? "success" : "neutral"} dot>
                 Portal Access {hasPortal ? "Active" : "Not set"}
-              </span>
+              </Badge>
             </div>
             {/* Actions */}
-            <div
-              style={{
-                marginTop: 20,
-              }}
-            >
-              <button
+            <div className="mt-5 space-y-2.5">
+              <Button
                 type="submit"
                 disabled={loading}
-                style={{
-                  width: "100%",
-                  padding: "13px",
-                  background: brand,
-                  color: "white",
-                  border: "none",
-                  borderRadius: 10,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  marginBottom: 10,
-                  opacity: loading ? 0.7 : 1,
-                }}
+                variant="primary"
+                size="lg"
+                className="w-full"
+                style={{ backgroundColor: brand }}
               >
                 {loading ? "Saving..." : "Save Changes"}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => router.back()}
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  background: "white",
-                  color: "#555",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 10,
-                  fontSize: 14,
-                  cursor: "pointer",
-                }}
+                variant="secondary"
+                size="md"
+                className="w-full"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
 
           {/* Danger zone */}
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              border: "1px solid #FECACA",
-              padding: 24,
-            }}
-          >
-            <p
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: "#EF4444",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                margin: "0 0 8px",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
+          <Card variant="outlined" className="bg-danger-50">
+            <p className="mb-2 flex items-center gap-1.5 text-caption font-bold uppercase tracking-wider text-danger-600">
               ⚠ Danger Zone
             </p>
-            <p
-              style={{
-                fontSize: 13,
-                color: "#666",
-                margin: "0 0 16px",
-                lineHeight: 1.6,
-              }}
-            >
+            <p className="mb-4 text-body-sm leading-relaxed text-ink-600">
               Permanently delete this staff member and all their data.{" "}
-              <strong style={{ color: "#111" }}>
+              <strong className="text-ink-900">
                 This action cannot be undone.
               </strong>
             </p>
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="md"
+              className="w-full justify-center text-danger-600"
               onClick={async () => {
                 if (!confirm("Are you sure? This cannot be undone.")) return;
                 const fd = new FormData();
@@ -563,25 +291,10 @@ export default function StaffEditForm({
                 await fetch("/api/staff/delete", { method: "POST", body: fd });
                 window.location.href = "/staff";
               }}
-              style={{
-                width: "100%",
-                padding: "11px",
-                background: "white",
-                color: "#EF4444",
-                border: "1px solid #FECACA",
-                borderRadius: 10,
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-              }}
             >
               <TrashIcon size={15} /> Delete Staff Member
-            </button>
-          </div>
+            </Button>
+          </Card>
         </div>
       </div>
     </form>

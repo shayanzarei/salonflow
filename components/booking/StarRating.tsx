@@ -46,7 +46,7 @@ export default function StarRating({
         <p
           style={{
             fontSize: 12,
-            color: "#f87171",
+            color: "var(--color-danger-600)",
             margin: "8px 0 0",
             textAlign: "center",
           }}

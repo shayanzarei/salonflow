@@ -1,3 +1,14 @@
+import { Avatar } from "@/components/ds/Avatar";
+import { Badge } from "@/components/ds/Badge";
+import { Button } from "@/components/ds/Button";
+import {
+  Table,
+  TableContainer,
+  TBodyRow,
+  TD,
+  TH,
+  THeadRow,
+} from "@/components/ds/Table";
 import { EyeIcon, PlusIcon, SearchIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { fillTemplate } from "@/lib/i18n/interpolate";
@@ -92,13 +103,10 @@ export default async function BookingsPage({
     { label: db.filterCancelled, value: "cancelled" },
   ];
 
-  const statusConfig: Record<
-    string,
-    { color: string; bg: string; dot: string }
-  > = {
-    confirmed: { color: "#059669", bg: "#ECFDF5", dot: "#10B981" },
-    pending: { color: 'var(--color-accent-600)', bg: "#FFFBEB", dot: 'var(--color-accent-500)' },
-    cancelled: { color: "#DC2626", bg: "#FEF2F2", dot: "#EF4444" },
+  const statusVariant: Record<string, "success" | "warning" | "danger"> = {
+    confirmed: "success",
+    pending: "warning",
+    cancelled: "danger",
   };
 
   return (
@@ -106,11 +114,11 @@ export default async function BookingsPage({
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 sm:mb-7 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
+          <h1 className="text-h2 font-bold text-ink-900 sm:text-h1">
             {db.title}
           </h1>
           <span
-            className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium sm:text-[13px]"
+            className="shrink-0 rounded-full px-2.5 py-1 text-caption font-medium"
             style={{
               color: brand,
               background: `${brand}15`,
@@ -119,19 +127,22 @@ export default async function BookingsPage({
             {fillTemplate(db.totalTemplate, { n: totalCount })}
           </span>
         </div>
-        <Link
-          href="/bookings/new"
-          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] px-4 py-2.5 text-sm font-medium text-white no-underline sm:w-auto"
-          style={{ background: brand }}
-
+        <Button
+          asChild
+          variant="primary"
+          size="md"
+          className="shrink-0"
+          style={{ backgroundColor: brand }}
         >
-          <PlusIcon size={14} style={{ display: "inline", verticalAlign: "middle" }} />
-          {db.addBooking}
-        </Link>
+          <Link href="/bookings/new">
+            <PlusIcon size={14} style={{ display: "inline", verticalAlign: "middle" }} />
+            {db.addBooking}
+          </Link>
+        </Button>
       </div>
 
       {/* Filters + search */}
-      <div className="mb-4 flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+      <div className="mb-4 flex flex-col gap-4 rounded-lg border border-ink-100 bg-ink-0 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
         {/* Status filters — horizontal scroll on narrow screens */}
         <div className="-mx-1 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]">
           {filters.map((f) => {
@@ -140,10 +151,10 @@ export default async function BookingsPage({
               <Link
                 key={f.value}
                 href={f.value ? `/bookings?status=${f.value}` : "/bookings"}
-                className={`shrink-0 rounded-full px-4 py-2 text-sm no-underline ${
+                className={`shrink-0 rounded-full px-4 py-2 text-body-sm no-underline ${
                   isActive
-                    ? "bg-gray-900 font-semibold text-white"
-                    : "border border-gray-200 font-normal text-gray-600"
+                    ? "bg-ink-900 font-semibold text-ink-0"
+                    : "border border-ink-200 font-normal text-ink-600"
                 }`}
               >
                 {f.label}
@@ -160,7 +171,7 @@ export default async function BookingsPage({
             className="relative w-full sm:w-auto"
           >
             {status && <input type="hidden" name="status" value={status} />}
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400">
               <SearchIcon size={15} />
             </span>
             <input
@@ -168,7 +179,7 @@ export default async function BookingsPage({
               name="search"
               defaultValue={search ?? ""}
               placeholder={db.searchPlaceholder}
-              className="w-full min-w-0 rounded-[10px] border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 outline-none sm:w-[220px] md:w-[260px]"
+              className="min-h-10 w-full min-w-0 rounded-sm border border-ink-200 bg-ink-0 py-2.5 pl-9 pr-4 text-body-sm text-ink-900 placeholder:text-ink-400 hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus focus-visible:outline-none sm:w-[220px] md:w-[260px]"
             />
           </form>
           {/* <button
@@ -191,129 +202,71 @@ export default async function BookingsPage({
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+      <TableContainer className="rounded-lg border-ink-100">
         <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
-          <table className="w-full min-w-[920px] border-collapse">
+          <Table className="min-w-[920px]">
           <thead>
-            <tr style={{ borderBottom: "1px solid #f5f5f5" }}>
-              {[
-                db.colClient,
-                db.colService,
-                db.colStaff,
-                db.colDateTime,
-                db.colStatus,
-                db.colPrice,
-                db.colAction,
-              ].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    padding: "14px 20px",
-                    textAlign: "left",
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
+            <THeadRow>
+              <TH>{db.colClient}</TH>
+              <TH>{db.colService}</TH>
+              <TH>{db.colStaff}</TH>
+              <TH>{db.colDateTime}</TH>
+              <TH>{db.colStatus}</TH>
+              <TH>{db.colPrice}</TH>
+              <TH>{db.colAction}</TH>
+            </THeadRow>
           </thead>
           <tbody>
             {bookings.length === 0 ? (
               <tr>
                 <td
                   colSpan={7}
-                  style={{
-                    padding: "48px 24px",
-                    textAlign: "center",
-                    color: "#aaa",
-                    fontSize: 14,
-                  }}
+                  className="px-6 py-12 text-center text-body-sm text-ink-400"
                 >
                   {db.noBookings}
                 </td>
               </tr>
             ) : (
               bookings.map((booking) => {
-                const sc = statusConfig[booking.status] ?? statusConfig.pending;
-                const initials = booking.client_name
-                  .split(" ")
-                  .map((n: string) => n[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase();
+                const variant = statusVariant[booking.status] ?? "warning";
 
                 return (
-                  <tr
-                    key={booking.id}
-                    style={{
-                      borderBottom: "1px solid #f9f9f9",
-                      transition: "background 0.15s",
-                    }}
-                  >
+                  <TBodyRow key={booking.id} interactive={false}>
                     {/* Client */}
-                    <td style={{ padding: "16px 20px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: "50%",
-                            background: brand,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "white",
-                            fontWeight: 600,
-                            fontSize: 13,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {initials}
-                        </div>
+                    <TD>
+                      <div className="flex items-center gap-2.5">
+                        <Avatar
+                          name={booking.client_name}
+                          size="md"
+                          className="text-body-sm text-white"
+                          style={{ background: brand }}
+                        />
                         <div>
-                          <p
-                            style={{
-                              fontSize: 14,
-                              fontWeight: 500,
-                              color: "#111",
-                              margin: 0,
-                            }}
-                          >
+                          <p className="text-body-sm font-medium text-ink-900">
                             {booking.client_name}
                           </p>
-                          <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                          <p className="text-caption text-ink-400">
                             {booking.client_email}
                           </p>
                         </div>
                       </div>
-                    </td>
+                    </TD>
 
                     {/* Service */}
-                    <td style={{ padding: "16px 20px" }}>
-                      <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                    <TD>
+                      <p className="text-body-sm text-ink-700">
                         {booking.service_name}
                       </p>
-                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                      <p className="text-caption text-ink-400">
                         {fillTemplate(db.minShort, {
                           n: booking.duration_mins,
                         })}
                       </p>
-                    </td>
+                    </TD>
 
                     {/* Staff */}
-                    <td style={{ padding: "16px 20px" }}>
-                      <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                    <TD>
+                      <p className="text-body-sm text-ink-700">
                         {booking.staff_name
                           .split(" ")
                           .map((n: string, i: number) =>
@@ -321,112 +274,74 @@ export default async function BookingsPage({
                           )
                           .join(" ")}
                       </p>
-                    </td>
+                    </TD>
 
                     {/* Date & Time */}
-                    <td style={{ padding: "16px 20px" }}>
-                      <p style={{ fontSize: 14, color: "#333", margin: 0 }}>
+                    <TD>
+                      <p className="text-body-sm text-ink-700">
                         {new Date(booking.booked_at).toLocaleDateString(
                           dateLocale,
                           { month: "short", day: "numeric", year: "numeric" }
                         )}
                       </p>
-                      <p style={{ fontSize: 12, color: "#aaa", margin: 0 }}>
+                      <p className="text-caption text-ink-400">
                         {new Date(booking.booked_at).toLocaleTimeString(
                           dateLocale,
                           { hour: "numeric", minute: "2-digit" }
                         )}
                       </p>
-                    </td>
+                    </TD>
 
                     {/* Status */}
-                    <td style={{ padding: "16px 20px" }}>
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 5,
-                          fontSize: 13,
-                          fontWeight: 500,
-                          color: sc.color,
-                          background: sc.bg,
-                          padding: "4px 10px",
-                          borderRadius: 100,
-                        }}
-                      >
-                        <span
-                          style={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: "50%",
-                            background: sc.dot,
-                            display: "inline-block",
-                          }}
-                        />
+                    <TD>
+                      <Badge variant={variant} dot>
                         {bookingStatusLabel(booking.status, t)}
-                      </span>
-                    </td>
+                      </Badge>
+                    </TD>
 
                     {/* Price */}
-                    <td style={{ padding: "16px 20px" }}>
-                      <p
-                        style={{
-                          fontSize: 14,
-                          fontWeight: 600,
-                          color: "#111",
-                          margin: 0,
-                        }}
-                      >
+                    <TD>
+                      <p className="text-body-sm font-semibold text-ink-900">
                         €{booking.price}
                       </p>
-                    </td>
+                    </TD>
 
                     {/* Action */}
-                    <td style={{ padding: "16px 20px" }}>
+                    <TD>
                       <Link
                         href={`/bookings/${booking.id}`}
+                        className="inline-flex items-center gap-1 rounded-md border px-3.5 py-1.5 text-body-sm font-medium no-underline"
                         style={{
-                          fontSize: 13,
                           color: brand,
-                          textDecoration: "none",
-                          fontWeight: 500,
-                          padding: "6px 14px",
-                          border: `1px solid ${brand}30`,
-                          borderRadius: 8,
+                          borderColor: `${brand}30`,
                           background: `${brand}08`,
                         }}
                       >
-                        <EyeIcon size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />{" "}
+                        <EyeIcon size={13} />{" "}
                         {db.view}
                       </Link>
-                    </td>
-                  </tr>
+                    </TD>
+                  </TBodyRow>
                 );
               })
             )}
           </tbody>
-        </table>
+        </Table>
         </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-              <span style={{ fontSize: 13, color: "#666" }}>{db.show}</span>
+          <div className="flex flex-col gap-4 border-t border-ink-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+            <div className="flex flex-wrap items-center gap-2 text-body-sm text-ink-600">
+              <span className="text-body-sm text-ink-600">{db.show}</span>
               <select
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 6,
-                  padding: "4px 8px",
-                  fontSize: 13,
-                  color: "#333",
-                }}
+                className="cursor-pointer rounded border border-ink-200 px-2 py-1 text-body-sm text-ink-700"
               >
                 <option>12</option>
                 <option>24</option>
                 <option>48</option>
               </select>
-              <span style={{ fontSize: 13, color: "#666" }}>
+              <span className="text-body-sm text-ink-600">
                 {fillTemplate(db.ofResultsTemplate, { n: totalCount })}
               </span>
             </div>
@@ -435,18 +350,7 @@ export default async function BookingsPage({
               {currentPage > 1 && (
                 <Link
                   href={`/bookings?${status ? `status=${status}&` : ""}${search ? `search=${search}&` : ""}page=${currentPage - 1}`}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 8,
-                    color: "#666",
-                    textDecoration: "none",
-                    fontSize: 14,
-                  }}
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-ink-200 text-body-sm text-ink-600 no-underline hover:bg-ink-50"
                 >
                   ‹
                 </Link>
@@ -458,18 +362,11 @@ export default async function BookingsPage({
                 <Link
                   key={p}
                   href={`/bookings?${status ? `status=${status}&` : ""}${search ? `search=${search}&` : ""}page=${p}`}
+                  className="flex h-8 w-8 items-center justify-center rounded-md text-body-sm no-underline"
                   style={{
-                    width: 32,
-                    height: 32,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: p === currentPage ? "none" : "1px solid #e5e7eb",
-                    borderRadius: 8,
-                    background: p === currentPage ? brand : "white",
-                    color: p === currentPage ? "white" : "#666",
-                    textDecoration: "none",
-                    fontSize: 14,
+                    border: p === currentPage ? "none" : "1px solid var(--color-ink-200)",
+                    background: p === currentPage ? brand : "var(--color-ink-0)",
+                    color: p === currentPage ? "white" : "var(--color-ink-600)",
                     fontWeight: p === currentPage ? 600 : 400,
                   }}
                 >
@@ -477,23 +374,12 @@ export default async function BookingsPage({
                 </Link>
               ))}
               {totalPages > 5 && (
-                <span style={{ color: "#aaa", fontSize: 14 }}>...</span>
+                <span className="text-body-sm text-ink-400">...</span>
               )}
               {totalPages > 5 && (
                 <Link
                   href={`/bookings?page=${totalPages}`}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 8,
-                    color: "#666",
-                    textDecoration: "none",
-                    fontSize: 14,
-                  }}
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-ink-200 text-body-sm text-ink-600 no-underline hover:bg-ink-50"
                 >
                   {totalPages}
                 </Link>
@@ -501,18 +387,7 @@ export default async function BookingsPage({
               {currentPage < totalPages && (
                 <Link
                   href={`/bookings?${status ? `status=${status}&` : ""}${search ? `search=${search}&` : ""}page=${currentPage + 1}`}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 8,
-                    color: "#666",
-                    textDecoration: "none",
-                    fontSize: 14,
-                  }}
+                  className="flex h-8 w-8 items-center justify-center rounded-md border border-ink-200 text-body-sm text-ink-600 no-underline hover:bg-ink-50"
                 >
                   ›
                 </Link>
@@ -520,7 +395,7 @@ export default async function BookingsPage({
             </div>
           </div>
         )}
-      </div>
+      </TableContainer>
     </div>
   );
 }

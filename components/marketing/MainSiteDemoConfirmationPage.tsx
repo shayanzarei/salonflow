@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ds/Button";
+import { Input, Textarea } from "@/components/ds/Input";
 import MainSiteFooter from "@/components/marketing/MainSiteFooter";
 import MainSiteHeader from "@/components/marketing/MainSiteHeader";
 import {
@@ -149,18 +151,18 @@ export default function MainSiteDemoConfirmationPage() {
                 <div className="mt-8 border-t border-slate-100 pt-8">
                   <h3 className="mb-4 font-semibold text-slate-900">Add to Calendar</h3>
                   <div className="flex flex-wrap gap-3">
-                    <button className="flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+                    <Button variant="secondary" size="md">
                       <span className="mr-2 text-slate-500">G</span>
                       Google
-                    </button>
-                    <button className="flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+                    </Button>
+                    <Button variant="secondary" size="md">
                       <span className="mr-2 text-slate-500">◧</span>
                       Outlook
-                    </button>
-                    <button className="flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+                    </Button>
+                    <Button variant="secondary" size="md">
                       <span className="mr-2 text-slate-500">◍</span>
                       Apple
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -193,37 +195,31 @@ export default function MainSiteDemoConfirmationPage() {
                     <p className="mb-4 text-sm text-slate-500">Optional: Tell us more so we can tailor the demo.</p>
 
                     <form className="space-y-4" onSubmit={handlePrepSubmit}>
-                      <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-700">
-                          What tools are you currently using?
-                        </label>
-                        <input
-                          type="text"
-                          value={currentTools}
-                          onChange={(e) => setCurrentTools(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
-                          placeholder="e.g. QuickBooks, Calendly"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-700">
-                          Biggest challenge right now?
-                        </label>
-                        <textarea
-                          rows={2}
-                          value={biggestChallenge}
-                          onChange={(e) => setBiggestChallenge(e.target.value)}
-                          className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20"
-                          placeholder="e.g. Too much manual admin work"
-                        />
-                      </div>
-                      <button
+                      <Input
+                        id="prep-current-tools"
+                        type="text"
+                        value={currentTools}
+                        onChange={(e) => setCurrentTools(e.target.value)}
+                        label="What tools are you currently using?"
+                        placeholder="e.g. QuickBooks, Calendly"
+                      />
+                      <Textarea
+                        id="prep-biggest-challenge"
+                        rows={2}
+                        value={biggestChallenge}
+                        onChange={(e) => setBiggestChallenge(e.target.value)}
+                        label="Biggest challenge right now?"
+                        placeholder="e.g. Too much manual admin work"
+                      />
+                      <Button
                         type="submit"
+                        variant="dark"
+                        size="md"
                         disabled={isSaving}
-                        className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="w-full"
                       >
                         {isSaving ? "Saving..." : "Submit Details"}
-                      </button>
+                      </Button>
                       {saveMessage ? (
                         <p className="text-xs text-slate-500">{saveMessage}</p>
                       ) : null}

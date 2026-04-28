@@ -85,6 +85,7 @@ export type Messages = {
     demoBookings: string;
     contacts: string;
     payments: string;
+    leads: string;
     settings: string;
     superAdmin: string;
   };
@@ -173,6 +174,7 @@ const en: Messages = {
     demoBookings: "Demo bookings",
     contacts: "Contacts",
     payments: "Payments",
+    leads: "Leads",
     settings: "Settings",
     superAdmin: "Super Admin",
   },
@@ -259,6 +261,7 @@ const nl: Messages = {
     demoBookings: "Demo-afspraken",
     contacts: "Contacten",
     payments: "Betalingen",
+    leads: "Leads",
     settings: "Instellingen",
     superAdmin: "Superbeheer",
   },

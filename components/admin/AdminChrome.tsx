@@ -21,6 +21,7 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
       { href: "/admin/demo-bookings", label: t.admin.demoBookings },
       { href: "/admin/contacts", label: t.admin.contacts },
       { href: "/admin/subscriptions", label: t.admin.payments },
+      { href: "/admin/leads", label: t.admin.leads },
       { href: "/admin/settings", label: t.admin.settings },
     ],
     [t]

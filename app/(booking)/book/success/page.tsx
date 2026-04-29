@@ -16,7 +16,13 @@ import {
   DEFAULT_FALLBACK_TIMEZONE,
   isValidIanaTimezone,
 } from "@/lib/timezone";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+// Success page is shown after a booking — never a search-result destination.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function SuccessPage({
   searchParams,

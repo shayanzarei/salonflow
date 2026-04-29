@@ -5,7 +5,13 @@ import { bcp47ForLocale } from "@/lib/i18n/locale-format";
 import { getServerTranslations } from "@/lib/i18n/server";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+// Mid-flow form step — not a landing page. Belt-and-suspenders with robots.ts.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function ChooseTimePage({
   searchParams,

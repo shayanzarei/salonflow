@@ -50,5 +50,14 @@ export interface Tenant {
     | "urban"
     | "professional"
     | "playful";
+  /**
+   * Optional SEO override fields. NULL means "use the auto-generated value
+   * from lib/seo/auto-meta.ts" — that's the default path for new tenants and
+   * it's good enough that we never force the owner to think about SEO.
+   * Super-admin can set these for tenants who need bespoke copy. See
+   * migration 018_tenant_seo_fields.sql.
+   */
+  seo_title: string | null;
+  meta_description: string | null;
   created_at: string;
 }

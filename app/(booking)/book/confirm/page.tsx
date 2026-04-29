@@ -15,7 +15,16 @@ import {
   DEFAULT_FALLBACK_TIMEZONE,
   isValidIanaTimezone,
 } from "@/lib/timezone";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+// Booking-flow steps shouldn't appear in search results — they're partial
+// forms tied to a specific (service, staff, time) URL, not landing pages.
+// robots.txt also disallows /book/confirm, but the meta tag is a belt-and-
+// suspenders signal in case a stray inbound link slips past the crawl rules.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function ConfirmPage({
   searchParams,

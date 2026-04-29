@@ -14,15 +14,87 @@ import { getGoogleMapsSearchUrl } from "@/lib/maps";
 import { getTenant } from "@/lib/tenant";
 import { normalizeWebsiteTemplate } from "@/lib/website-templates";
 import { isMainSiteHost } from "@/lib/main-site";
+import { autoDescription, autoTitle } from "@/lib/seo/auto-meta";
+import { buildLocalBusinessJsonLd } from "@/lib/seo/json-ld";
 import {
   DEFAULT_FALLBACK_TIMEZONE,
   isValidIanaTimezone,
   todayInZone,
 } from "@/lib/timezone";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+/**
+ * Per-tenant SEO. Server-rendered into <head> on every public-page request,
+ * which is what Googlebot reads. The override path is in lib/seo/auto-meta —
+ * tenants.seo_title / meta_description short-circuit the auto generator when
+ * super-admin has filled them in. See AGENTS.md "Public-page SEO" if/when we
+ * add it.
+ *
+ * The OG image priority is hero → logo → none. Picking the hero first because
+ * it's the larger, more visually compelling shot — what Twitter / WhatsApp /
+ * iMessage previews look better with. Logo as a fallback so newly-created
+ * tenants without a hero still get *some* OG card.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const hdr = await headers();
+  const host = hdr.get("x-forwarded-host") ?? hdr.get("host");
+
+  // On the main marketing host this page renders <MainSiteLanding /> (see
+  // BookingHomePage below). The platform-level metadata in app/layout.tsx is
+  // what we want there, so we return nothing tenant-specific.
+  if (isMainSiteHost(host)) {
+    return {};
+  }
+
+  const tenant = await getTenant();
+  if (!tenant) {
+    return { title: "Not found" };
+  }
+
+  // We need services to drive the service-aware description. One small
+  // query — the page itself does the same query a few lines below, but
+  // generateMetadata runs in a separate render pass and Next doesn't
+  // memoise across them. The cost is negligible compared to the SEO win.
+  const servicesRes = await pool.query(
+    `SELECT s.name, sc.name AS category_name
+       FROM services s
+       LEFT JOIN service_categories sc ON s.category_id = sc.id
+       WHERE s.tenant_id = $1 AND ${bookableServiceSql()}
+       ORDER BY s.name`,
+    [tenant.id]
+  );
+  const services = servicesRes.rows;
+
+  const title = autoTitle(tenant);
+  const description = autoDescription(tenant, services);
+  const protocol = host?.startsWith("localhost") ? "http" : "https";
+  const canonical = `${protocol}://${host ?? `${tenant.slug}.solohub.nl`}/`;
+  const ogImage = tenant.hero_image_url ?? tenant.logo_url ?? null;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      siteName: tenant.name,
+      type: "website",
+      images: ogImage ? [{ url: ogImage }] : undefined,
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: ogImage ? [ogImage] : undefined,
+    },
+  };
+}
 
 async function getSectionFlags(tenantId: string) {
   const result = await pool.query(
@@ -146,7 +218,7 @@ export default async function BookingHomePage({
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const [servicesResult, staffResult, reviewsResult, galleryResult, reviewStatsResult, clientStatsResult, sections] =
+  const [servicesResult, staffResult, reviewsResult, galleryResult, reviewStatsResult, clientStatsResult, sections, workingHoursResult] =
     await Promise.all([
       pool.query(
         `SELECT s.*, sc.name AS category_name
@@ -183,6 +255,17 @@ export default async function BookingHomePage({
         [tenant.id]
       ),
       getSectionFlags(tenant.id),
+      // Hours for the JSON-LD `openingHoursSpecification` array. Same table
+      // lib/availability uses; we only need the salon-level hours, not the
+      // per-staff overrides — the structured-data consumer is asking
+      // "when is the salon open?" not "when is Sara specifically working?".
+      pool.query(
+        `SELECT day_of_week, start_time, end_time, is_working
+           FROM salon_working_hours
+           WHERE tenant_id = $1
+           ORDER BY day_of_week`,
+        [tenant.id]
+      ),
     ]);
 
   const services = servicesResult.rows;
@@ -263,16 +346,81 @@ export default async function BookingHomePage({
             activeCategory
         );
 
-  if (websiteTemplate === "luxe") return <LuxeTemplate tenant={tenant} />;
+  // ── JSON-LD LocalBusiness schema for rich results in Google.
+  //    Built once and rendered into whichever template branch wins below.
+  //    Lives in the document body (Next 15 renders it server-side, before
+  //    hydration, which is what Googlebot reads). See lib/seo/json-ld.ts
+  //    for the schema design.
+  const pageProtocol = host?.startsWith("localhost") ? "http" : "https";
+  const pageUrl = `${pageProtocol}://${host ?? `${tenant.slug}.solohub.nl`}/`;
+  const jsonLd = buildLocalBusinessJsonLd({
+    tenant,
+    pageUrl,
+    services: services.map((s) => ({
+      name: s.name,
+      price: s.price,
+      duration_mins: s.duration_mins,
+    })),
+    reviewStats:
+      totalReviews > 0
+        ? { total: totalReviews, avg_rating: avgRating }
+        : null,
+    workingHours: workingHoursResult.rows.map((row) => ({
+      day_of_week: Number(row.day_of_week),
+      start_time: String(row.start_time),
+      end_time: String(row.end_time),
+      is_working: Boolean(row.is_working),
+    })),
+  });
+  const jsonLdScript = (
+    <script
+      type="application/ld+json"
+      // Stringify locally so we control escaping. dangerouslySetInnerHTML is
+      // the standard React idiom for embedding JSON-LD; the alternative
+      // (children prop) gets HTML-escaped and breaks the JSON.
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+
+  if (websiteTemplate === "luxe")
+    return (
+      <>
+        {jsonLdScript}
+        <LuxeTemplate tenant={tenant} />
+      </>
+    );
   if (websiteTemplate === "minimalist")
-    return <MinimalistTemplate tenant={tenant} />;
-  if (websiteTemplate === "urban") return <UrbanTemplate tenant={tenant} />;
+    return (
+      <>
+        {jsonLdScript}
+        <MinimalistTemplate tenant={tenant} />
+      </>
+    );
+  if (websiteTemplate === "urban")
+    return (
+      <>
+        {jsonLdScript}
+        <UrbanTemplate tenant={tenant} />
+      </>
+    );
   if (websiteTemplate === "professional")
-    return <ProfessionalTemplate tenant={tenant} />;
-  if (websiteTemplate === "playful") return <PlayfulTemplate tenant={tenant} />;
+    return (
+      <>
+        {jsonLdScript}
+        <ProfessionalTemplate tenant={tenant} />
+      </>
+    );
+  if (websiteTemplate === "playful")
+    return (
+      <>
+        {jsonLdScript}
+        <PlayfulTemplate tenant={tenant} />
+      </>
+    );
 
   return (
     <>
+      {jsonLdScript}
       <BookingPublicNav
         brand={brand}
         salonName={tenant.name}

@@ -42,14 +42,36 @@ export interface ConflictCheckInput {
 export const PG_EXCLUSION_VIOLATION_SQLSTATE = "23P01";
 
 /**
+ * Postgres SQLSTATE for deadlock. Under high contention against the *same*
+ * range, GiST page-lock acquisition order isn't deterministic and Postgres
+ * aborts losing transactions as deadlocks before the exclusion check fires.
+ * The winning transaction commits exactly one row, so the "no double-booking"
+ * invariant holds — but losers see 40P01 instead of 23P01. From the caller's
+ * perspective both mean "you don't get this slot, please try again", and we
+ * map them to the same 409 response. See scripts/test-concurrent-bookings.ts
+ * which demonstrates this empirically with 50-way contention.
+ */
+export const PG_DEADLOCK_DETECTED_SQLSTATE = "40P01";
+
+/**
  * Type guard for a Postgres error coming back from `pg`. The driver throws
  * an Error subclass that carries `code` (SQLSTATE) and other PG-specific
  * fields. We only need `code` for the 409 mapping.
+ *
+ * Returns true for both:
+ *   • 23P01 exclusion_violation — the constraint rejected the row directly
+ *   • 40P01 deadlock_detected   — page-lock contention on the GiST index
+ *                                 aborted the loser before the constraint
+ *                                 even ran. Functionally identical to the
+ *                                 caller: someone else got the slot.
  */
 export function isExclusionViolation(err: unknown): boolean {
   if (!err || typeof err !== "object") return false;
   const code = (err as { code?: unknown }).code;
-  return code === PG_EXCLUSION_VIOLATION_SQLSTATE;
+  return (
+    code === PG_EXCLUSION_VIOLATION_SQLSTATE ||
+    code === PG_DEADLOCK_DETECTED_SQLSTATE
+  );
 }
 
 /**

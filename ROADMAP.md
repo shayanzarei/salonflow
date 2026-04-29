@@ -183,6 +183,171 @@ Concrete pieces:
 
 ---
 
+## SEO depth & performance polish (per-provider pages, schema breadth, CWV budgets)
+
+**Status:** Deferred. Foundations shipped (auto title/description, robots,
+sitemap, `LocalBusiness` JSON-LD with `OfferCatalog` and `AggregateRating`,
+OG/Twitter tags, super-admin SEO override editor under
+`/admin/tenants/[id]/website?tab=seo`). The next layer below is mostly
+"more schemas + image pipeline + CI guardrails" — pick this up when we have
+real organic search traffic to optimise against, or when a competitor's
+search snippet visibly out-ranks ours for the same query.
+
+**What it is**
+Six related improvements that compound on the SEO foundation already in
+place:
+
+1. **Per-provider pages with unique meta.** Today only the salon root
+   (`{slug}.solohub.nl/`) has bespoke SEO. If we add per-staff or
+   per-service landing pages later, each needs its own `generateMetadata`
+   that follows the same auto-with-override pattern but with the staff /
+   service name baked in. Title pattern: `"Sara Cuts — Hair Stylist in
+   Amsterdam Oud-Zuid | Book Online"`.
+2. **Schema breadth.** Extend the JSON-LD blob beyond `LocalBusiness`:
+   - `Person` schema per staff member, with `jobTitle`, `worksFor` →
+     LocalBusiness `@id`, and `image` if we have an avatar.
+   - `Service` as a top-level node (currently embedded as `Offer`s inside
+     `OfferCatalog`).
+   - Standalone `Offer`s linked back to the parent `Service` so price &
+     availability render in rich results.
+   - Validate every change with Google's Rich Results Test before
+     shipping.
+3. **OG / Twitter card hero image.** `generateMetadata` already emits OG
+   and Twitter tags but uses the salon name only — wire `hero_image_url`
+   through as `og:image` (and provide an explicit `og:image:width` /
+   `:height` so social platforms don't crop weirdly). Same for Twitter.
+4. **Image optimisation pass.** Replace `<img>` tags in the 5 booking
+   templates and the website-content sections with `next/image`:
+   - WebP/AVIF served automatically.
+   - Responsive `srcset` and `sizes`.
+   - `loading="lazy"` for below-fold images, `priority` for hero.
+   - Explicit `width` / `height` (or `fill` + aspect-ratio container) to
+     eliminate CLS on first load.
+
+   User-uploaded images come through Supabase Storage — `next/image` works
+   with remote URLs once we whitelist the host in `next.config.ts` under
+   `images.remotePatterns`.
+5. **Core Web Vitals budgets in CI.** Add Lighthouse CI to GitHub Actions
+   running against a Vercel preview deploy. Fail the build if:
+   - LCP &gt; 2.5s
+   - CLS &gt; 0.1
+   - INP &gt; 200ms
+   on the salon landing page (we pick one representative tenant slug, e.g.
+   the demo tenant). Configure via `lighthouserc.json` with explicit
+   `assertions`. Block PRs on regression.
+6. **Live preview in the SEO editor.** The current Website→SEO tab shows
+   a static preview using the auto values (or overrides). Upgrade to a
+   client component that:
+   - Updates the title/description preview as the operator types.
+   - Shows a character counter that goes amber at 50/140 and red at
+     60/160.
+   - Mirrors Google's actual SERP truncation.
+
+**Why it's not in MVP**
+We have ~zero organic traffic at MVP. Adding `Person` schema and shaving
+LCP from 2.4s to 1.8s improves nothing measurable until we're actually
+ranking. The foundations already shipped (auto meta, sitemap, robots,
+`LocalBusiness`) cover the 80% case. Everything in this entry is the next
+20% that becomes worth doing once Search Console shows real impressions
+and clicks.
+
+**Implementation sketch (when picked up)**
+
+1. **Per-staff pages (only if we add them).** New route
+   `app/(booking)/staff/[staffId]/page.tsx` with its own
+   `generateMetadata`. Title generator in `lib/seo/auto-meta.ts` —
+   add `autoStaffTitle(tenant, staff)` and
+   `autoStaffDescription(tenant, staff, services)`. Honor optional
+   per-staff override columns if we add them (`staff.seo_title`,
+   `staff.meta_description`).
+2. **Schema breadth.** Extend `lib/seo/json-ld.ts`:
+   - Add `buildPersonJsonLd(staff, tenant)` returning an array of
+     `Person` nodes (one per staff member).
+   - Add `buildServiceJsonLd(services, tenant)` returning standalone
+     `Service` nodes with `provider` → tenant `@id` and nested `offers`.
+   - Update `app/(booking)/page.tsx` to inject all three schema blobs
+     (LocalBusiness + Persons + Services) inside the same
+     `dangerouslySetInnerHTML` block, or as separate `<script>` tags.
+   - Run each change through https://search.google.com/test/rich-results
+     before merging.
+3. **OG / Twitter hero.** In `app/(booking)/page.tsx` `generateMetadata`,
+   add:
+   ```ts
+   openGraph: { ..., images: tenant.hero_image_url
+     ? [{ url: tenant.hero_image_url, width: 1200, height: 630, alt: tenant.name }]
+     : [] },
+   twitter: { ..., images: tenant.hero_image_url ? [tenant.hero_image_url] : [] },
+   ```
+   We don't actually know the user-uploaded image's dimensions; either
+   normalise on upload (Supabase Edge Function that resizes to 1200×630
+   for OG variants) or pick safe defaults and accept some social
+   platforms cropping.
+4. **Image migration.** For each of the 5 templates
+   (`components/website/templates/{Luxe,Minimalist,Urban,Professional,Playful}.tsx`):
+   - Replace `<img src={tenant.hero_image_url} />` with
+     `<Image src={tenant.hero_image_url} alt={tenant.name} fill sizes="..." priority />`
+     and wrap in an aspect-ratio container.
+   - Below-fold images: drop `priority`, keep `fill` + `loading="lazy"`
+     (Next does this automatically without `priority`).
+   - Whitelist Supabase Storage host in `next.config.ts`:
+     ```ts
+     images: { remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }] }
+     ```
+5. **Lighthouse CI.** Add `.github/workflows/lighthouse.yml` that:
+   - Triggers on `pull_request`.
+   - Waits for the Vercel preview URL via the Vercel deploy webhook (or
+     uses `lhci collect --url`).
+   - Runs `lhci autorun` with a `lighthouserc.json` that includes:
+     ```json
+     {
+       "ci": {
+         "assert": {
+           "assertions": {
+             "largest-contentful-paint": ["error", {"maxNumericValue": 2500}],
+             "cumulative-layout-shift":  ["error", {"maxNumericValue": 0.1}],
+             "interaction-to-next-paint": ["error", {"maxNumericValue": 200}]
+           }
+         }
+       }
+     }
+     ```
+   - Comments scores back on the PR via `lhci-action`.
+
+   Pick one representative tenant URL — the demo tenant — and run
+   against the salon root, the booking widget, and one detail page.
+6. **Live SEO editor preview.** New client component
+   `components/admin/SeoLivePreview.tsx`:
+   - Takes `defaultTitle`, `defaultDescription`, `autoTitle`,
+     `autoDescription` as props.
+   - Renders Google-SERP-styled preview that re-renders on every
+     keystroke.
+   - Character counter component with thresholds (amber at 50/140, red
+     at 60/160).
+   - Truncates at 60/160 with `…` to match Google's SERP rendering.
+   Wire into `app/(admin)/admin/tenants/[id]/website/page.tsx` Tab=seo,
+   replacing the current static preview Card.
+
+**Estimated effort:**
+- Schema breadth (Person + Service standalone) + OG hero: ~half a day.
+- Image migration across 5 templates with `next/image`: ~1 day, mostly
+  template editing and visual QA.
+- Lighthouse CI integration: ~half a day, plus tuning the budgets the
+  first week as real numbers come in.
+- Live SEO editor preview: ~2 hours.
+- Per-provider pages: depends on whether we ship `/staff/[id]` routes at
+  all — that's a separate product decision.
+
+**Pre-work that's safe to do anytime:**
+- Verify Search Console is set up for `solohub.nl` and at least one
+  tenant subdomain so we can measure the impact when we ship.
+- Decide whether per-staff pages are even on the roadmap — they only
+  make sense for multi-staff salons and may not be worth it for the
+  solo segment that's most of our user base.
+- Add the Supabase Storage host to `next.config.ts` `remotePatterns` so
+  `next/image` is unblocked the day we start migrating templates.
+
+---
+
 ## How to use this file
 
 When a customer asks for one of these, before opening a PR:

@@ -18,6 +18,7 @@ import { notFound } from "next/navigation";
 type WebsiteTab =
   | "branding"
   | "content"
+  | "copy"
   | "contact"
   | "hours"
   | "sections"
@@ -26,6 +27,11 @@ type WebsiteTab =
 const TABS: { id: WebsiteTab; label: string; description: string }[] = [
   { id: "branding", label: "Branding", description: "Template, color, logo" },
   { id: "content", label: "Content", description: "Tagline, about, hero" },
+  {
+    id: "copy",
+    label: "Template copy",
+    description: "Per-section headlines on the public site",
+  },
   {
     id: "contact",
     label: "Contact",
@@ -60,7 +66,15 @@ export default async function TenantWebsitePage({
   const { id } = await params;
   const { tab: tabParam } = await searchParams;
   const tab: WebsiteTab = (
-    ["branding", "content", "contact", "hours", "sections", "seo"] as const
+    [
+      "branding",
+      "content",
+      "copy",
+      "contact",
+      "hours",
+      "sections",
+      "seo",
+    ] as const
   ).includes(tabParam as WebsiteTab)
     ? (tabParam as WebsiteTab)
     : "branding";
@@ -122,6 +136,8 @@ export default async function TenantWebsitePage({
       )}
 
       {tab === "content" && <ContentTab id={id} tenant={tenant} />}
+
+      {tab === "copy" && <CopyTab id={id} tenant={tenant} />}
 
       {tab === "contact" && <ContactTab id={id} tenant={tenant} />}
 
@@ -280,6 +296,129 @@ function ContentTab({ id, tenant }: { id: string; tenant: Tenant }) {
             className="order-1 w-full sm:order-2 sm:w-auto"
           >
             Save content
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+/* ─── Tab: Template copy ─────────────────────────────────────────────── */
+/**
+ * Per-section copy overrides for the Signature template (migration 019).
+ * Each field is optional — empty values fall back to the template's
+ * hard-coded default. The placeholders mirror those defaults so super-admin
+ * can see exactly what they're replacing before they type.
+ */
+function CopyTab({ id, tenant }: { id: string; tenant: Tenant }) {
+  return (
+    <Card variant="outlined" className="overflow-hidden p-0">
+      <div className="border-b border-ink-100 px-4 py-4 sm:px-6">
+        <h2 className="font-semibold text-ink-900">Template copy</h2>
+        <p className="mt-0.5 text-caption text-ink-400">
+          Section-level headlines and paragraphs on the Signature template.
+          Leave a field blank to use the template default shown as
+          placeholder.
+        </p>
+      </div>
+      <form
+        action="/api/admin/tenants/template-copy"
+        method="POST"
+        className="space-y-5 p-4 sm:p-6"
+      >
+        <input type="hidden" name="tenant_id" value={id} />
+
+        <fieldset className="space-y-3">
+          <legend className="text-label font-medium text-ink-700">
+            Hero section
+          </legend>
+          <Input
+            id="tpl-hero-eyebrow"
+            type="text"
+            name="tpl_hero_eyebrow"
+            label="Eyebrow"
+            defaultValue={tenant.tpl_hero_eyebrow ?? ""}
+            placeholder="Premium Beauty Experience"
+            helperText="Small label above the hero H1."
+            optionalLabel="optional"
+          />
+          <Textarea
+            id="tpl-hero-description"
+            name="tpl_hero_description"
+            label="Description"
+            defaultValue={tenant.tpl_hero_description ?? ""}
+            placeholder="Experience luxury treatments tailored to your unique style. Book your appointment seamlessly and discover the ultimate salon experience."
+            optionalLabel="optional"
+            rows={3}
+          />
+        </fieldset>
+
+        <fieldset className="space-y-3">
+          <legend className="text-label font-medium text-ink-700">
+            Services band
+          </legend>
+          <Input
+            id="tpl-services-title"
+            type="text"
+            name="tpl_services_title"
+            label="Title"
+            defaultValue={tenant.tpl_services_title ?? ""}
+            placeholder="Signature Services"
+            optionalLabel="optional"
+          />
+          <Textarea
+            id="tpl-services-description"
+            name="tpl_services_description"
+            label="Description"
+            defaultValue={tenant.tpl_services_description ?? ""}
+            placeholder="Tailored treatments designed to enhance your natural beauty and provide ultimate relaxation."
+            optionalLabel="optional"
+            rows={2}
+          />
+        </fieldset>
+
+        <fieldset className="space-y-3">
+          <legend className="text-label font-medium text-ink-700">
+            Booking CTA banner
+          </legend>
+          <Input
+            id="tpl-cta-title"
+            type="text"
+            name="tpl_cta_title"
+            label="Title"
+            defaultValue={tenant.tpl_cta_title ?? ""}
+            placeholder="Ready for your transformation?"
+            optionalLabel="optional"
+          />
+          <Textarea
+            id="tpl-cta-description"
+            name="tpl_cta_description"
+            label="Description"
+            defaultValue={tenant.tpl_cta_description ?? ""}
+            placeholder="Book your appointment today and let our expert team enhance your natural beauty in our luxurious, relaxing environment."
+            optionalLabel="optional"
+            rows={3}
+          />
+        </fieldset>
+
+        <fieldset className="space-y-3">
+          <legend className="text-label font-medium text-ink-700">
+            Footer
+          </legend>
+          <Textarea
+            id="tpl-footer-about"
+            name="tpl_footer_about"
+            label="About paragraph"
+            defaultValue={tenant.tpl_footer_about ?? ""}
+            placeholder="Your premium destination for luxury beauty treatments. Experience the perfect blend of expertise and relaxation."
+            optionalLabel="optional"
+            rows={3}
+          />
+        </fieldset>
+
+        <div className="flex justify-end">
+          <Button type="submit" variant="dark" size="md">
+            Save template copy
           </Button>
         </div>
       </form>

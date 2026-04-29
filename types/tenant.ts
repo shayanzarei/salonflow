@@ -59,5 +59,19 @@ export interface Tenant {
    */
   seo_title: string | null;
   meta_description: string | null;
+  /**
+   * Optional Signature-template copy overrides. NULL means "use the
+   * template's hard-coded default". See migration
+   * 019_tenant_template_copy.sql. The `tpl_` prefix groups these visually
+   * in `\d tenants` and in editor UIs, separately from the editorial
+   * columns (tagline, about, etc.) which are shared across templates.
+   */
+  tpl_hero_eyebrow: string | null;
+  tpl_hero_description: string | null;
+  tpl_services_title: string | null;
+  tpl_services_description: string | null;
+  tpl_cta_title: string | null;
+  tpl_cta_description: string | null;
+  tpl_footer_about: string | null;
   created_at: string;
 }

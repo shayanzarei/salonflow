@@ -444,7 +444,7 @@ export default async function BookingHomePage({
                   className="text-xs font-medium"
                   style={{ color: brand }}
                 >
-                  Premium Beauty Experience
+                  {tenant.tpl_hero_eyebrow ?? "Premium Beauty Experience"}
                 </span>
               </div>
               <h1 className="mb-4 text-balance text-4xl font-bold leading-[1.08] tracking-tight text-[#0f0f0f] sm:mb-5 sm:text-5xl md:text-[52px] lg:text-[56px]">
@@ -459,9 +459,8 @@ export default async function BookingHomePage({
                 )}
               </h1>
               <p className="mb-8 max-w-xl text-[15px] leading-relaxed text-ink-500 sm:mb-9 sm:text-base">
-                Experience luxury treatments tailored to your unique style. Book
-                your appointment seamlessly and discover the ultimate salon
-                experience.
+                {tenant.tpl_hero_description ??
+                  "Experience luxury treatments tailored to your unique style. Book your appointment seamlessly and discover the ultimate salon experience."}
               </p>
               <div className="mb-9 flex w-full max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-3">
                 <a
@@ -603,11 +602,11 @@ export default async function BookingHomePage({
                   Our Services
                 </p>
                 <h2 className="text-balance text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl lg:text-[40px] lg:leading-tight">
-                  Signature Services
+                  {tenant.tpl_services_title ?? "Signature Services"}
                 </h2>
                 <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-500 sm:text-[15px]">
-                  Tailored treatments designed to enhance your natural beauty
-                  and provide ultimate relaxation.
+                  {tenant.tpl_services_description ??
+                    "Tailored treatments designed to enhance your natural beauty and provide ultimate relaxation."}
                 </p>
               </div>
               <a
@@ -919,11 +918,11 @@ export default async function BookingHomePage({
               style={{ background: brand }}
             >
               <h2 className="mb-3 text-balance text-2xl font-bold text-white sm:mb-4 sm:text-3xl md:text-4xl lg:text-[40px]">
-                Ready for your transformation?
+                {tenant.tpl_cta_title ?? "Ready for your transformation?"}
               </h2>
               <p className="mx-auto mb-8 max-w-2xl text-[15px] leading-relaxed text-white/80 sm:mb-9 sm:text-base">
-                Book your appointment today and let our expert team enhance your
-                natural beauty in our luxurious, relaxing environment.
+                {tenant.tpl_cta_description ??
+                  "Book your appointment today and let our expert team enhance your natural beauty in our luxurious, relaxing environment."}
               </p>
 
               <a
@@ -973,8 +972,8 @@ export default async function BookingHomePage({
                 </span>
               </div>
               <p className="max-w-xs text-sm leading-relaxed text-ink-500">
-                Your premium destination for luxury beauty treatments.
-                Experience the perfect blend of expertise and relaxation.
+                {tenant.tpl_footer_about ??
+                  "Your premium destination for luxury beauty treatments. Experience the perfect blend of expertise and relaxation."}
               </p>
               {/* Social links */}
               {(tenant.social_instagram || tenant.social_facebook || tenant.social_tiktok || tenant.social_youtube) && (

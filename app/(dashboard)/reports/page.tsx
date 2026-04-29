@@ -30,6 +30,8 @@ type RevenueSummary = {
   month_revenue: number;
   month_completed: number;
   today_appointments: DayBooking[];
+  /** IANA zone the API used to compute "today/this week/this month". */
+  tenant_iana_timezone?: string;
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -42,9 +44,14 @@ function formatEUR(n: number, localeTag: string) {
   }).format(n);
 }
 
-function fmtTime(iso: string, localeTag: string) {
+// Render an appointment's UTC instant in the salon's wall clock. Falls back to
+// Europe/Amsterdam only if the API didn't echo the tenant's zone (older
+// deployment); never silently to the browser's local zone, which would
+// misrepresent times for any salon abroad.
+function fmtTime(iso: string, localeTag: string, salonZone?: string) {
+  const tz = salonZone || "Europe/Amsterdam";
   return new Date(iso).toLocaleTimeString(localeTag, {
-    timeZone: "Europe/Amsterdam",
+    timeZone: tz,
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -331,7 +338,7 @@ export default function ReportsPage() {
                     </p>
                     <p className="truncate text-caption text-ink-500">
                       {booking.service_name} · {booking.staff_name} ·{" "}
-                      {fmtTime(booking.booked_at, localeTag)}
+                      {fmtTime(booking.booked_at, localeTag, data?.tenant_iana_timezone)}
                     </p>
                   </div>
 

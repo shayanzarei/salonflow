@@ -1,4 +1,8 @@
-const DEMO_TIMEZONE = "Europe/Amsterdam";
+import { DEFAULT_FALLBACK_TIMEZONE } from "@/lib/timezone";
+
+// Demo bookings are scheduled into SoloHub's calendar, so the zone is the
+// company's office zone — sourced from the helper for consistency.
+const DEMO_TIMEZONE = DEFAULT_FALLBACK_TIMEZONE;
 
 function escapeHtml(input: string) {
   return input

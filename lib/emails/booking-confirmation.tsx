@@ -1,4 +1,9 @@
 import { formatEUR } from "@/lib/format-currency";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  formatWithZoneLabel,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 
 export function bookingConfirmationEmail({
   clientName,
@@ -13,6 +18,7 @@ export function bookingConfirmationEmail({
   salonSlug,
   cancelBaseUrl,
   brandColor,
+  salonTimezone,
 }: {
   clientName: string;
   salonName: string;
@@ -26,6 +32,12 @@ export function bookingConfirmationEmail({
   salonSlug: string;
   cancelBaseUrl?: string | null;
   brandColor?: string | null;
+  /**
+   * IANA zone of the salon (provider). Required for correct multi-timezone
+   * display. Falls back to Europe/Amsterdam only if the supplied value is
+   * missing or unrecognised by the runtime — never silently to server local.
+   */
+  salonTimezone?: string | null;
 }) {
   const color = /^#[0-9A-Fa-f]{6}$/.test(brandColor ?? "")
     ? (brandColor as string)
@@ -33,20 +45,22 @@ export function bookingConfirmationEmail({
   const colorDark = "#6D28D9";
   const colorTint = `${color}22`;
 
+  const tz =
+    salonTimezone && isValidIanaTimezone(salonTimezone)
+      ? salonTimezone
+      : DEFAULT_FALLBACK_TIMEZONE;
+
   const date = bookedAt.toLocaleDateString("nl-NL", {
-    timeZone: "Europe/Amsterdam",
+    timeZone: tz,
     weekday: "long",
     month: "long",
     day: "numeric",
     year: "numeric",
   });
 
-  const time = bookedAt.toLocaleTimeString("nl-NL", {
-    timeZone: "Europe/Amsterdam",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  // Time is rendered with an explicit zone label ("14:00 CET") so a customer
+  // booking from a different region can never confuse it with their own clock.
+  const time = formatWithZoneLabel(bookedAt, tz, "nl-NL");
 
   const cancelHost =
     (cancelBaseUrl ?? "").replace(/\/$/, "") ||

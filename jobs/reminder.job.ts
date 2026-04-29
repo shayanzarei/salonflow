@@ -15,6 +15,10 @@ type BookingReminderRow = {
   salon_address: string | null;
   salon_slug: string;
   booked_at: string;
+  /** UTC; preferred display source after migration 016. */
+  booking_start_utc: string;
+  /** Provider's IANA zone, denormalised onto the booking. */
+  provider_iana_timezone: string;
   cancellation_token: string;
   price: string | number;
 };
@@ -96,18 +100,25 @@ export const sendBookingReminders = inngest.createFunction(
       flag: string
     ) {
       for (const booking of bookings) {
+        // Prefer the explicit UTC column written by the new code path; fall
+        // back to legacy `booked_at` for any rows that pre-date migration 016
+        // and somehow weren't backfilled.
+        const startInstant = new Date(
+          booking.booking_start_utc ?? booking.booked_at
+        );
         const { subject, html } = bookingReminderEmail({
           clientName: booking.client_name,
           salonName: booking.salon_name,
           serviceName: booking.service_name,
           staffName: booking.staff_name,
-          bookedAt: new Date(booking.booked_at),
+          bookedAt: startInstant,
           salonAddress: booking.salon_address,
           cancellationToken: booking.cancellation_token,
           bookingId: booking.id,
           salonSlug: booking.salon_slug,
           reminderType,
           price: Number(booking.price),
+          salonTimezone: booking.provider_iana_timezone,
         });
 
         await sendEmail({ to: booking.client_email, subject, html });

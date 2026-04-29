@@ -1,67 +1,71 @@
 import pool from "@/lib/db";
-const BUSINESS_TIMEZONE = "Europe/Amsterdam";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  dayOfWeekInZone,
+  getOffsetMinutes,
+  isValidIanaTimezone,
+  todayInZone,
+  wallClockToUtc,
+} from "@/lib/timezone";
 
-function getTzDateParts(date: Date, timeZone: string) {
-  const formatter = new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    weekday: "short",
-  });
-  const parts = formatter.formatToParts(date);
-  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
-  return {
-    year: Number(get("year")),
-    month: Number(get("month")),
-    day: Number(get("day")),
-    hour: Number(get("hour")),
-    minute: Number(get("minute")),
-    weekdayShort: get("weekday"),
-  };
-}
-
-function getWeekdayIndex(dateYmd: string, timeZone: string) {
-  const [year, month, day] = dateYmd.split("-").map(Number);
-  const utcMidday = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
-  const weekdayShort = getTzDateParts(utcMidday, timeZone).weekdayShort;
-  const map: Record<string, number> = {
-    Sun: 0,
-    Mon: 1,
-    Tue: 2,
-    Wed: 3,
-    Thu: 4,
-    Fri: 5,
-    Sat: 6,
-  };
-  return map[weekdayShort] ?? 0;
-}
+/**
+ * lib/availability.ts
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Slot generation for the booking widget.
+ *
+ * Time-zone contract:
+ *   • Working-hours rows store wall-clock TIME values; their meaning is "this
+ *     hour on the salon's clock", interpreted against `tenants.iana_timezone`.
+ *   • The output `Slot.isoTime` is a **UTC** ISO string (Z-suffixed) so that
+ *     POST /api/bookings can compare it against `booking_start_utc` directly
+ *     and pass `assertIsoHasZoneOrThrow`.
+ *   • The display `label` is rendered in the salon's zone — that's the wall
+ *     clock the customer expects to see ("3:00 PM" at the salon's time).
+ */
 
 export interface Slot {
-  /** "YYYY-MM-DDTHH:MM:00" — no Z, local time */
+  /** UTC ISO 8601 instant the slot starts at (ends with 'Z'). */
   isoTime: string;
-  /** "9:00 AM" */
+  /**
+   * Salon-local 24h wall-clock time (e.g. "14:00") for this slot.
+   *
+   * This is the value the dashboard "Add Booking" form should POST as `time`
+   * to `/api/bookings/manual` — that endpoint runs `wallClockToUtc(date, time,
+   * tenantZone)` on the way in. Slicing `isoTime` for the time part is a bug:
+   * it would yield the UTC hour, not the salon-local hour, so a 14:00 CEST
+   * slot would arrive at the server as 12:00.
+   */
+  wallClockTime: string;
+  /** Human label rendered in the salon's wall clock, e.g. "3:00 PM". */
   label: string;
   period: "morning" | "afternoon" | "evening";
-  /** Whether this slot can be booked */
+  /** Whether this slot can be booked. */
   available: boolean;
-  /** Why it's unavailable (omitted when available) */
+  /** Why it's unavailable (omitted when available). */
   reason?: "booked" | "past";
 }
 
 export async function computeSlots(input: {
   serviceId: string;
   staffId: string;
-  /** YYYY-MM-DD in the caller's local calendar */
+  /** YYYY-MM-DD in the salon's local calendar. */
   date: string;
   tenantId: string;
 }): Promise<Slot[]> {
   const { serviceId, staffId, date, tenantId } = input;
 
-  // 1. Service duration
+  // ── 0. Resolve the salon's IANA zone. Everything below is anchored on it.
+  //      Falling back to DEFAULT_FALLBACK_TIMEZONE preserves the historic
+  //      behaviour for any tenant whose iana_timezone is somehow unset.
+  const tenantRes = await pool.query(
+    `SELECT iana_timezone FROM tenants WHERE id = $1`,
+    [tenantId]
+  );
+  const rawZone = (tenantRes.rows[0]?.iana_timezone ?? "") as string;
+  const salonZone =
+    rawZone && isValidIanaTimezone(rawZone) ? rawZone : DEFAULT_FALLBACK_TIMEZONE;
+
+  // ── 1. Service duration
   const serviceRes = await pool.query(
     `SELECT duration_mins FROM services WHERE id = $1 AND tenant_id = $2`,
     [serviceId, tenantId]
@@ -69,10 +73,10 @@ export async function computeSlots(input: {
   if (!serviceRes.rows[0]) return [];
   const durationMins: number = parseInt(serviceRes.rows[0].duration_mins);
 
-  // 2. Day-of-week from salon timezone date.
-  const dayOfWeek = getWeekdayIndex(date, BUSINESS_TIMEZONE); // 0=Sun … 6=Sat
+  // ── 2. Day-of-week interpreted in the salon's zone, NOT the server's.
+  const dayOfWeek = dayOfWeekInZone(date, salonZone); // 0=Sun … 6=Sat
 
-  // 3. Working hours for this staff + day
+  // ── 3. Working hours for this staff + day
   const hoursRes = await pool.query(
     `SELECT start_time, end_time, is_working
      FROM staff_working_hours
@@ -106,7 +110,7 @@ export async function computeSlots(input: {
     endTotal = eh * 60 + em;
   }
 
-  // 4. Salon-level opening hours for this day (if configured)
+  // ── 4. Salon-level opening hours for this day (if configured)
   const salonHoursRes = await pool.query(
     `SELECT start_time, end_time, is_working
      FROM salon_working_hours
@@ -142,37 +146,62 @@ export async function computeSlots(input: {
     }
   }
 
-  // 5. Existing bookings for this staff on selected business date
+  // ── 5. Existing bookings for this staff on the selected salon-local date.
+  //      Compute the day's UTC bounds explicitly via wallClockToUtc so we don't
+  //      depend on Postgres's session timezone or the legacy `booked_at`.
+  const dayStartUtc = wallClockToUtc(date, "00:00", salonZone);
+  const dayEndUtc = new Date(dayStartUtc.getTime() + 24 * 60 * 60_000);
+
+  // Use an interval-overlap predicate against the day window so we catch
+  // bookings that *start* before the day but *end* inside it (e.g. an
+  // appointment that began the previous local night and extends past local
+  // midnight). Filtering only by `booking_start_utc` between dayStartUtc and
+  // dayEndUtc would miss those rows, while POST /api/bookings/manual's own
+  // conflict check (which is unbounded and uses overlap) would still reject
+  // the slot — producing the divergence where availability says "free" and
+  // create says "already booked".
+  //
+  // The predicate body (status set + open-interval overlap on
+  // booking_start_utc / booking_end_utc) MUST stay in lock-step with
+  // lib/conflict-check.ts. We can't share the helper here because we need
+  // multiple rows back (to bucket per slot) rather than a single existence
+  // check, but the rule is the same.
   const bookingsRes = await pool.query(
-    `SELECT b.booked_at, s.duration_mins AS svc_duration
+    `SELECT b.booking_start_utc, b.booking_end_utc
      FROM bookings b
-     JOIN services s ON b.service_id = s.id
      WHERE b.staff_id = $1
-       AND b.booked_at >= (($2::date)::timestamp AT TIME ZONE '${BUSINESS_TIMEZONE}')
-       AND b.booked_at < ((($2::date + INTERVAL '1 day')::timestamp) AT TIME ZONE '${BUSINESS_TIMEZONE}')
-       AND b.status IN ('confirmed', 'pending')`,
-    [staffId, date]
+       AND b.status IN ('confirmed', 'pending')
+       AND b.booking_start_utc < $3::timestamptz
+       AND b.booking_end_utc   > $2::timestamptz`,
+    [staffId, dayStartUtc.toISOString(), dayEndUtc.toISOString()]
   );
 
-  // Blocked ranges in minutes-from-LOCAL-midnight
-  const blocked: { start: number; end: number }[] = bookingsRes.rows.map((b) => {
-    const d = new Date(b.booked_at as string);
-    const tz = getTzDateParts(d, BUSINESS_TIMEZONE);
-    const startMin = tz.hour * 60 + tz.minute;
-    return { start: startMin, end: startMin + parseInt(b.svc_duration) };
-  });
+  // Convert each booking's UTC instants back into salon-local minutes-from-
+  // midnight so the overlap check is in the same coordinate system as
+  // startTotal/endTotal above. The .filter guards against rows where the UTC
+  // columns are somehow NULL (legacy seed data, manual psql inserts that
+  // bypassed the trigger) — those would produce Invalid Date and silently
+  // sink the bucketing math.
+  const blocked: { start: number; end: number }[] = bookingsRes.rows
+    .filter((b) => b.booking_start_utc && b.booking_end_utc)
+    .map((b) => {
+      const startUtc = new Date(b.booking_start_utc as string);
+      const endUtc = new Date(b.booking_end_utc as string);
+      const startLocalMin = utcToSalonMinutes(startUtc, salonZone, dayStartUtc);
+      const endLocalMin = utcToSalonMinutes(endUtc, salonZone, dayStartUtc);
+      return { start: startLocalMin, end: endLocalMin };
+    });
 
-  // 6. Guard against past slots for today in business timezone.
-  const nowTz = getTzDateParts(new Date(), BUSINESS_TIMEZONE);
-  const todayLocal = [
-    nowTz.year,
-    String(nowTz.month).padStart(2, "0"),
-    String(nowTz.day).padStart(2, "0"),
-  ].join("-");
+  // ── 6. Guard against past slots for today, evaluated in the salon's zone.
+  const todayLocal = todayInZone(salonZone);
   const isToday = date === todayLocal;
-  const nowMins = isToday ? nowTz.hour * 60 + nowTz.minute : -1;
+  let nowMins = -1;
+  if (isToday) {
+    const now = new Date();
+    nowMins = utcToSalonMinutes(now, salonZone, dayStartUtc);
+  }
 
-  // 7. Generate ALL slots within working hours, marking availability
+  // ── 7. Generate slots within working hours.
   const slots: Slot[] = [];
 
   for (
@@ -187,20 +216,27 @@ export async function computeSlots(input: {
 
     const HH = String(h).padStart(2, "0");
     const MM = String(m).padStart(2, "0");
-    // Naive local-time string — no Z, parsed as local by JS
-    const isoTime = `${date}T${HH}:${MM}:00`;
+    const wallClockTime = `${HH}:${MM}`;
 
-    const label = new Date(isoTime).toLocaleTimeString("en-US", {
+    // Convert salon wall-clock → UTC. The resulting ISO is Z-suffixed, which
+    // is exactly what the booking widget should POST back: it survives the
+    // boundary check in app/api/bookings/route.ts (isoHasExplicitZone).
+    const startUtc = wallClockToUtc(date, wallClockTime, salonZone);
+    const isoTime = startUtc.toISOString();
+
+    // Display label uses the salon's wall clock — that's what the customer
+    // booking from anywhere expects to see for an in-person appointment.
+    const label = new Intl.DateTimeFormat("en-US", {
+      timeZone: salonZone,
       hour: "numeric",
       minute: "2-digit",
-    });
+    }).format(startUtc);
 
     const period: Slot["period"] =
       h < 12 ? "morning" : h < 17 ? "afternoon" : "evening";
 
-    // Determine availability
     if (isToday && slotStart <= nowMins) {
-      slots.push({ isoTime, label, period, available: false, reason: "past" });
+      slots.push({ isoTime, wallClockTime, label, period, available: false, reason: "past" });
       continue;
     }
 
@@ -208,12 +244,40 @@ export async function computeSlots(input: {
       (b) => slotStart < b.end && slotEnd > b.start
     );
     if (hasConflict) {
-      slots.push({ isoTime, label, period, available: false, reason: "booked" });
+      slots.push({ isoTime, wallClockTime, label, period, available: false, reason: "booked" });
       continue;
     }
 
-    slots.push({ isoTime, label, period, available: true });
+    slots.push({ isoTime, wallClockTime, label, period, available: true });
   }
 
   return slots;
+}
+
+/**
+ * Project a UTC instant onto "minutes from local midnight" in `salonZone`,
+ * relative to the salon-local day that begins at `dayStartUtc`.
+ *
+ * If the instant lies before that day → returns a negative number.
+ * If it lies after → returns >= 1440.
+ *
+ * Implementation note: we ask Intl what the instant looks like in the salon's
+ * zone, then subtract from the day start. Doing the subtraction in UTC
+ * milliseconds avoids any DST cliff on the day itself.
+ */
+function utcToSalonMinutes(
+  instant: Date,
+  salonZone: string,
+  dayStartUtc: Date
+): number {
+  // Offset (in minutes) of `instant` in the salon zone — used to compute the
+  // wall-clock minutes-of-day the instant maps to. We re-apply the offset to
+  // the day start as well so the difference is taken on the same axis.
+  const offsetAtInstant = getOffsetMinutes(instant, salonZone);
+  const offsetAtDayStart = getOffsetMinutes(dayStartUtc, salonZone);
+  // Wall-clock instant = UTC + offset
+  const wallInstantMin = (instant.getTime() + offsetAtInstant * 60_000) / 60_000;
+  const wallDayStartMin =
+    (dayStartUtc.getTime() + offsetAtDayStart * 60_000) / 60_000;
+  return Math.round(wallInstantMin - wallDayStartMin);
 }

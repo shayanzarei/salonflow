@@ -1,4 +1,9 @@
 import { formatEUR } from "@/lib/format-currency";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  formatWithZoneLabel,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 
 /**
  * Email sent to the salon owner and/or the assigned staff member
@@ -21,6 +26,7 @@ export function bookingStaffNotificationEmail({
   durationMins,
   price,
   dashboardUrl,
+  salonTimezone,
 }: {
   recipientName: string;
   recipientRole: "owner" | "staff";
@@ -34,21 +40,25 @@ export function bookingStaffNotificationEmail({
   durationMins: number;
   price: number;
   dashboardUrl: string;
+  /** IANA zone of the salon (provider). See booking-confirmation for rationale. */
+  salonTimezone?: string | null;
 }) {
+  const tz =
+    salonTimezone && isValidIanaTimezone(salonTimezone)
+      ? salonTimezone
+      : DEFAULT_FALLBACK_TIMEZONE;
+
   const date = bookedAt.toLocaleDateString("nl-NL", {
-    timeZone: "Europe/Amsterdam",
+    timeZone: tz,
     weekday: "long",
     month: "long",
     day: "numeric",
     year: "numeric",
   });
 
-  const time = bookedAt.toLocaleTimeString("nl-NL", {
-    timeZone: "Europe/Amsterdam",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  // Time uses an explicit zone label so e.g. a remote staff member sees
+  // "14:00 CET" rather than ambiguous local-looking "14:00".
+  const time = formatWithZoneLabel(bookedAt, tz, "nl-NL");
 
   function esc(str: string) {
     return str

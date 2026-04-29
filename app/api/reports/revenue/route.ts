@@ -1,5 +1,9 @@
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 import { NextResponse } from "next/server";
 
 /**
@@ -10,8 +14,15 @@ import { NextResponse } from "next/server";
  *  - All of today's bookings (confirmed + pending + completed + no_show) so the
  *    Day Overview can show them for finalization
  *
- * All times are evaluated in Europe/Amsterdam timezone so "today" matches what
- * the salon owner sees on their clock.
+ * "Today", "this week" and "this month" are evaluated in the **tenant's** IANA
+ * zone (`tenants.iana_timezone`) so the numbers always match what the salon
+ * owner sees on their wall clock — never the server's clock or a hardcoded
+ * value. Migration 016 backfills tenants.iana_timezone with the helper's
+ * default for any pre-migration row.
+ *
+ * Time-zone is passed as a parameter (`$2`) rather than inlined into the SQL
+ * to avoid any chance of SQL injection via the tenant's stored zone string.
+ * `AT TIME ZONE` accepts a TEXT expression, so this is straightforward.
  */
 export async function GET() {
   try {
@@ -20,51 +31,58 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const tenantZone =
+      tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+        ? tenant.iana_timezone
+        : DEFAULT_FALLBACK_TIMEZONE;
+
     const [revenueResult, todayResult] = await Promise.all([
-      // Revenue aggregates — only count status = 'completed'
+      // Revenue aggregates — only count status = 'completed'.
+      // Uses booking_start_utc (post-016) and falls back to booked_at — the
+      // trigger keeps these in sync for legacy rows during the transition.
       pool.query(
         `SELECT
            -- Today
            COALESCE(SUM(s.price) FILTER (
-             WHERE b.booked_at::date = (NOW() AT TIME ZONE 'Europe/Amsterdam')::date
+             WHERE (b.booking_start_utc AT TIME ZONE $2)::date = (NOW() AT TIME ZONE $2)::date
                AND b.status = 'completed'
            ), 0)::float AS today_revenue,
 
            COUNT(*) FILTER (
-             WHERE b.booked_at::date = (NOW() AT TIME ZONE 'Europe/Amsterdam')::date
+             WHERE (b.booking_start_utc AT TIME ZONE $2)::date = (NOW() AT TIME ZONE $2)::date
                AND b.status = 'completed'
            )::int AS today_completed,
 
            -- This calendar week (Mon–Sun)
            COALESCE(SUM(s.price) FILTER (
-             WHERE date_trunc('week', b.booked_at AT TIME ZONE 'Europe/Amsterdam')
-                 = date_trunc('week', NOW() AT TIME ZONE 'Europe/Amsterdam')
+             WHERE date_trunc('week', b.booking_start_utc AT TIME ZONE $2)
+                 = date_trunc('week', NOW() AT TIME ZONE $2)
                AND b.status = 'completed'
            ), 0)::float AS week_revenue,
 
            COUNT(*) FILTER (
-             WHERE date_trunc('week', b.booked_at AT TIME ZONE 'Europe/Amsterdam')
-                 = date_trunc('week', NOW() AT TIME ZONE 'Europe/Amsterdam')
+             WHERE date_trunc('week', b.booking_start_utc AT TIME ZONE $2)
+                 = date_trunc('week', NOW() AT TIME ZONE $2)
                AND b.status = 'completed'
            )::int AS week_completed,
 
            -- This calendar month
            COALESCE(SUM(s.price) FILTER (
-             WHERE date_trunc('month', b.booked_at AT TIME ZONE 'Europe/Amsterdam')
-                 = date_trunc('month', NOW() AT TIME ZONE 'Europe/Amsterdam')
+             WHERE date_trunc('month', b.booking_start_utc AT TIME ZONE $2)
+                 = date_trunc('month', NOW() AT TIME ZONE $2)
                AND b.status = 'completed'
            ), 0)::float AS month_revenue,
 
            COUNT(*) FILTER (
-             WHERE date_trunc('month', b.booked_at AT TIME ZONE 'Europe/Amsterdam')
-                 = date_trunc('month', NOW() AT TIME ZONE 'Europe/Amsterdam')
+             WHERE date_trunc('month', b.booking_start_utc AT TIME ZONE $2)
+                 = date_trunc('month', NOW() AT TIME ZONE $2)
                AND b.status = 'completed'
            )::int AS month_completed
 
          FROM bookings b
          JOIN services s ON b.service_id = s.id
          WHERE b.tenant_id = $1`,
-        [tenant.id]
+        [tenant.id, tenantZone]
       ),
 
       // All of today's appointments for the Day Overview panel
@@ -72,7 +90,7 @@ export async function GET() {
         `SELECT
            b.id,
            b.client_name,
-           b.booked_at,
+           b.booking_start_utc AS booked_at,
            b.status,
            s.name   AS service_name,
            s.price::float AS price,
@@ -82,21 +100,24 @@ export async function GET() {
          JOIN services s  ON b.service_id  = s.id
          JOIN staff    st ON b.staff_id    = st.id
          WHERE b.tenant_id = $1
-           AND b.booked_at::date = (NOW() AT TIME ZONE 'Europe/Amsterdam')::date
+           AND (b.booking_start_utc AT TIME ZONE $2)::date = (NOW() AT TIME ZONE $2)::date
            AND b.status NOT IN ('cancelled')
         ORDER BY
           CASE
             WHEN b.status IN ('completed', 'no_show', 'cancelled') THEN 1
             ELSE 0
           END ASC,
-          b.booked_at ASC`,
-        [tenant.id]
+          b.booking_start_utc ASC`,
+        [tenant.id, tenantZone]
       ),
     ]);
 
     const rev = revenueResult.rows[0];
 
     return NextResponse.json({
+      // Echo the resolved zone so the client can render times against the
+      // salon's wall clock rather than the browser's locale default.
+      tenant_iana_timezone: tenantZone,
       today_revenue:    Number(rev.today_revenue),
       today_completed:  Number(rev.today_completed),
       week_revenue:     Number(rev.week_revenue),

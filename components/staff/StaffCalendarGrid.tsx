@@ -2,13 +2,21 @@
 
 import { Avatar } from "@/components/ds/Avatar";
 import { CalendarIcon, ClockIcon, ScissorsIcon, SearchIcon, XIcon } from "@/components/ui/Icons";
+import { salonLocalParts } from "@/lib/timezone";
 import { useState } from "react";
 
 interface Booking {
   id: string;
   client_name: string;
   client_email: string;
-  booked_at: string;
+  /**
+   * Canonical UTC start instant (ISO 8601 with offset/Z). Always re-format
+   * with Intl + tenantZone for display and bucketing — never read
+   * `.getHours()` / `.getMinutes()` on the resulting Date, those return
+   * values in the runtime's local zone (UTC on Vercel) and produce
+   * off-by-N hours in the grid.
+   */
+  booking_start_utc: string;
   service_name: string;
   duration_mins: number;
   price: number;
@@ -20,10 +28,38 @@ interface Booking {
 export default function StaffCalendarGrid({
   bookings,
   brandColor,
+  tenantZone,
 }: {
   bookings: Booking[];
   brandColor: string;
+  /** Salon's IANA zone — every clock-related computation runs against it. */
+  tenantZone: string;
 }) {
+  // Salon-local YYYY-MM-DD for a UTC instant. Used to bucket bookings into
+  // the correct day cell regardless of the browser's zone.
+  const ymdInTenantZone = (instant: Date): string =>
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: tenantZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(instant);
+
+  // Salon-local hour (0-23) for a UTC instant.
+  const hourInTenantZone = (instant: Date): number =>
+    salonLocalParts(instant, tenantZone).hour;
+
+  // The grid's day cells are still constructed in the *browser's* zone (the
+  // user navigates "this week" from their device), but that's only used as
+  // a key for matching against ymdInTenantZone, never compared against
+  // booking instants directly.
+  const ymdFromGridDay = (day: Date): string => {
+    const y = day.getFullYear();
+    const m = String(day.getMonth() + 1).padStart(2, "0");
+    const d = String(day.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const now = new Date();
     const day = now.getDay();
@@ -56,11 +92,16 @@ export default function StaffCalendarGrid({
     : bookings;
 
   function getBookingsForDayAndHour(day: Date, hour: number) {
+    const dayYmd = ymdFromGridDay(day);
     return filteredBookings.filter((b) => {
-      const bookedAt = new Date(b.booked_at);
+      const startInstant = new Date(b.booking_start_utc);
+      // Compare salon-local Y-M-D and salon-local hour. Going through the
+      // tenant zone (rather than browser-local) means a 14:00 Amsterdam
+      // booking shows in the 14:00 row even when the staff member is on a
+      // device that's set to UTC.
       return (
-        bookedAt.toDateString() === day.toDateString() &&
-        bookedAt.getHours() === hour
+        ymdInTenantZone(startInstant) === dayYmd &&
+        hourInTenantZone(startInstant) === hour
       );
     });
   }
@@ -69,9 +110,13 @@ export default function StaffCalendarGrid({
     return (durationMins / 60) * 64;
   }
 
+  // The "now" line position is computed against the salon's clock so it
+  // lands where the salon's clock says, not where the staff member's
+  // browser does.
+  const nowParts = salonLocalParts(now, tenantZone);
   const currentTimePercent =
-    (((now.getHours() - 8) * 60 + now.getMinutes()) / (13 * 60)) * 100;
-  const showTimeLine = now.getHours() >= 8 && now.getHours() <= 20;
+    (((nowParts.hour - 8) * 60 + nowParts.minute) / (13 * 60)) * 100;
+  const showTimeLine = nowParts.hour >= 8 && nowParts.hour <= 20;
 
   function prevWeek() {
     const prev = new Date(currentWeekStart);
@@ -285,7 +330,14 @@ export default function StaffCalendarGrid({
                       >
                         {dayBookings.map((booking) => {
                           const height = getBookingHeight(booking.duration_mins);
-                          const startMinutes = new Date(booking.booked_at).getMinutes();
+                          // Salon-local minutes for the within-cell vertical
+                          // offset. `.getMinutes()` would read the runtime's
+                          // local zone (UTC on Vercel) and visually misalign
+                          // bookings whose UTC offset isn't a whole hour.
+                          const startMinutes = salonLocalParts(
+                            new Date(booking.booking_start_utc),
+                            tenantZone
+                          ).minute;
                           const topOffset = (startMinutes / 60) * 64;
 
                           return (
@@ -345,9 +397,13 @@ export default function StaffCalendarGrid({
                                   }}
                                 >
                                   <ClockIcon size={10} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />
-                                  {new Date(booking.booked_at).toLocaleTimeString(
+                                  {new Date(booking.booking_start_utc).toLocaleTimeString(
                                     "en-US",
-                                    { hour: "numeric", minute: "2-digit" }
+                                    {
+                                      timeZone: tenantZone,
+                                      hour: "numeric",
+                                      minute: "2-digit",
+                                    }
                                   )}
                                 </p>
                               )}
@@ -447,7 +503,8 @@ export default function StaffCalendarGrid({
                 {
                   icon: <CalendarIcon size={15} />,
                   label: "Date",
-                  value: new Date(selectedBooking.booked_at).toLocaleDateString("en-US", {
+                  value: new Date(selectedBooking.booking_start_utc).toLocaleDateString("en-US", {
+                    timeZone: tenantZone,
                     weekday: "long",
                     month: "long",
                     day: "numeric",
@@ -456,7 +513,8 @@ export default function StaffCalendarGrid({
                 {
                   icon: <ClockIcon size={15} />,
                   label: "Time",
-                  value: new Date(selectedBooking.booked_at).toLocaleTimeString("en-US", {
+                  value: new Date(selectedBooking.booking_start_utc).toLocaleTimeString("en-US", {
+                    timeZone: tenantZone,
                     hour: "numeric",
                     minute: "2-digit",
                   }),

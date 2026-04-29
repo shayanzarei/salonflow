@@ -1,5 +1,10 @@
 import pool from "@/lib/db";
 import { sendEmail } from "@/lib/emails/send";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  formatWithZoneLabel,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -22,10 +27,13 @@ export async function POST(req: NextRequest) {
            b.client_email,
            b.client_phone,
            b.booked_at,
+           b.booking_start_utc,
+           b.provider_iana_timezone,
            s.name AS service_name,
            st.name AS staff_name,
            st.email AS staff_email,
            t.name AS salon_name,
+           t.iana_timezone AS salon_iana_timezone,
            t.owner_email
          FROM bookings b
          JOIN services s ON s.id = b.service_id
@@ -44,11 +52,26 @@ export async function POST(req: NextRequest) {
           console.error("[update-status] client cancellation email failed", error)
         );
       }
-      const appointmentAt = new Date(details.booked_at).toLocaleString("nl-NL", {
-        timeZone: "Europe/Amsterdam",
+      // Render the appointment instant in the salon's zone (preferred:
+      // provider_iana_timezone on the booking; falls back to the tenant's
+      // current zone, then to the helper's default).
+      const candidateZone =
+        details.provider_iana_timezone ||
+        details.salon_iana_timezone ||
+        "";
+      const cancellationZone =
+        candidateZone && isValidIanaTimezone(candidateZone)
+          ? candidateZone
+          : DEFAULT_FALLBACK_TIMEZONE;
+      const startInstant = new Date(
+        details.booking_start_utc ?? details.booked_at
+      );
+      const dateLabel = startInstant.toLocaleDateString("nl-NL", {
+        timeZone: cancellationZone,
         dateStyle: "full",
-        timeStyle: "short",
       });
+      const timeLabel = formatWithZoneLabel(startInstant, cancellationZone, "nl-NL");
+      const appointmentAt = `${dateLabel} ${timeLabel}`;
       const internalSubject = `Appointment cancelled: ${details.service_name} — ${appointmentAt}`;
       const internalHtml = `
         <p>${details.client_name} cancelled their appointment.</p>

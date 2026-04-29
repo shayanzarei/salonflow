@@ -17,6 +17,12 @@ import {
 } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+  todayInZone,
+  wallClockToUtc,
+} from "@/lib/timezone";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -24,17 +30,31 @@ export default async function DashboardPage() {
   const tenant = await getTenant();
   if (!tenant) notFound();
 
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
+  // Salon-local zone — used for every booking time we render below so the
+  // wall clock matches what the salon owner sees on their watch.
+  const tenantZone =
+    tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+      ? tenant.iana_timezone
+      : DEFAULT_FALLBACK_TIMEZONE;
+
+  // "Today" must be evaluated in the salon's IANA zone, not the server's
+  // (UTC on Vercel). Otherwise the "today bookings" count and the upcoming
+  // list both shift by hours twice a year on DST seams. We compute the day
+  // window as a UTC instant pair (midnight–midnight in the salon's clock)
+  // and feed the canonical booking_start_utc column to all queries.
+  const todayLocalYmd = todayInZone(tenantZone);
+  const dayStartUtc = wallClockToUtc(todayLocalYmd, "00:00", tenantZone);
+  const dayEndUtc = new Date(dayStartUtc.getTime() + 24 * 60 * 60_000);
 
   const [todayBookings, totalRevenue, upcomingBookings, totalCustomers] =
     await Promise.all([
       pool.query(
         `SELECT COUNT(*) FROM bookings
-         WHERE tenant_id = $1 AND booked_at BETWEEN $2 AND $3 AND status = 'confirmed'`,
-        [tenant.id, todayStart, todayEnd]
+         WHERE tenant_id = $1
+           AND booking_start_utc >= $2::timestamptz
+           AND booking_start_utc <  $3::timestamptz
+           AND status = 'confirmed'`,
+        [tenant.id, dayStartUtc.toISOString(), dayEndUtc.toISOString()]
       ),
       pool.query(
         `SELECT COALESCE(SUM(s.price), 0) as total
@@ -45,16 +65,16 @@ export default async function DashboardPage() {
       ),
       pool.query(
         `SELECT
-           b.id, b.client_name, b.client_email, b.booked_at, b.status,
+           b.id, b.client_name, b.client_email, b.booking_start_utc, b.status,
            s.name AS service_name, s.duration_mins, s.price,
            st.name AS staff_name
          FROM bookings b
          JOIN services s ON b.service_id = s.id
          JOIN staff st ON b.staff_id = st.id
          WHERE b.tenant_id = $1
-           AND b.booked_at >= NOW()
+           AND b.booking_start_utc >= NOW()
            AND b.status = 'confirmed'
-         ORDER BY b.booked_at ASC
+         ORDER BY b.booking_start_utc ASC
          LIMIT 6`,
         [tenant.id]
       ),
@@ -523,10 +543,15 @@ export default async function DashboardPage() {
                       </div>
                     </TD>
                     <TD>
+                      {/* booking_start_utc is the canonical column. Intl with
+                          tenantZone re-formats UTC into the salon's wall clock,
+                          which is the time the salon owner actually expects to
+                          see in their dashboard. */}
                       <p className="text-body-sm font-medium text-ink-900">
-                        {new Date(booking.booked_at).toLocaleDateString(
+                        {new Date(booking.booking_start_utc).toLocaleDateString(
                           "en-US",
                           {
+                            timeZone: tenantZone,
                             month: "short",
                             day: "numeric",
                             year: "numeric",
@@ -534,9 +559,10 @@ export default async function DashboardPage() {
                         )}
                       </p>
                       <p className="text-caption text-ink-400">
-                        {new Date(booking.booked_at).toLocaleTimeString(
+                        {new Date(booking.booking_start_utc).toLocaleTimeString(
                           "en-US",
                           {
+                            timeZone: tenantZone,
                             hour: "numeric",
                             minute: "2-digit",
                           }

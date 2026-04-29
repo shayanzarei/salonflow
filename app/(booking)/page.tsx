@@ -14,6 +14,11 @@ import { getGoogleMapsSearchUrl } from "@/lib/maps";
 import { getTenant } from "@/lib/tenant";
 import { normalizeWebsiteTemplate } from "@/lib/website-templates";
 import { isMainSiteHost } from "@/lib/main-site";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+  todayInZone,
+} from "@/lib/timezone";
 import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,19 +45,31 @@ async function getSectionFlags(tenantId: string) {
   return map;
 }
 
-function formatDateOnly(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+/**
+ * Add `n` calendar days to a `YYYY-MM-DD` string, treating the date as a
+ * civil calendar date (not an instant). Used to advance through "the salon's
+ * next 14 days" in the salon's own zone — going through `new Date(...).
+ * setDate(...)` would re-anchor the iteration to the server's zone.
+ */
+function addDaysYmd(ymd: string, n: number): string {
+  const [y, m, d] = ymd.split("-").map((p) => parseInt(p, 10));
+  // Build via Date.UTC so we never cross a DST cliff in the server's zone.
+  const utc = new Date(Date.UTC(y, m - 1, d));
+  utc.setUTCDate(utc.getUTCDate() + n);
+  const yy = utc.getUTCFullYear();
+  const mm = String(utc.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(utc.getUTCDate()).padStart(2, "0");
+  return `${yy}-${mm}-${dd}`;
 }
 
 async function getNextAvailableSlot(input: {
   tenantId: string;
+  /** Salon's IANA zone — dictates "today" and the 14-day window below. */
+  salonZone: string;
   serviceIds: string[];
   staffIds: string[];
 }) {
-  const { tenantId, serviceIds, staffIds } = input;
+  const { tenantId, salonZone, serviceIds, staffIds } = input;
   if (serviceIds.length === 0 || staffIds.length === 0) return null;
 
   const assignmentsRes = await pool.query(
@@ -70,11 +87,12 @@ async function getNextAvailableSlot(input: {
     assignedStaffByService.get(row.service_id)?.add(row.staff_id);
   }
 
-  const today = new Date();
+  // Anchor the search on the salon's "today", not the server's. This way a
+  // tenant in Asia doesn't see "no slots today" at 4 PM local just because
+  // the Vercel server is still on yesterday's UTC date.
+  const startYmd = todayInZone(salonZone);
   for (let offset = 0; offset < 14; offset++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + offset);
-    const dateStr = formatDateOnly(date);
+    const dateStr = addDaysYmd(startYmd, offset);
     let bestForDay: { isoTime: string; label: string } | null = null;
 
     for (const serviceId of serviceIds) {
@@ -178,6 +196,13 @@ export default async function BookingHomePage({
   const totalClients = clientStats?.total_clients ?? 0;
   const brand = tenant.primary_color ?? 'var(--color-brand-600)';
   const websiteTemplate = normalizeWebsiteTemplate(tenant.website_template);
+  // The salon's IANA zone — single source of truth for "what day is it" on
+  // this widget. Falling back keeps older tenants rendering sensibly during
+  // the migration window.
+  const tenantZone =
+    tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+      ? tenant.iana_timezone
+      : DEFAULT_FALLBACK_TIMEZONE;
   const yearsExperience = Math.max(
     1,
     new Date().getFullYear() -
@@ -190,15 +215,27 @@ export default async function BookingHomePage({
     .map((service) => service.id as string);
   const nextAvailable = await getNextAvailableSlot({
     tenantId: tenant.id,
+    salonZone: tenantZone,
     serviceIds: priorityServiceIds,
     staffIds: staffList.map((staff) => staff.id as string),
   });
   const nextAvailableDate = nextAvailable ? new Date(nextAvailable.isoTime) : null;
-  const todayKey = formatDateOnly(new Date());
+  // Compare salon-local "today" against the slot's salon-local day so the
+  // "Today" prefix matches what the customer sees on the salon's clock.
+  const todayKey = todayInZone(tenantZone);
+  const nextAvailableYmd = nextAvailableDate
+    ? new Intl.DateTimeFormat("en-CA", {
+        timeZone: tenantZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(nextAvailableDate)
+    : null;
   const nextAvailableLabel = nextAvailable
-    ? formatDateOnly(nextAvailableDate as Date) === todayKey
+    ? nextAvailableYmd === todayKey
       ? `Today, ${nextAvailable.label}`
       : `${(nextAvailableDate as Date).toLocaleDateString("en-US", {
+          timeZone: tenantZone,
           month: "short",
           day: "numeric",
         })}, ${nextAvailable.label}`

@@ -1,3 +1,7 @@
+import {
+  findConflictingBooking,
+  isExclusionViolation,
+} from "@/lib/conflict-check";
 import pool from "@/lib/db";
 import { bookingConfirmationEmail } from "@/lib/emails/booking-confirmation";
 import { bookingStaffNotificationEmail } from "@/lib/emails/booking-staff-notification";
@@ -5,6 +9,11 @@ import { sendEmail } from "@/lib/emails/send";
 import { createNotification } from "@/lib/notifications";
 import { isValidPhone, normalizePhoneInput } from "@/lib/phone";
 import { bookableServiceSql } from "@/lib/services/bookable";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+  wallClockToUtc,
+} from "@/lib/timezone";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -22,17 +31,14 @@ export async function POST(req: NextRequest) {
     const time = formData.get("time") as string;
     const status = formData.get("status") as string;
 
-    const booked_at = new Date(`${date}T${time}`);
     if (!isValidPhone(normalizedPhone)) {
       return NextResponse.json({ error: "Invalid phone number format" }, { status: 400 });
     }
-    if (Number.isNaN(booked_at.getTime()) || booked_at.getTime() <= Date.now()) {
-      return NextResponse.json(
-        { error: "Booking time must be in the future." },
-        { status: 400 }
-      );
-    }
 
+    // ── Resolve tenant + service + staff up front so we know the salon's IANA
+    //    zone *before* we convert the wall-clock input to UTC. The form sends
+    //    the salon-local date/time (what the owner sees in their dashboard);
+    //    we MUST interpret that against the salon's zone, not the server's.
     const [tenantResult, serviceResult, staffResult] = await Promise.all([
       pool.query(`SELECT * FROM tenants WHERE id = $1`, [tenant_id]),
       pool.query(
@@ -49,42 +55,81 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid booking selection" }, { status: 400 });
     }
 
-    const conflictResult = await pool.query(
-      `SELECT b.id
-       FROM bookings b
-       JOIN services s ON b.service_id = s.id
-       WHERE b.staff_id = $1
-         AND b.status IN ('confirmed', 'pending')
-         AND b.booked_at < ($2::timestamptz + ($3::int || ' minutes')::interval)
-         AND (b.booked_at + (s.duration_mins || ' minutes')::interval) > $2::timestamptz
-       LIMIT 1`,
-      [staff_id, booked_at.toISOString(), service.duration_mins]
-    );
-    if (conflictResult.rows.length > 0) {
+    const tenantZone =
+      tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+        ? (tenant.iana_timezone as string)
+        : DEFAULT_FALLBACK_TIMEZONE;
+
+    // Convert wall-clock (date + time the owner picked) → UTC using the salon's
+    // zone. wallClockToUtc throws on malformed input; let it bubble to the
+    // catch block as a 500-with-message so the client sees a clear failure
+    // instead of a silently shifted booking.
+    let booked_at: Date;
+    try {
+      booked_at = wallClockToUtc(date, time, tenantZone);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Invalid date/time";
+      return NextResponse.json({ error: msg }, { status: 400 });
+    }
+    if (Number.isNaN(booked_at.getTime()) || booked_at.getTime() <= Date.now()) {
+      return NextResponse.json(
+        { error: "Booking time must be in the future." },
+        { status: 400 }
+      );
+    }
+
+    const durationMins = Number(service.duration_mins);
+    const booking_end_utc = new Date(booked_at.getTime() + durationMins * 60_000);
+
+    // Single source of truth for the overlap rule (see lib/conflict-check.ts).
+    // Stays in lock-step with /api/bookings, /api/bookings/update, and
+    // lib/availability — change the rule there, not here.
+    const conflictId = await findConflictingBooking(pool, {
+      staffId: staff_id,
+      startUtc: booked_at.toISOString(),
+      endUtc: booking_end_utc.toISOString(),
+    });
+    if (conflictId) {
       return NextResponse.json(
         { error: "This staff member is already booked at that time." },
         { status: 409 }
       );
     }
 
-    const result = await pool.query(
-      `INSERT INTO bookings
-        (tenant_id, service_id, staff_id, client_name, client_email, client_phone, booked_at, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-      [
-        tenant_id,
-        service_id,
-        staff_id,
-        client_name,
-        client_email,
-        normalizedPhone,
-        booked_at,
-        status,
-      ]
-    );
-
-    const booking = result.rows[0];
+    // DB-side backstop for the race two app-level checks can't catch — see
+    // migration 017 and lib/conflict-check.ts. SQLSTATE 23P01 → 409 keeps the
+    // shape identical to the application-level conflict response above.
+    let booking;
+    try {
+      const result = await pool.query(
+        `INSERT INTO bookings
+          (tenant_id, service_id, staff_id, client_name, client_email, client_phone,
+           booking_start_utc, booking_end_utc, provider_iana_timezone, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         RETURNING *`,
+        [
+          tenant_id,
+          service_id,
+          staff_id,
+          client_name,
+          client_email,
+          normalizedPhone,
+          booked_at,
+          booking_end_utc,
+          tenantZone,
+          status,
+        ]
+      );
+      booking = result.rows[0];
+    } catch (err) {
+      if (isExclusionViolation(err)) {
+        return NextResponse.json(
+          { error: "This staff member was just booked at that time. Please choose another." },
+          { status: 409 }
+        );
+      }
+      throw err;
+    }
     const bookingId = booking.id as string;
 
     const detailsResult = await pool.query(
@@ -129,6 +174,7 @@ export async function POST(req: NextRequest) {
       salonSlug: tenant.slug,
       cancelBaseUrl: req.nextUrl.origin,
       brandColor: tenant.primary_color,
+      salonTimezone: tenantZone,
     });
     const emailJobs: Array<Promise<boolean>> = [
       sendEmail({
@@ -153,6 +199,7 @@ export async function POST(req: NextRequest) {
         durationMins: service.duration_mins,
         price: Number(service.price),
         dashboardUrl,
+        salonTimezone: tenantZone,
       });
       emailJobs.push(
         sendEmail({
@@ -178,6 +225,7 @@ export async function POST(req: NextRequest) {
         durationMins: service.duration_mins,
         price: Number(service.price),
         dashboardUrl,
+        salonTimezone: tenantZone,
       });
       emailJobs.push(
         sendEmail({

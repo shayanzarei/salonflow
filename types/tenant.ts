@@ -15,6 +15,13 @@ export interface Tenant {
   about: string | null;
   address: string | null;
   hours: string | null;
+  /**
+   * IANA time-zone identifier for the salon (e.g. "Europe/Amsterdam",
+   * "America/New_York"). Backed by the tenants.iana_timezone column added in
+   * migration 016. Backfilled to "Europe/Amsterdam" for pre-migration rows.
+   * NOT NULL at the DB layer; modelled here as required.
+   */
+  iana_timezone: string;
   phone?: string | null;
   hero_image_url: string | null;
   about_image_url: string | null;

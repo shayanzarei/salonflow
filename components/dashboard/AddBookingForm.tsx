@@ -32,6 +32,14 @@ interface Client {
 
 interface AvailabilitySlot {
   isoTime: string;
+  /**
+   * Salon-local 24h wall-clock time (e.g. "14:00"). This is what we POST as
+   * the `time` field — `/api/bookings/manual` runs `wallClockToUtc(date,
+   * time, tenantZone)` and writes the correct UTC instant. Slicing isoTime
+   * here would give us the UTC hour, not the salon-local hour, which is the
+   * exact bug this field exists to prevent.
+   */
+  wallClockTime: string;
   label: string;
   available: boolean;
 }
@@ -64,6 +72,7 @@ export default function AddBookingForm({
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [availabilityError, setAvailabilityError] = useState("");
   const [availableSlots, setAvailableSlots] = useState<AvailabilitySlot[]>([]);
+  const [submitError, setSubmitError] = useState("");
 
   const selectedService = services.find((s) => s.id === serviceId);
   const selectedStaff = staffList.find((s) => s.id === staffId);
@@ -94,35 +103,59 @@ export default function AddBookingForm({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSubmitError("");
     const normalizedPhone = normalizePhoneInput(clientPhone);
     if (!isValidPhone(normalizedPhone)) {
       setPhoneError("Please enter a valid phone number.");
       return;
     }
     if (!time) {
+      setSubmitError("Pick an available time before creating the booking.");
       return;
     }
     setPhoneError("");
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("tenant_id", tenantId);
-    formData.append("client_name", clientName);
-    formData.append("client_email", clientEmail);
-    formData.append("client_phone", normalizedPhone ?? "");
-    formData.append("service_id", serviceId);
-    formData.append("staff_id", staffId);
-    formData.append("date", date);
-    formData.append("time", time);
-    formData.append("status", status);
+    try {
+      const formData = new FormData();
+      formData.append("tenant_id", tenantId);
+      formData.append("client_name", clientName);
+      formData.append("client_email", clientEmail);
+      formData.append("client_phone", normalizedPhone ?? "");
+      formData.append("service_id", serviceId);
+      formData.append("staff_id", staffId);
+      formData.append("date", date);
+      formData.append("time", time);
+      formData.append("status", status);
 
-    const res = await fetch("/api/bookings/manual", {
-      method: "POST",
-      body: formData,
-      redirect: "manual",
-    });
+      const res = await fetch("/api/bookings/manual", {
+        method: "POST",
+        body: formData,
+        redirect: "manual",
+      });
 
-    router.push("/bookings");
+      // The route returns a 3xx redirect on success. With `redirect: "manual"`
+      // the browser surfaces that as `type === "opaqueredirect"` and `status === 0`.
+      // Any other 4xx/5xx is a real failure (most commonly 409 "already booked").
+      if (res.type !== "opaqueredirect" && !res.ok) {
+        const payload = (await res.json().catch(() => ({}))) as { error?: string };
+        // If the error indicates the slot is taken, also drop it from the local
+        // dropdown so the owner can't pick it again without re-fetching.
+        if (res.status === 409) {
+          setAvailableSlots((prev) => prev.filter((s) => s.wallClockTime !== time));
+          setTime("");
+        }
+        throw new Error(payload.error ?? "Failed to create booking.");
+      }
+
+      router.push("/bookings");
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "Failed to create booking."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -137,6 +170,7 @@ export default function AddBookingForm({
 
       setAvailabilityLoading(true);
       setAvailabilityError("");
+      setSubmitError("");
       setTime("");
       try {
         const res = await fetch(
@@ -343,8 +377,14 @@ export default function AddBookingForm({
                         ? "Loading availability..."
                         : "Select available time..."}
                     </option>
+                    {/*
+                       * value MUST be the salon-local 24h wall clock. Slicing
+                       * slot.isoTime would yield the UTC hour and ship "12:00"
+                       * for a 14:00 CEST slot. /api/bookings/manual then runs
+                       * wallClockToUtc(date, time, tenantZone) on this value.
+                       */}
                     {availableSlots.map((slot) => (
-                      <option key={slot.isoTime} value={slot.isoTime.slice(11, 16)}>
+                      <option key={slot.isoTime} value={slot.wallClockTime}>
                         {slot.label}
                       </option>
                     ))}
@@ -462,6 +502,15 @@ export default function AddBookingForm({
 
           {/* Actions card */}
           <Card variant="outlined">
+            {submitError ? (
+              <div
+                role="alert"
+                className="mb-3.5 rounded-md border border-danger-600 bg-danger-50 px-3 py-2 text-body-sm text-danger-700"
+              >
+                {submitError}
+              </div>
+            ) : null}
+
             <Button
               type="submit"
               disabled={loading || !time}

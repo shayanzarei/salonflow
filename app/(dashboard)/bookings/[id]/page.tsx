@@ -2,10 +2,14 @@ import { Avatar } from "@/components/ds/Avatar";
 import { Badge } from "@/components/ds/Badge";
 import { Button } from "@/components/ds/Button";
 import { Card } from "@/components/ds/Card";
-import { Select } from "@/components/ds/Select";
+import EditBookingForm from "@/components/dashboard/EditBookingForm";
 import { CalendarIcon, ClockIcon, MapPinIcon, ScissorsIcon, TrashIcon, UserIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -19,6 +23,14 @@ export default async function BookingDetailPage({
   if (!tenant) notFound();
 
   const brand = tenant.primary_color ?? 'var(--color-brand-600)';
+
+  // Salon-local IANA zone — used for every Intl call that renders booking
+  // times so the wall clock matches the salon's clock, not the server's
+  // (UTC on Vercel) or the browser's locale default.
+  const tenantZone =
+    tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+      ? tenant.iana_timezone
+      : DEFAULT_FALLBACK_TIMEZONE;
 
   const [bookingResult, servicesResult, staffResult] = await Promise.all([
     pool.query(
@@ -70,6 +82,28 @@ export default async function BookingDetailPage({
   const badgeVariant = statusVariant[booking.status] ?? "warning";
   const bookingRef = `#BK-${booking.id.split("-")[0].toUpperCase()}`;
 
+  // Salon-local YYYY-MM-DD and HH:MM (24h) for the Edit form defaults. Both
+  // are computed via Intl with the tenant zone so they reflect the salon's
+  // wall clock, not the server's UTC clock or the browser's locale. We read
+  // the canonical booking_start_utc column — the legacy booked_at is
+  // maintained read-only by trigger and must not be relied on in app code.
+  const bookedAtUtc = new Date(booking.booking_start_utc);
+  const dateParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tenantZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(bookedAtUtc);
+  const initialDate = `${dateParts.find((p) => p.type === "year")!.value}-${dateParts.find((p) => p.type === "month")!.value}-${dateParts.find((p) => p.type === "day")!.value}`;
+
+  const timeParts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: tenantZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(bookedAtUtc);
+  const initialTime = `${timeParts.find((p) => p.type === "hour")!.value}:${timeParts.find((p) => p.type === "minute")!.value}`;
+
   const detailItems = [
     {
       icon: <ScissorsIcon size={15} color="var(--color-ink-500)" />,
@@ -87,19 +121,26 @@ export default async function BookingDetailPage({
       icon: <CalendarIcon size={15} color="var(--color-ink-500)" />,
       label: "Date",
       colored: false,
-      value: new Date(booking.booked_at).toLocaleDateString(
-        "en-US",
-        { month: "short", day: "numeric", year: "numeric" }
-      ),
+      value: new Date(booking.booking_start_utc).toLocaleDateString("en-US", {
+        timeZone: tenantZone,
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
     },
     {
       icon: <ClockIcon size={15} color="var(--color-ink-500)" />,
       label: "Time",
       colored: false,
-      value: new Date(booking.booked_at).toLocaleTimeString(
-        "en-US",
-        { hour: "numeric", minute: "2-digit" }
-      ),
+      // Read booking_start_utc (TIMESTAMPTZ) and let Intl re-format in the
+      // tenant's IANA zone. This is the *only* correct way to display salon
+      // wall-clock time; passing a Date through toLocaleTimeString without
+      // an explicit timeZone shows the server's local time (UTC on Vercel).
+      value: new Date(booking.booking_start_utc).toLocaleTimeString("en-US", {
+        timeZone: tenantZone,
+        hour: "numeric",
+        minute: "2-digit",
+      }),
     },
     {
       icon: <ClockIcon size={15} color="var(--color-ink-500)" />,
@@ -248,109 +289,29 @@ export default async function BookingDetailPage({
 
         {/* Right column */}
         <div className="flex min-w-0 flex-col gap-5 xl:sticky xl:top-20 xl:self-start">
-          {/* Edit booking card */}
+          {/* Edit booking card — client component so we can fetch the same
+              /api/availability slots used by AddBookingForm and present a
+              <Select> dropdown rather than a raw <input type="time"> (which
+              has no timezone awareness and is impossible to seed correctly
+              from a TIMESTAMPTZ). The form posts salon-local YYYY-MM-DD and
+              HH:MM (24h) — /api/bookings/update converts via wallClockToUtc. */}
           {booking.status !== "cancelled" && (
-            <Card variant="outlined">
-              <div className="mb-5 flex items-center gap-2">
-                <span className="text-base">✏️</span>
-                <h2 className="text-body font-semibold text-ink-900">
-                  Edit Booking
-                </h2>
-              </div>
-
-              <form
-                action="/api/bookings/update"
-                method="POST"
-                className="flex flex-col gap-4"
-              >
-                <input type="hidden" name="booking_id" value={booking.id} />
-                <input type="hidden" name="tenant_id" value={tenant.id} />
-
-                <Select
-                  id="booking-edit-service"
-                  name="service_id"
-                  label="Service"
-                  defaultValue={booking.service_id}
-                >
-                  {services.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </Select>
-
-                <Select
-                  id="booking-edit-staff"
-                  name="staff_id"
-                  label="Staff"
-                  defaultValue={booking.staff_id}
-                >
-                  {staffList.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </Select>
-
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="booking-edit-date"
-                      className="mb-2 block text-caption font-semibold uppercase tracking-wider text-ink-400"
-                    >
-                      Date
-                    </label>
-                    <input
-                      id="booking-edit-date"
-                      type="date"
-                      name="date"
-                      defaultValue={
-                        new Date(booking.booked_at).toISOString().split("T")[0]
-                      }
-                      className="min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 px-4 py-2.5 text-body-sm text-ink-900 outline-none hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="booking-edit-time"
-                      className="mb-2 block text-caption font-semibold uppercase tracking-wider text-ink-400"
-                    >
-                      Time
-                    </label>
-                    <input
-                      id="booking-edit-time"
-                      type="time"
-                      name="time"
-                      defaultValue={new Date(booking.booked_at)
-                        .toTimeString()
-                        .slice(0, 5)}
-                      className="min-h-10 w-full rounded-sm border border-ink-200 bg-ink-0 px-4 py-2.5 text-body-sm text-ink-900 outline-none hover:border-ink-300 focus-visible:border-brand-600 focus-visible:shadow-focus"
-                    />
-                  </div>
-                </div>
-
-                <Select
-                  id="booking-edit-status"
-                  name="status"
-                  label="Status"
-                  defaultValue={booking.status}
-                >
-                  <option value="confirmed">● Confirmed</option>
-                  <option value="pending">● Pending</option>
-                  <option value="cancelled">● Cancelled</option>
-                </Select>
-
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="lg"
-                  className="mt-1 w-full"
-                  style={{ backgroundColor: brand }}
-                >
-                  Save Changes
-                </Button>
-              </form>
-            </Card>
+            <EditBookingForm
+              bookingId={booking.id}
+              tenantId={tenant.id}
+              services={services.map((s) => ({
+                id: s.id,
+                name: s.name,
+                duration_mins: s.duration_mins,
+              }))}
+              staffList={staffList.map((s) => ({ id: s.id, name: s.name }))}
+              initialServiceId={booking.service_id}
+              initialStaffId={booking.staff_id}
+              initialDate={initialDate}
+              initialTime={initialTime}
+              initialStatus={booking.status}
+              brand={brand}
+            />
           )}
 
           {/* Quick actions card */}

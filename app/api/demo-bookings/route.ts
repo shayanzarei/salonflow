@@ -3,6 +3,7 @@ import { generateDemoMeetingLink } from "@/lib/demo-meeting-links";
 import { demoBookingConfirmationEmail } from "@/lib/emails/demo-booking-confirmation";
 import { sendEmail } from "@/lib/emails/send";
 import { sendWhatsAppNotification } from "@/lib/notify/whatsapp";
+import { DEFAULT_FALLBACK_TIMEZONE } from "@/lib/timezone";
 import { NextRequest, NextResponse } from "next/server";
 
 const SLOT_OPTIONS = [
@@ -14,7 +15,9 @@ const SLOT_OPTIONS = [
   { value: "14:30", label: "2:30 PM" },
   { value: "16:00", label: "4:00 PM" },
 ] as const;
-const DEMO_TIMEZONE = "Europe/Amsterdam";
+// Demo bookings are slotted into SoloHub's own calendar, so they live in the
+// company's office zone (sourced from the timezone helper).
+const DEMO_TIMEZONE = DEFAULT_FALLBACK_TIMEZONE;
 
 function isValidDate(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);

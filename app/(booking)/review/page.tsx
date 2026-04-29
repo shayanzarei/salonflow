@@ -16,8 +16,17 @@ export default async function ReviewPage({
 
   if (!booking || !token) notFound();
 
+  // Read the canonical UTC column. The legacy `booked_at` is mirrored by
+  // trigger and must not be referenced in app code.
   const result = await pool.query(
-    `SELECT b.*, s.name AS service_name, st.name AS staff_name
+    `SELECT
+       b.id,
+       b.tenant_id,
+       b.client_name,
+       b.review_token,
+       b.booking_start_utc,
+       s.name AS service_name,
+       st.name AS staff_name
      FROM bookings b
      JOIN services s ON b.service_id = s.id
      JOIN staff st ON b.staff_id = st.id
@@ -34,7 +43,7 @@ export default async function ReviewPage({
     [
       bookingData.tenant_id,
       bookingData.client_name,
-      new Date(bookingData.booked_at),
+      new Date(bookingData.booking_start_utc),
     ]
   );
 

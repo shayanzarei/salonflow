@@ -5,6 +5,10 @@ import { Card } from "@/components/ds/Card";
 import { CalendarIcon, TrendingUpIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { getTenant } from "@/lib/tenant";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -58,10 +62,14 @@ export default async function StaffDetailPage({
   );
 
   const [statsResult, upcomingResult, pastResult, hoursResult] = await Promise.all([
+    // All booking-time predicates read booking_start_utc, never booked_at.
+    // booking_start_utc is the canonical TIMESTAMPTZ column; booked_at is
+    // the legacy mirror maintained read-only by trigger and slated for
+    // removal.
     pool.query(
       `SELECT
          COUNT(*) AS total_bookings,
-         COUNT(*) FILTER (WHERE b.booked_at >= NOW() - INTERVAL '7 days' AND b.booked_at <= NOW() + INTERVAL '7 days') AS this_week,
+         COUNT(*) FILTER (WHERE b.booking_start_utc >= NOW() - INTERVAL '7 days' AND b.booking_start_utc <= NOW() + INTERVAL '7 days') AS this_week,
          COALESCE(SUM(s.price) FILTER (WHERE b.status = 'confirmed'), 0) AS revenue
        FROM bookings b
        JOIN services s ON b.service_id = s.id
@@ -70,23 +78,23 @@ export default async function StaffDetailPage({
     ),
     pool.query(
       `SELECT
-         b.id, b.client_name, b.client_email, b.booked_at, b.status,
+         b.id, b.client_name, b.client_email, b.booking_start_utc, b.status,
          s.name AS service_name, s.duration_mins, s.price
        FROM bookings b
        JOIN services s ON b.service_id = s.id
-       WHERE b.staff_id = $1 AND b.booked_at >= NOW() AND b.status = 'confirmed'
-       ORDER BY b.booked_at ASC
+       WHERE b.staff_id = $1 AND b.booking_start_utc >= NOW() AND b.status = 'confirmed'
+       ORDER BY b.booking_start_utc ASC
        LIMIT 20`,
       [id]
     ),
     pool.query(
       `SELECT
-         b.id, b.client_name, b.client_email, b.booked_at, b.status,
+         b.id, b.client_name, b.client_email, b.booking_start_utc, b.status,
          s.name AS service_name, s.duration_mins, s.price
        FROM bookings b
        JOIN services s ON b.service_id = s.id
-       WHERE b.staff_id = $1 AND b.booked_at < NOW()
-       ORDER BY b.booked_at DESC
+       WHERE b.staff_id = $1 AND b.booking_start_utc < NOW()
+       ORDER BY b.booking_start_utc DESC
        LIMIT 20`,
       [id]
     ),
@@ -250,6 +258,11 @@ export default async function StaffDetailPage({
         brand={brand}
         activity={activityResult.rows}
         workingHours={workingHours}
+        tenantZone={
+          tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+            ? tenant.iana_timezone
+            : DEFAULT_FALLBACK_TIMEZONE
+        }
       />
     </div>
   );

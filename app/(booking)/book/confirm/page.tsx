@@ -11,6 +11,10 @@ import { getGoogleMapsSearchUrl } from "@/lib/maps";
 import { PHONE_INPUT_PATTERN } from "@/lib/phone";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 import { notFound } from "next/navigation";
 
 export default async function ConfirmPage({
@@ -41,6 +45,19 @@ export default async function ConfirmPage({
   const selectedStaff = staffResult.rows[0];
   if (!selectedService || !selectedStaff || !time) notFound();
 
+  // The customer-facing booking widget always renders times in the salon's
+  // wall clock — that's what the customer expects to see for an in-person
+  // appointment, and it matches the slot labels they already picked from
+  // TimeSlotPicker. Falling through to the default zone keeps older tenants
+  // (with iana_timezone unset) showing something sensible rather than
+  // silently rendering in the server's UTC zone.
+  const tenantZone =
+    tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+      ? tenant.iana_timezone
+      : DEFAULT_FALLBACK_TIMEZONE;
+
+  // `time` is a UTC ISO string (Z-suffixed) emitted by lib/availability —
+  // safe to parse with `new Date(...)` and re-format with timeZone.
   const bookedAt = new Date(time);
 
   return (
@@ -148,6 +165,7 @@ export default async function ConfirmPage({
                   {
                     label: t.booking.rowDate,
                     value: bookedAt.toLocaleDateString(dateLocale, {
+                      timeZone: tenantZone,
                       weekday: "long",
                       month: "long",
                       day: "numeric",
@@ -156,6 +174,7 @@ export default async function ConfirmPage({
                   {
                     label: t.booking.rowTime,
                     value: bookedAt.toLocaleTimeString(dateLocale, {
+                      timeZone: tenantZone,
                       hour: "numeric",
                       minute: "2-digit",
                     }),

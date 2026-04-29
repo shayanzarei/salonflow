@@ -3,7 +3,12 @@
  *
  * trialWarningEmail   — sent 3 days before trial_ends_at
  * trialExpiredEmail   — sent on the day trial_ends_at passes
+ *
+ * These emails are SoloHub-side communications (not tenant-scoped), so the
+ * date is rendered in SoloHub's office zone — sourced from the same helper
+ * default the rest of the codebase uses.
  */
+import { DEFAULT_FALLBACK_TIMEZONE } from "@/lib/timezone";
 
 function baseLayout(preheader: string, body: string): string {
   return `<!DOCTYPE html>
@@ -75,7 +80,7 @@ export function trialWarningEmail({
   );
 
   const endDate = trialEndsAt.toLocaleDateString("nl-NL", {
-    timeZone: "Europe/Amsterdam",
+    timeZone: DEFAULT_FALLBACK_TIMEZONE,
     weekday: "long",
     day: "numeric",
     month: "long",

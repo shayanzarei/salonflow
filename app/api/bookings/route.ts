@@ -1,3 +1,7 @@
+import {
+  findConflictingBooking,
+  isExclusionViolation,
+} from '@/lib/conflict-check';
 import pool from '@/lib/db';
 import { bookingConfirmationEmail } from '@/lib/emails/booking-confirmation';
 import { bookingStaffNotificationEmail } from '@/lib/emails/booking-staff-notification';
@@ -6,6 +10,11 @@ import { createNotification } from '@/lib/notifications';
 import { isValidPhone, normalizePhoneInput } from '@/lib/phone';
 import { bookableServiceSql } from '@/lib/services/bookable';
 import { canAccessPublicWebsite } from '@/lib/tenant';
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isoHasExplicitZone,
+  isValidIanaTimezone,
+} from '@/lib/timezone';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -26,6 +35,19 @@ export async function POST(req: NextRequest) {
     }
     if (!isValidPhone(normalizedPhone)) {
       return NextResponse.json({ error: "Invalid phone number format" }, { status: 400 });
+    }
+    // Hard-reject naked local-time strings ("2026-04-28T13:00:00") at the API
+    // boundary. The booking widget always serialises a UTC instant (Z-suffixed),
+    // so an unzoned string here is either a stale client or a probe — fail fast
+    // rather than silently parsing in server-local time.
+    if (!isoHasExplicitZone(booked_at)) {
+      return NextResponse.json(
+        {
+          error:
+            "Booking time must be sent as a UTC ISO string with 'Z' or an explicit ±HH:MM offset.",
+        },
+        { status: 400 }
+      );
     }
     const bookingDate = new Date(booked_at);
     if (Number.isNaN(bookingDate.getTime()) || bookingDate.getTime() <= Date.now()) {
@@ -64,6 +86,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // The salon's IANA zone — used for *_utc bookkeeping and for rendering the
+    // confirmation emails with the correct local clock + zone label.
+    const tenantZone =
+      tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+        ? (tenant.iana_timezone as string)
+        : DEFAULT_FALLBACK_TIMEZONE;
+
+    const durationMins = Number(service.duration_mins);
+    const bookingEndUtc = new Date(bookingDate.getTime() + durationMins * 60_000);
+
     const assignResult = await pool.query(
       `SELECT
          NOT EXISTS (SELECT 1 FROM service_staff ss WHERE ss.service_id = $1)
@@ -80,37 +112,59 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check for double-booking: new slot must not overlap any existing booking
-    // for the same staff member (confirmed or pending).
-    // Overlap condition: new_start < existing_end AND new_end > existing_start
-    const conflictResult = await pool.query(
-      `SELECT b.id
-       FROM bookings b
-       JOIN services s ON b.service_id = s.id
-       WHERE b.staff_id = $1
-         AND b.status IN ('confirmed', 'pending')
-         AND b.booked_at < ($2::timestamptz + ($3::int || ' minutes')::interval)
-         AND (b.booked_at + (s.duration_mins || ' minutes')::interval) > $2::timestamptz
-       LIMIT 1`,
-      [staff_id, bookingDate.toISOString(), service.duration_mins]
-    );
-
-    if (conflictResult.rows.length > 0) {
+    // Single source of truth for the overlap rule (see lib/conflict-check.ts).
+    // Inlining the query here used to drift out of sync with the manual/update
+    // endpoints and with availability — producing "looks free, returns 409"
+    // bugs.
+    const conflictId = await findConflictingBooking(pool, {
+      staffId: staff_id,
+      startUtc: bookingDate.toISOString(),
+      endUtc: bookingEndUtc.toISOString(),
+    });
+    if (conflictId) {
       return NextResponse.json(
         { error: 'This time slot is already booked. Please choose another time.' },
         { status: 409 }
       );
     }
 
-    const result = await pool.query(
-      `INSERT INTO bookings
-        (tenant_id, service_id, staff_id, booked_at, client_name, client_email, client_phone, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'confirmed')
-       RETURNING *`,
-      [tenant_id, service_id, staff_id, booked_at, client_name, client_email, normalizedPhone]
-    );
-
-    const booking = result.rows[0];
+    // The application-level conflict check above isn't enough on its own:
+    // two concurrent requests can both pass it before either commits. The
+    // `bookings_no_overlap` exclusion constraint (migration 017) is the
+    // backstop — it raises SQLSTATE 23P01 if a race slips through. Translate
+    // that to 409 Conflict so the client sees the same error shape regardless
+    // of whether it lost the race in app code or in the DB.
+    let booking;
+    try {
+      const result = await pool.query(
+        `INSERT INTO bookings
+          (tenant_id, service_id, staff_id,
+           booking_start_utc, booking_end_utc, provider_iana_timezone,
+           client_name, client_email, client_phone, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'confirmed')
+         RETURNING *`,
+        [
+          tenant_id,
+          service_id,
+          staff_id,
+          bookingDate,
+          bookingEndUtc,
+          tenantZone,
+          client_name,
+          client_email,
+          normalizedPhone,
+        ]
+      );
+      booking = result.rows[0];
+    } catch (err) {
+      if (isExclusionViolation(err)) {
+        return NextResponse.json(
+          { error: 'This time slot was just booked by someone else. Please choose another time.' },
+          { status: 409 }
+        );
+      }
+      throw err;
+    }
 
     const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.solohub.nl').replace(/\/$/, '');
     const bookingDashboardUrl = `${appUrl}/bookings`;
@@ -148,6 +202,7 @@ export async function POST(req: NextRequest) {
       salonSlug: tenant.slug,
       cancelBaseUrl: req.nextUrl.origin,
       brandColor: tenant.primary_color,
+      salonTimezone: tenantZone,
     });
 
     void sendEmail({
@@ -172,6 +227,7 @@ export async function POST(req: NextRequest) {
         durationMins: service.duration_mins,
         price: parseFloat(service.price),
         dashboardUrl: bookingDashboardUrl,
+        salonTimezone: tenantZone,
       });
 
       void sendEmail({
@@ -199,6 +255,7 @@ export async function POST(req: NextRequest) {
         durationMins: service.duration_mins,
         price: parseFloat(service.price),
         dashboardUrl: bookingDashboardUrl,
+        salonTimezone: tenantZone,
       });
 
       void sendEmail({

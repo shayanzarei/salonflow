@@ -4,6 +4,10 @@ import { fillTemplate } from "@/lib/i18n/interpolate";
 import { bcp47ForLocale } from "@/lib/i18n/locale-format";
 import { getServerTranslations } from "@/lib/i18n/server";
 import { getGoogleMapsSearchUrl } from "@/lib/maps";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 import { notFound } from "next/navigation";
 
 export default async function CancelPage({
@@ -18,15 +22,22 @@ export default async function CancelPage({
 
   if (!booking || !token) notFound();
 
+  // Pull `booking_start_utc` (the canonical UTC column) and the salon's
+  // IANA zone so the times below render in the salon's wall clock — what
+  // the customer expects to see for an in-person appointment, regardless
+  // of where their browser thinks they are.
   const result = await pool.query(
     `SELECT
-       b.*,
+       b.id,
+       b.status,
+       b.booking_start_utc,
        s.name AS service_name,
        s.price,
        s.duration_mins,
        st.name AS staff_name,
        t.primary_color,
-       t.address
+       t.address,
+       t.iana_timezone
      FROM bookings b
      JOIN services s ON b.service_id = s.id
      JOIN staff st ON b.staff_id = st.id
@@ -40,7 +51,11 @@ export default async function CancelPage({
 
   const alreadyCancelled = bookingData.status === "cancelled";
   const brand = bookingData.primary_color ?? 'var(--color-brand-600)';
-  const bookedAt = new Date(bookingData.booked_at);
+  const tenantZone =
+    bookingData.iana_timezone && isValidIanaTimezone(bookingData.iana_timezone)
+      ? bookingData.iana_timezone
+      : DEFAULT_FALLBACK_TIMEZONE;
+  const bookedAt = new Date(bookingData.booking_start_utc);
 
   if (alreadyCancelled) {
     return (
@@ -178,6 +193,7 @@ export default async function CancelPage({
               }}
             >
               {bookedAt.toLocaleDateString(dateLocale, {
+                timeZone: tenantZone,
                 weekday: "long",
                 month: "long",
                 day: "numeric",
@@ -206,6 +222,7 @@ export default async function CancelPage({
               }}
             >
               {bookedAt.toLocaleTimeString(dateLocale, {
+                timeZone: tenantZone,
                 hour: "numeric",
                 minute: "2-digit",
               })}

@@ -16,6 +16,10 @@ import { bcp47ForLocale } from "@/lib/i18n/locale-format";
 import { getServerTranslations } from "@/lib/i18n/server";
 import type { Translations } from "@/lib/i18n/translations";
 import { getTenant } from "@/lib/tenant";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -45,6 +49,15 @@ export default async function BookingsPage({
   const tenant = await getTenant();
   if (!tenant) notFound();
 
+  // Resolve the salon's IANA zone once. Every time we render to the user we
+  // pass this to Intl so the wall-clock matches the salon's location, not the
+  // browser's locale default. Falling back to the helper's default keeps any
+  // tenant whose zone is somehow unset on the historic Amsterdam value.
+  const tenantZone =
+    tenant.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+      ? tenant.iana_timezone
+      : DEFAULT_FALLBACK_TIMEZONE;
+
   const { status, page, search } = await searchParams;
   const currentPage = parseInt(page ?? "1");
   const offset = (currentPage - 1) * PAGE_SIZE;
@@ -72,15 +85,20 @@ export default async function BookingsPage({
 
   const [bookingsResult, countResult] = await Promise.all([
     pool.query(
+      // Read the canonical UTC instant (booking_start_utc), never the legacy
+      // booked_at — see lib/timezone.ts for the rule. Sorting by start_utc is
+      // semantically the same as sorting by booked_at since the trigger keeps
+      // them in sync, but reading the UTC column directly avoids any
+      // ambiguity if booked_at is later dropped.
       `SELECT
-         b.id, b.client_name, b.client_email, b.booked_at, b.status,
+         b.id, b.client_name, b.client_email, b.booking_start_utc, b.status,
          s.name AS service_name, s.price, s.duration_mins,
          st.name AS staff_name
        FROM bookings b
        JOIN services s ON b.service_id = s.id
        JOIN staff st ON b.staff_id = st.id
        WHERE ${whereClause}
-       ORDER BY b.booked_at DESC
+       ORDER BY b.booking_start_utc DESC
        LIMIT ${PAGE_SIZE} OFFSET ${offset}`,
       params
     ),
@@ -276,18 +294,33 @@ export default async function BookingsPage({
                       </p>
                     </TD>
 
-                    {/* Date & Time */}
+                    {/* Date & Time — both rendered in the salon's wall clock.
+                        Reading booking_start_utc (TIMESTAMPTZ) and passing the
+                        tenant's IANA zone via Intl is the only way to display
+                        the correct salon-local hour. Calling toLocaleString
+                        without timeZone would show the SERVER's wall clock,
+                        which is UTC on Vercel — that's the "DB has 14:00,
+                        UI shows 12" bug. */}
                     <TD>
                       <p className="text-body-sm text-ink-700">
-                        {new Date(booking.booked_at).toLocaleDateString(
+                        {new Date(booking.booking_start_utc).toLocaleDateString(
                           dateLocale,
-                          { month: "short", day: "numeric", year: "numeric" }
+                          {
+                            timeZone: tenantZone,
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
                         )}
                       </p>
                       <p className="text-caption text-ink-400">
-                        {new Date(booking.booked_at).toLocaleTimeString(
+                        {new Date(booking.booking_start_utc).toLocaleTimeString(
                           dateLocale,
-                          { hour: "numeric", minute: "2-digit" }
+                          {
+                            timeZone: tenantZone,
+                            hour: "numeric",
+                            minute: "2-digit",
+                          }
                         )}
                       </p>
                     </TD>

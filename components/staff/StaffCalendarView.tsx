@@ -8,7 +8,13 @@ interface Booking {
   id: string;
   client_name: string;
   client_email: string;
-  booked_at: string;
+  /**
+   * Canonical UTC start instant. Always re-format with Intl + tenantZone for
+   * display; never call `.toDateString()` / `.toLocaleString()` without an
+   * explicit timeZone — those read in the browser's zone and group bookings
+   * into the wrong day for staff members travelling abroad.
+   */
+  booking_start_utc: string;
   service_name: string;
   duration_mins: number;
   price: number;
@@ -20,15 +26,30 @@ interface Booking {
 export default function StaffCalendarView({
   bookings,
   brandColor,
+  tenantZone,
 }: {
   bookings: Booking[];
   brandColor: string;
+  /** Salon's IANA zone — every clock-related computation runs against it. */
+  tenantZone: string;
 }) {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
+  // Salon-local YYYY-MM-DD key. Using en-CA gives the ISO-ish ordering for
+  // free, and going through the tenant zone means a booking at 23:30
+  // Amsterdam never accidentally lands on the previous day for a staff
+  // member whose browser is in a westerly zone.
+  const ymdInTenantZone = (instant: Date): string =>
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: tenantZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(instant);
+
   const grouped = bookings.reduce(
     (acc, booking) => {
-      const day = new Date(booking.booked_at).toDateString();
+      const day = ymdInTenantZone(new Date(booking.booking_start_utc));
       if (!acc[day]) acc[day] = [];
       acc[day].push(booking);
       return acc;
@@ -36,9 +57,7 @@ export default function StaffCalendarView({
     {} as Record<string, Booking[]>
   );
 
-  const days = Object.keys(grouped).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
-  );
+  const days = Object.keys(grouped).sort(); // YYYY-MM-DD strings sort lexicographically
 
   return (
     <div>
@@ -57,7 +76,11 @@ export default function StaffCalendarView({
               <div key={day}>
                 <div className="px-6 py-2 bg-gray-50 border-b border-gray-100">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    {new Date(day).toLocaleDateString("en-US", {
+                    {/* `day` is a salon-local YYYY-MM-DD; parse as a midday-
+                        UTC instant to dodge any DST edge, then re-format via
+                        Intl in the tenant zone for the human label. */}
+                    {new Date(`${day}T12:00:00Z`).toLocaleDateString("en-US", {
+                      timeZone: tenantZone,
                       weekday: "long",
                       month: "long",
                       day: "numeric",
@@ -88,9 +111,10 @@ export default function StaffCalendarView({
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-gray-900">
-                        {new Date(booking.booked_at).toLocaleTimeString(
+                        {new Date(booking.booking_start_utc).toLocaleTimeString(
                           "en-US",
                           {
+                            timeZone: tenantZone,
                             hour: "numeric",
                             minute: "2-digit",
                           }
@@ -149,8 +173,9 @@ export default function StaffCalendarView({
                   {
                     label: "Date",
                     value: new Date(
-                      selectedBooking.booked_at
+                      selectedBooking.booking_start_utc
                     ).toLocaleDateString("en-US", {
+                      timeZone: tenantZone,
                       weekday: "long",
                       month: "long",
                       day: "numeric",
@@ -159,8 +184,9 @@ export default function StaffCalendarView({
                   {
                     label: "Time",
                     value: new Date(
-                      selectedBooking.booked_at
+                      selectedBooking.booking_start_utc
                     ).toLocaleTimeString("en-US", {
+                      timeZone: tenantZone,
                       hour: "numeric",
                       minute: "2-digit",
                     }),

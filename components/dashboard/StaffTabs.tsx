@@ -20,7 +20,15 @@ interface Booking {
   id: string;
   client_name: string;
   client_email: string;
-  booked_at: string;
+  /**
+   * Canonical UTC start instant (TIMESTAMPTZ from the DB).
+   *
+   * Always re-format with Intl + tenantZone for display — never call
+   * `.getHours()` / `.toLocaleString()` without an explicit timeZone, those
+   * read in the runtime's local zone (UTC on Vercel) and produce off-by-N
+   * hours in the UI.
+   */
+  booking_start_utc: string;
   status: string;
   service_name: string;
   duration_mins: number;
@@ -45,6 +53,7 @@ export default function StaffTabs({
   brand,
   activity,
   workingHours,
+  tenantZone,
 }: {
   staffId: string;
   tenantId: string;
@@ -56,6 +65,8 @@ export default function StaffTabs({
   brand: string;
   activity: Activity[];
   workingHours: DayHours[];
+  /** Salon's IANA zone — every booking time must render against it. */
+  tenantZone: string;
 }) {
   const [activeTab, setActiveTab] = useState<
     "upcoming" | "past" | "portal" | "hours"
@@ -109,13 +120,15 @@ export default function StaffTabs({
               <TBodyRow key={booking.id} interactive={false}>
                 <TD>
                   <p className="text-body-sm font-semibold text-ink-900">
-                    {new Date(booking.booked_at).toLocaleDateString("en-US", {
+                    {new Date(booking.booking_start_utc).toLocaleDateString("en-US", {
+                      timeZone: tenantZone,
                       month: "short",
                       day: "numeric",
                     })}
                   </p>
                   <p className="text-caption text-ink-400">
-                    {new Date(booking.booked_at).toLocaleTimeString("en-US", {
+                    {new Date(booking.booking_start_utc).toLocaleTimeString("en-US", {
+                      timeZone: tenantZone,
                       hour: "numeric",
                       minute: "2-digit",
                     })}

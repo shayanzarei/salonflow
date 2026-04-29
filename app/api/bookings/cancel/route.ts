@@ -1,5 +1,10 @@
 import pool from '@/lib/db';
 import { sendEmail } from '@/lib/emails/send';
+import {
+    DEFAULT_FALLBACK_TIMEZONE,
+    formatWithZoneLabel,
+    isValidIanaTimezone,
+} from '@/lib/timezone';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -15,6 +20,7 @@ export async function POST(req: NextRequest) {
               s.name AS service_name,
               t.name AS salon_name,
               t.slug AS salon_slug,
+              t.iana_timezone AS salon_iana_timezone,
               t.owner_email,
               t.owner_first_name,
               st.name AS staff_name,
@@ -75,11 +81,26 @@ export async function POST(req: NextRequest) {
       `,
         });
 
-        const appointmentAt = new Date(booking.booked_at).toLocaleString("nl-NL", {
-            timeZone: "Europe/Amsterdam",
+        // Render the appointment instant in the salon's zone (provider zone on
+        // the booking, falling back to the tenant's current zone, then to the
+        // helper default — never silently to server-local).
+        const candidateZone =
+            (booking.provider_iana_timezone as string | null) ||
+            (booking.salon_iana_timezone as string | null) ||
+            "";
+        const cancellationZone =
+            candidateZone && isValidIanaTimezone(candidateZone)
+                ? candidateZone
+                : DEFAULT_FALLBACK_TIMEZONE;
+        const startInstant = new Date(
+            (booking.booking_start_utc as string) ?? (booking.booked_at as string)
+        );
+        const dateLabel = startInstant.toLocaleDateString("nl-NL", {
+            timeZone: cancellationZone,
             dateStyle: "full",
-            timeStyle: "short",
         });
+        const timeLabel = formatWithZoneLabel(startInstant, cancellationZone, "nl-NL");
+        const appointmentAt = `${dateLabel} ${timeLabel}`;
         const subject = `Appointment cancelled: ${booking.service_name} — ${appointmentAt}`;
         const html = `
 <p>Hello,</p>

@@ -12,6 +12,10 @@ import { bcp47ForLocale } from "@/lib/i18n/locale-format";
 import { getServerTranslations } from "@/lib/i18n/server";
 import { getGoogleMapsSearchUrl } from "@/lib/maps";
 import { getTenant } from "@/lib/tenant";
+import {
+  DEFAULT_FALLBACK_TIMEZONE,
+  isValidIanaTimezone,
+} from "@/lib/timezone";
 import Link from "next/link";
 
 export default async function SuccessPage({
@@ -26,7 +30,7 @@ export default async function SuccessPage({
   const brand = tenant?.primary_color ?? 'var(--color-brand-600)';
 
   let bookingData: {
-    booked_at: string;
+    booking_start_utc: string;
     service_name: string;
     duration_mins: number;
     price: string | number;
@@ -34,9 +38,12 @@ export default async function SuccessPage({
   } | null = null;
 
   if (booking) {
+    // Read the canonical UTC column. The legacy `booked_at` is maintained
+    // read-only by trigger and must not be relied on in app code.
     const result = await pool.query(
       `SELECT
-         b.*,
+         b.id,
+         b.booking_start_utc,
          s.name AS service_name,
          s.duration_mins,
          s.price,
@@ -50,7 +57,15 @@ export default async function SuccessPage({
     bookingData = result.rows[0] ?? null;
   }
 
-  const bookedAt = bookingData ? new Date(bookingData.booked_at) : null;
+  // Customer-facing booking widget: always render in the salon's wall clock,
+  // never the customer's browser zone. The customer is booking an in-person
+  // appointment at the salon; that's the clock they need to plan around.
+  const tenantZone =
+    tenant?.iana_timezone && isValidIanaTimezone(tenant.iana_timezone)
+      ? tenant.iana_timezone
+      : DEFAULT_FALLBACK_TIMEZONE;
+
+  const bookedAt = bookingData ? new Date(bookingData.booking_start_utc) : null;
   const salonName = tenant?.name ?? "the salon";
   const priceNum =
     bookingData != null
@@ -141,6 +156,7 @@ export default async function SuccessPage({
                     icon: <CalendarIcon size={14} color="#9ca3af" />,
                     label: t.booking.success.dateLabel,
                     value: bookedAt.toLocaleDateString(dateLocale, {
+                      timeZone: tenantZone,
                       weekday: "long",
                       month: "long",
                       day: "numeric",
@@ -151,6 +167,7 @@ export default async function SuccessPage({
                     icon: <ClockIcon size={14} color="#9ca3af" />,
                     label: t.booking.success.timeLabel,
                     value: bookedAt.toLocaleTimeString(dateLocale, {
+                      timeZone: tenantZone,
                       hour: "numeric",
                       minute: "2-digit",
                     }),

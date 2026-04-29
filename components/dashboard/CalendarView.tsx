@@ -4,6 +4,7 @@ import { Avatar } from "@/components/ds/Avatar";
 import { Button } from "@/components/ds/Button";
 import { Modal } from "@/components/ds/Modal";
 import { CalendarIcon, ClockIcon, ScissorsIcon, SearchIcon, UserIcon } from "@/components/ui/Icons";
+import { salonLocalParts } from "@/lib/timezone";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -11,7 +12,15 @@ interface Booking {
   id: string;
   client_name: string;
   client_email: string;
-  booked_at: string;
+  /**
+   * Canonical UTC start instant (ISO 8601 with offset/Z) for the booking.
+   *
+   * Always re-format with Intl + the tenant's IANA zone — never read
+   * `.getHours()` / `.getMinutes()` directly off a Date built from this
+   * string, those return values in the runtime's local zone (UTC on Vercel)
+   * and produce off-by-N hours in the calendar grid.
+   */
+  booking_start_utc: string;
   service_name: string;
   duration_mins: number;
   price: number;
@@ -39,11 +48,55 @@ export default function CalendarView({
   bookings,
   staff,
   brandColor,
+  tenantZone,
 }: {
   bookings: Booking[];
   staff: Staff[];
   brandColor: string;
+  /**
+   * IANA zone for the salon (e.g. "Europe/Amsterdam"). Every clock-related
+   * computation in this component must be anchored to it — the previous code
+   * used `Date#getHours()` and `Date#toDateString()` which both run in the
+   * viewer's *browser* zone, so a salon owner travelling abroad would see
+   * their bookings shift on the grid. With this prop, we compute the salon-
+   * local hour and salon-local YYYY-MM-DD via Intl.formatToParts.
+   */
+  tenantZone: string;
 }) {
+  // Helper: salon-local hour (0-23) for a UTC instant.
+  const hourInTenantZone = (instant: Date): number => {
+    const part = new Intl.DateTimeFormat("en-GB", {
+      timeZone: tenantZone,
+      hour: "2-digit",
+      hour12: false,
+    }).formatToParts(instant).find((p) => p.type === "hour")!.value;
+    return parseInt(part, 10);
+  };
+
+  // Helper: salon-local YYYY-MM-DD for a UTC instant.
+  const ymdInTenantZone = (instant: Date): string => {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: tenantZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(instant);
+    const y = parts.find((p) => p.type === "year")!.value;
+    const m = parts.find((p) => p.type === "month")!.value;
+    const d = parts.find((p) => p.type === "day")!.value;
+    return `${y}-${m}-${d}`;
+  };
+
+  // Helper: turn a "local Date" (the grid's day cells) into salon-local YMD.
+  // The grid day is constructed from the user's browser, so we read its
+  // wall-clock components directly rather than going through the salon zone
+  // again — these dates only exist as keys for matching, not as instants.
+  const ymdFromGridDay = (day: Date): string => {
+    const y = day.getFullYear();
+    const m = String(day.getMonth() + 1).padStart(2, "0");
+    const d = String(day.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const now = new Date();
     const day = now.getDay();
@@ -78,11 +131,16 @@ export default function CalendarView({
       : bookings.filter((b) => b.staff_id === selectedStaffId);
 
   function getBookingsForDayAndHour(day: Date, hour: number) {
+    const dayYmd = ymdFromGridDay(day);
     return filteredBookings.filter((b) => {
-      const bookedAt = new Date(b.booked_at);
+      const startInstant = new Date(b.booking_start_utc);
+      // Compare salon-local Y-M-D and salon-local hour. Going through the
+      // tenant zone (rather than browser-local) means a 14:00 Amsterdam
+      // booking shows in the 14:00 row even when the salon owner is on a
+      // browser that's set to UTC.
       return (
-        bookedAt.toDateString() === day.toDateString() &&
-        bookedAt.getHours() === hour
+        ymdInTenantZone(startInstant) === dayYmd &&
+        hourInTenantZone(startInstant) === hour
       );
     });
   }
@@ -91,9 +149,20 @@ export default function CalendarView({
     return (durationMins / 60) * 64;
   }
 
+  // Time-line position is also computed against the salon's wall clock so the
+  // red "now" line lands where the salon's clock says, not where the browser's
+  // does.
+  const nowSalonHour = hourInTenantZone(now);
+  const nowSalonMinute = parseInt(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: tenantZone,
+      minute: "2-digit",
+    }).formatToParts(now).find((p) => p.type === "minute")!.value,
+    10
+  );
   const currentTimePercent =
-    (((now.getHours() - 8) * 60 + now.getMinutes()) / (13 * 60)) * 100;
-  const showTimeLine = now.getHours() >= 8 && now.getHours() <= 20;
+    (((nowSalonHour - 8) * 60 + nowSalonMinute) / (13 * 60)) * 100;
+  const showTimeLine = nowSalonHour >= 8 && nowSalonHour <= 20;
 
   function prevWeek() {
     const prev = new Date(currentWeekStart);
@@ -268,9 +337,15 @@ export default function CalendarView({
                       const color =
                         staffColorMap[booking.staff_id] ?? brandColor;
                       const height = getBookingHeight(booking.duration_mins);
-                      const startMinutes = new Date(
-                        booking.booked_at
-                      ).getMinutes();
+                      // Use salonLocalParts so the minute offset reflects the
+                      // salon's clock (e.g. 14:30 Amsterdam) instead of the
+                      // viewer's. Calling Date#getMinutes() here would read
+                      // in the browser's zone — fine in Amsterdam, wrong in
+                      // a UTC-set browser, and silently shifts on DST seams.
+                      const startMinutes = salonLocalParts(
+                        new Date(booking.booking_start_utc),
+                        tenantZone
+                      ).minute;
                       const topOffset = (startMinutes / 60) * 64;
 
                       return (
@@ -297,9 +372,13 @@ export default function CalendarView({
                           {height > 56 && (
                             <p className="mt-0.5 text-[10px] text-white/75">
                               <ClockIcon size={10} style={{ display: "inline", verticalAlign: "middle", marginRight: 3 }} />
-                              {new Date(booking.booked_at).toLocaleTimeString(
+                              {new Date(booking.booking_start_utc).toLocaleTimeString(
                                 "en-US",
-                                { hour: "numeric", minute: "2-digit" }
+                                {
+                                  timeZone: tenantZone,
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                }
                               )}
                             </p>
                           )}
@@ -406,17 +485,26 @@ export default function CalendarView({
                 {
                   icon: <CalendarIcon size={15} />,
                   label: "Date",
-                  value: new Date(selectedBooking.booked_at).toLocaleDateString(
+                  value: new Date(selectedBooking.booking_start_utc).toLocaleDateString(
                     "en-US",
-                    { weekday: "long", month: "long", day: "numeric" }
+                    {
+                      timeZone: tenantZone,
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    }
                   ),
                 },
                 {
                   icon: <ClockIcon size={15} />,
                   label: "Time",
-                  value: new Date(selectedBooking.booked_at).toLocaleTimeString(
+                  value: new Date(selectedBooking.booking_start_utc).toLocaleTimeString(
                     "en-US",
-                    { hour: "numeric", minute: "2-digit" }
+                    {
+                      timeZone: tenantZone,
+                      hour: "numeric",
+                      minute: "2-digit",
+                    }
                   ),
                 },
                 {

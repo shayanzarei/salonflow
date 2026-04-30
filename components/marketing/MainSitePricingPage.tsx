@@ -48,6 +48,12 @@ export default function MainSitePricingPage({
     () => pricingFaqs[0]?.q ?? null
   );
   const [checkoutPlan, setCheckoutPlan] = useState<string | null>(null);
+  // Beta mode: hide the Stripe Checkout button and route the pricing card CTA
+  // to the contact form instead. Server is also gated (see
+  // app/api/stripe/checkout/route.ts) — this is purely a UX layer.
+  // NEXT_PUBLIC_BETA_MODE === "false" opens paid plans; any other value (or
+  // unset) keeps the beta UI active. Default-on is intentional.
+  const isBetaMode = process.env.NEXT_PUBLIC_BETA_MODE !== "false";
 
   useEffect(() => {
     const first = pricingFaqs[0]?.q ?? null;
@@ -243,18 +249,33 @@ export default function MainSitePricingPage({
                       </div>
                     </div>
 
-                    <Button
-                      onClick={() => startCheckout(plan.id)}
-                      disabled={checkoutPlan === plan.id}
-                      size="xl"
-                      
-                      variant={plan.featured ? "primary" : "secondary"}
-                      className="mb-8 w-full"
-                    >
-                      {checkoutPlan === plan.id
-                        ? m.pricingRedirecting
-                        : m.pricingGetStarted}
-                    </Button>
+                    {isBetaMode ? (
+                      <Button
+                        asChild
+                        size="xl"
+                        variant={plan.featured ? "primary" : "secondary"}
+                        className="mb-8 w-full"
+                      >
+                        <Link
+                          href={`/contact?plan=${plan.id}&beta=1`}
+                          aria-label={`Join the SoloHub private beta — ${plan.name}`}
+                        >
+                          {m.pricingJoinBeta ?? "Join the beta"}
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => startCheckout(plan.id)}
+                        disabled={checkoutPlan === plan.id}
+                        size="xl"
+                        variant={plan.featured ? "primary" : "secondary"}
+                        className="mb-8 w-full"
+                      >
+                        {checkoutPlan === plan.id
+                          ? m.pricingRedirecting
+                          : m.pricingGetStarted}
+                      </Button>
+                    )}
                     <ul className="w-full space-y-4 text-left">
                       {cardFeatures.map((feature) => (
                         <li key={feature} className="flex items-start">

@@ -24,6 +24,23 @@ const VALID_PLANS = new Set<PlanId>(["solo", "hub", "agency"]);
 const VALID_CYCLES = new Set<BillingCycle>(["monthly", "annual"]);
 
 export async function POST(request: NextRequest) {
+  // ── Beta kill-switch ─────────────────────────────────────────────────────
+  // SoloHub is in private beta. The legal entity is not yet incorporated, so
+  // we cannot legally collect payment. The pricing page no longer renders a
+  // button that hits this route, but a stale bookmark or direct curl could
+  // still land here; refuse explicitly. Set BETA_MODE=false in the
+  // environment to flip back on once the entity is registered.
+  if (process.env.BETA_MODE !== "false") {
+    return NextResponse.json(
+      {
+        error:
+          "SoloHub is currently in private beta. Paid plans are not yet available — please contact us at hello@solohub.nl for early access.",
+      },
+      { status: 503 }
+    );
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   try {
     const body = (await request.json()) as {
       plan?: string;
@@ -70,6 +87,21 @@ export async function POST(request: NextRequest) {
       cancel_url: `${baseUrl}/pricing/checkout/cancel`,
       customer_email: email || undefined,
       allow_promotion_codes: true,
+      // ── VAT / Stripe Tax (disabled during free beta) ────────────────────
+      // SoloHub is not yet incorporated and has no VAT registration, so we
+      // cannot legally collect BTW. When the entity is registered:
+      //   1) enable Stripe Tax in the dashboard (Settings → Tax) with the
+      //      NL origin address and a NL VAT registration;
+      //   2) set tax_behavior = "exclusive" on every Stripe Price;
+      //   3) re-enable the three lines below.
+      // The success page and confirmation email already render a tax
+      // breakdown when Stripe returns total_details.amount_tax > 0, so
+      // turning this back on later requires no further code changes.
+      //
+      // automatic_tax: { enabled: true },
+      // tax_id_collection: { enabled: true },
+      // billing_address_collection: "required",
+      // ────────────────────────────────────────────────────────────────────
       // Stamp plan info on the subscription itself so webhooks can read it later
       // (e.g. when the user upgrades or downgrades via the Customer Portal).
       subscription_data: {

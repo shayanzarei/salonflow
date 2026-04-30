@@ -70,6 +70,7 @@ export type MarketingSection = {
   pricingMostPopular: string;
   pricingRedirecting: string;
   pricingGetStarted: string;
+  pricingJoinBeta: string;
   pricingSuffixMo: string;
   pricingSuffixYr: string;
   pricingTrialEyebrow: string;
@@ -131,7 +132,7 @@ const faqSectionsEn: MarketingFaqSection[] = [
     items: [
       {
         q: "Do your prices include BTW (VAT)?",
-        a: "As standard for B2B services in the Netherlands, prices shown on our website exclude 21% BTW. This is clearly calculated and added on your monthly invoice.",
+        a: "These are our planned prices. We are currently in private beta and not yet collecting payment. Once we open paid plans, the pricing structure will follow standard B2B SaaS practice in the Netherlands.",
       },
       {
         q: "What is a Founding Member or Early Bird account?",
@@ -165,7 +166,7 @@ const faqSectionsEn: MarketingFaqSection[] = [
     items: [
       {
         q: "Is SoloHub a Dutch company?",
-        a: "Yes. SoloHub B.V. is fully registered with the Dutch Chamber of Commerce (KVK). We are built in the Netherlands specifically for the Dutch service market.",
+        a: "SoloHub is built in the Netherlands specifically for the Dutch service market. We are a pre-launch product running a private beta with our first salons; the legal entity will be incorporated before paid plans open.",
       },
       {
         q: "How do you handle data and privacy (AVG/GDPR)?",
@@ -215,7 +216,7 @@ const faqSectionsNl: MarketingFaqSection[] = [
     items: [
       {
         q: "Zijn jullie prijzen inclusief BTW?",
-        a: "Zoals gebruikelijk bij B2B-diensten in Nederland tonen we prijzen exclusief 21% BTW. Op je factuur wordt dit duidelijk verrekend.",
+        a: "Dit zijn onze geplande prijzen. We zijn nu in private bèta en innen nog geen betalingen. Zodra betaalde abonnementen openstaan, volgt de prijsopbouw de gebruikelijke B2B-SaaS-praktijk in Nederland.",
       },
       {
         q: "Wat is een Founding Member- of Early Bird-account?",
@@ -249,7 +250,7 @@ const faqSectionsNl: MarketingFaqSection[] = [
     items: [
       {
         q: "Is SoloHub een Nederlands bedrijf?",
-        a: "Ja. SoloHub B.V. staat ingeschreven bij de KVK. We bouwen in Nederland voor de Nederlandse dienstverleningsmarkt.",
+        a: "SoloHub wordt in Nederland gebouwd voor de Nederlandse dienstverleningsmarkt. We zijn een pre-launch product in private bèta met de eerste salons; de juridische entiteit wordt opgericht voordat we betaalde abonnementen openstellen.",
       },
       {
         q: "Hoe gaan jullie om met data en privacy (AVG)?",
@@ -279,7 +280,7 @@ const faqSectionsNl: MarketingFaqSection[] = [
 const pricingFaqsEn: MarketingFaqItem[] = [
   {
     q: "Is this price inclusive of VAT?",
-    a: "As is standard for B2B SaaS in the Netherlands, all prices are displayed excluding 21% BTW.",
+    a: "We're not collecting payment yet — SoloHub is in private beta. Once paid plans open, pricing will follow standard B2B SaaS practice in the Netherlands.",
   },
   {
     q: "Can each staff member have their own login?",
@@ -318,7 +319,7 @@ const pricingFaqsEn: MarketingFaqItem[] = [
 const pricingFaqsNl: MarketingFaqItem[] = [
   {
     q: "Is deze prijs inclusief BTW?",
-    a: "Zoals gebruikelijk bij B2B-SaaS in Nederland tonen we alle prijzen exclusief 21% BTW.",
+    a: "We innen nog geen betalingen — SoloHub is in private bèta. Zodra betaalde abonnementen openstaan, volgt de prijsopbouw de gebruikelijke B2B-SaaS-praktijk in Nederland.",
   },
   {
     q: "Kan elk teamlid een eigen login krijgen?",
@@ -473,7 +474,7 @@ export const marketingEn: MarketingSection = {
   pricingUnableCheckout: "Unable to start checkout. Please try again.",
   pricingHeroTitle: "Simple, Professional Pricing",
   pricingHeroSubtitle:
-    "No commission, no hidden fees. All prices exclude 21% BTW.",
+    "These are our planned prices. SoloHub is currently in private beta — get in touch to join the first 5 salons we onboard.",
   pricingMonthly: "Monthly",
   pricingAnnually: "Annually",
   pricingSave20: "Save 20%",
@@ -481,6 +482,7 @@ export const marketingEn: MarketingSection = {
   pricingMostPopular: "Most Popular",
   pricingRedirecting: "Redirecting...",
   pricingGetStarted: "Get Started",
+  pricingJoinBeta: "Join the beta",
   pricingSuffixMo: "/mo",
   pricingSuffixYr: "/yr",
   pricingTrialEyebrow: "Why a 14-day trial?",
@@ -586,7 +588,7 @@ export const marketingNl: MarketingSection = {
     "Afrekenen starten lukt niet. Probeer het opnieuw.",
   pricingHeroTitle: "Eenvoudige, professionele prijzen",
   pricingHeroSubtitle:
-    "Geen commissie, geen verborgen kosten. Alle prijzen exclusief 21% BTW.",
+    "Dit zijn onze geplande prijzen. SoloHub is nu in private bèta — neem contact op om bij de eerste 5 salons te horen die we onboarden.",
   pricingMonthly: "Maandelijks",
   pricingAnnually: "Jaarlijks",
   pricingSave20: "Bespaar 20%",
@@ -594,6 +596,7 @@ export const marketingNl: MarketingSection = {
   pricingMostPopular: "Populairste",
   pricingRedirecting: "Doorsturen...",
   pricingGetStarted: "Aan de slag",
+  pricingJoinBeta: "Doe mee aan de bèta",
   pricingSuffixMo: "/mnd",
   pricingSuffixYr: "/jr",
   pricingTrialEyebrow: "Waarom 14 dagen proberen?",

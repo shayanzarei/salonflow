@@ -12,6 +12,11 @@ type SessionPayload = {
   customer_email: string | null;
   plan: string | null;
   billing_cycle: string | null;
+  // Tax breakdown — all in the smallest currency unit (cents).
+  // subtotal + tax = total under Stripe Tax. tax may be 0 for reverse-charge
+  // (EU B2B with valid VAT ID) and non-EU customers.
+  amount_subtotal: number | null;
+  amount_tax: number | null;
   amount_total: number | null;
   currency: string | null;
   provisioned: boolean;
@@ -49,13 +54,24 @@ export function CheckoutSuccessContent({ sessionId }: { sessionId: string }) {
     };
   }, [sessionId]);
 
-  const amountLabel =
-    data?.amount_total != null && data.currency
+  const fmtCents = (cents: number | null | undefined) =>
+    cents != null && data?.currency
       ? new Intl.NumberFormat("nl-NL", {
           style: "currency",
           currency: data.currency.toUpperCase(),
-        }).format(data.amount_total / 100)
+        }).format(cents / 100)
       : null;
+
+  const subtotalLabel = fmtCents(data?.amount_subtotal);
+  const taxLabel = fmtCents(data?.amount_tax);
+  const amountLabel = fmtCents(data?.amount_total);
+  // Show the three-row breakdown only when there's actual VAT (NL or EU
+  // non-reverse-charge). Reverse-charge and non-EU customers see a single
+  // Total row, since their tax is 0.
+  const showBreakdown =
+    subtotalLabel !== null &&
+    amountLabel !== null &&
+    (data?.amount_tax ?? 0) > 0;
 
   const pendingAsync =
     !loading &&
@@ -110,12 +126,29 @@ export function CheckoutSuccessContent({ sessionId }: { sessionId: string }) {
                   </dd>
                 </div>
               )}
-              {amountLabel && (
+              {showBreakdown ? (
+                <>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-500">Subtotal</dt>
+                    <dd className="text-slate-900">{subtotalLabel}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-500">BTW (21%)</dt>
+                    <dd className="text-slate-900">{taxLabel}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4 border-t border-slate-200 pt-3">
+                    <dt className="text-slate-500">Total</dt>
+                    <dd className="font-semibold text-slate-900">
+                      {amountLabel}
+                    </dd>
+                  </div>
+                </>
+              ) : amountLabel ? (
                 <div className="flex justify-between gap-4">
                   <dt className="text-slate-500">Total</dt>
                   <dd className="font-medium text-slate-900">{amountLabel}</dd>
                 </div>
-              )}
+              ) : null}
               {data.customer_email && (
                 <div className="flex justify-between gap-4">
                   <dt className="text-slate-500">Email</dt>

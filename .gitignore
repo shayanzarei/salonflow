@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# FUSE filesystem ghosts left by sandboxed editors that rewrite files
+# in-place (perl -i, sed -i, etc). They're invisible to the real
+# macOS/Linux filesystem but show up as untracked in git. Never commit.
+.fuse_hidden*

@@ -54,7 +54,7 @@ function baseLayout(preheader: string, body: string): string {
               <a href="https://app.solohub.nl/settings/billing" style="color:#64748B;text-decoration:none;">Billing settings</a>&nbsp;·&nbsp;
               <a href="https://solohub.nl/privacy" style="color:#64748B;text-decoration:none;">Privacy Policy</a>
             </p>
-            <p style="margin:0;font-size:11px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">SoloHub B.V. · KvK 12345678 · Herengracht 1, Amsterdam</p>
+            <p style="margin:0;font-size:11px;color:#94A3B8;font-family:Inter,Arial,Helvetica,sans-serif;">SoloHub (private beta) · hello@solohub.nl</p>
           </td>
         </tr>
 

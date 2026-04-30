@@ -11,6 +11,11 @@ type SubscriptionConfirmationInput = {
   email?: string | null;
   plan?: string | null;
   billingCycle?: string | null;
+  /** Subtotal in cents (pre-tax). Required to render the VAT breakdown. */
+  subtotalCents?: number | null;
+  /** VAT amount in cents. 0 for reverse-charge / non-EU customers. */
+  taxCents?: number | null;
+  /** Grand total in cents (subtotal + tax). What the customer was charged. */
   amountCents?: number | null;
   currency?: string | null;
 };
@@ -19,6 +24,8 @@ export function subscriptionConfirmationEmail({
   email,
   plan,
   billingCycle,
+  subtotalCents,
+  taxCents,
   amountCents,
   currency,
 }: SubscriptionConfirmationInput) {
@@ -31,13 +38,28 @@ export function subscriptionConfirmationEmail({
         ? "Monthly"
         : null;
 
-  const amountLabel =
-    amountCents != null && currency
+  const fmt = (cents: number) =>
+    currency
       ? new Intl.NumberFormat("nl-NL", {
           style: "currency",
           currency: currency.toUpperCase(),
-        }).format(amountCents / 100)
-      : null;
+        }).format(cents / 100)
+      : `${(cents / 100).toFixed(2)}`;
+
+  // Render a three-row breakdown when we have all three numbers AND there's
+  // actual tax to show; otherwise fall back to the single-line "Total" so
+  // older call sites and reverse-charge / non-EU customers (tax = 0) get a
+  // clean single line.
+  const showBreakdown =
+    subtotalCents != null &&
+    amountCents != null &&
+    currency != null &&
+    (taxCents ?? 0) > 0;
+
+  const subtotalLabel = showBreakdown ? fmt(subtotalCents!) : null;
+  const taxLabel = showBreakdown ? fmt(taxCents ?? 0) : null;
+  const amountLabel =
+    amountCents != null && currency ? fmt(amountCents) : null;
 
   const subject = "Your SoloHub subscription is confirmed";
 
@@ -72,12 +94,25 @@ export function subscriptionConfirmationEmail({
                   <td style="padding:14px 16px;text-align:right;font-size:13px;font-weight:700;color:#0f172a;text-transform:capitalize;">${safePlan}${cycleLabel ? ` (${cycleLabel})` : ""}</td>
                 </tr>
                 ${
-                  amountLabel
+                  showBreakdown
                     ? `<tr>
+                  <td style="padding:0 16px 8px;font-size:13px;color:#64748b;">Subtotal</td>
+                  <td style="padding:0 16px 8px;text-align:right;font-size:13px;color:#0f172a;">${subtotalLabel}</td>
+                </tr>
+                <tr>
+                  <td style="padding:0 16px 8px;font-size:13px;color:#64748b;">BTW (21%)</td>
+                  <td style="padding:0 16px 8px;text-align:right;font-size:13px;color:#0f172a;">${taxLabel}</td>
+                </tr>
+                <tr>
+                  <td style="padding:0 16px 14px;font-size:13px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:8px;">Total</td>
+                  <td style="padding:0 16px 14px;text-align:right;font-size:13px;font-weight:700;color:#0f172a;border-top:1px solid #e2e8f0;padding-top:8px;">${amountLabel}</td>
+                </tr>`
+                    : amountLabel
+                      ? `<tr>
                   <td style="padding:0 16px 14px;font-size:13px;color:#64748b;">Total</td>
                   <td style="padding:0 16px 14px;text-align:right;font-size:13px;font-weight:700;color:#0f172a;">${amountLabel}</td>
                 </tr>`
-                    : ""
+                      : ""
                 }
                 ${
                   safeEmail

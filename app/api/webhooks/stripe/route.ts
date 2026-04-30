@@ -122,6 +122,8 @@ export async function POST(request: Request) {
             email: customerEmail,
             plan: session.metadata?.plan ?? null,
             billingCycle: session.metadata?.billingCycle ?? null,
+            subtotalCents: session.amount_subtotal,
+            taxCents: session.total_details?.amount_tax ?? 0,
             amountCents: session.amount_total,
             currency: session.currency,
           });

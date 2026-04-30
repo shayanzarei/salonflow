@@ -147,6 +147,12 @@ export default function BillingPage() {
   const [selectedCycle, setSelectedCycle] = useState<BillingCycle>("monthly");
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
+  // Beta mode: keep the cards visible (so users see the planned plans) but
+  // disable the upgrade/portal buttons. The /api/stripe/checkout route is
+  // also gated server-side. Set NEXT_PUBLIC_BETA_MODE="false" to open paid
+  // plans once the legal entity is registered.
+  const isBetaMode = process.env.NEXT_PUBLIC_BETA_MODE !== "false";
+
   // Read URL params for expired/suspended banners
   const params =
     typeof window !== "undefined"
@@ -243,6 +249,22 @@ export default function BillingPage() {
         </p>
       </div>
 
+      {/* Private-beta banner — replaces upgrade prompts during the pre-incorporation window. */}
+      {isBetaMode && (
+        <div className="rounded-xl border border-violet-200 bg-violet-50 px-5 py-4 flex items-start gap-3">
+          <span className="text-violet-500 text-lg">🚀</span>
+          <div>
+            <p className="font-semibold text-violet-900">
+              You&apos;re on the SoloHub private beta
+            </p>
+            <p className="text-sm text-violet-800 mt-0.5">
+              Paid plans aren&apos;t open yet. Keep using everything for free —
+              we&apos;ll email you ahead of time before billing starts.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Trial expired banner */}
       {(isExpired || (isTrialing && trialDays === 0)) && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 flex items-start gap-3">
@@ -334,8 +356,13 @@ export default function BillingPage() {
           {isActive && (
             <button
               onClick={handleManagePortal}
-              disabled={managingPortal}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+              disabled={managingPortal || isBetaMode}
+              title={
+                isBetaMode
+                  ? "Available when paid plans open"
+                  : undefined
+              }
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {managingPortal ? "Opening…" : "Manage subscription ↗"}
             </button>
@@ -462,17 +489,22 @@ export default function BillingPage() {
               )}
               <button
                 onClick={handleUpgrade}
-                disabled={upgrading}
-                className="w-full rounded-xl py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                disabled={upgrading || isBetaMode}
+                title={
+                  isBetaMode ? "Available when paid plans open" : undefined
+                }
+                className="w-full rounded-xl py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ backgroundColor: brand }}
               >
-                {upgrading
-                  ? "Redirecting to checkout…"
-                  : `Subscribe to ${PLAN_META[selectedPlan].name} — €${
-                      selectedCycle === "monthly"
-                        ? PLAN_META[selectedPlan].monthlyPrice
-                        : Math.round(PLAN_META[selectedPlan].annualPrice / 12)
-                    }/mo`}
+                {isBetaMode
+                  ? `${PLAN_META[selectedPlan].name} — available when paid plans open`
+                  : upgrading
+                    ? "Redirecting to checkout…"
+                    : `Subscribe to ${PLAN_META[selectedPlan].name} — €${
+                        selectedCycle === "monthly"
+                          ? PLAN_META[selectedPlan].monthlyPrice
+                          : Math.round(PLAN_META[selectedPlan].annualPrice / 12)
+                      }/mo`}
               </button>
             </div>
           )}

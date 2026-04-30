@@ -1,9 +1,10 @@
+import Providers from "@/components/providers";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/i18n/translations";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
-import Providers from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Providers initialLocale={locale}>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   );

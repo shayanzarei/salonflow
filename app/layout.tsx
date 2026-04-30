@@ -1,6 +1,7 @@
 import Providers from "@/components/providers";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/i18n/translations";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
@@ -46,6 +47,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Providers initialLocale={locale}>{children}</Providers>
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>

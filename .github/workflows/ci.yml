@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-flight runs on the same ref when a new commit lands. Saves CI
+# minutes and keeps PR feedback fast.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint, typecheck, unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        # `--prefer-offline` because cache hit is the common path; `--no-audit`
+        # to skip the audit step in CI (we run npm audit on a separate
+        # cadence, not on every PR).
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        # Keep going past the first error so the PR sees every lint failure
+        # at once instead of fix-rerun-fix-rerun.
+        run: npm run lint -- --max-warnings 0
+        continue-on-error: false
+
+      - name: Unit tests
+        # CI=1 toggles vitest's github-actions reporter (configured in
+        # vitest.config.ts) so failed assertions surface as PR annotations
+        # on the exact line of the test file.
+        env:
+          CI: "1"
+        run: npm test

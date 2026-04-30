@@ -11,7 +11,7 @@ import { computeSlots } from "@/lib/availability";
 import pool from "@/lib/db";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getGoogleMapsSearchUrl } from "@/lib/maps";
-import { getTenant } from "@/lib/tenant";
+import { canAccessPublicWebsite, getTenant } from "@/lib/tenant";
 import { normalizeWebsiteTemplate } from "@/lib/website-templates";
 import { isMainSiteHost } from "@/lib/main-site";
 import { autoDescription, autoTitle } from "@/lib/seo/auto-meta";
@@ -53,6 +53,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const tenant = await getTenant();
   if (!tenant) {
     return { title: "Not found" };
+  }
+
+  // If the tenant exists but the public site is gated off (draft / expired
+  // trial / suspended), emit a noindex tag. Browsers will still see it in
+  // case our gate ever lets a request through, but Googlebot will skip.
+  if (!canAccessPublicWebsite(tenant)) {
+    return { title: "Not found", robots: { index: false, follow: false } };
   }
 
   // We need services to drive the service-aware description. One small
@@ -217,6 +224,18 @@ export default async function BookingHomePage({
   const qp = await searchParams;
   const tenant = await getTenant();
   if (!tenant) notFound();
+
+  // Visibility gate: tenant resolved, but is the public site supposed to be
+  // reachable right now? Three states block:
+  //   - website_status !== "published" (still in draft, never approved)
+  //   - tenant_status === "trial" with an expired trial_ends_at
+  //   - tenant_status === "suspended"
+  // Active subs and live trials pass through. We 404 (rather than redirect
+  // to a "site coming soon" page) so search engines that crawl during a
+  // suspension don't index a placeholder.
+  if (!canAccessPublicWebsite(tenant)) {
+    notFound();
+  }
 
   const [servicesResult, staffResult, reviewsResult, galleryResult, reviewStatsResult, clientStatsResult, sections, workingHoursResult] =
     await Promise.all([

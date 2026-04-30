@@ -30,6 +30,8 @@ export type BookingSection = {
   placeholderPhone: string;
   confirmPolicyNotice: string;
   confirmBookingCta: string;
+  submittingCta: string;
+  genericError: string;
   progress: {
     service: string;
     staff: string;
@@ -127,6 +129,9 @@ export const bookingEn: BookingSection = {
   confirmPolicyNotice:
     "By confirming, you agree to our cancellation policy. Free cancellation up to 24 hours before your appointment.",
   confirmBookingCta: "Confirm booking →",
+  submittingCta: "Confirming…",
+  genericError:
+    "Something went wrong. Please try again, or pick another time slot.",
   progress: {
     service: "Service",
     staff: "Staff",
@@ -227,6 +232,9 @@ export const bookingNl: BookingSection = {
   confirmPolicyNotice:
     "Door te bevestigen ga je akkoord met het annuleringsbeleid. Gratis annuleren tot 24 uur voor je afspraak.",
   confirmBookingCta: "Afspraak bevestigen →",
+  submittingCta: "Bezig met bevestigen…",
+  genericError:
+    "Er ging iets mis. Probeer het opnieuw of kies een ander tijdslot.",
   progress: {
     service: "Dienst",
     staff: "Medewerker",

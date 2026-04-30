@@ -1,14 +1,12 @@
+import BookingConfirmForm from "@/components/booking/BookingConfirmForm";
 import BookingProgress from "@/components/booking/BookingProgress";
 import { Avatar } from "@/components/ds/Avatar";
-import { Button } from "@/components/ds/Button";
-import { Input } from "@/components/ds/Input";
 import { MapPinIcon } from "@/components/ui/Icons";
 import pool from "@/lib/db";
 import { fillTemplate } from "@/lib/i18n/interpolate";
 import { bcp47ForLocale } from "@/lib/i18n/locale-format";
 import { getServerTranslations } from "@/lib/i18n/server";
 import { getGoogleMapsSearchUrl } from "@/lib/maps";
-import { PHONE_INPUT_PATTERN } from "@/lib/phone";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getTenant } from "@/lib/tenant";
 import {
@@ -281,62 +279,27 @@ export default async function ConfirmPage({
               {t.booking.yourDetailsHint}
             </p>
 
-            <form
-              action="/api/bookings"
-              method="POST"
-              className="flex flex-col gap-5"
-            >
-              <input type="hidden" name="tenant_id" value={tenant.id} />
-              <input type="hidden" name="service_id" value={service} />
-              <input type="hidden" name="staff_id" value={staff} />
-              <input type="hidden" name="booked_at" value={time} />
-
-              <Input
-                id="confirm-client-name"
-                name="client_name"
-                type="text"
-                required
-                label={t.booking.fullName}
-                placeholder={t.booking.placeholderName}
-              />
-
-              <Input
-                id="confirm-client-email"
-                name="client_email"
-                type="email"
-                required
-                label={t.booking.emailAddress}
-                placeholder={t.booking.placeholderEmail}
-              />
-
-              <Input
-                id="confirm-client-phone"
-                name="client_phone"
-                type="tel"
-                pattern={PHONE_INPUT_PATTERN}
-                title="Use a valid phone number format."
-                label={t.booking.phoneNumber}
-                optionalLabel={t.booking.phoneOptional}
-                placeholder={t.booking.placeholderPhone}
-              />
-
-              {/* Cancellation policy */}
-              <div className="rounded-xl bg-ink-50 px-4 py-3.5">
-                <p className="m-0 text-xs leading-relaxed text-ink-500">
-                  {t.booking.confirmPolicyNotice}
-                </p>
-              </div>
-
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="mt-1 w-full rounded-full"
-                style={{ backgroundColor: brand }}
-              >
-                {t.booking.confirmBookingCta}
-              </Button>
-            </form>
+            <BookingConfirmForm
+              tenantId={tenant.id}
+              serviceId={service!}
+              staffId={staff!}
+              bookedAt={time}
+              brand={brand}
+              labels={{
+                fullName: t.booking.fullName,
+                placeholderName: t.booking.placeholderName,
+                emailAddress: t.booking.emailAddress,
+                placeholderEmail: t.booking.placeholderEmail,
+                phoneNumber: t.booking.phoneNumber,
+                phoneOptional: t.booking.phoneOptional,
+                placeholderPhone: t.booking.placeholderPhone,
+                confirmPolicyNotice: t.booking.confirmPolicyNotice,
+                confirmBookingCta: t.booking.confirmBookingCta,
+                submittingCta: t.booking.submittingCta,
+                genericError: t.booking.genericError,
+                phoneTitle: "Use a valid phone number format.",
+              }}
+            />
           </div>
         </div>
       </div>

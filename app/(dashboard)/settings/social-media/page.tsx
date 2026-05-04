@@ -10,10 +10,17 @@ import {
 import { getTenant } from "@/lib/tenant";
 import { notFound } from "next/navigation";
 
-export default async function SocialMediaPage() {
+export default async function SocialMediaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string; error?: string }>;
+}) {
   const tenant = await getTenant();
   if (!tenant) notFound();
   const brand = tenant.primary_color ?? 'var(--color-brand-600)';
+  const qp = await searchParams;
+  const justSaved = qp.saved === "1";
+  const hasError = qp.error === "invalid_url";
 
   const socials = [
     {
@@ -50,6 +57,24 @@ export default async function SocialMediaPage() {
           Manage links shown in your booking site footer.
         </p>
       </div>
+
+      {justSaved ? (
+        <div
+          role="status"
+          className="mb-4 rounded-md border border-success-600/30 bg-success-50 px-4 py-3 text-body-sm text-success-700"
+        >
+          Social links saved.
+        </div>
+      ) : null}
+      {hasError ? (
+        <div
+          role="alert"
+          className="mb-4 rounded-md border border-danger-600/30 bg-danger-50 px-4 py-3 text-body-sm text-danger-700"
+        >
+          One of your links isn’t a valid URL. Make sure each starts with
+          {" "}<code className="font-mono">https://</code> and try again.
+        </div>
+      ) : null}
 
       <form
         action="/api/settings"

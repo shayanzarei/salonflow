@@ -193,10 +193,31 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "social") {
-      const instagram = (formData.get("social_instagram") as string) ?? "";
-      const facebook  = (formData.get("social_facebook")  as string) ?? "";
-      const tiktok    = (formData.get("social_tiktok")    as string) ?? "";
-      const youtube   = (formData.get("social_youtube")   as string) ?? "";
+      const instagram = ((formData.get("social_instagram") as string) ?? "").trim();
+      const facebook  = ((formData.get("social_facebook")  as string) ?? "").trim();
+      const tiktok    = ((formData.get("social_tiktok")    as string) ?? "").trim();
+      const youtube   = ((formData.get("social_youtube")   as string) ?? "").trim();
+
+      const isValidHttpUrl = (value: string) => {
+        if (value === "") return true;
+        try {
+          const u = new URL(value);
+          return u.protocol === "http:" || u.protocol === "https:";
+        } catch {
+          return false;
+        }
+      };
+
+      if (
+        !isValidHttpUrl(instagram) ||
+        !isValidHttpUrl(facebook) ||
+        !isValidHttpUrl(tiktok) ||
+        !isValidHttpUrl(youtube)
+      ) {
+        return NextResponse.redirect(
+          new URL(`${redirectTo}?error=invalid_url`, req.url)
+        );
+      }
 
       await pool.query(
         `UPDATE tenants SET
@@ -206,6 +227,10 @@ export async function POST(req: NextRequest) {
            social_youtube   = NULLIF($4, '')
          WHERE id = $5`,
         [instagram, facebook, tiktok, youtube, tenant.id]
+      );
+
+      return NextResponse.redirect(
+        new URL(`${redirectTo}?saved=1`, req.url)
       );
     }
 

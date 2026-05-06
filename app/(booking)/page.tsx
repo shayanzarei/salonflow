@@ -681,19 +681,32 @@ export default async function BookingHomePage({
                   key={service.id}
                   className="overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm transition-shadow hover:shadow-md"
                 >
+                  {/*
+                   * Service photo box.
+                   * - Locked to a 4:3 aspect ratio at every breakpoint so cards
+                   *   line up in the grid no matter what the salon uploaded.
+                   *   The cropper in ServiceImageField (4:3) feeds this box,
+                   *   so a freshly-cropped image will fit edge-to-edge.
+                   * - object-cover + object-top: legacy/un-cropped images get
+                   *   center-cropped to 4:3 with the *top* of the photo kept,
+                   *   which is the safer default for portraits (faces survive).
+                   */}
                   <div
-                    className="flex h-40 items-center justify-center overflow-hidden sm:h-48 lg:h-[200px]"
+                    className="relative aspect-[4/3] w-full overflow-hidden"
                     style={{ background: "#f8f7f5" }}
                   >
                     {service.image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={service.image_url}
                         alt={service.name}
-                        className="h-full w-full object-cover"
+                        fill
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover object-top"
                       />
                     ) : (
-                      <p style={{ color: "#ccc", fontSize: 13 }}>Service photo</p>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <p style={{ color: "#ccc", fontSize: 13 }}>Service photo</p>
+                      </div>
                     )}
                   </div>
                   <div className="p-4 sm:p-5 md:p-6">

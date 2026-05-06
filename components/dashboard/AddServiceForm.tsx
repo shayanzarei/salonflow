@@ -154,12 +154,21 @@ export function AddServiceForm({
                 placeholder="Describe what's included in this service..."
               />
 
+              {/*
+               * Same 4:3 crop config as ServiceImageField — keep them in sync,
+               * because both feed the same service-card box on /book.
+               */}
               <ImageUploadField
                 name="image_url"
                 label="Service image (optional)"
                 value={imageUrl}
                 onChange={setImageUrl}
-                hint="Shown on your booking page service card"
+                hint="Shown on your booking page service card. You'll be asked to crop to 4:3 (1200×900 recommended)."
+                cropAspect={4 / 3}
+                cropOutputWidth={1200}
+                cropOutputHeight={900}
+                minSourceWidth={800}
+                minSourceHeight={600}
               />
             </div>
           </Card>

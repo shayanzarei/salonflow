@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { RefreshIcon, UploadCloudIcon } from "@/components/ui/Icons";
+import { ImageCropperModal } from "@/components/ui/ImageCropperModal";
 
 interface ImageUploadFieldProps {
   /** Optional form field name to include as hidden input */
@@ -15,6 +16,24 @@ interface ImageUploadFieldProps {
   /** Small hint text shown below */
   hint?: string;
   className?: string;
+
+  /**
+   * If set, picked images that don't already match this aspect ratio (within
+   * a small tolerance) open a cropper before upload. Use the same ratio as the
+   * place that renders the image — service cards on /book are 4:3, so passing
+   * `4 / 3` here forces the salon owner to frame their photo the way it'll be
+   * rendered. Leave undefined for free-form uploads (logos, hero images, etc).
+   */
+  cropAspect?: number;
+  /** Pixel size of the cropped JPEG. Required when cropAspect is set. */
+  cropOutputWidth?: number;
+  cropOutputHeight?: number;
+  /**
+   * Reject sources smaller than this even before the cropper opens — cropping
+   * a 320×240 photo just produces a blurry 1200×900 file.
+   */
+  minSourceWidth?: number;
+  minSourceHeight?: number;
 }
 
 export function ImageUploadField({
@@ -24,26 +43,54 @@ export function ImageUploadField({
   label,
   hint,
   className,
+  cropAspect,
+  cropOutputWidth,
+  cropOutputHeight,
+  minSourceWidth,
+  minSourceHeight,
 }: ImageUploadFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFile(file: File) {
-    setError(null);
-    if (!file.type.startsWith("image/")) {
-      setError("Please choose an image file.");
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setError("Image must be under 10 MB.");
-      return;
-    }
+  // When the cropper is open, we hold the picked file's blob URL + name so the
+  // modal can render it. `pendingFileName` doubles as a feature flag.
+  const [pending, setPending] = useState<{ src: string; fileName: string } | null>(
+    null
+  );
+
+  // Aspect ratios within ±2% are treated as "already matches" so we don't
+  // force the cropper on a photo that's already 4:3.
+  const ASPECT_TOLERANCE = 0.02;
+
+  /** Read intrinsic dimensions of a File without uploading. */
+  function readDimensions(
+    file: File
+  ): Promise<{ width: number; height: number; objectUrl: string }> {
+    return new Promise((resolve, reject) => {
+      const objectUrl = URL.createObjectURL(file);
+      const img = new window.Image();
+      img.onload = () => {
+        resolve({
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          objectUrl,
+        });
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("Could not read image."));
+      };
+      img.src = objectUrl;
+    });
+  }
+
+  async function uploadBlob(blob: Blob, fileName: string) {
     setUploading(true);
     try {
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", new File([blob], fileName, { type: blob.type }));
       const res = await fetch("/api/uploads", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) {
@@ -56,6 +103,67 @@ export function ImageUploadField({
     } finally {
       setUploading(false);
     }
+  }
+
+  async function handleFile(file: File) {
+    setError(null);
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Image must be under 10 MB.");
+      return;
+    }
+
+    // GIFs preserve animation; cropping rasterizes a single frame, which is
+    // almost certainly not what the user wants. Treat them as "as-is" uploads.
+    const isAnimated = file.type === "image/gif";
+
+    // Free-form mode (logos, hero, etc.): upload as-is.
+    if (!cropAspect || isAnimated) {
+      await uploadBlob(file, file.name);
+      return;
+    }
+
+    // Crop mode: inspect dimensions before deciding whether to open the modal.
+    let dims: { width: number; height: number; objectUrl: string };
+    try {
+      dims = await readDimensions(file);
+    } catch {
+      setError("Couldn't read this image — please try a different file.");
+      return;
+    }
+
+    // Reject sources that are too small to crop without going blurry.
+    if (
+      (minSourceWidth && dims.width < minSourceWidth) ||
+      (minSourceHeight && dims.height < minSourceHeight)
+    ) {
+      URL.revokeObjectURL(dims.objectUrl);
+      setError(
+        `Image is too small — please choose at least ${minSourceWidth ?? 0}×${
+          minSourceHeight ?? 0
+        }px.`
+      );
+      return;
+    }
+
+    // Skip the modal if the source is already at the target ratio AND big
+    // enough — no point making the user click "Save crop" on a perfect file.
+    const sourceAspect = dims.width / dims.height;
+    const ratioOk =
+      Math.abs(sourceAspect - cropAspect) / cropAspect < ASPECT_TOLERANCE;
+    const bigEnough =
+      cropOutputWidth ? dims.width >= cropOutputWidth : true;
+    if (ratioOk && bigEnough) {
+      URL.revokeObjectURL(dims.objectUrl);
+      await uploadBlob(file, file.name);
+      return;
+    }
+
+    // Otherwise open the cropper. The modal owns the objectUrl until close.
+    setPending({ src: dims.objectUrl, fileName: file.name });
   }
 
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -71,6 +179,25 @@ export function ImageUploadField({
     if (file) handleFile(file);
   }
 
+  function closeCropper() {
+    if (pending) URL.revokeObjectURL(pending.src);
+    setPending(null);
+  }
+
+  async function handleCropConfirm(blob: Blob, fileName: string) {
+    closeCropper();
+    await uploadBlob(blob, fileName);
+  }
+
+  // Pick the preview's aspect class based on the configured crop. When
+  // cropAspect is set we want the preview to mirror what the user just saved.
+  const previewAspect =
+    cropAspect && Math.abs(cropAspect - 4 / 3) < 0.01
+      ? "aspect-[4/3]"
+      : cropAspect && Math.abs(cropAspect - 16 / 9) < 0.01
+        ? "aspect-[16/9]"
+        : "aspect-[16/9] sm:aspect-[4/3]";
+
   return (
     <div className={className}>
       {name ? <input type="hidden" name={name} value={value} /> : null}
@@ -85,7 +212,7 @@ export function ImageUploadField({
           <img
             src={value}
             alt="Preview"
-            className="h-auto w-full object-cover aspect-[16/9] sm:aspect-[4/3]"
+            className={`h-auto w-full object-cover object-top ${previewAspect}`}
           />
         </div>
       )}
@@ -167,7 +294,18 @@ export function ImageUploadField({
         onChange={onInputChange}
         disabled={uploading}
       />
+
+      {pending && cropAspect && cropOutputWidth && cropOutputHeight ? (
+        <ImageCropperModal
+          src={pending.src}
+          fileName={pending.fileName}
+          aspect={cropAspect}
+          outputWidth={cropOutputWidth}
+          outputHeight={cropOutputHeight}
+          onConfirm={handleCropConfirm}
+          onCancel={closeCropper}
+        />
+      ) : null}
     </div>
   );
 }
-

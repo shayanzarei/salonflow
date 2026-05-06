@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { RefreshIcon, UploadCloudIcon } from "@/components/ui/Icons";
 import { ImageCropperModal } from "@/components/ui/ImageCropperModal";
+import { compressImage } from "@/lib/compress-image";
 
 interface ImageUploadFieldProps {
   /** Optional form field name to include as hidden input */
@@ -34,6 +35,16 @@ interface ImageUploadFieldProps {
    */
   minSourceWidth?: number;
   minSourceHeight?: number;
+
+  /**
+   * Run a browser-side compression pass before posting to /api/uploads.
+   * Defaults to true. Files that are already small (<256 KB), animated GIFs,
+   * SVGs, and PNGs with transparency are auto-bypassed inside compressImage —
+   * see lib/compress-image.ts for the full bypass rules. Pass `false` if a
+   * caller needs to upload bytes verbatim (e.g. importing a vendor logo whose
+   * exact source bytes matter).
+   */
+  compress?: boolean;
 }
 
 export function ImageUploadField({
@@ -48,6 +59,7 @@ export function ImageUploadField({
   cropOutputHeight,
   minSourceWidth,
   minSourceHeight,
+  compress = true,
 }: ImageUploadFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,8 +101,24 @@ export function ImageUploadField({
   async function uploadBlob(blob: Blob, fileName: string) {
     setUploading(true);
     try {
+      // Wrap the blob as a File so compressImage can read .name/.type/.size.
+      // For the as-is path the caller already has a File; for the cropper
+      // path we get a fresh JPEG Blob — both work the same after this line.
+      const sourceFile =
+        blob instanceof File
+          ? blob
+          : new File([blob], fileName, { type: blob.type });
+
+      // Browser-side compression pass. compressImage returns the original
+      // File when nothing's worth doing (already small, GIF/SVG, transparent
+      // PNG, or "compressed" output came out larger than the source), so on
+      // those branches this is effectively free.
+      const toUpload = compress
+        ? await compressImage(sourceFile).catch(() => sourceFile)
+        : sourceFile;
+
       const fd = new FormData();
-      fd.append("file", new File([blob], fileName, { type: blob.type }));
+      fd.append("file", toUpload);
       const res = await fetch("/api/uploads", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) {

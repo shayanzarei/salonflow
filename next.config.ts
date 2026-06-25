@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const configDir = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   /**
@@ -19,6 +23,11 @@ const nextConfig: NextConfig = {
         hostname: "blob.vercel-storage.com",
       },
     ],
+  },
+  turbopack: {
+    // Multiple lockfiles exist one level up, so pin Turbopack's workspace root
+    // to this project directory to keep CSS/module resolution local.
+    root: configDir,
   },
 };
 

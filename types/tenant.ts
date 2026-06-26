@@ -1,3 +1,5 @@
+import type { ProfessionalContent } from "@/lib/professional-template";
+
 export interface Tenant {
   id: string;
   name: string;
@@ -73,5 +75,12 @@ export interface Tenant {
   tpl_cta_title: string | null;
   tpl_cta_description: string | null;
   tpl_footer_about: string | null;
+  /**
+   * Bilingual content tree for the "Professional" website template. NULL =
+   * render from DEFAULT_PROFESSIONAL_CONTENT. See migration
+   * 020_tenant_professional_content.sql and lib/professional-template.ts.
+   * Stored as JSONB; node-postgres returns it pre-parsed.
+   */
+  professional_content: ProfessionalContent | null;
   created_at: string;
 }

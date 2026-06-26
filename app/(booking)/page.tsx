@@ -11,6 +11,8 @@ import { computeSlots } from "@/lib/availability";
 import pool from "@/lib/db";
 import { bookableServiceSql } from "@/lib/services/bookable";
 import { getGoogleMapsSearchUrl } from "@/lib/maps";
+import { getServerLocale } from "@/lib/i18n/server";
+import { mergeProfessionalContent } from "@/lib/professional-template";
 import { canAccessPublicWebsite, getTenant } from "@/lib/tenant";
 import { normalizeWebsiteTemplate } from "@/lib/website-templates";
 import { isMainSiteHost } from "@/lib/main-site";
@@ -422,13 +424,22 @@ export default async function BookingHomePage({
         <UrbanTemplate tenant={tenant} />
       </>
     );
-  if (websiteTemplate === "professional")
+  if (websiteTemplate === "professional") {
+    const locale = await getServerLocale();
     return (
       <>
         {jsonLdScript}
-        <ProfessionalTemplate tenant={tenant} />
+        <ProfessionalTemplate
+          tenant={tenant}
+          content={mergeProfessionalContent(tenant.professional_content)}
+          locale={locale}
+          services={services}
+          galleryItems={galleryItems}
+          bookHref="/book"
+        />
       </>
     );
+  }
   if (websiteTemplate === "playful")
     return (
       <>

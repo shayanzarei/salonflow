@@ -113,8 +113,8 @@ export function ProfessionalNav({
         {/* Desktop nav row */}
         <nav className="hidden border-t border-[var(--pro-line)] lg:block">
           <ul className="mx-auto flex max-w-6xl items-center justify-center gap-10 px-4 py-3.5">
-            {links.map((link) => (
-              <li key={link.href}>
+            {links.map((link, index) => (
+              <li key={`${link.href}-${index}`}>
                 <a
                   href={link.href}
                   className="text-[12px] uppercase tracking-[0.14em] text-[var(--pro-ink)] no-underline transition-colors hover:text-[var(--pro-gold)]"

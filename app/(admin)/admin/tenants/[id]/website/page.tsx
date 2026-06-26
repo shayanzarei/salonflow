@@ -1,3 +1,4 @@
+import { ProfessionalContentForm } from "@/components/admin/ProfessionalContentForm";
 import { Badge } from "@/components/ds/Badge";
 import { Button } from "@/components/ds/Button";
 import { Card } from "@/components/ds/Card";
@@ -6,6 +7,7 @@ import { Select } from "@/components/ds/Select";
 import { UploadInput } from "@/components/ui/UploadInput";
 import { SITE_SECTIONS } from "@/config/plans";
 import pool from "@/lib/db";
+import { mergeProfessionalContent } from "@/lib/professional-template";
 import { autoTitle, autoDescription } from "@/lib/seo/auto-meta";
 import {
   WEBSITE_TEMPLATES,
@@ -19,6 +21,7 @@ type WebsiteTab =
   | "branding"
   | "content"
   | "copy"
+  | "professional"
   | "contact"
   | "hours"
   | "sections"
@@ -31,6 +34,11 @@ const TABS: { id: WebsiteTab; label: string; description: string }[] = [
     id: "copy",
     label: "Template copy",
     description: "Per-section headlines on the public site",
+  },
+  {
+    id: "professional",
+    label: "Professional template",
+    description: "Bilingual content for the Professional template",
   },
   {
     id: "contact",
@@ -70,6 +78,7 @@ export default async function TenantWebsitePage({
       "branding",
       "content",
       "copy",
+      "professional",
       "contact",
       "hours",
       "sections",
@@ -138,6 +147,13 @@ export default async function TenantWebsitePage({
       {tab === "content" && <ContentTab id={id} tenant={tenant} />}
 
       {tab === "copy" && <CopyTab id={id} tenant={tenant} />}
+
+      {tab === "professional" && (
+        <ProfessionalContentForm
+          tenantId={id}
+          initial={mergeProfessionalContent(tenant.professional_content)}
+        />
+      )}
 
       {tab === "contact" && <ContactTab id={id} tenant={tenant} />}
 
